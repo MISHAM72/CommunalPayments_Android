@@ -1,0 +1,100 @@
+package com.github.misham72.communalpayments.logic
+
+import android.content.Context
+import android.widget.Toast
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+
+class Troyka(private val context: Context) {
+    private val fileManager = FileManager(context)
+
+    data class TroykaData(
+        val daysUntilPayment: Long,
+        val daysFromPayment: Long,
+        val nextPayment: String,
+        val previousPayment: String,
+        val priceTariff: Long,
+        val currentDate: String,
+        val formattedDateTime: String,
+        val nextPaymentDate: Date,
+        val previousPaymentDate: Date
+    )
+
+    fun calculateTroykaData(): TroykaData {
+        val daysUntilPayment = DateCalculator.calculateDaysToNextPayment(1, 23)
+        val daysFromPayment = DateCalculator.calculateDaysFromPreviousPayment(1, 23)
+
+        // Получаем даты как строки
+        val nextPayment = getFutureDateString(daysUntilPayment)
+        val previousPayment = getPastDateString(daysFromPayment)
+        val currentDate = getCurrentDateString()
+
+        // Получаем объекты Date
+        val nextPaymentDate = DateCalculator.getNextPaymentDate(1, 23)
+        val previousPaymentDate = DateCalculator.getPreviousPaymentDate(1, 23)
+
+        val priceTariff = 10000L
+        val formattedDateTime =
+            SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.getDefault()).format(Date())
+
+        return TroykaData(
+            daysUntilPayment,
+            daysFromPayment,
+            nextPayment,
+            previousPayment,
+            priceTariff,
+            currentDate,
+            formattedDateTime,
+            nextPaymentDate,
+            previousPaymentDate
+        )
+    }
+
+    private fun getCurrentDateString(): String {
+        return SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(Date())
+    }
+
+    private fun getFutureDateString(daysToAdd: Long): String {
+        val date = Date()
+        date.time = date.time + daysToAdd * 24 * 60 * 60 * 1000L
+        return SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(date)
+    }
+
+    private fun getPastDateString(daysToSubtract: Long): String {
+        val date = Date()
+        date.time = date.time - daysToSubtract * 24 * 60 * 60 * 1000L
+        return SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(date)
+    }
+
+    @Suppress("UNUSED")  // ← ДОБАВЬ ЭТУ СТРОКУ
+    // Обычное сохранение
+    fun saveTroykaData(data: TroykaData) {
+        saveTroykaData(data, "") // вызываем перегруженный метод с пустым статусом
+    }
+
+    // Перегруженный метод с кастомным статусом
+    fun saveTroykaData(data: TroykaData, customStatus: String) {
+        try {
+            fileManager.formatPaymentDate(
+                "troyka",
+                data.daysUntilPayment,
+                data.daysFromPayment,
+                data.nextPayment,
+                data.previousPayment,
+                data.priceTariff,
+                data.formattedDateTime,
+                data.nextPaymentDate,
+                data.previousPaymentDate,
+                customStatus  // ← передаем кастомный статус
+            )
+
+            Toast.makeText(context, "Данные о карте Тройка сохранены!", Toast.LENGTH_SHORT).show()
+
+        } catch (ex: Exception) {
+            Toast.makeText(
+                context, "Ошибка сохранения карта Тройка: ${ex.message}", Toast.LENGTH_LONG
+            ).show()
+        }
+    }
+}
