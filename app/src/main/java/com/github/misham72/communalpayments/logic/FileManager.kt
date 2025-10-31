@@ -16,35 +16,35 @@ class FileManager(private val context: Context) {
     // ОБНОВИТЕ этот метод - добавьте два новых параметра
     fun formatPaymentDate(
         serviceType: String,
-        daysUntilPayment: Long,
-        daysFromPayment: Long,
-        nextPayment: String,
-        previousPayment: String,
-        priceTariff: Long,
         formattedDateTime: String,
-        nextPaymentDate: Date,
-        previousPaymentDate: Date,
+        customStatus: String = "",
 
-        customStatus: String = ""
-    ) {
+        previousPayment: String,
+        nextPayment: String,
+
+        daysFromPayment: Long,
+        daysUntilPayment: Long,
+        priceTariff: Long,
+
+        ) {
         val fileName = getFileName(serviceType)
-        val dateFormat = SimpleDateFormat("dd.MM.yyyy   ---   HH:mm:ss", Locale.getDefault())
 
         val format = """
-            |///////////////////////////////////////////////////
+            |///////////////////////////////////////////////////////
             |Услуга:  -   $serviceType
-            |---------------------------------------------------
-            |${if (customStatus.isNotEmpty()) "Статус: $customStatus" else ""} 
-            |Предыдущая оплата:               - $previousPayment  // ← ДОБАВЬ ЭТУ СТРОКУ!
-            |Дата предыдущей оплаты:          - ${dateFormat.format(previousPaymentDate)}
-            |Дата оплаты:                     - $nextPayment  
-            |Следующая дата оплаты:           - ${dateFormat.format(nextPaymentDate)}
-            |Оплата через:                    - $daysUntilPayment дней
-            |С момента оплаты прошло:         - $daysFromPayment дней
-            |Стоимость тарифа:                - $priceTariff руб.
-            |----------------------------------------------------
+            |-----------------------------------------------------------
             |($formattedDateTime)
-            |///////////////////////////////////////////////////
+            |-----------------------------------------------------------
+            |${if (customStatus.isNotEmpty()) "Статус: $customStatus" else ""}
+            |-----------------------------------------------------------
+            |Предыдущая  оплата: - $previousPayment
+            |Следующая  оплаты:  - $nextPayment
+            
+            |Оплата была: - $daysFromPayment дней назад.
+            |След. оплата через: - $daysUntilPayment дней.
+           
+            |Стоимость тарифа: - $priceTariff руб.
+            |///////////////////////////////////////////////////////
             """.trimMargin()
 
         saveToFile(fileName, format, true)
@@ -68,29 +68,33 @@ class FileManager(private val context: Context) {
 
     fun formatMeterReadingPaymentData(
         serviceType: String,
+        formattedDateTime: String,
+        customStatus: String = "",
+
         currentReading: Double,
         previousReading: Double,
         consumption: Double,
+
         tariff: Double,
         payment: Double,
         unit: String,
-        formattedDateTime: String,
-        customStatus: String = ""
-    ) {
+
+        ) {
         val fileName = getFileName(serviceType)
         val format = """
-            |//////////////////////////////////////////////////
+            |//////////////////////////////////////////////////////
             |Услуга   -   $serviceType
-            |--------------------------------------------------
-            |${if (customStatus.isNotEmpty()) "Статус: $customStatus" else ""}  // ← ДОБАВЬ И ЗДЕСЬ!
-            |Текущие показания:  - ${"%.2f".format(currentReading)} $unit
-            |Предыдущие показания:  - ${"%.2f".format(previousReading)} $unit
-            |Расход:              - ${"%.2f".format(consumption)} $unit
-            |Тариф:        - ${"%.2f".format(tariff)} руб. / $unit
-            |Сумма оплаты:- ${"%.2f".format(payment)} руб.
-            |---------------------------------------------------
+            |----------------------------------------------------------
             |( $formattedDateTime)
-            |///////////////////////////////////////////////////
+            |----------------------------------------------------------
+            |${if (customStatus.isNotEmpty()) "Статус: $customStatus" else ""}
+            |----------------------------------------------------------
+            |Текущие показания:  - ${"%.2f".format(currentReading)} $unit
+            |Пред. показания:     - ${"%.2f".format(previousReading)} $unit
+            ||Тариф:                - ${"%.2f".format(tariff)} руб.
+            |Расход:                  - ${"%.2f".format(consumption)} $unit
+            |Сумма оплаты:- ${"%.2f".format(payment)} руб.        
+            |/////////////////////////////////////////////////////
             """.trimMargin()
 
         saveToFile(fileName, format, true)

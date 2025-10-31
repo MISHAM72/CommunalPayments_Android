@@ -10,50 +10,33 @@ class Internet(private val context: Context) {
     private val fileManager = FileManager(context)
 
     data class InternetData(
-        val daysUntilPayment: Long,
-        val daysFromPayment: Long,
-        val nextPayment: String,
-        val previousPayment: String,
-        val priceTariff: Long,
-        val currentDate: String,
         val formattedDateTime: String,
-        val nextPaymentDate: Date,
-        val previousPaymentDate: Date
+        val previousPayment: String,
+        val nextPayment: String,
+        val daysFromPayment: Long,
+        val daysUntilPayment: Long,
+        val priceTariff: Long,
     )
 
     fun calculateInternetData(): InternetData {
-        val daysUntilPayment = DateCalculator.calculateDaysToNextPayment(1, 30)
-        val daysFromPayment = DateCalculator.calculateDaysFromPreviousPayment(1, 30)
-
-        // Получаем даты как строки
-        val nextPayment = getFutureDateString(daysUntilPayment)
-        val previousPayment = getPastDateString(daysFromPayment)
-        val currentDate = getCurrentDateString()
-
-        // ДОБАВЬТЕ ЭТИ СТРОКИ - получаем объекты Date
-        val nextPaymentDate = DateCalculator.getNextPaymentDate(1, 30)
-        val previousPaymentDate = DateCalculator.getPreviousPaymentDate(1, 30)
-
-
-        val priceTariff = 950L
         val formattedDateTime =
             SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.getDefault()).format(Date())
 
-        return InternetData(
-            daysUntilPayment,
-            daysFromPayment,
-            nextPayment,
-            previousPayment,
-            priceTariff,
-            currentDate,
-            formattedDateTime,
-            nextPaymentDate,
-            previousPaymentDate
-        )
-    }
+        val daysUntilPayment = DateCalculator.calculateDaysToNextPayment(1, 23)
+        val daysFromPayment = DateCalculator.calculateDaysFromPreviousPayment(1, 23)
 
-    private fun getCurrentDateString(): String {
-        return SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(Date())
+        val previousPayment = getPastDateString(daysFromPayment)  // ← "30.10.2023"
+        val nextPayment = getFutureDateString(daysUntilPayment)   // ← "30.11.2023"
+        val priceTariff = 402L
+
+        return InternetData(
+            formattedDateTime,
+            previousPayment,
+            nextPayment,
+            daysFromPayment,
+            daysUntilPayment,
+            priceTariff,
+        )
     }
 
     private fun getFutureDateString(daysToAdd: Long): String {
@@ -77,15 +60,13 @@ class Internet(private val context: Context) {
         try {
             fileManager.formatPaymentDate(
                 "internet",
-                data.daysUntilPayment,
-                data.daysFromPayment,
-                data.nextPayment,
-                data.previousPayment,
-                data.priceTariff,
                 data.formattedDateTime,
-                data.nextPaymentDate,
-                data.previousPaymentDate,
-                customStatus // ← передаем кастомный статус
+                customStatus = customStatus,
+                data.previousPayment,
+                data.nextPayment,
+                data.daysFromPayment,
+                data.daysUntilPayment,
+                data.priceTariff,
             )
 
             Toast.makeText(context, "Данные Интернет сохранены!", Toast.LENGTH_SHORT).show()

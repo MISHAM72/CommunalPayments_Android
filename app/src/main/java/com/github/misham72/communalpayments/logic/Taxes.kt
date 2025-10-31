@@ -13,50 +13,34 @@ class Taxes(
 
 
     data class TaxesData(
-        val daysUntilPayment: Long,
-        val daysFromPayment: Long,
-        val nextPayment: String,
-        val previousPayment: String,
-        val priceTariff: Long,
-        val currentDate: String,
-        val formattedDateTime: String,
-        val nextPaymentDate: Date,
-        val previousPaymentDate: Date
 
+        val formattedDateTime: String,
+        val previousPayment: String,
+        val nextPayment: String,
+        val daysFromPayment: Long,
+        val daysUntilPayment: Long,
+        val priceTariff: Long,
     )
 
     fun calculateTaxesData(): TaxesData {
-        val daysUntilPayment = DateCalculator.calculateDaysToNextPayment(1, 30)
-        val daysFromPayment = DateCalculator.calculateDaysFromPreviousPayment(1, 30)
-
-        // Получаем даты как строки
-        val nextPayment = getFutureDateString(daysUntilPayment)
-        val previousPayment = getPastDateString(daysFromPayment)
-        val currentDate = getCurrentDateString()
-
-        // ДОБАВЬТЕ ЭТИ СТРОКИ - получаем объекты Date
-        val nextPaymentDate = DateCalculator.getNextPaymentDate(1, 30)
-        val previousPaymentDate = DateCalculator.getPreviousPaymentDate(1, 30)
-
-        val priceTariff = 13000L
         val formattedDateTime =
             SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.getDefault()).format(Date())
 
-        return TaxesData(
-            daysUntilPayment,
-            daysFromPayment,
-            nextPayment,
-            previousPayment,
-            priceTariff,
-            currentDate,
-            formattedDateTime,
-            nextPaymentDate,
-            previousPaymentDate
-        )
-    }
+        val daysUntilPayment = DateCalculator.calculateDaysToNextPayment(1, 23)
+        val daysFromPayment = DateCalculator.calculateDaysFromPreviousPayment(1, 23)
 
-    private fun getCurrentDateString(): String {
-        return SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(Date())
+        val previousPayment = getPastDateString(daysFromPayment)  // ← "30.10.2023"
+        val nextPayment = getFutureDateString(daysUntilPayment)   // ← "30.11.2023"
+        val priceTariff = 402L
+
+        return TaxesData(
+            formattedDateTime,
+            previousPayment,
+            nextPayment,
+            daysFromPayment,
+            daysUntilPayment,
+            priceTariff,
+        )
     }
 
     private fun getFutureDateString(daysToAdd: Long): String {
@@ -77,20 +61,20 @@ class Taxes(
         saveTaxesData(data, "") // вызываем перегруженный метод с пустым статусом
     }
 
+    @Suppress("UNUSED")
     fun saveTaxesData(data: TaxesData, customStatus: String) {
         try {
             fileManager.formatPaymentDate(
                 "taxes",
-                data.daysUntilPayment,
-                data.daysFromPayment,
-                data.nextPayment,
-                data.previousPayment,
-                data.priceTariff,
                 data.formattedDateTime,
-                data.nextPaymentDate,
-                data.previousPaymentDate,
-                customStatus             // ← customStatus: String
-            )
+                customStatus = customStatus,
+                data.previousPayment,
+                data.nextPayment,
+                data.daysFromPayment,
+                data.daysUntilPayment,
+                data.priceTariff,
+
+                )
 
             Toast.makeText(context, "Данные о налогах сохранены!", Toast.LENGTH_SHORT).show()
 

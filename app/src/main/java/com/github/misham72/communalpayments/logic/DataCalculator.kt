@@ -6,12 +6,12 @@ import java.util.Date
 class DateCalculator {
 
     companion object {
-        fun getNextPaymentDate(monthsPeriod: Int, paymentDay: Int): Date {
+        fun getNextPayment(monthsPeriod: Int, paymentDay: Int): Date {
             val calendar = Calendar.getInstance()
             return alignToPeriodEnd(calendar, monthsPeriod, paymentDay).time
         }
 
-        fun getPreviousPaymentDate(monthsPeriod: Int, paymentDay: Int): Date {
+        fun getPreviousPayment(monthsPeriod: Int, paymentDay: Int): Date {
             val calendar = Calendar.getInstance()
             return alignToPeriodStart(calendar, monthsPeriod, paymentDay).time
         }

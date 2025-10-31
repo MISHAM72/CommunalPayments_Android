@@ -11,49 +11,36 @@ class Garbage(private val context: Context) {
     private val fileManager = FileManager(context)
 
     data class GarbageData(
-        val daysUntilPayment: Long,
-        val daysFromPayment: Long,
-        val nextPayment: String,
+        val formattedDateTime: String,
         val previousPayment: String,
+        val nextPayment: String,
+        val daysFromPayment: Long,
+        val daysUntilPayment: Long,
         val priceTariff: Long,
-        val currentDate: String,
-        val formattedDateTime: String,  // ← formattedDateTime ДОЛЖЕН БЫТЬ ПЕРЕД Date!
-        val nextPaymentDate: Date,
-        val previousPaymentDate: Date
-    )
+
+        )
 
     fun calculateGarbageData(): GarbageData {
-        val daysUntilPayment = DateCalculator.calculateDaysToNextPayment(1, 23)
-        val daysFromPayment = DateCalculator.calculateDaysFromPreviousPayment(1, 23)
-
-        // Получаем даты как строки
-        val nextPayment = getFutureDateString(daysUntilPayment)
-        val previousPayment = getPastDateString(daysFromPayment)
-        val currentDate = getCurrentDateString()
-
-        // Получаем объекты Date
-        val nextPaymentDate = DateCalculator.getNextPaymentDate(1, 23)
-        val previousPaymentDate = DateCalculator.getPreviousPaymentDate(1, 23)
-
-        val priceTariff = 402L
         val formattedDateTime =
             SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.getDefault()).format(Date())
 
-        return GarbageData(
-            daysUntilPayment,
-            daysFromPayment,
-            nextPayment,
-            previousPayment,
-            priceTariff,
-            currentDate,
-            formattedDateTime,  // ← formattedDateTime ПЕРЕД Date объектами
-            nextPaymentDate,
-            previousPaymentDate
-        )
-    }
+        val daysUntilPayment = DateCalculator.calculateDaysToNextPayment(1, 23)
+        val daysFromPayment = DateCalculator.calculateDaysFromPreviousPayment(1, 23)
 
-    private fun getCurrentDateString(): String {
-        return SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(Date())
+        val previousPayment = getPastDateString(daysFromPayment)  // ← "30.10.2023"
+        val nextPayment = getFutureDateString(daysUntilPayment)   // ← "30.11.2023"
+        val priceTariff = 402L
+
+        return GarbageData(
+            formattedDateTime,
+            previousPayment,
+            nextPayment,
+            daysFromPayment,
+            daysUntilPayment,
+            priceTariff,
+
+
+            )
     }
 
     private fun getFutureDateString(daysToAdd: Long): String {
@@ -80,16 +67,15 @@ class Garbage(private val context: Context) {
         try {
             fileManager.formatPaymentDate(
                 "garbage",
-                data.daysUntilPayment,
-                data.daysFromPayment,
-                data.nextPayment,
+                data.formattedDateTime,
+                customStatus = customStatus,
                 data.previousPayment,
+                data.nextPayment,
+                data.daysFromPayment,
+                data.daysUntilPayment,
                 data.priceTariff,
-                data.formattedDateTime,  // ← formattedDateTime: String
-                data.nextPaymentDate,    // ← nextPaymentDate: Date
-                data.previousPaymentDate, // ← previousPaymentDate: Date
-                customStatus             // ← customStatus: String
-            )
+
+                )
 
             Toast.makeText(context, "Данные Мусор сохранены!", Toast.LENGTH_SHORT).show()
 

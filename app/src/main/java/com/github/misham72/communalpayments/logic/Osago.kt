@@ -13,50 +13,34 @@ class Osago(
 
 
     data class OsagoData(
-        val daysUntilPayment: Long,
-        val daysFromPayment: Long,
-        val nextPayment: String,
-        val previousPayment: String,
-        val priceTariff: Long,
-        val currentDate: String,
         val formattedDateTime: String,
-        val nextPaymentDate: Date,
-        val previousPaymentDate: Date
+        val previousPayment: String,
+        val nextPayment: String,
+        val daysFromPayment: Long,
+        val daysUntilPayment: Long,
+        val priceTariff: Long,
     )
 
     fun calculateOsagoData(): OsagoData {
-        val daysUntilPayment = DateCalculator.calculateDaysToNextPayment(1, 23)
-        val daysFromPayment = DateCalculator.calculateDaysFromPreviousPayment(1, 23)
-
-        // Получаем даты как строки
-        val nextPayment = getFutureDateString(daysUntilPayment)
-        val previousPayment = getPastDateString(daysFromPayment)
-        val currentDate = getCurrentDateString()
-
-        // ДОБАВЬТЕ ЭТИ СТРОКИ - получаем объекты Date
-        val nextPaymentDate = DateCalculator.getNextPaymentDate(1, 23)
-        val previousPaymentDate = DateCalculator.getPreviousPaymentDate(1, 23)
-
-        val priceTariff = 10000L
         val formattedDateTime =
             SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.getDefault()).format(Date())
 
+        val daysUntilPayment = DateCalculator.calculateDaysToNextPayment(1, 23)
+        val daysFromPayment = DateCalculator.calculateDaysFromPreviousPayment(1, 23)
+
+        val previousPayment = getPastDateString(daysFromPayment)  // ← "30.10.2023"
+        val nextPayment = getFutureDateString(daysUntilPayment)   // ← "30.11.2023"
+        val priceTariff = 402L
         return OsagoData(
-            daysUntilPayment,
-            daysFromPayment,
-            nextPayment,
-            previousPayment,
-            priceTariff,
-            currentDate,
             formattedDateTime,
-            nextPaymentDate,
-            previousPaymentDate,
+            previousPayment,
+            nextPayment,
+            daysFromPayment,
+            daysUntilPayment,
+            priceTariff,
         )
     }
 
-    private fun getCurrentDateString(): String {
-        return SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(Date())
-    }
 
     private fun getFutureDateString(daysToAdd: Long): String {
         val date = Date()
@@ -75,19 +59,18 @@ class Osago(
         saveOsagoData(data, customStatus = "")
     }
 
+    @Suppress("UNUSED")
     fun saveOsagoData(data: OsagoData, customStatus: String) {
         try {
             fileManager.formatPaymentDate(
                 "osago",
-                data.daysUntilPayment,
-                data.daysFromPayment,
-                data.nextPayment,
-                data.previousPayment,
-                data.priceTariff,
                 data.formattedDateTime,
-                data.nextPaymentDate,
-                data.previousPaymentDate,
-                customStatus  // ← передаем кастомный статус
+                customStatus = customStatus,
+                data.previousPayment,
+                data.nextPayment,
+                data.daysFromPayment,
+                data.daysUntilPayment,
+                data.priceTariff,
             )
 
             Toast.makeText(context, "Данные о полисе ОСАГО сохранены!", Toast.LENGTH_SHORT).show()

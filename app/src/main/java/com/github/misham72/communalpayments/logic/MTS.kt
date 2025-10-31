@@ -11,50 +11,35 @@ class MTS(private val context: Context) {
     private val fileManager = FileManager(context)
 
     data class MTSData(
-        val daysUntilPayment: Long,
-        val daysFromPayment: Long,
-        val nextPayment: String,
-        val previousPayment: String,
-        val priceTariff: Long,
-        val currentDate: String,
         val formattedDateTime: String,
-        val nextPaymentDate: Date,
-        val previousPaymentDate: Date
+        val previousPayment: String,
+        val nextPayment: String,
+        val daysFromPayment: Long,
+        val daysUntilPayment: Long,
+        val priceTariff: Long,
     )
 
     fun calculateMTSData(): MTSData {
-        val daysUntilPayment = DateCalculator.calculateDaysToNextPayment(1, 23)
-        val daysFromPayment = DateCalculator.calculateDaysFromPreviousPayment(1, 23)
-
-        // Получаем даты как строки
-        val nextPayment = getFutureDateString(daysUntilPayment)
-        val previousPayment = getPastDateString(daysFromPayment)
-        val currentDate = getCurrentDateString()
-
-        // ДОБАВЬТЕ ЭТИ СТРОКИ - получаем объекты Date
-        val nextPaymentDate = DateCalculator.getNextPaymentDate(1, 23)
-        val previousPaymentDate = DateCalculator.getPreviousPaymentDate(1, 23)
-
-        val priceTariff = 905L
         val formattedDateTime =
             SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.getDefault()).format(Date())
 
+        val daysUntilPayment = DateCalculator.calculateDaysToNextPayment(1, 23)
+        val daysFromPayment = DateCalculator.calculateDaysFromPreviousPayment(1, 23)
+
+        val previousPayment = getPastDateString(daysFromPayment)  // ← "30.10.2023"
+        val nextPayment = getFutureDateString(daysUntilPayment)   // ← "30.11.2023"
+        val priceTariff = 402L
+
         return MTSData(
-            daysUntilPayment,
-            daysFromPayment,
-            nextPayment,
-            previousPayment,
-            priceTariff,
-            currentDate,
             formattedDateTime,
-            nextPaymentDate,
-            previousPaymentDate
+            previousPayment,
+            nextPayment,
+            daysFromPayment,
+            daysUntilPayment,
+            priceTariff,
         )
     }
 
-    private fun getCurrentDateString(): String {
-        return SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(Date())
-    }
 
     private fun getFutureDateString(daysToAdd: Long): String {
         val date = Date()
@@ -73,19 +58,18 @@ class MTS(private val context: Context) {
         saveMTSData(data, "") // вызываем перегруженный метод с пустым статусом
     }
 
+    @Suppress("UNUSED")
     fun saveMTSData(data: MTSData, customStatus: String) {
         try {
             fileManager.formatPaymentDate(
                 "mts",
-                data.daysUntilPayment,
-                data.daysFromPayment,
-                data.nextPayment,
-                data.previousPayment,
-                data.priceTariff,
                 data.formattedDateTime,
-                data.nextPaymentDate,
-                data.previousPaymentDate,
-                customStatus  // ← передаем кастомный статус
+                customStatus = customStatus,
+                data.previousPayment,
+                data.nextPayment,
+                data.daysFromPayment,
+                data.daysUntilPayment,
+                data.priceTariff,
             )
 
             Toast.makeText(context, "Данные МТС сохранены!", Toast.LENGTH_SHORT).show()

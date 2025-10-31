@@ -53,38 +53,47 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             CommunalPaymentsTheme {
-                ServiceCalculatorApp()
+                ControlBetweenScreens()
             }
         }
     }
 }
 
-data class Service(
-    val icon: String, val name: String, val account: String  // ← ДОБАВЛЯЕМ ПОЛЕ ДЛЯ СЧЕТА/ТЕЛЕФОНА
+data class InitialScreen(
+    val icon: String,
+    val name: String,
+    val account: String,
+    val fileKey: String,
+    val screen: @Composable () -> Unit// ← "инструкция как нарисовать экран"
 )
 
 @Composable
-fun getServices(): List<Service> {
-    return remember {
-        listOf(
-            Service("⚡", "Электричество", "ЛС: 2324 0001 3040"),
-            Service("🔥", "Газ", "ЛС: 1230 0102 5113"),
-            Service("💧", "Вода", "ЛС: 000 007 894"),
-            Service("🌡️", "ZONT", "тел. +7(910) 133-00-85"),
-            Service("📶", "Интернет", "ЛС: 2300 0343 3205"),
-            Service("📞", "МТС", "тел. +7(918) 48-48-989"),
-            Service("📲", "Тинькоф", "тел. +7(995) 00-585-44"),
-            Service("🗑️", "Мусор", ""),
-            Service("💰", "Налоги ИП", ""),
-            Service("🚇", "Тройка", ""),
-            Service("🚗", "Автострахование", "")
+fun getListInitialScreen(): List<InitialScreen> { // "Дай мне список всех услуг"
+    return remember { // "Запомни этот список"
+        listOf(// "Состоящий из:"
+            InitialScreen(// "Услуги Электричество"
+                "⚡",
+                "Электричество",
+                "ЛС: 2324 0001 3040",
+                "electricity",
+                { ElectricityScreen() }),
+            InitialScreen("🔥", "Газ", "ЛС: 1230 0102 5113", "gas", { GasScreen() }),
+            InitialScreen("💧", "Вода", "ЛС: 000 007 894", "water", { WaterScreen() }),
+            InitialScreen("🌡️", "ZONT", "тел. +7(910) 133-00-85", "zont", { ZONTScreen() }),
+            InitialScreen("📶", "Интернет", "ЛС: 2300 0343 3205", "internet", { InternetScreen() }),
+            InitialScreen("📞", "МТС", "тел. +7(918) 48-48-989", "mts", { MTSScreen() }),
+            InitialScreen("📲", "Тинькоф", "тел. +7(995) 00-585-44", "tinkof", { TinkoffScreen() }),
+            InitialScreen("🗑️", "Мусор", "ЛС: 210 1010 8366", "garbage", { GarbageScreen() }),
+            InitialScreen("💰", "Налоги ИП", "ИНН: 2323 0478 5694", "taxes", { TaxesScreen() }),
+            InitialScreen("🚇", "Тройка", "4874 701 1", "troyka", { TroykaScreen() }),
+            InitialScreen("🚗", "ОСАГО полис", "№ XXX 0574 944 292", "osago", { OsagoScreen() })
         )
     }
 }
 
 @Composable
 fun ServiceTab(
-    service: Service, isSelected: Boolean, onClick: () -> Unit
+    service: InitialScreen, isSelected: Boolean, onClick: () -> Unit
 ) {
     val backgroundColor = if (isSelected) Color(0xFF2196F3) else Color(0xFFE0E0E0)
     val textColor = if (isSelected) Color.White else Color.Black
@@ -102,30 +111,18 @@ fun ServiceTab(
 }
 
 @Composable
-fun ServiceCalculatorApp() {
+
+fun ControlBetweenScreens() {
     var selectedService by remember { mutableIntStateOf(0) }
     var showHistory by remember { mutableStateOf(false) }
-    val services = getServices()
+    val services = getListInitialScreen()
 
     if (showHistory) {
         SimpleHistoryScreen(
-            onBack = { showHistory = false }, initialService = when (selectedService) {
-                //Пользователь выбирает вкладку → получаем индекс
-                //Тапает на ⚡ → индекс 0
-                // // Преобразование в ключ для логики
-                0 -> "electricity"// ← КЛЮЧ для файлов
-                1 -> "gas"
-                2 -> "water"
-                3 -> "zont"
-                4 -> "internet"
-                5 -> "mts"
-                6 -> "tinkoff"
-                7 -> "garbage"
-                8 -> "taxes"
-                9 -> "troyka"
-                10 -> "osago"
-                else -> "electricity"
-            }
+            onBack = { showHistory = false },
+
+
+            initialService = services[selectedService].fileKey  // ← ВОТ ЭТА СТРОКА
         )
     } else {
         Column(
@@ -171,20 +168,9 @@ fun ServiceCalculatorApp() {
             }
 
             // Преобразование в ключ для логики
-            when (selectedService) {
-                0 -> ElectricityCalculator()
-                1 -> GasCalculator()
-                2 -> WaterCalculator()
-                3 -> ZONTCalculator()
-                4 -> InternetCalculator()
-                5 -> MTSCalculator()
-                6 -> TinkoffCalculator()
-                7 -> GarbageCalculator()
-                8 -> TaxesCalculator()
-                9 -> TroykaCalculator()
-                10 -> OsagoCalculator()
-                else -> Text("Скоро добавим ${services[selectedService].name}")
-            }
+
+            services[selectedService].screen()  // ← ВОТ ЭТА СТРОКА для покзза экрана
+
 
             Image(
                 painter = painterResource(R.drawable.night),// 1. ГДЕ ФОТО
@@ -205,8 +191,9 @@ fun ServiceCalculatorApp() {
     }
 }
 
+//   Garbage  GarbageScreen
 @Composable
-fun ElectricityCalculator() {
+fun ElectricityScreen() {
     var currentReading by remember { mutableStateOf("") }
     var previousReading by remember { mutableStateOf("") }
     var tariff by remember { mutableStateOf("") }
@@ -262,7 +249,7 @@ fun ElectricityCalculator() {
     if (consumption.isNotEmpty()) {
         Card(modifier = Modifier.fillMaxWidth()) {
             Column(modifier = Modifier.padding(16.dp)) {
-                Text("Результаты:", fontWeight = FontWeight.Bold)
+                Text("Результат по свету:", fontWeight = FontWeight.Bold)
                 Text("Расход: $consumption")
                 Text("К оплате: $payment")
                 Text("Дата: ${electricityApp.getCurrentDateTime()}")
@@ -272,7 +259,7 @@ fun ElectricityCalculator() {
 }
 
 @Composable
-fun WaterCalculator() {
+fun WaterScreen() {
     var currentReading by remember { mutableStateOf("") }
     var previousReading by remember { mutableStateOf("") }
     var tariff by remember { mutableStateOf("") }
@@ -323,7 +310,7 @@ fun WaterCalculator() {
     if (consumption.isNotEmpty()) {
         Card(modifier = Modifier.fillMaxWidth()) {
             Column(modifier = Modifier.padding(16.dp)) {
-                Text("Результаты:", fontWeight = FontWeight.Bold)
+                Text("Результат по воде:", fontWeight = FontWeight.Bold)
                 Text("Расход: $consumption")
                 Text("К оплате: $payment")
                 Text("Дата: ${waterApp.getCurrentDateTime()}")
@@ -333,7 +320,7 @@ fun WaterCalculator() {
 }
 
 @Composable
-fun GasCalculator() {
+fun GasScreen() {
     var currentReading by remember { mutableStateOf("") }
     var previousReading by remember { mutableStateOf("") }
     var tariff by remember { mutableStateOf("") }
@@ -385,21 +372,24 @@ fun GasCalculator() {
     if (consumption.isNotEmpty()) {
         Card(modifier = Modifier.fillMaxWidth()) {
             Column(modifier = Modifier.padding(16.dp)) {
-                Text("Результаты:", fontWeight = FontWeight.Bold)
+                Text("Результат по газу:", fontWeight = FontWeight.Bold)
                 Text("Расход: $consumption")
                 Text("К оплате: $payment")
                 Text("Дата: ${gasApp.getCurrentDateTime()}")
+
             }
         }
     }
 }
 
+
 // КАЛЬКУЛЯТОР МТС
 
 @Composable
-fun ZONTCalculator() {
+fun ZONTScreen() {
     val context = LocalContext.current
     val zontApp = remember { ZONT(context) }
+    val fileManager = remember { FileManager(context) } // ← ДОБАВИТЬ
     var zontData by remember { mutableStateOf<ZONT.ZONTData?>(null) }
 
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -407,8 +397,7 @@ fun ZONTCalculator() {
             onClick = {
                 zontData = zontApp.calculateZONTData()
                 zontApp.saveZONTData(
-                    zontData!!,
-                    "<font color='#FF0000'>🔴 ОПЛАЧЕНО</font>"
+                    zontData!!, "<font color='#FF0000'>🔴 ОПЛАЧЕНО</font>"
                 ) // ← цветной статус
             }, modifier = Modifier.align(Alignment.CenterHorizontally)
         ) {
@@ -418,13 +407,14 @@ fun ZONTCalculator() {
         if (zontData != null) {
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text("Результаты ZONT:", fontWeight = FontWeight.Bold)
-                    Text("Оплата через: ${zontData!!.daysUntilPayment} дней")
-                    Text("С момента оплаты прошло: ${zontData!!.daysFromPayment} дней")
-                    Text("Стоимость тарифа: ${zontData!!.priceTariff} руб.")
-                    Text("Следующая оплата: ${zontData!!.nextPayment}")
+                    Text("Результат по  ZONT:", fontWeight = FontWeight.Bold)
                     Text("Предыдущая оплата: ${zontData!!.previousPayment}")
-                    Text("Дата расчета: ${zontData!!.formattedDateTime}")
+                    Text("Следующая оплата: ${zontData!!.nextPayment}")
+                    Text("Оплата была: ${zontData!!.daysFromPayment} дней назад.")
+                    Text("След. оплата через: ${zontData!!.daysUntilPayment} дней")
+                    Text("Стоимость тарифа: ${zontData!!.priceTariff} руб.")
+                    Text("Дата: ${fileManager.getCurrentDateTime()}") // ← ИСПОЛЬЗУЕМ FileManager
+
                 }
             }
         }
@@ -432,7 +422,7 @@ fun ZONTCalculator() {
 }
 
 @Composable
-fun InternetCalculator() {
+fun InternetScreen() {
     val context = LocalContext.current
     val internetApp = remember { Internet(context) }
     var internetData by remember { mutableStateOf<Internet.InternetData?>(null) }
@@ -442,8 +432,7 @@ fun InternetCalculator() {
             onClick = {
                 internetData = internetApp.calculateInternetData()
                 internetApp.saveInternetData(
-                    internetData!!,
-                    "<font color='#FF0000'>🔴 ОПЛАЧЕНО</font>"
+                    internetData!!, "<font color='#FF0000'>🔴 ОПЛАЧЕНО</font>"
                 )  // ← цветной статус
             }, modifier = Modifier.align(Alignment.CenterHorizontally)
         ) {
@@ -467,7 +456,7 @@ fun InternetCalculator() {
 }
 
 @Composable
-fun MTSCalculator() {
+fun MTSScreen() {
     val context = LocalContext.current
     val mtsApp = remember { MTS(context) }
     var mtsData by remember { mutableStateOf<MTS.MTSData?>(null) }
@@ -477,8 +466,7 @@ fun MTSCalculator() {
             onClick = {
                 mtsData = mtsApp.calculateMTSData()
                 mtsApp.saveMTSData(
-                    mtsData!!,
-                    "<font color='#FF0000'>🔴 ОПЛАЧЕНО</font>"
+                    mtsData!!, "<font color='#FF0000'>🔴 ОПЛАЧЕНО</font>"
                 )  // ← цветной статус
             }, modifier = Modifier.align(Alignment.CenterHorizontally)
         ) {
@@ -502,7 +490,7 @@ fun MTSCalculator() {
 }
 
 @Composable
-fun TinkoffCalculator() {
+fun TinkoffScreen() {
     val context = LocalContext.current
     val tinkoffApp = remember { Tinkoff(context) }
     var tinkoffData by remember { mutableStateOf<Tinkoff.TinkoffData?>(null) }
@@ -512,8 +500,7 @@ fun TinkoffCalculator() {
             onClick = {
                 tinkoffData = tinkoffApp.calculateTinkoffData()
                 tinkoffApp.saveTinkoffData(
-                    tinkoffData!!,
-                    "<font color='#FF0000'>🔴 ОПЛАЧЕНО</font>"
+                    tinkoffData!!, "<font color='#FF0000'>🔴 ОПЛАЧЕНО</font>"
                 ) // ← цветной статус
             }, modifier = Modifier.align(Alignment.CenterHorizontally)
         ) {
@@ -537,7 +524,7 @@ fun TinkoffCalculator() {
 }
 
 @Composable
-fun GarbageCalculator() {
+fun GarbageScreen() {
     val context = LocalContext.current
     val garbageApp = remember { Garbage(context) }
     var garbageData by remember { mutableStateOf<Garbage.GarbageData?>(null) }
@@ -547,8 +534,7 @@ fun GarbageCalculator() {
             onClick = {
                 garbageData = garbageApp.calculateGarbageData()
                 garbageApp.saveGarbageData(
-                    garbageData!!,
-                    "<font color='#FF0000'>🔴 ОПЛАЧЕНО</font>"
+                    garbageData!!, "<font color='#FF0000'>🔴 ОПЛАЧЕНО</font>"
                 ) // ← цветной статус
             }, modifier = Modifier.align(Alignment.CenterHorizontally)
         ) {
@@ -572,7 +558,7 @@ fun GarbageCalculator() {
 }
 
 @Composable
-fun TaxesCalculator() {
+fun TaxesScreen() {
     val context = LocalContext.current
     val taxesApp = remember { Taxes(context) }
     var taxesData by remember { mutableStateOf<Taxes.TaxesData?>(null) }
@@ -582,8 +568,7 @@ fun TaxesCalculator() {
             onClick = {
                 taxesData = taxesApp.calculateTaxesData()
                 taxesApp.saveTaxesData(
-                    taxesData!!,
-                    "<font color='#FF0000'>🔴 ОПЛАЧЕНО</font>"
+                    taxesData!!, "<font color='#FF0000'>🔴 ОПЛАЧЕНО</font>"
                 )  // ← цветной статус
             }, modifier = Modifier.align(Alignment.CenterHorizontally)
         ) {
@@ -607,7 +592,7 @@ fun TaxesCalculator() {
 }
 
 @Composable
-fun TroykaCalculator() {
+fun TroykaScreen() {
     val accessToSystemFiles = LocalContext.current
     val troykaCardManager = remember { Troyka(accessToSystemFiles) }
     var troykaCardManagerResult by remember { mutableStateOf<Troyka.TroykaData?>(null) }
@@ -617,8 +602,7 @@ fun TroykaCalculator() {
             onClick = {
                 troykaCardManagerResult = troykaCardManager.calculateTroykaData()
                 troykaCardManager.saveTroykaData(
-                    troykaCardManagerResult!!,
-                    "<font color='#FF0000'>🔴 ОПЛАЧЕНО</font>"
+                    troykaCardManagerResult!!, "<font color='#FF0000'>🔴 ОПЛАЧЕНО</font>"
                 ) // ← цветной статус
             }, modifier = Modifier.align(Alignment.CenterHorizontally)
         ) {
@@ -642,7 +626,7 @@ fun TroykaCalculator() {
 }
 
 @Composable
-fun OsagoCalculator() {
+fun OsagoScreen() {
     val accessToSystemFiles = LocalContext.current
     val osagoCardManager = remember { Osago(accessToSystemFiles) }
     var osagoCardManagerResult by remember { mutableStateOf<Osago.OsagoData?>(null) }
@@ -652,8 +636,7 @@ fun OsagoCalculator() {
             onClick = {
                 osagoCardManagerResult = osagoCardManager.calculateOsagoData()
                 osagoCardManager.saveOsagoData(
-                    osagoCardManagerResult!!,
-                    "<font color='#FF0000'>🔴 ОПЛАЧЕНО</font>"
+                    osagoCardManagerResult!!, "<font color='#FF0000'>🔴 ОПЛАЧЕНО</font>"
                 )  // ← цветной статус
             }, modifier = Modifier.align(Alignment.CenterHorizontally)
         ) {
@@ -780,14 +763,12 @@ fun SimpleHistoryScreen(
                     factory = { context ->
                         TextView(context).apply {
                             text = HtmlCompat.fromHtml(
-                                fileContent,
-                                HtmlCompat.FROM_HTML_MODE_COMPACT
+                                fileContent, HtmlCompat.FROM_HTML_MODE_COMPACT
                             )
                             textSize = 16f
                             setTextIsSelectable(true)
                         }
-                    },
-                    modifier = Modifier
+                    }, modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp)
                 )
