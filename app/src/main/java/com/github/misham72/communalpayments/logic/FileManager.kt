@@ -24,9 +24,9 @@ class FileManager(private val context: Context) {
 
         daysFromPayment: Long,
         daysUntilPayment: Long,
-        priceTariff: Long,
+        priceTariff: Long
 
-        ) {
+    ) {
         val fileName = getFileName(serviceType)
 
         val format = """
@@ -38,7 +38,7 @@ class FileManager(private val context: Context) {
             |${if (customStatus.isNotEmpty()) "Статус: $customStatus" else ""}
             |-----------------------------------------------------------
             |Предыдущая  оплата: - $previousPayment
-            |Следующая  оплаты:  - $nextPayment
+            |Следующая  оплата:  - $nextPayment
             
             |Оплата была: - $daysFromPayment дней назад.
             |След. оплата через: - $daysUntilPayment дней.
@@ -154,4 +154,6 @@ class FileManager(private val context: Context) {
         val sdf = SimpleDateFormat("dd-MM-yyyy   ---   HH:mm:ss", Locale.getDefault())
         return sdf.format(Date())
     }
+
+    val formattedDateTime = getCurrentDateTime()
 }

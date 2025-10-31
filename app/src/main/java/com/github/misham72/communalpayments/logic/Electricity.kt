@@ -7,9 +7,15 @@ class Electricity(context: Context) : BaseService(context, "electricity", "кВ�
     fun calculate(current: Double, previous: Double, tariff: Double): CalculationResult {
         val consumption = current - previous
         val payment = consumption * tariff
+        saveCalculationResult(
+            current = current,
+            previous = previous,
+            tariff = tariff,
+            consumption = consumption,
+            payment = payment,
+            customStatus = "<font color='#FF0000'>🔴 ОПЛАЧЕНО</font>" // ← ДОБАВИТЬ ЭТУ СТРОКУ
+        )
 
-        // Автоматическое сохранение
-        saveCalculationResult(current, previous, tariff, consumption, payment)
 
         return CalculationResult(consumption, payment)
     }

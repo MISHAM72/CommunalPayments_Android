@@ -7,8 +7,15 @@ class Gas(context: Context) : BaseService(context, "gas", "куб.м") {
     fun calculate(current: Double, previous: Double, tariff: Double): CalculationResult {
         val consumption = current - previous
         val payment = consumption * tariff
-
-        saveCalculationResult(current, previous, tariff, consumption, payment)
+        // 👇 ДОБАВЬТЕ ЦВЕТНОЙ СТАТУС:
+        saveCalculationResult(
+            current = current,
+            previous = previous,
+            tariff = tariff,
+            consumption = consumption,
+            payment = payment,
+            customStatus = "<font color='#FF0000'>🔴 ОПЛАЧЕНО</font>" // ← ДОБАВИТЬ ЭТУ СТРОКУ
+        )
 
         return CalculationResult(consumption, payment)
     }

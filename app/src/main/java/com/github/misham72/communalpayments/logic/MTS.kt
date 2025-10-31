@@ -20,8 +20,7 @@ class MTS(private val context: Context) {
     )
 
     fun calculateMTSData(): MTSData {
-        val formattedDateTime =
-            SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.getDefault()).format(Date())
+        val formattedDateTime = fileManager.getCurrentDateTime() // ← ПРАВИЛЬНО!
 
         val daysUntilPayment = DateCalculator.calculateDaysToNextPayment(1, 23)
         val daysFromPayment = DateCalculator.calculateDaysFromPreviousPayment(1, 23)
