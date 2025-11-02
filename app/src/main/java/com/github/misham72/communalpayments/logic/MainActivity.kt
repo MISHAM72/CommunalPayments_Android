@@ -6,6 +6,7 @@ package com.github.misham72.communalpayments.logic
 
 import android.os.Bundle
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -153,6 +154,7 @@ fun ControlBetweenScreens() {
                         service = service,
                         isSelected = selectedService == index,
                         onClick = { selectedService = index })
+
                 }
             }
             // ЗАМЕНЯЕМ весь старый when (0 -> Row, 1 -> Row, и т.д.) на этот код:
@@ -184,6 +186,7 @@ fun ControlBetweenScreens() {
             )
             Button(
                 onClick = { showHistory = true }, modifier = Modifier.fillMaxWidth()
+
             ) {
                 Text("История")
             }
@@ -194,14 +197,15 @@ fun ControlBetweenScreens() {
 //   Garbage  GarbageScreen
 @Composable
 fun ElectricityScreen() {
+    val context = LocalContext.current  // ← вызов контента
+    val newElectricity = remember { Electricity(context) }
+    val fileManager = remember { FileManager(context) }
+
     var currentReading by remember { mutableStateOf("") }
     var previousReading by remember { mutableStateOf("") }
     var tariff by remember { mutableStateOf("") }
     var consumption by remember { mutableStateOf("") }
     var payment by remember { mutableStateOf("") }
-
-    val context = LocalContext.current  // ← вызов контента
-    val electricityApp = remember { Electricity(context) } // Передаем context
 
 
     Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
@@ -229,13 +233,15 @@ fun ElectricityScreen() {
 
         Button(
             onClick = {
+
                 val current = currentReading.toDoubleOrNull() ?: 0.0
                 val previous = previousReading.toDoubleOrNull() ?: 0.0
                 val tariffValue = tariff.toDoubleOrNull() ?: 0.0
 
-                val result = electricityApp.calculate(current, previous, tariffValue)
+                val result = newElectricity.calculateElectricityData(current, previous, tariffValue)
                 consumption = "%.2f кВт·ч".format(result.consumption)
                 payment = "%.2f руб.".format(result.payment)
+                newElectricity.saveElectricityData(result)
                 // Сохранение теперь происходит автоматически в calculate()
             }, modifier = Modifier.align(Alignment.CenterHorizontally)
         ) {
@@ -252,7 +258,7 @@ fun ElectricityScreen() {
                 Text("Результат по свету:", fontWeight = FontWeight.Bold)
                 Text("Расход: $consumption")
                 Text("К оплате: $payment")
-                Text("Дата: ${electricityApp.getCurrentDateTime()}")
+                Text("Дата: ${fileManager.getCurrentDateTime()}") // ← ИСПОЛЬЗУЕМ fileManager
             }
         }
     }
@@ -267,7 +273,8 @@ fun WaterScreen() {
     var payment by remember { mutableStateOf("") }
 
     val context = LocalContext.current  // ← вызов контента
-    val waterApp = remember { Water(context) } // Передаем context
+    val newWater = remember { Water(context) } // Передаем context
+    val fileManager = remember { FileManager(context) } // ← ДОБАВИТЬ ЭТУ СТРОКУ
 
     Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
         OutlinedTextField(
@@ -296,9 +303,10 @@ fun WaterScreen() {
                 val previous = previousReading.toDoubleOrNull() ?: 0.0
                 val tariffValue = tariff.toDoubleOrNull() ?: 0.0
 
-                val result = waterApp.calculate(current, previous, tariffValue)
+                val result = newWater.calculateWaterData(current, previous, tariffValue)
                 consumption = "%.2f куб.м".format(result.consumption)
                 payment = "%.2f руб.".format(result.payment)
+                newWater.saveWaterData(result)
                 // Сохранение теперь происходит автоматически в calculate()
             }, modifier = Modifier.align(Alignment.CenterHorizontally)
         ) {
@@ -313,7 +321,7 @@ fun WaterScreen() {
                 Text("Результат по воде:", fontWeight = FontWeight.Bold)
                 Text("Расход: $consumption")
                 Text("К оплате: $payment")
-                Text("Дата: ${waterApp.getCurrentDateTime()}")
+                Text("Дата: ${fileManager.getCurrentDateTime()}") // ← ИСПОЛЬЗУЕМ fileManager
             }
         }
     }
@@ -321,13 +329,17 @@ fun WaterScreen() {
 
 @Composable
 fun GasScreen() {
+    val context = LocalContext.current  // ← вызов контента
     var currentReading by remember { mutableStateOf("") }
     var previousReading by remember { mutableStateOf("") }
     var tariff by remember { mutableStateOf("") }
     var consumption by remember { mutableStateOf("") }
     var payment by remember { mutableStateOf("") }
-    val context = LocalContext.current  // ← вызов контента
-    val gasApp = remember { Gas(context) } // Передаем context
+
+
+    val newGas = remember { Gas(context) } // Передаем context
+    val fileManager = remember { FileManager(context) } // ← ДОБАВИТЬ ЭТУ СТРОКУ
+
 
     Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
         OutlinedTextField(
@@ -357,9 +369,10 @@ fun GasScreen() {
                 val previous = previousReading.toDoubleOrNull() ?: 0.0
                 val tariffValue = tariff.toDoubleOrNull() ?: 0.0
 
-                val result = gasApp.calculate(current, previous, tariffValue)
+                val result = newGas.calculateGasData(current, previous, tariffValue)
                 consumption = "%.2f куб.м".format(result.consumption)
                 payment = "%.2f руб.".format(result.payment)
+                newGas.saveGasData(result)
 
                 // Сохранение теперь происходит автоматически в calculate()
             }, modifier = Modifier.align(Alignment.CenterHorizontally)
@@ -377,45 +390,42 @@ fun GasScreen() {
                 Text("Результат по газу:", fontWeight = FontWeight.Bold)
                 Text("Расход: $consumption")
                 Text("К оплате: $payment")
-                Text("Дата: ${gasApp.getCurrentDateTime()}")
+                Text("Дата: ${fileManager.getCurrentDateTime()}")
 
             }
         }
     }
 }
 
-
-// КАЛЬКУЛЯТОР МТС
-
 @Composable
 fun ZONTScreen() {
     val context = LocalContext.current
-    val zontApp = remember { ZONT(context) }
-    val fileManager = remember { FileManager(context) } // ← ДОБАВИТЬ
-    var zontData by remember { mutableStateOf<ZONT.ZONTData?>(null) }
+    val newZONT = remember { ZONT(context) }
+    val fileManager = remember { FileManager(context) }
+    var newZONTData by remember { mutableStateOf<ZONT.ZONTData?>(null) }
 
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Button(
             onClick = {
-                zontData = zontApp.calculateZONTData()
-                zontApp.saveZONTData(
-                    zontData!!, customStatus = "🔴 ОПЛАЧЕНО"
-                ) // ← цветной статус
+                newZONTData = newZONT.calculateZONTData()
+                newZONT.saveZONTData(newZONTData!!)
+
             }, modifier = Modifier.align(Alignment.CenterHorizontally)
         ) {
             Text("Сохранить и Рассчитать")
         }
 
-        if (zontData != null) {
+        if (newZONTData != null) {
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text("Результат по  ZONT:", fontWeight = FontWeight.Bold)
-                    Text("Предыдущая оплата: ${zontData!!.previousPayment}")
-                    Text("Следующая оплата: ${zontData!!.nextPayment}")
-                    Text("Оплата была: ${zontData!!.daysFromPayment} дней назад.")
-                    Text("След. оплата через: ${zontData!!.daysUntilPayment} дней")
-                    Text("Стоимость тарифа: ${zontData!!.priceTariff} руб.")
-                    Text("Дата: ${fileManager.getCurrentDateTime()}") // ← ИСПОЛЬЗУЕМ FileManager
+                    Text("Дата: ${fileManager.getCurrentDateTime()}")
+                    Text("Предыдущая оплата: ${newZONTData!!.previousPayment}")
+                    Text("Следующая оплата: ${newZONTData!!.nextPayment}")
+                    Text("Оплата была: ${newZONTData!!.daysFromPayment} дней назад.")
+                    Text("След. оплата через: ${newZONTData!!.daysUntilPayment} дней")
+                    Text("Стоимость тарифа: ${newZONTData!!.priceTariff} руб.")
+
 
                 }
             }
@@ -426,32 +436,32 @@ fun ZONTScreen() {
 @Composable
 fun InternetScreen() {
     val context = LocalContext.current
-    val internetApp = remember { Internet(context) }
+    val newIntent = remember { Internet(context) }
     val fileManager = remember { FileManager(context) } // ← ДОБАВИТЬ
-    var internetData by remember { mutableStateOf<Internet.InternetData?>(null) }
+    var newInternetData by remember { mutableStateOf<Internet.InternetData?>(null) }
 
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Button(
             onClick = {
-                internetData = internetApp.calculateInternetData()
-                internetApp.saveInternetData(
-                    internetData!!, customStatus = "🔴 ОПЛАЧЕНО"
-                )  // ← цветной статус
+                newInternetData = newIntent.calculateInternetData()
+                newIntent.saveInternetData(newInternetData!!)
+
             }, modifier = Modifier.align(Alignment.CenterHorizontally)
         ) {
             Text("Сохранить и Рассчитать")
         }
 
-        if (internetData != null) {
+        if (newInternetData != null) {
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text("Результаты Internet:", fontWeight = FontWeight.Bold)
-                    Text("Оплата через: ${internetData!!.daysUntilPayment} дней")
-                    Text("С момента оплаты прошло: ${internetData!!.daysFromPayment} дней")
-                    Text("Стоимость тарифа: ${internetData!!.priceTariff} руб.")
-                    Text("Следующая оплата: ${internetData!!.nextPayment}")
-                    Text("Предыдущая оплата: ${internetData!!.previousPayment}")
-                    Text("Дата: ${fileManager.getCurrentDateTime()}") // ← ИСПОЛЬЗУЕМ FileManager
+                    Text("Дата: ${fileManager.getCurrentDateTime()}")
+                    Text("Оплата через: ${newInternetData!!.daysUntilPayment} дней")
+                    Text("С момента оплаты прошло: ${newInternetData!!.daysFromPayment} дней")
+                    Text("Стоимость тарифа: ${newInternetData!!.priceTariff} руб.")
+                    Text("Следующая оплата: ${newInternetData!!.nextPayment}")
+                    Text("Предыдущая оплата: ${newInternetData!!.previousPayment}")
+
                 }
             }
         }
@@ -461,32 +471,31 @@ fun InternetScreen() {
 @Composable
 fun MTSScreen() {
     val context = LocalContext.current
-    val mtsApp = remember { MTS(context) }
-    val fileManager = remember { FileManager(context) } // ← ДОБАВИТЬ
-    var mtsData by remember { mutableStateOf<MTS.MTSData?>(null) }
+    val newMTS = remember { MTS(context) }
+    val fileManager = remember { FileManager(context) }
+    var newMTSData by remember { mutableStateOf<MTS.MTSData?>(null) }
 
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Button(
             onClick = {
-                mtsData = mtsApp.calculateMTSData()
-                mtsApp.saveMTSData(
-                    mtsData!!, customStatus = "🔴 ОПЛАЧЕНО"
-                )  // ← цветной статус
+                newMTSData = newMTS.calculateMTSData()
+                newMTS.saveMTSData(newMTSData!!)
             }, modifier = Modifier.align(Alignment.CenterHorizontally)
         ) {
             Text("Сохранить и Рассчитать")
         }
 
-        if (mtsData != null) {
+        if (newMTSData != null) {
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text("Результаты МТС:", fontWeight = FontWeight.Bold)
-                    Text("Оплата через: ${mtsData!!.daysUntilPayment} дней")
-                    Text("С момента оплаты прошло: ${mtsData!!.daysFromPayment} дней")
-                    Text("Стоимость тарифа: ${mtsData!!.priceTariff} руб.")
-                    Text("Следующая оплата: ${mtsData!!.nextPayment}")
-                    Text("Предыдущая оплата: ${mtsData!!.previousPayment}")
-                    Text("Дата: ${fileManager.getCurrentDateTime()}") // ← ИСПОЛЬЗУЕМ FileManager
+                    Text("Дата: ${fileManager.getCurrentDateTime()}")
+                    Text("Оплата через: ${newMTSData!!.daysUntilPayment} дней")
+                    Text("С момента оплаты прошло: ${newMTSData!!.daysFromPayment} дней")
+                    Text("Стоимость тарифа: ${newMTSData!!.priceTariff} руб.")
+                    Text("Следующая оплата: ${newMTSData!!.nextPayment}")
+                    Text("Предыдущая оплата: ${newMTSData!!.previousPayment}")
+
                 }
             }
         }
@@ -496,32 +505,32 @@ fun MTSScreen() {
 @Composable
 fun TinkoffScreen() {
     val context = LocalContext.current
-    val tinkoffApp = remember { Tinkoff(context) }
+    val newTinkoff = remember { Tinkoff(context) }
     val fileManager = remember { FileManager(context) } // ← ДОБАВИТЬ
-    var tinkoffData by remember { mutableStateOf<Tinkoff.TinkoffData?>(null) }
+    var newTinkoffData by remember { mutableStateOf<Tinkoff.TinkoffData?>(null) }
 
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Button(
             onClick = {
-                tinkoffData = tinkoffApp.calculateTinkoffData()
-                tinkoffApp.saveTinkoffData(
-                    tinkoffData!!, customStatus = "🔴 ОПЛАЧЕНО"
-                ) // ← цветной статус
+                newTinkoffData = newTinkoff.calculateTinkoffData()
+                newTinkoff.saveTinkoffData(newTinkoffData!!)
+
             }, modifier = Modifier.align(Alignment.CenterHorizontally)
         ) {
             Text("Сохранить и Рассчитать")
         }
 
-        if (tinkoffData != null) {
+        if (newTinkoffData != null) {
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text("Результаты Тинькоф:", fontWeight = FontWeight.Bold)
-                    Text("Оплата через: ${tinkoffData!!.daysUntilPayment} дней")
-                    Text("С момента оплаты прошло: ${tinkoffData!!.daysFromPayment} дней")
-                    Text("Стоимость тарифа: ${tinkoffData!!.priceTariff} руб.")
-                    Text("Следующая оплата: ${tinkoffData!!.nextPayment}")
-                    Text("Предыдущая оплата: ${tinkoffData!!.previousPayment}")
-                    Text("Дата: ${fileManager.getCurrentDateTime()}") // ← ИСПОЛЬЗУЕМ FileManager
+                    Text("Дата: ${fileManager.getCurrentDateTime()}")
+                    Text("Оплата через: ${newTinkoffData!!.daysUntilPayment} дней")
+                    Text("С момента оплаты прошло: ${newTinkoffData!!.daysFromPayment} дней")
+                    Text("Стоимость тарифа: ${newTinkoffData!!.priceTariff} руб.")
+                    Text("Следующая оплата: ${newTinkoffData!!.nextPayment}")
+                    Text("Предыдущая оплата: ${newTinkoffData!!.previousPayment}")
+
                 }
             }
         }
@@ -531,32 +540,32 @@ fun TinkoffScreen() {
 @Composable
 fun GarbageScreen() {
     val context = LocalContext.current
-    val garbageApp = remember { Garbage(context) }
+    val newGarbage = remember { Garbage(context) }
     val fileManager = remember { FileManager(context) } // ← ДОБАВИТЬ
-    var garbageData by remember { mutableStateOf<Garbage.GarbageData?>(null) }
+    var newGarbageData by remember { mutableStateOf<Garbage.GarbageData?>(null) }
 
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Button(
             onClick = {
-                garbageData = garbageApp.calculateGarbageData()
-                garbageApp.saveGarbageData(
-                    garbageData!!, customStatus = "🔴 ОПЛАЧЕНО"
-                ) // ← цветной статус
+                newGarbageData = newGarbage.calculateGarbageData()
+                newGarbage.saveGarbageData(newGarbageData!!)
+
             }, modifier = Modifier.align(Alignment.CenterHorizontally)
         ) {
             Text("Сохранить и Рассчитать")
         }
 
-        if (garbageData != null) {
+        if (newGarbageData != null) {
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text("Результаты Мусор:", fontWeight = FontWeight.Bold)
-                    Text("Оплата через: ${garbageData!!.daysUntilPayment} дней")
-                    Text("С момента оплаты прошло: ${garbageData!!.daysFromPayment} дней")
-                    Text("Стоимость тарифа: ${garbageData!!.priceTariff} руб.")
-                    Text("Следующая оплата: ${garbageData!!.nextPayment}")
-                    Text("Предыдущая оплата: ${garbageData!!.previousPayment}")
-                    Text("Дата: ${fileManager.getCurrentDateTime()}") // ← ИСПОЛЬЗУЕМ FileManager
+                    Text("Дата: ${fileManager.getCurrentDateTime()}")
+                    Text("Оплата через: ${newGarbageData!!.daysUntilPayment} дней")
+                    Text("С момента оплаты прошло: ${newGarbageData!!.daysFromPayment} дней")
+                    Text("Стоимость тарифа: ${newGarbageData!!.priceTariff} руб.")
+                    Text("Следующая оплата: ${newGarbageData!!.nextPayment}")
+                    Text("Предыдущая оплата: ${newGarbageData!!.previousPayment}")
+
                 }
             }
         }
@@ -566,32 +575,32 @@ fun GarbageScreen() {
 @Composable
 fun TaxesScreen() {
     val context = LocalContext.current
-    val taxesApp = remember { Taxes(context) }
+    val newTaxes = remember { Taxes(context) }
     val fileManager = remember { FileManager(context) } // ← ДОБАВИТЬ
-    var taxesData by remember { mutableStateOf<Taxes.TaxesData?>(null) }
+    var newTaxesData by remember { mutableStateOf<Taxes.TaxesData?>(null) }
 
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Button(
             onClick = {
-                taxesData = taxesApp.calculateTaxesData()
-                taxesApp.saveTaxesData(
-                    taxesData!!, customStatus = "🔴 ОПЛАЧЕНО"
-                )  // ← цветной статус
+                newTaxesData = newTaxes.calculateTaxesData()
+                newTaxes.saveTaxesData(newTaxesData!!)
+
             }, modifier = Modifier.align(Alignment.CenterHorizontally)
         ) {
             Text("Сохранить и Рассчитать")
         }
 
-        if (taxesData != null) {
+        if (newTaxesData != null) {
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text("Результаты Тинькоф:", fontWeight = FontWeight.Bold)
-                    Text("Оплата через: ${taxesData!!.daysUntilPayment} дней")
-                    Text("С момента оплаты прошло: ${taxesData!!.daysFromPayment} дней")
-                    Text("Стоимость тарифа: ${taxesData!!.priceTariff} руб.")
-                    Text("Следующая оплата: ${taxesData!!.nextPayment}")
-                    Text("Предыдущая оплата: ${taxesData!!.previousPayment}")
-                    Text("Дата: ${fileManager.getCurrentDateTime()}") // ← ИСПОЛЬЗУЕМ FileManager
+                    Text("Дата: ${fileManager.getCurrentDateTime()}")
+                    Text("Оплата через: ${newTaxesData!!.daysUntilPayment} дней")
+                    Text("С момента оплаты прошло: ${newTaxesData!!.daysFromPayment} дней")
+                    Text("Стоимость тарифа: ${newTaxesData!!.priceTariff} руб.")
+                    Text("Следующая оплата: ${newTaxesData!!.nextPayment}")
+                    Text("Предыдущая оплата: ${newTaxesData!!.previousPayment}")
+
                 }
             }
         }
@@ -601,28 +610,29 @@ fun TaxesScreen() {
 @Composable
 fun TroykaScreen() {
     val context = LocalContext.current
-    val troykaApp = remember { Troyka(context) } // ← ПЕРЕИМЕНОВАТЬ
-    val fileManager = remember { FileManager(context) } // ← ДОБАВИТЬ
-    var troykaData by remember { mutableStateOf<Troyka.TroykaData?>(null) } // ← ПЕРЕИМЕНОВАТЬ
+    val newTroyka = remember { Troyka(context) }
+    val fileManager = remember { FileManager(context) }
+    var newTroykaDataD by remember { mutableStateOf<Troyka.TroykaData?>(null) }
 
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Button(onClick = {
-            troykaData = troykaApp.calculateTroykaData()
-            troykaApp.saveTroykaData(troykaData!!, "🔴 ОПЛАЧЕНО")
-        }) {
+            newTroykaDataD = newTroyka.calculateTroykaData()
+            newTroyka.saveTroykaData(newTroykaDataD!!)
+        }
+        ) {
             Text("Рассчитать и сохранить")
         }
     }
 
-    if (troykaData != null) {
+    if (newTroykaDataD != null) {
         Card(modifier = Modifier.fillMaxWidth()) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text("Результаты Тройка:", fontWeight = FontWeight.Bold)
-                Text("Оплата через: ${troykaData!!.daysUntilPayment} дней")
-                Text("С момента оплаты прошло: ${troykaData!!.daysFromPayment} дней")
-                Text("Стоимость тарифа: ${troykaData!!.priceTariff} руб.")
-                Text("Следующая оплата: ${troykaData!!.nextPayment}")
-                Text("Предыдущая оплата: ${troykaData!!.previousPayment}")
+                Text("Оплата через: ${newTroykaDataD!!.daysUntilPayment} дней")
+                Text("С момента оплаты прошло: ${newTroykaDataD!!.daysFromPayment} дней")
+                Text("Стоимость тарифа: ${newTroykaDataD!!.priceTariff} руб.")
+                Text("Следующая оплата: ${newTroykaDataD!!.nextPayment}")
+                Text("Предыдущая оплата: ${newTroykaDataD!!.previousPayment}")
                 Text("Дата: ${fileManager.getCurrentDateTime()}") // ← ИСПОЛЬЗУЕМ FileManager
             }
         }
@@ -633,31 +643,32 @@ fun TroykaScreen() {
 @Composable
 fun OsagoScreen() {
     val context = LocalContext.current
-    val osagoApp = remember { Osago(context) } // ← ПЕРЕИМЕНОВАТЬ
-    val fileManager = remember { FileManager(context) } // ← ДОБАВИТЬ
-    var osagoData by remember { mutableStateOf<Osago.OsagoData?>(null) } // ← ПЕРЕИМЕНОВАТЬ
+    val newOsago = remember { Osago(context) }
+    val fileManager = remember { FileManager(context) }
+    var newOsagoData by remember { mutableStateOf<Osago.OsagoData?>(null) }
 
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Button(
             onClick = {
-                osagoData = osagoApp.calculateOsagoData()
-                osagoApp.saveOsagoData(osagoData!!, "🔴 ОПЛАЧЕНО")
+                newOsagoData = newOsago.calculateOsagoData()
+                newOsago.saveOsagoData(newOsagoData!!)
             }, modifier = Modifier.align(Alignment.CenterHorizontally)
 
         ) {
             Text("Сохранить и Рассчитать")
         }
 
-        if (osagoData != null) {
+        if (newOsagoData != null) {
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text("Результаты Тинькоф:", fontWeight = FontWeight.Bold)
-                    Text("Оплата через: ${osagoData!!.daysUntilPayment} дней")
-                    Text("С момента оплаты прошло: ${osagoData!!.daysFromPayment} дней")
-                    Text("Стоимость тарифа: ${osagoData!!.priceTariff} руб.")
-                    Text("Следующая оплата: ${osagoData!!.nextPayment}")
-                    Text("Предыдущая оплата: ${osagoData!!.previousPayment}")
                     Text("Дата: ${fileManager.getCurrentDateTime()}") // ← ИСПОЛЬЗУЕМ FileManager
+                    Text("Оплата через: ${newOsagoData!!.daysUntilPayment} дней")
+                    Text("С момента оплаты прошло: ${newOsagoData!!.daysFromPayment} дней")
+                    Text("Стоимость тарифа: ${newOsagoData!!.priceTariff} руб.")
+                    Text("Следующая оплата: ${newOsagoData!!.nextPayment}")
+                    Text("Предыдущая оплата: ${newOsagoData!!.previousPayment}")
+
                 }
             }
         }
@@ -670,6 +681,7 @@ fun SimpleHistoryScreen(
 ) {
     val context = LocalContext.current
     var fileContent by remember { mutableStateOf("Загрузка...") }
+
     var isEditing by remember { mutableStateOf(false) }
     var selectedService by remember { mutableStateOf(initialService) }  // ← ИСПОЛЬЗУЕМ ПЕРЕДАННУЮ УСЛУГУ
 

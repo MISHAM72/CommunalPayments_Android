@@ -13,9 +13,10 @@ import java.util.Locale
 
 class FileManager(private val context: Context) {
 
-    // ОБНОВИТЕ этот метод - добавьте два новых параметра
     fun formatPaymentDate(
+        isHistory: Boolean = true,
         serviceType: String,
+
         formattedDateTime: String,
         customStatus: String = "",
 
@@ -26,11 +27,15 @@ class FileManager(private val context: Context) {
         daysUntilPayment: Long,
         priceTariff: Long
 
+
     ) {
         val fileName = getFileName(serviceType)
 
+        val header = if (isHistory) "|🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩" else ""
+
+
         val format = """
-            |///////////////////////////////////////////////////////
+            |$header
             |Услуга:  -   $serviceType
             |-----------------------------------------------------------
             |($formattedDateTime)
@@ -43,14 +48,12 @@ class FileManager(private val context: Context) {
             |Оплата была: - $daysFromPayment дней назад.
             |След. оплата через: - $daysUntilPayment дней.
            
-            |Стоимость тарифа: - $priceTariff руб.
-            |///////////////////////////////////////////////////////
+            |    Стоимость тарифа: - $priceTariff руб.
             """.trimMargin()
 
         saveToFile(fileName, format, true)
     }
 
-    // Остальные методы остаются без изменений
     fun getFileName(serviceType: String): String {
         // FileManager работает с файлами по ключам
         return "${serviceType}_calculations.txt"
@@ -67,6 +70,7 @@ class FileManager(private val context: Context) {
     }
 
     fun formatMeterReadingPaymentData(
+        isHistory: Boolean = false,  // ← НОВЫЙ ПАРАМЕТР
         serviceType: String,
         formattedDateTime: String,
         customStatus: String = "",
@@ -79,10 +83,15 @@ class FileManager(private val context: Context) {
         payment: Double,
         unit: String,
 
+
         ) {
         val fileName = getFileName(serviceType)
+
+        val header = if (isHistory) "|🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩" else ""
+
+
         val format = """
-            |//////////////////////////////////////////////////////
+            |$header
             |Услуга   -   $serviceType
             |----------------------------------------------------------
             |( $formattedDateTime)
@@ -94,7 +103,6 @@ class FileManager(private val context: Context) {
             ||Тариф:                - ${"%.2f".format(tariff)} руб.
             |Расход:                  - ${"%.2f".format(consumption)} $unit
             |Сумма оплаты:- ${"%.2f".format(payment)} руб.        
-            |/////////////////////////////////////////////////////
             """.trimMargin()
 
         saveToFile(fileName, format, true)
@@ -151,7 +159,7 @@ class FileManager(private val context: Context) {
 
 
     fun getCurrentDateTime(): String {
-        val sdf = SimpleDateFormat("dd-MM-yyyy   ---   HH:mm:ss", Locale.getDefault())
+        val sdf = SimpleDateFormat("dd-MM-yyyy _ HH:mm:ss", Locale.getDefault())
         return sdf.format(Date())
     }
 

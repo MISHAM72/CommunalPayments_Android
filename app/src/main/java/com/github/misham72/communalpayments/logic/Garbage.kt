@@ -2,79 +2,52 @@ package com.github.misham72.communalpayments.logic
 
 import android.content.Context
 import android.widget.Toast
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 class Garbage(private val context: Context) {
 
     private val fileManager = FileManager(context)
 
     data class GarbageData(
+        val isHistory: Boolean,
         val formattedDateTime: String,
+        val customStatus: String,
         val previousPayment: String,
         val nextPayment: String,
         val daysFromPayment: Long,
         val daysUntilPayment: Long,
-        val priceTariff: Long,
+        val priceTariff: Long
 
-        )
+    )
 
     fun calculateGarbageData(): GarbageData {
-        val formattedDateTime = fileManager.getCurrentDateTime() // ← ПРАВИЛЬНО!
-
-        val daysUntilPayment = DateCalculator.calculateDaysToNextPayment(1, 23)
-        val daysFromPayment = DateCalculator.calculateDaysFromPreviousPayment(1, 23)
-
-        val previousPayment = getPastDateString(daysFromPayment)  // ← "30.10.2023"
-        val nextPayment = getFutureDateString(daysUntilPayment)   // ← "30.11.2023"
-        val priceTariff = 402L
-
         return GarbageData(
-            formattedDateTime,
-            previousPayment,
-            nextPayment,
-            daysFromPayment,
-            daysUntilPayment,
-            priceTariff,
-
-
-            )
+            isHistory = true,
+            formattedDateTime = fileManager.getCurrentDateTime(),
+            customStatus = "🔴 ОПЛАЧЕНО",
+            previousPayment = DateCalculator.getPreviousPaymentString(1, 23),
+            nextPayment = DateCalculator.getNextPaymentString(1, 23),
+            daysFromPayment = DateCalculator.calculateDaysFromPreviousPayment(1, 23),
+            daysUntilPayment = DateCalculator.calculateDaysToNextPayment(1, 23),
+            priceTariff = 402L,
+        )
     }
 
-    private fun getFutureDateString(daysToAdd: Long): String {
-        val date = Date()
-        date.time = date.time + daysToAdd * 24 * 60 * 60 * 1000L
-        return SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(date)
-    }
-
-    private fun getPastDateString(daysToSubtract: Long): String {
-        val date = Date()
-        date.time = date.time - daysToSubtract * 24 * 60 * 60 * 1000L
-        return SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(date)
-    }
-
-    @Suppress("UNUSED")  // ← ДОБАВЬ ЭТУ СТРОКУ
-    // Обычное сохранение
+    @Suppress("UNUSED")
     fun saveGarbageData(data: GarbageData) {
-        saveGarbageData(data, "") // вызываем перегруженный метод с пустым статусом
-    }
-
-    @Suppress("UNUSED")  // ← ДОБАВЬ ЭТУ СТРОКУ
-    // Перегруженный метод с кастомным статусом
-    fun saveGarbageData(data: GarbageData, customStatus: String) {
         try {
             fileManager.formatPaymentDate(
+                data.isHistory,
                 "garbage",
+
                 data.formattedDateTime,
-                customStatus = customStatus,
+                data.customStatus,
                 data.previousPayment,
                 data.nextPayment,
                 data.daysFromPayment,
                 data.daysUntilPayment,
-                data.priceTariff,
+                data.priceTariff
 
-                )
+            )
 
             Toast.makeText(context, "Данные Мусор сохранены!", Toast.LENGTH_SHORT).show()
 

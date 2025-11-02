@@ -10,12 +10,14 @@ class Internet(private val context: Context) {
     private val fileManager = FileManager(context)
 
     data class InternetData(
+        val isHistory: Boolean,
         val formattedDateTime: String,
+        val customStatus: String,
         val previousPayment: String,
         val nextPayment: String,
         val daysFromPayment: Long,
         val daysUntilPayment: Long,
-        val priceTariff: Long,
+        val priceTariff: Long
     )
 
     fun calculateInternetData(): InternetData {
@@ -30,12 +32,14 @@ class Internet(private val context: Context) {
         val priceTariff = 402L
 
         return InternetData(
+            isHistory = true,
             formattedDateTime,
+            customStatus = "🔴 ОПЛАЧЕНО",
             previousPayment,
             nextPayment,
             daysFromPayment,
             daysUntilPayment,
-            priceTariff,
+            priceTariff
         )
     }
 
@@ -51,22 +55,19 @@ class Internet(private val context: Context) {
         return SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(date)
     }
 
-    @Suppress("UNUSED")  // ← ДОБАВЬ ЭТУ СТРОКУ
     fun saveInternetData(data: InternetData) {
-        saveInternetData(data, customStatus = "")
-    }
-
-    fun saveInternetData(data: InternetData, customStatus: String) {
         try {
             fileManager.formatPaymentDate(
+                data.isHistory,
                 "internet",
+
                 data.formattedDateTime,
-                customStatus = customStatus,
+                data.customStatus,
                 data.previousPayment,
                 data.nextPayment,
                 data.daysFromPayment,
                 data.daysUntilPayment,
-                data.priceTariff,
+                data.priceTariff
             )
 
             Toast.makeText(context, "Данные Интернет сохранены!", Toast.LENGTH_SHORT).show()
