@@ -23,11 +23,11 @@ class Troyka(private val context: Context) {
             isHistory = true,
             formattedDateTime = fileManager.getCurrentDateTime(),
             customStatus = "🔴 ОПЛАЧЕНО",
-            previousPayment = DateCalculator.getPreviousPaymentString(1, 23),
-            nextPayment = DateCalculator.getNextPaymentString(1, 23),
-            daysFromPayment = DateCalculator.calculateDaysFromPreviousPayment(1, 23),
-            daysUntilPayment = DateCalculator.calculateDaysToNextPayment(1, 23),
-            priceTariff = 402L,
+            previousPayment = DateCalculator.getPreviousPaymentString(12, 24),
+            nextPayment = DateCalculator.getNextPaymentString(12, 24),
+            daysFromPayment = DateCalculator.calculateDaysFromPreviousPayment(12, 24),
+            daysUntilPayment = DateCalculator.calculateDaysToNextPayment(12, 24),
+            priceTariff = 16400L,
         )
     }
 
@@ -37,7 +37,6 @@ class Troyka(private val context: Context) {
             fileManager.formatPaymentDate(
                 data.isHistory,
                 "troyka",
-
                 data.formattedDateTime,
                 data.customStatus,
                 data.previousPayment,

@@ -27,7 +27,7 @@ class MTS(private val context: Context) {
             nextPayment = DateCalculator.getNextPaymentString(1, 23),
             daysFromPayment = DateCalculator.calculateDaysFromPreviousPayment(1, 23),
             daysUntilPayment = DateCalculator.calculateDaysToNextPayment(1, 23),
-            priceTariff = 402L,
+            priceTariff = 905L,
         )
     }
 

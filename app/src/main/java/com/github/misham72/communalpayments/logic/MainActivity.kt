@@ -6,7 +6,6 @@ package com.github.misham72.communalpayments.logic
 
 import android.os.Bundle
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -17,8 +16,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -257,7 +258,12 @@ fun ElectricityScreen() {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text("Результат по свету:", fontWeight = FontWeight.Bold)
                 Text("Расход: $consumption")
-                Text("К оплате: $payment")
+                //Text("К оплате: $payment")
+                Text(
+                    "К оплате: - $payment рублей..",
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Red
+                )
                 Text("Дата: ${fileManager.getCurrentDateTime()}") // ← ИСПОЛЬЗУЕМ fileManager
             }
         }
@@ -320,7 +326,11 @@ fun WaterScreen() {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text("Результат по воде:", fontWeight = FontWeight.Bold)
                 Text("Расход: $consumption")
-                Text("К оплате: $payment")
+                Text(
+                    "К оплате: - $payment рублей..",
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Red
+                )
                 Text("Дата: ${fileManager.getCurrentDateTime()}") // ← ИСПОЛЬЗУЕМ fileManager
             }
         }
@@ -389,7 +399,11 @@ fun GasScreen() {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text("Результат по газу:", fontWeight = FontWeight.Bold)
                 Text("Расход: $consumption")
-                Text("К оплате: $payment")
+                Text(
+                    "К оплате: - $payment рублей..",
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Red
+                )
                 Text("Дата: ${fileManager.getCurrentDateTime()}")
 
             }
@@ -420,11 +434,21 @@ fun ZONTScreen() {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text("Результат по  ZONT:", fontWeight = FontWeight.Bold)
                     Text("Дата: ${fileManager.getCurrentDateTime()}")
-                    Text("Предыдущая оплата: ${newZONTData!!.previousPayment}")
-                    Text("Следующая оплата: ${newZONTData!!.nextPayment}")
-                    Text("Оплата была: ${newZONTData!!.daysFromPayment} дней назад.")
-                    Text("След. оплата через: ${newZONTData!!.daysUntilPayment} дней")
-                    Text("Стоимость тарифа: ${newZONTData!!.priceTariff} руб.")
+                    Spacer(modifier = Modifier.height(8.dp)) // ← ДОБАВЬТЕ ЭТО
+
+                    Text("Предыдущая оплата: - ${newZONTData!!.previousPayment}")
+                    Text("Следующая оплата: - ${newZONTData!!.nextPayment}")
+                    Spacer(modifier = Modifier.height(8.dp)) // ← ДОБАВЬТЕ ЭТО
+
+                    Text("Оплата была: - ${newZONTData!!.daysFromPayment} дней назад.")
+                    //Text("След. оплата через: ${newZONTData!!.daysUntilPayment} дней")
+                    Text(
+                        "След. оплата через: - ${newZONTData!!.daysUntilPayment} дней",
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Red
+                    )
+                    Spacer(modifier = Modifier.height(8.dp)) // ← ДОБАВЬТЕ ЭТО
+                    Text("Стоимость тарифа: - ${newZONTData!!.priceTariff} руб.")
 
 
                 }
@@ -456,12 +480,21 @@ fun InternetScreen() {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text("Результаты Internet:", fontWeight = FontWeight.Bold)
                     Text("Дата: ${fileManager.getCurrentDateTime()}")
-                    Text("Оплата через: ${newInternetData!!.daysUntilPayment} дней")
-                    Text("С момента оплаты прошло: ${newInternetData!!.daysFromPayment} дней")
-                    Text("Стоимость тарифа: ${newInternetData!!.priceTariff} руб.")
-                    Text("Следующая оплата: ${newInternetData!!.nextPayment}")
-                    Text("Предыдущая оплата: ${newInternetData!!.previousPayment}")
+                    Spacer(modifier = Modifier.height(8.dp)) // ← ДОБАВЬТЕ ЭТО
 
+                    Text("Предыдущая оплата: - ${newInternetData!!.previousPayment}")
+                    Text("Следующая оплата: - ${newInternetData!!.nextPayment}")
+                    Spacer(modifier = Modifier.height(8.dp)) // ← ДОБАВЬТЕ ЭТО
+
+                    Text("Оплата была: - ${newInternetData!!.daysFromPayment} дней назад.")
+
+                    Text(
+                        "След. оплата через: - ${newInternetData!!.daysUntilPayment} дней",
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Red
+                    )
+                    Spacer(modifier = Modifier.height(8.dp)) // ← ДОБАВЬТЕ ЭТО
+                    Text("Стоимость тарифа: - ${newInternetData!!.priceTariff} руб.")
                 }
             }
         }
@@ -490,11 +523,21 @@ fun MTSScreen() {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text("Результаты МТС:", fontWeight = FontWeight.Bold)
                     Text("Дата: ${fileManager.getCurrentDateTime()}")
-                    Text("Оплата через: ${newMTSData!!.daysUntilPayment} дней")
-                    Text("С момента оплаты прошло: ${newMTSData!!.daysFromPayment} дней")
-                    Text("Стоимость тарифа: ${newMTSData!!.priceTariff} руб.")
-                    Text("Следующая оплата: ${newMTSData!!.nextPayment}")
-                    Text("Предыдущая оплата: ${newMTSData!!.previousPayment}")
+                    Spacer(modifier = Modifier.height(8.dp)) // ← ДОБАВЬТЕ ЭТО
+
+                    Text("Предыдущая оплата: - ${newMTSData!!.previousPayment}")
+                    Text("Следующая оплата: - ${newMTSData!!.nextPayment}")
+                    Spacer(modifier = Modifier.height(8.dp)) // ← ДОБАВЬТЕ ЭТО
+
+                    Text("Оплата была: - ${newMTSData!!.daysFromPayment} дней назад.")
+                    Text(
+                        "След. оплата через: - ${newMTSData!!.daysUntilPayment} дней.",
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Red
+                    )
+                    Spacer(modifier = Modifier.height(8.dp)) // ← ДОБАВЬТЕ ЭТО
+                    Text("Стоимость тарифа: - ${newMTSData!!.priceTariff} руб.")
+
 
                 }
             }
@@ -525,11 +568,22 @@ fun TinkoffScreen() {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text("Результаты Тинькоф:", fontWeight = FontWeight.Bold)
                     Text("Дата: ${fileManager.getCurrentDateTime()}")
-                    Text("Оплата через: ${newTinkoffData!!.daysUntilPayment} дней")
-                    Text("С момента оплаты прошло: ${newTinkoffData!!.daysFromPayment} дней")
-                    Text("Стоимость тарифа: ${newTinkoffData!!.priceTariff} руб.")
-                    Text("Следующая оплата: ${newTinkoffData!!.nextPayment}")
-                    Text("Предыдущая оплата: ${newTinkoffData!!.previousPayment}")
+                    Spacer(modifier = Modifier.height(8.dp)) // ← ДОБАВЬТЕ ЭТО
+
+                    Text("Предыдущая оплата: - ${newTinkoffData!!.previousPayment}")
+                    Text("Следующая оплата: - ${newTinkoffData!!.nextPayment}")
+                    Spacer(modifier = Modifier.height(8.dp)) // ← ДОБАВЬТЕ ЭТО
+
+                    Text("Оплата была: - ${newTinkoffData!!.daysFromPayment} дней назад.")
+                    Text(
+                        "След. оплата через: - ${newTinkoffData!!.daysUntilPayment} дней.",
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Red
+                    )
+                    Spacer(modifier = Modifier.height(8.dp)) // ← ДОБАВЬТЕ ЭТО )
+
+                    Text("Стоимость тарифа: - ${newTinkoffData!!.priceTariff} руб.")
+
 
                 }
             }
@@ -560,11 +614,19 @@ fun GarbageScreen() {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text("Результаты Мусор:", fontWeight = FontWeight.Bold)
                     Text("Дата: ${fileManager.getCurrentDateTime()}")
-                    Text("Оплата через: ${newGarbageData!!.daysUntilPayment} дней")
-                    Text("С момента оплаты прошло: ${newGarbageData!!.daysFromPayment} дней")
-                    Text("Стоимость тарифа: ${newGarbageData!!.priceTariff} руб.")
-                    Text("Следующая оплата: ${newGarbageData!!.nextPayment}")
-                    Text("Предыдущая оплата: ${newGarbageData!!.previousPayment}")
+                    Spacer(modifier = Modifier.height(8.dp)) // ← ДОБАВЬТЕ ЭТО
+                    Text("Предыдущая оплата: - ${newGarbageData!!.previousPayment}")
+                    Text("Следующая оплата: - ${newGarbageData!!.nextPayment}")
+                    Spacer(modifier = Modifier.height(8.dp)) // ← ДОБАВЬТЕ ЭТО
+                    Text("Оплата была: - ${newGarbageData!!.daysFromPayment} дней назад.")
+                    Text(
+                        "След. оплата через: - ${newGarbageData!!.daysUntilPayment} дней.",
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Red
+                    )
+                    Spacer(modifier = Modifier.height(8.dp)) // ← ДОБАВЬТЕ ЭТО
+                    Text("Стоимость тарифа: - ${newGarbageData!!.priceTariff} руб.")
+
 
                 }
             }
@@ -595,11 +657,22 @@ fun TaxesScreen() {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text("Результаты Тинькоф:", fontWeight = FontWeight.Bold)
                     Text("Дата: ${fileManager.getCurrentDateTime()}")
-                    Text("Оплата через: ${newTaxesData!!.daysUntilPayment} дней")
-                    Text("С момента оплаты прошло: ${newTaxesData!!.daysFromPayment} дней")
-                    Text("Стоимость тарифа: ${newTaxesData!!.priceTariff} руб.")
-                    Text("Следующая оплата: ${newTaxesData!!.nextPayment}")
-                    Text("Предыдущая оплата: ${newTaxesData!!.previousPayment}")
+                    Spacer(modifier = Modifier.height(8.dp)) // ← ДОБАВЬТЕ ЭТО
+
+                    Text("Предыдущая оплата: - ${newTaxesData!!.previousPayment}")
+                    Text("Следующая оплата: - ${newTaxesData!!.nextPayment}")
+                    Spacer(modifier = Modifier.height(8.dp)) // ← ДОБАВЬТЕ ЭТО
+
+                    Text("Оплата была: - ${newTaxesData!!.daysFromPayment} дней")
+                    Text(
+                        "След. оплата через: - ${newTaxesData!!.daysUntilPayment} дней.",
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Red
+                    )
+                    Spacer(modifier = Modifier.height(8.dp)) // ← ДОБАВЬТЕ ЭТО
+                    Text("Стоимость тарифа: - ${newTaxesData!!.priceTariff} руб.")
+
+
 
                 }
             }
@@ -612,28 +685,37 @@ fun TroykaScreen() {
     val context = LocalContext.current
     val newTroyka = remember { Troyka(context) }
     val fileManager = remember { FileManager(context) }
-    var newTroykaDataD by remember { mutableStateOf<Troyka.TroykaData?>(null) }
+    var newTroykaData by remember { mutableStateOf<Troyka.TroykaData?>(null) }
 
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Button(onClick = {
-            newTroykaDataD = newTroyka.calculateTroykaData()
-            newTroyka.saveTroykaData(newTroykaDataD!!)
+            newTroykaData = newTroyka.calculateTroykaData()
+            newTroyka.saveTroykaData(newTroykaData!!)
         }
         ) {
             Text("Рассчитать и сохранить")
         }
     }
 
-    if (newTroykaDataD != null) {
+    if (newTroykaData != null) {
         Card(modifier = Modifier.fillMaxWidth()) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text("Результаты Тройка:", fontWeight = FontWeight.Bold)
-                Text("Оплата через: ${newTroykaDataD!!.daysUntilPayment} дней")
-                Text("С момента оплаты прошло: ${newTroykaDataD!!.daysFromPayment} дней")
-                Text("Стоимость тарифа: ${newTroykaDataD!!.priceTariff} руб.")
-                Text("Следующая оплата: ${newTroykaDataD!!.nextPayment}")
-                Text("Предыдущая оплата: ${newTroykaDataD!!.previousPayment}")
                 Text("Дата: ${fileManager.getCurrentDateTime()}") // ← ИСПОЛЬЗУЕМ FileManager
+                Spacer(modifier = Modifier.height(8.dp)) // ← ДОБАВЬТЕ ЭТО
+
+                Text("Предыдущая оплата: - ${newTroykaData!!.previousPayment}")
+                Text("Следующая оплата: - ${newTroykaData!!.nextPayment}")
+                Spacer(modifier = Modifier.height(8.dp)) // ← ДОБАВЬТЕ ЭТО
+
+                Text("Оплата была: - ${newTroykaData!!.daysFromPayment} дней")
+                Text(
+                    "След. оплата через: - ${newTroykaData!!.daysUntilPayment} дней.",
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Red
+                )
+                Spacer(modifier = Modifier.height(8.dp)) // ← ДОБАВЬТЕ ЭТО
+                Text("Стоимость тарифа: - ${newTroykaData!!.priceTariff} руб.")
             }
         }
     }
@@ -663,12 +745,20 @@ fun OsagoScreen() {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text("Результаты Тинькоф:", fontWeight = FontWeight.Bold)
                     Text("Дата: ${fileManager.getCurrentDateTime()}") // ← ИСПОЛЬЗУЕМ FileManager
-                    Text("Оплата через: ${newOsagoData!!.daysUntilPayment} дней")
-                    Text("С момента оплаты прошло: ${newOsagoData!!.daysFromPayment} дней")
-                    Text("Стоимость тарифа: ${newOsagoData!!.priceTariff} руб.")
-                    Text("Следующая оплата: ${newOsagoData!!.nextPayment}")
-                    Text("Предыдущая оплата: ${newOsagoData!!.previousPayment}")
+                    Spacer(modifier = Modifier.height(8.dp)) // ← ДОБАВЬТЕ ЭТО
 
+                    Text("Предыдущая оплата: - ${newOsagoData!!.previousPayment}")
+                    Text("Следующая оплата: - ${newOsagoData!!.nextPayment}")
+                    Spacer(modifier = Modifier.height(8.dp)) // ← ДОБАВЬТЕ ЭТО
+
+                    Text("Оплата была: - ${newOsagoData!!.daysFromPayment} дней назад.")
+                    Text(
+                        "След. оплата через: - ${newOsagoData!!.daysUntilPayment} дней.",
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Red
+                    )
+                    Spacer(modifier = Modifier.height(8.dp)) // ← ДОБАВЬТЕ ЭТО
+                    Text("Стоимость тарифа: - ${newOsagoData!!.priceTariff} руб.")
                 }
             }
         }

@@ -24,11 +24,11 @@ class Taxes(
             isHistory = true,
             formattedDateTime = fileManager.getCurrentDateTime(),
             customStatus = "🔴 ОПЛАЧЕНО",
-            previousPayment = DateCalculator.getPreviousPaymentString(1, 23),
-            nextPayment = DateCalculator.getNextPaymentString(1, 23),
-            daysFromPayment = DateCalculator.calculateDaysFromPreviousPayment(1, 23),
-            daysUntilPayment = DateCalculator.calculateDaysToNextPayment(1, 23),
-            priceTariff = 402L,
+            previousPayment = DateCalculator.getPreviousPaymentString(3, 29),
+            nextPayment = DateCalculator.getNextPaymentString(3, 29),
+            daysFromPayment = DateCalculator.calculateDaysFromPreviousPayment(3, 29),
+            daysUntilPayment = DateCalculator.calculateDaysToNextPayment(3, 29),
+            priceTariff = 13415L,
         )
     }
 
@@ -37,7 +37,6 @@ class Taxes(
             fileManager.formatPaymentDate(
                 data.isHistory,
                 "taxes",
-
                 data.formattedDateTime,
                 data.customStatus,
                 data.previousPayment,

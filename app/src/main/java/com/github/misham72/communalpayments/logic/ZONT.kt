@@ -29,11 +29,11 @@ class ZONT(private val context: Context?) {
             isHistory = true,
             formattedDateTime = fileManager.getCurrentDateTime(),
             customStatus = "🔴 ОПЛАЧЕНО",
-            previousPayment = DateCalculator.getPreviousPaymentString(1, 23),
-            nextPayment = DateCalculator.getNextPaymentString(1, 23),
-            daysFromPayment = DateCalculator.calculateDaysFromPreviousPayment(1, 23),
-            daysUntilPayment = DateCalculator.calculateDaysToNextPayment(1, 23),
-            priceTariff = 402L,
+            previousPayment = DateCalculator.getPreviousPaymentString(1, 30),
+            nextPayment = DateCalculator.getNextPaymentString(1, 30),
+            daysFromPayment = DateCalculator.calculateDaysFromPreviousPayment(1, 30),
+            daysUntilPayment = DateCalculator.calculateDaysToNextPayment(1, 30),
+            priceTariff = 120L,
         )
     }
 

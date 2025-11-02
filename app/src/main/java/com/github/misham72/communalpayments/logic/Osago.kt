@@ -3,16 +3,14 @@ package com.github.misham72.communalpayments.logic
 import android.content.Context
 import android.widget.Toast
 
-class Osago(
-    private val context: Context
-) {
+class Osago(private val context: Context) {
     private val fileManager = FileManager(context)
 
 
     data class OsagoData(
         val isHistory: Boolean,
         val formattedDateTime: String,
-        val customStatus: String,
+        val customStatus: String = "🔴 ОПЛАЧЕНО", // ← ДОБАВИТЬ ПОЛЕ
         val previousPayment: String,
         val nextPayment: String,
         val daysFromPayment: Long,
@@ -25,11 +23,11 @@ class Osago(
             isHistory = true,
             formattedDateTime = fileManager.getCurrentDateTime(),
             customStatus = "🔴 ОПЛАЧЕНО",
-            previousPayment = DateCalculator.getPreviousPaymentString(1, 23),
-            nextPayment = DateCalculator.getNextPaymentString(1, 23),
-            daysFromPayment = DateCalculator.calculateDaysFromPreviousPayment(1, 23),
-            daysUntilPayment = DateCalculator.calculateDaysToNextPayment(1, 23),
-            priceTariff = 402L,
+            previousPayment = DateCalculator.getPreviousPaymentString(12, 27),
+            nextPayment = DateCalculator.getNextPaymentString(12, 27),
+            daysFromPayment = DateCalculator.calculateDaysFromPreviousPayment(12, 27),
+            daysUntilPayment = DateCalculator.calculateDaysToNextPayment(12, 27),
+            priceTariff = 7530L,
         )
     }
 
@@ -39,7 +37,6 @@ class Osago(
             fileManager.formatPaymentDate(
                 data.isHistory,
                 "osago",
-
                 data.formattedDateTime,
                 data.customStatus,
                 data.previousPayment,

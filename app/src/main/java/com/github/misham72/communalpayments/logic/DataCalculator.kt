@@ -19,7 +19,7 @@ class DateCalculator {
             val date = getNextPayment(monthsPeriod, paymentDay)
             return SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(date)
         }
-
+        //====================================
 
         fun getPreviousPayment(monthsPeriod: Int, paymentDay: Int): Date {
             val calendar = Calendar.getInstance()
@@ -31,7 +31,7 @@ class DateCalculator {
             val calendar = Calendar.getInstance()
             return alignToPeriodEnd(calendar, monthsPeriod, paymentDay).time
         }
-
+        //==========================================
         fun calculateDaysFromPreviousPayment(monthsPeriod: Int, paymentDay: Int): Long {
             val today = Calendar.getInstance()
             val previousPayment =
@@ -60,16 +60,14 @@ class DateCalculator {
                 monthsPeriod == 1 && paymentDay == 23 -> periodStart.add(Calendar.DAY_OF_MONTH, -8)
                 monthsPeriod == 3 -> periodStart.add(Calendar.DAY_OF_MONTH, -1)
                 monthsPeriod == 12 && paymentDay == 27 -> periodStart.add(
-                    Calendar.DAY_OF_MONTH,
-                    -66
-                )
+                    Calendar.DAY_OF_MONTH, 300)
 
                 monthsPeriod == 12 && paymentDay == 24 -> periodStart.add(Calendar.DAY_OF_MONTH, 54)
             }
 
             return periodStart
         }
-
+        //==================================================
 
         fun calculateDaysToNextPayment(monthsPeriod: Int, paymentDay: Int): Long {
             val today = Calendar.getInstance()
@@ -97,7 +95,7 @@ class DateCalculator {
 
             // Специальные условия
             when {
-                monthsPeriod == 12 && paymentDay == 27 -> periodEnd.add(Calendar.DAY_OF_MONTH, -61)
+                monthsPeriod == 12 && paymentDay == 27 -> periodEnd.add(Calendar.DAY_OF_MONTH, 300)
                 monthsPeriod == 12 && paymentDay == 24 -> periodEnd.add(Calendar.DAY_OF_MONTH, 62)
             }
 
