@@ -1,16 +1,14 @@
 package com.github.misham72.communalpayments.logic
 
 import android.content.Context
-import android.widget.Toast
+import android.util.Log
+import com.github.misham72.communalpayments.R
+import com.github.misham72.communalpayments.data.local.FileManager
+import com.github.misham72.communalpayments.logic.calculators.DateCalculator
 
-/**Ответственность: Бизнес-логика конкретно для ZONT. Что делает:
-Знает специфику ZONT (тариф 402 рубля, день платежа 23 число)
-Формирует структуру данных для ZONT
-Определяет статусы оплаты ("🔴 ОПЛАЧЕНО"). Сохраняет данные ZONT через FileManager
-Взаимодействует с пользователем (показывает Toast) */
-class ZONT(private val context: Context?) {
+class ZONT(private val context: Context) {
 
-    private val fileManager = FileManager(context!!)
+    private val fileManager = FileManager(context)
 
     data class ZONTData(
         val isHistory: Boolean,
@@ -24,11 +22,11 @@ class ZONT(private val context: Context?) {
 
         )
 
-    fun calculateZONTData(): ZONTData {
+    fun collectZONTData(): ZONTData {
         return ZONTData(
             isHistory = true,
             formattedDateTime = fileManager.getCurrentDateTime(),
-            customStatus = "🔴 ОПЛАЧЕНО",
+            customStatus = context.getString(R.string.status_paid),
             previousPayment = DateCalculator.getPreviousPaymentString(1, 30),
             nextPayment = DateCalculator.getNextPaymentString(1, 30),
             daysFromPayment = DateCalculator.calculateDaysFromPreviousPayment(1, 30),
@@ -37,28 +35,47 @@ class ZONT(private val context: Context?) {
         )
     }
 
-    /**2. Сохранение данных.Передает все данные в FileManager для форматирования и записи в файл  */
-    @Suppress("UNUSED")  // ← ДОБАВЬ ЭТУ СТРОКУ
+
     fun saveZONTData(data: ZONTData) {
+        val tag = context.getString(R.string.service_key_zont) // ← Добавьте тег!
         try {
-            fileManager.formatPaymentDate(
-                data.isHistory,
-                "zont",
+            // 1. ПОДГОТОВКА ВСЕХ ГОТОВЫХ СТРОК:
 
-                data.formattedDateTime,
-                data.customStatus,
-                data.previousPayment,
-                data.nextPayment,
-                data.daysFromPayment,
-                data.daysUntilPayment,
-                data.priceTariff
+            val readyHeader = if (data.isHistory) "🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩" else ""   //  Если запись историческая (data.isHistory == true), то заголовком будет строка из "🟩🟩🟩". Если нет — заголовок будет пустым
+            val serviceName = context.getString(R.string.service_display_name_zont)   //  Текст на вкладке для пользователя - Интернет.
+            val readyService = context.getString(R.string.custom_ready_service, serviceName)  // Это шаблон "Услуга - %s", а serviceName - это значение "Свет", которое встанет на место %s.
+            val readySeparator1 = "-----------------------------------------------------------"  // Разделитель.
+            val readyDateTime = "(${data.formattedDateTime})"
+            val readyStatus = if (data.customStatus.isNotEmpty()) context.getString(R.string.custom_status_paid, data.customStatus) else ""   // Статус для пользователя (если есть)
+            val readySeparator2 = "-----------------------------------------------------------"  // Разделитель.
+            val readyPreviousPayment = context.getString(R.string.previous_payment, data.previousPayment)
+            val readyNextPayment = context.getString(R.string.next_payment, data.nextPayment)
+            val readyDaysAgo = context.getString(R.string.days_from_payment, data.daysFromPayment)
+            val readyDaysLeft = context.getString(R.string.days_until_payment, data.daysUntilPayment)
+            val readyTariff = context.getString(R.string.price_tariff, data.priceTariff)
+            val fileName = fileManager.getFileName(tag)
+
+// 2. ПРАВИЛЬНЫЙ ВЫЗОВ ФУНКЦИИ formatPaymentDate:
+            fileManager.savePeriodicPayment(
+                readyHeader = readyHeader,
+                readyService = readyService,
+                readySeparator1 = readySeparator1,
+                readyDateTime = readyDateTime,
+                readyStatus = readyStatus,
+                readySeparator2 = readySeparator2,
+                readyPreviousPayment = readyPreviousPayment,
+                readyNextPayment = readyNextPayment,
+                readyDaysAgo = readyDaysAgo,
+                readyDaysLeft = readyDaysLeft,
+                readyTariff = readyTariff,
+                fileName = fileName
             )
-            //3. Уведомление об успехе
-            Toast.makeText(context, "Данные zont сохранены!", Toast.LENGTH_SHORT).show()
 
-        } catch (ex: Exception) {
-            Toast.makeText(context, "Ошибка сохранения zont: ${ex.message}", Toast.LENGTH_LONG)
-                .show()
+            // ДОБАВЬТЕ логирование успеха:
+            Log.i(tag, "✅ " + context.getString(R.string.data_saved))
+
+        } catch (e: Exception) {
+            Log.e(tag, "❌ " + context.getString(R.string.error_saving), e)
         }
     }
 }

@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "CommunalPayments"
-include(":app")
+settings.rootProject.name = "CommunalPayments_Android"
+settings.include(":app")
  

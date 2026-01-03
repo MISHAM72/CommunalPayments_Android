@@ -1,0 +1,8 @@
+package com.github.misham72.communalpayments.screen.navigation.models
+
+import androidx.compose.runtime.Composable
+
+data class InitialScreen(
+    val icon: String, val name: String, val account: String, val fileKey: String, val screen: @Composable () -> Unit, val onEditClick: () -> Unit = {} // ← ДОБАВИТЬ этот параметр
+// ← "инструкция как нарисовать экран"
+)

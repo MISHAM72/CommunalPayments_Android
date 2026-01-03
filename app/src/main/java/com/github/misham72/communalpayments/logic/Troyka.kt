@@ -1,7 +1,10 @@
 package com.github.misham72.communalpayments.logic
 
 import android.content.Context
-import android.widget.Toast
+import android.util.Log
+import com.github.misham72.communalpayments.R
+import com.github.misham72.communalpayments.data.local.FileManager
+import com.github.misham72.communalpayments.logic.calculators.DateCalculator
 
 class Troyka(private val context: Context) {
     private val fileManager = FileManager(context)
@@ -9,7 +12,7 @@ class Troyka(private val context: Context) {
     data class TroykaData(
         val isHistory: Boolean,
         val formattedDateTime: String,
-        val customStatus: String = "🔴 ОПЛАЧЕНО", // ← ДОБАВИТЬ ПОЛЕ
+        val customStatus: String,
         val previousPayment: String,
         val nextPayment: String,
         val daysFromPayment: Long,
@@ -18,11 +21,11 @@ class Troyka(private val context: Context) {
 
         )
 
-    fun calculateTroykaData(): TroykaData {
+    fun collectTroykaData(): TroykaData {
         return TroykaData(
             isHistory = true,
             formattedDateTime = fileManager.getCurrentDateTime(),
-            customStatus = "🔴 ОПЛАЧЕНО",
+            customStatus = context.getString(R.string.status_paid),
             previousPayment = DateCalculator.getPreviousPaymentString(12, 24),
             nextPayment = DateCalculator.getNextPaymentString(12, 24),
             daysFromPayment = DateCalculator.calculateDaysFromPreviousPayment(12, 24),
@@ -31,28 +34,47 @@ class Troyka(private val context: Context) {
         )
     }
 
-    @Suppress("UNUSED")  // ← ДОБАВЬ ЭТУ СТРОКУ
+
     fun saveTroykaData(data: TroykaData) {
+        val tag = context.getString(R.string.service_key_troyka) // ← Добавьте тег!
         try {
-            fileManager.formatPaymentDate(
-                data.isHistory,
-                "troyka",
-                data.formattedDateTime,
-                data.customStatus,
-                data.previousPayment,
-                data.nextPayment,
-                data.daysFromPayment,
-                data.daysUntilPayment,
-                data.priceTariff,
+            // 1. ПОДГОТОВКА ВСЕХ ГОТОВЫХ СТРОК:
 
-                )
-            Toast.makeText(context, "Данные о карте Тройка сохранены!", Toast.LENGTH_SHORT).show()
+            val readyHeader = if (data.isHistory) "🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩" else ""   //  Если запись историческая (data.isHistory == true), то заголовком будет строка из "🟩🟩🟩". Если нет — заголовок будет пустым
+            val serviceName = context.getString(R.string.service_display_name_troyka)   //  Текст на вкладке для пользователя - Интернет.
+            val readyService = context.getString(R.string.custom_ready_service, serviceName)  // Это шаблон "Услуга - %s", а serviceName - это значение "Свет", которое встанет на место %s.
+            val readySeparator1 = "-----------------------------------------------------------"  // Разделитель.
+            val readyDateTime = "(${data.formattedDateTime})"
+            val readyStatus = if (data.customStatus.isNotEmpty()) context.getString(R.string.custom_status_paid, data.customStatus) else ""   // Статус для пользователя (если есть)
+            val readySeparator2 = "-----------------------------------------------------------"  // Разделитель.
+            val readyPreviousPayment = context.getString(R.string.previous_payment, data.previousPayment)
+            val readyNextPayment = context.getString(R.string.next_payment, data.nextPayment)
+            val readyDaysAgo = context.getString(R.string.days_from_payment, data.daysFromPayment)
+            val readyDaysLeft = context.getString(R.string.days_until_payment, data.daysUntilPayment)
+            val readyTariff = context.getString(R.string.price_tariff, data.priceTariff)
+            val fileName = fileManager.getFileName(tag)
 
-        } catch (ex: Exception) {
-            Toast.makeText(
-                context, "Ошибка сохранения карта Тройка: ${ex.message}", Toast.LENGTH_LONG
+// 2. ПРАВИЛЬНЫЙ ВЫЗОВ ФУНКЦИИ formatPaymentDate:
+            fileManager.savePeriodicPayment(
+                readyHeader = readyHeader,
+                readyService = readyService,
+                readySeparator1 = readySeparator1,
+                readyDateTime = readyDateTime,
+                readyStatus = readyStatus,
+                readySeparator2 = readySeparator2,
+                readyPreviousPayment = readyPreviousPayment,
+                readyNextPayment = readyNextPayment,
+                readyDaysAgo = readyDaysAgo,
+                readyDaysLeft = readyDaysLeft,
+                readyTariff = readyTariff,
+                fileName = fileName
             )
-                .show()
+
+            // ДОБАВЬТЕ логирование успеха:
+            Log.i(tag, "✅ " + context.getString(R.string.data_saved))
+
+        } catch (e: Exception) {
+            Log.e(tag, "❌ " + context.getString(R.string.error_saving), e)
         }
     }
 }

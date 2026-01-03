@@ -1,9 +1,10 @@
-package com.github.misham72.communalpayments.logic
+package com.github.misham72.communalpayments.logic.calculators
 
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+
 /**  Вычисляет предыдущие/следующие даты платежей. Считает количество дней между датами
 Работает с календарем и временными промежутками. Форматирует даты в строки */
 class DateCalculator {
@@ -21,16 +22,17 @@ class DateCalculator {
         }
         //====================================
 
-        fun getPreviousPayment(monthsPeriod: Int, paymentDay: Int): Date {
+        private fun getPreviousPayment(monthsPeriod: Int, paymentDay: Int): Date {
             val calendar = Calendar.getInstance()
             return alignToPeriodStart(calendar, monthsPeriod, paymentDay).time
         }
 
 
-        fun getNextPayment(monthsPeriod: Int, paymentDay: Int): Date {
+        private fun getNextPayment(monthsPeriod: Int, paymentDay: Int): Date {
             val calendar = Calendar.getInstance()
             return alignToPeriodEnd(calendar, monthsPeriod, paymentDay).time
         }
+
         //==========================================
         fun calculateDaysFromPreviousPayment(monthsPeriod: Int, paymentDay: Int): Long {
             val today = Calendar.getInstance()
@@ -60,7 +62,8 @@ class DateCalculator {
                 monthsPeriod == 1 && paymentDay == 23 -> periodStart.add(Calendar.DAY_OF_MONTH, -8)
                 monthsPeriod == 3 -> periodStart.add(Calendar.DAY_OF_MONTH, -1)
                 monthsPeriod == 12 && paymentDay == 27 -> periodStart.add(
-                    Calendar.DAY_OF_MONTH, 300)
+                    Calendar.DAY_OF_MONTH, 300
+                )
 
                 monthsPeriod == 12 && paymentDay == 24 -> periodStart.add(Calendar.DAY_OF_MONTH, 54)
             }

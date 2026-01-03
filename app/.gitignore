@@ -1,1 +1,9 @@
-/build
+
+# Файлы, сгенерированные Android Studio и Gradle
+*.iml
+.gradle/
+build/
+local.properties
+
+# Файлы настроек самой среды разработки (IDE)
+.idea/

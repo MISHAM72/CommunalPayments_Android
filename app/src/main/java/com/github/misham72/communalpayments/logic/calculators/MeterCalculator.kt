@@ -1,4 +1,4 @@
-package com.github.misham72.communalpayments.logic
+package com.github.misham72.communalpayments.logic.calculators
 
 data class MeterCalculator(
 

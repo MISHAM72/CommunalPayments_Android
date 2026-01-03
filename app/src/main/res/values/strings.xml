@@ -1,3 +1,99 @@
 <resources>
+    // заголовок
     <string name="app_name">CommunalPayments</string>
+    <string name="summer_night">Летняя ночь сзади дома</string>
+    <string name="app_title">Коммунальные платежи</string>
+
+    // общие
+    <string name="custom_ready_service">Услуга   -   %1$s</string>
+    <string name="template_service">Услуга: - %1$s</string>
+    <string name="status_paid">🔴 ОПЛАЧЕНО</string>
+    <string name="custom_status_paid">Статус: %1$s</string>
+    <string name="data_saved">Данные сохранены!</string>
+    <string name="error_saving">Ошибка сохранения</string>
+
+    // оплата по счетчику
+    <string name="current_reading">Текущие показания: (кВ/ч) - </string>
+    <string name="previous_reading">Пред. показания: (кВ/ч) - </string>
+    <string name="format_two_decimals">%.2f</string>
+    <string name="consumption">Расход: - %1$s %2$s</string>
+    <string name="payment_sum">Сумма оплаты: - %1$s руб.</string>
+    <string name="payment">К оплате: - %1$s руб.</string>
+    <string name="unit_cubic_meter">куб.м.</string>
+    <string name="unit_kilowatt_hour">кВт/ч</string>
+    <string name="tariff">Тариф: (руб.) - </string>
+
+    // вкладки для пользователя общие
+    <string name="service_display_name_electricity">Свет</string>
+    <string name="service_display_name_water">Вода</string>
+    <string name="service_display_name_gas">Газ</string>
+    <string name="service_display_name_internet">Интернет</string>
+    <string name="service_display_name_garbage">Мусор</string>
+    <string name="service_display_name_mts">МТС</string>
+    <string name="service_display_name_osago">Осаго</string>
+    <string name="service_display_name_taxes">Налоги</string>
+    <string name="service_display_name_tinkoff">Тинькофф</string>
+    <string name="service_display_name_troyka">Тройка</string>
+    <string name="service_display_name_zont">ZONT</string>
+
+    // оплата за период
+    <string name="previous_payment">Предыдущая оплата: - %1$s</string>
+    <string name="next_payment">Следующая оплата: - %1$s</string>
+    <string name="days_from_payment">Оплата была: - %1$d дней назад.</string>
+    <string name="days_until_payment">След. оплата через: - %1$d дней.</string>
+    <string name="price_tariff">Тариф: - %1$.2f руб</string>
+
+    // ключи
+    <string name="service_key_electricity">electricity</string>
+    <string name="service_key_water">Water</string>
+    <string name="service_key_gas">Gas</string>
+    <string name="service_key_internet">internet</string>
+    <string name="service_key_garbage">garbage</string>
+    <string name="service_key_mts">mts</string>
+    <string name="service_key_osago">car_insurence</string>
+    <string name="service_key_troyka">troyka</string>
+    <string name="service_key_taxes">taxes</string>
+    <string name="service_key_tinkoff">tinkoff</string>
+    <string name="service_key_zont">zont</string>
+
+    // логи
+    <string name="log_file_request">🔍 ЗАПРОС ФАЙЛА: %1$s</string>
+    <string name="log_file_read_success">✅ ФАЙЛ ПРОЧИТАН: %1$s, размер: %2$d символов</string>
+    <string name="log_file_not_found">❌ ФАЙЛ НЕ НАЙДЕН: %1$s</string>
+    <string name="log_file_read_error">❌ ОШИБКА ЧТЕНИЯ ФАЙЛА %1$s</string>
+    <string name="log_data_saved_to_file">✅ Данные сохранены в файл: %1$s (append=%2$b)</string>
+    <string name="log_error_saving_to_file">❌ Ошибка сохранения в файл %1$s: %2$s</string>
+
+
+    <string name="empty_history_message">История расчетов пуста</string>
+    <string name="error_read_file_message">Ошибка чтения файла: %1$s</string>
+    <string name="format_date_time_file">dd-MM-yyyy _ HH:mm:ss</string>
+
+
+    <string name="History">История</string>
+    <string name="loading">Загрузка...</string>
+    <string name="back">Назад</string>
+    <string name="calculation_history">История расчетов</string>
+    <string name="save">Сохранить</string>
+    <string name="cancel">Отмена</string>
+    <string name="Edit_history">Редактировать историю</string>
+    <string name="calculate_and_save">Сохранить и Рассчитать</string>
+    <string name="result_tinkoff">Результаты Тинькоф:</string>
+    <string name="date">Дата: %1$s</string>
+    <string name="previous_payment_with_value">Предыдущая оплата: - %1$s</string>
+    <string name="next_payment_with_value">Следующая оплата: - %1$s</string>
+    <string name="payment_made_with_value">Оплата была: - %1$d дней назад.</string>
+    <string name="next_payment_in_days">След. оплата через: - %1$d дней.</string>
+    <string name="result_garbage">Результаты Мусор:</string>
+    <string name="result_zont">Результат по  ZONT:</string>
+    <string name="result_internet">Результат по  Интернет:</string>
+    <string name="result_mts">Результаты МТС:</string>
+    <string name="result_taxes">Результаты Тинькоф:</string>
+    <string name="result_osago">Результаты Осаго:</string>
+    <string name="result_troyka">Результаты Тройка:</string>
+    <string name="result_electricity">Результат по свету:</string>
+    <string name="currency_rub">%.2f руб.</string>
+    <string name="result_water">Результат по воде:</string>
+    <string name="result_gas">Результат по газу:</string>
+
 </resources>
