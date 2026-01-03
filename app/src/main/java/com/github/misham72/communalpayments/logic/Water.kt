@@ -77,7 +77,7 @@ class Water(private val context: Context) {
                 readyPaymentSum = readyPaymentSum,
                 fileName = fileName
             )
-            Log.i(tag, "✅ " + context.getString(R.string.data_saved))
+
         } catch (e: Exception) {
             // 4. ОШИБКА
             Log.e(tag, "❌ " + context.getString(R.string.error_saving), e)

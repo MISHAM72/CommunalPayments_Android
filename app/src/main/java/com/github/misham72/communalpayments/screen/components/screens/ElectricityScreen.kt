@@ -40,16 +40,17 @@ fun DisplayElectricityScreen() {
 
     Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
 
+        // ИСПРАВЛЕННЫЙ КОД:
         OutlinedTextField(
-            value = currentReading, onValueChange = { currentReading = it }, label = { Text(stringResource(R.string.current_reading)) }, modifier = Modifier.fillMaxWidth()
+            value = currentReading, onValueChange = { currentReading = it }, label = { Text(stringResource(R.string.current_reading_label_electricity)) }, modifier = Modifier.fillMaxWidth()
         )
 
         OutlinedTextField(
-            value = previousReading, onValueChange = { previousReading = it }, label = { Text(stringResource(R.string.previous_reading)) }, modifier = Modifier.fillMaxWidth()
+            value = previousReading, onValueChange = { previousReading = it }, label = { Text(stringResource(R.string.previous_reading_label_electricity)) }, modifier = Modifier.fillMaxWidth()
         )
 
         OutlinedTextField(
-            value = tariff, onValueChange = { tariff = it }, label = { Text(stringResource(R.string.tariff)) }, modifier = Modifier.fillMaxWidth()
+            value = tariff, onValueChange = { tariff = it }, label = { Text(stringResource(R.string.tariff_label)) }, modifier = Modifier.fillMaxWidth()
         )
 
         Button(
@@ -60,7 +61,7 @@ fun DisplayElectricityScreen() {
                 val tariffValue = tariff.toDoubleOrNull() ?: 0.0
 
                 val result = newElectricity.collectElectricityData(current, previous, tariffValue)
-                consumption = context.getString(R.string.unit_kilowatt_hour).format(result.consumption)
+                consumption = context.getString(R.string.consumption).format(result.consumption, result.unit)
                 payment = (context.getString(R.string.currency_rub).format(result.payment))
                 newElectricity.saveElectricityData(result)
                 // Сохранение теперь происходит автоматически в calculate()
@@ -75,11 +76,17 @@ fun DisplayElectricityScreen() {
         Card(modifier = Modifier.fillMaxWidth()) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(stringResource(R.string.result_electricity), fontWeight = FontWeight.Bold)
-                Text("${stringResource(R.string.consumption)}: $consumption")
 
-                Text(
-                    "${stringResource(R.string.payment)}: $payment", fontWeight = FontWeight.Bold, color = Color.Red
-                )
+               // Text(context.getString(R.string.consumption_label), fontWeight = FontWeight.Bold)
+
+               // Text(context.getString(R.string.payment_label), fontWeight = FontWeight.Bold, color = Color.Red)
+                // ✅ ПРАВИЛЬНО: используем ваши реальные переменные
+                // Вариант А: Просто выводим готовые строки
+                Text(consumption) // Уже содержит "Расход: - 20.50 кВт·ч"
+                Text(payment, fontWeight = FontWeight.Bold, color = Color.Red) // "102.50 руб."
+
+
+
                 Text(stringResource(R.string.date, fileManager.getCurrentDateTime())) // ← ИСПОЛЬЗУЕМ fileManager
             }
         }

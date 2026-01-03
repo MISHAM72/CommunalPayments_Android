@@ -49,7 +49,7 @@ class Electricity(private val context: Context) {
             // 1. ПОДГОТОВКА ВСЕХ ГОТОВЫХ СТРОК:
 
             val readyHeader = if (data.isHistory) "🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩" else ""   //  Если запись историческая (data.isHistory == true), то заголовком будет строка из "🟩🟩🟩". Если нет — заголовок будет пустым
-            val serviceName = context.getString(R.string.service_display_name_electricity)    //  Текст на вкладке для пользователя - Свет.
+            val serviceName = (context.getString(R.string.service_display_name_electricity))  //  Текст на вкладке для пользователя - Свет.
             val readyService = context.getString(R.string.custom_ready_service, serviceName)  // Это шаблон "Услуга - %s", а serviceName - это значение "Свет", которое встанет на место %s.
             val readySeparator1 = "----------------------------------------------------------"   // Разделитель.
             val readyDateTime = "( ${data.formattedDateTime} )"   // d) Дата в скобках
@@ -78,7 +78,6 @@ class Electricity(private val context: Context) {
                 fileName = fileName
             )
 
-            Log.i(tag, "✅ " + context.getString(R.string.data_saved))
         } catch (e: Exception) {
             // 4. ОШИБКА
             Log.e(tag, "❌ " + context.getString(R.string.error_saving), e)

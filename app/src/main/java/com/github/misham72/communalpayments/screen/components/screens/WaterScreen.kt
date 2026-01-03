@@ -41,15 +41,15 @@ fun DisplayWaterScreen() {
 
     Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
         OutlinedTextField(
-            value = currentReading, onValueChange = { currentReading = it }, label = { Text(stringResource(R.string.current_reading)) }, modifier = Modifier.fillMaxWidth()
+            value = currentReading, onValueChange = { currentReading = it }, label = { Text(stringResource(R.string.current_reading_label_water)) }, modifier = Modifier.fillMaxWidth()
         )
 
         OutlinedTextField(
-            value = previousReading, onValueChange = { previousReading = it }, label = { Text(stringResource(R.string.previous_reading)) }, modifier = Modifier.fillMaxWidth()
+            value = previousReading, onValueChange = { previousReading = it }, label = { Text(stringResource(R.string.previous_reading_label_water)) }, modifier = Modifier.fillMaxWidth()
         )
 
         OutlinedTextField(
-            value = tariff, onValueChange = { tariff = it }, label = { Text(stringResource(R.string.tariff)) }, modifier = Modifier.fillMaxWidth()
+            value = tariff, onValueChange = { tariff = it }, label = { Text(stringResource(R.string.tariff_label)) }, modifier = Modifier.fillMaxWidth()
         )
         Button(
             onClick = {
@@ -58,7 +58,7 @@ fun DisplayWaterScreen() {
                 val tariffValue = tariff.toDoubleOrNull() ?: 0.0
 
                 val result = newWater.collectWaterData(current, previous, tariffValue)  // 1. collectWaterData СОБИРАЕТ объект из введённых чисел val result теперь содержит ВСЕ данные для отображения
-                consumption = context.getString(R.string.unit_cubic_meter).format(result.consumption)  // Из waterData
+                consumption = context.getString(R.string.consumption).format(result.consumption, result.unit)  // Из waterData
                 payment = context.getString(R.string.currency_rub).format(result.payment)           // Из waterData
                 newWater.saveWaterData(result)                          // Внутри себя готовит readyHeader, readyService...
                 // Сохранение теперь происходит автоматически в calculate()
@@ -73,10 +73,14 @@ fun DisplayWaterScreen() {
         Card(modifier = Modifier.fillMaxWidth()) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(stringResource(R.string.result_water), fontWeight = FontWeight.Bold)
-                Text("${stringResource(R.string.consumption)}: $consumption")
-                Text(
-                    "${stringResource(R.string.payment_sum)}: $payment", fontWeight = FontWeight.Bold, color = Color.Red
-                )
+                // Text(context.getString(R.string.consumption_label), fontWeight = FontWeight.Bold)
+
+                // Text(context.getString(R.string.payment_label), fontWeight = FontWeight.Bold, color = Color.Red)
+                // ✅ ПРАВИЛЬНО: используем ваши реальные переменные
+                // Вариант А: Просто выводим готовые строки
+                Text(consumption)
+                Text(payment, fontWeight = FontWeight.Bold, color = Color.Red) // "102.50 руб."
+
                 Text(stringResource(R.string.date, fileManager.getCurrentDateTime())) // ← ИСПОЛЬЗУЕМ fileManager
             }
         }

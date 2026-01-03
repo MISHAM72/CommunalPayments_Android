@@ -71,7 +71,8 @@ class FileManager(private val context: Context) {
         readySeparator2: String,    // Пример: "----------------------------------------------------------"
         readyCurrentReading: String,    // Пример: "Текущие показания: - 100.50 кВт/ч"
         readyPreviousReading: String,   // Пример: "Пред. показания: - 80.00 кВт/ч"
-        readyTariff: String, readyConsumption: String,       // Пример: "Расход: - 20.50 кВт/ч"
+        readyTariff: String,
+        readyConsumption: String,       // Пример: "Расход: - 20.50 кВт/ч"
         readyPaymentSum: String,        // Пример: "Сумма оплаты: - 102.50 руб."
         fileName: String                // Имя файла для сохранения
 
@@ -101,7 +102,6 @@ class FileManager(private val context: Context) {
 
         val fileName = getFileName(serviceType)
         val stringBuilder = StringBuilder()
-        Log.d(tag, context.getString(R.string.log_file_request, fileName)) // ← Заменили println на Log.d
 
         try {
             BufferedReader(
@@ -114,8 +114,6 @@ class FileManager(private val context: Context) {
                     stringBuilder.append(line).append("\n")
                 }
             }
-            Log.d(tag, context.getString(R.string.log_file_read_success, fileName, stringBuilder.length)) // ← Добавили лог успеха
-
         } catch (_: FileNotFoundException) {
             Log.w(tag, context.getString(R.string.log_file_not_found, fileName)) // ← Заменили println на Log.w (предупреждение)
             return context.getString(R.string.empty_history_message)
@@ -139,11 +137,6 @@ class FileManager(private val context: Context) {
                 outputStream.write(text.toByteArray(StandardCharsets.UTF_8))
                 outputStream.write("\n".toByteArray())  // Добавляем перенос строки
             }
-
-
-            // Просто заменяем println на Log.i
-            Log.i("FileManager", context.getString(R.string.log_data_saved_to_file, fileName, append))
-
         } catch (e: Exception) {
             // Просто заменяем println на Log.e (и добавляем e для stack trace)
             Log.e("FileManager", context.getString(R.string.log_error_saving_to_file, fileName, e.message), e)
