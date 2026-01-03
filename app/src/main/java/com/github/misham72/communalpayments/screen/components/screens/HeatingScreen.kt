@@ -59,7 +59,7 @@ fun DisplayHeatingScreen() {
                         stringResource(R.string.next_payment_in_days, data.daysUntilPayment), fontWeight = FontWeight.Bold, color = Color.Red
                     )
                     Spacer(modifier = Modifier.height(8.dp)) // ← ДОБАВЬТЕ ЭТО
-                    Text(stringResource(R.string.price_tariff, data.priceTariff))
+                    Text(stringResource(R.string.price_tariff, data.priceTariff.toDouble()))
 
 
                 }
