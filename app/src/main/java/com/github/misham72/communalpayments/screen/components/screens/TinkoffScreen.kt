@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -39,7 +40,10 @@ fun DisplayTinkoffScreen() {
                 newTinkoffData = newTinkoff.collectTinkoffData()
                 newTinkoff.saveTinkoffData(newTinkoffData ?: return@Button)
 
-            }, modifier = Modifier.align(Alignment.CenterHorizontally)
+            }, modifier = Modifier.align(Alignment.CenterHorizontally),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFF0D44FF)  // Более насыщенный и приятный голубой
+            )
         ) {
             Text(stringResource(R.string.calculate_and_save))
         }
@@ -52,17 +56,24 @@ fun DisplayTinkoffScreen() {
                     Text(stringResource(R.string.date, fileManager.getCurrentDateTime()))
                     Spacer(modifier = Modifier.height(8.dp)) // ← ДОБАВЬТЕ ЭТО
 
-                    Text(stringResource(R.string.previous_payment_with_value, data.previousPayment))
-                    Text(stringResource(R.string.next_payment_with_value, data.nextPayment))
+                    Text(
+                        stringResource(R.string.previous_payment_with_value, data.previousPayment), fontWeight = FontWeight.Bold, color = Color(red = 0.02f, green = 0.4f, blue = 0.0f) // RGB значения 0-1
+                    )
+                    //оплата была
+                    Text(
+                        stringResource(R.string.payment_made_with_value, data.daysFromPayment), fontWeight = FontWeight.Bold, color = Color(red = 0.02f, green = 0.4f, blue = 0.0f)// оплата через
+                    )   //прошло
                     Spacer(modifier = Modifier.height(8.dp)) // ← ДОБАВЬТЕ ЭТО
 
-                    Text(stringResource(R.string.payment_made_with_value, data.daysFromPayment))
                     Text(
-                        stringResource(R.string.next_payment_in_days, data.daysUntilPayment), fontWeight = FontWeight.Bold, color = Color.Red
-                    )
+                        stringResource(R.string.next_payment_with_value, data.nextPayment), fontWeight = FontWeight.Bold, color = Color.Red
+                    )   //дата оплаты
+                    Text(
+                        stringResource(R.string.days_until_payment, data.daysUntilPayment), fontWeight = FontWeight.Bold, color = Color.Red // оплата через
+                    )   // оплата через
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    Text(stringResource(R.string.price_tariff, data.priceTariff))
+                    Text(stringResource(R.string.tariff, data.priceTariff))
 
 
                 }

@@ -64,10 +64,8 @@
     <string name="previous_payment">Предыдущая оплата: - %1$s</string>
     <string name="next_payment">Следующая оплата: - %1$s</string>
     <string name="days_from_payment">Оплата была: - %1$d дней назад.</string>
-    <string name="days_until_payment">След. оплата через: - %1$d дней.</string>
-    <string name="price_tariff">Тариф: - %1$.2f руб</string>
-
-    // ключи
+    <string name="days_until_payment">Оплата через: - %1$d дней.</string>
+     // ключи
     <string name="service_key_electricity">electricity</string>
     <string name="service_key_water">Water</string>
     <string name="service_key_gas">Gas</string>
@@ -103,9 +101,9 @@
     <string name="calculate_and_save">Рассчитать и Сохранить</string>
     <string name="result_tinkoff">Результаты Тинькоф:</string>
     <string name="date">Дата: %1$s</string>
-    <string name="previous_payment_with_value">Предыдущая оплата: - %1$s</string>
-    <string name="next_payment_with_value">Следующая оплата: - %1$s</string>
-    <string name="payment_made_with_value">Оплата была: - %1$d дней назад.</string>
+    <string name="previous_payment_with_value">Оплата была: - %1$s</string>
+    <string name="next_payment_with_value">Дата оплаты: - %1$s</string>
+    <string name="payment_made_with_value">Прошло: - %1$d дня.</string>
     <string name="next_payment_in_days">След. оплата через: - %1$d дней.</string>
     <string name="result_garbage">Результаты Мусор:</string>
     <string name="result_zont">Результат по  ZONT:</string>
@@ -117,5 +115,6 @@
     <string name="result_electricity">Результат по свету:</string>
     <string name="result_water">Результат по воде:</string>
     <string name="result_gas">Результат по газу:</string>
+    <string name="loading">Загрузка</string>
 
 </resources>

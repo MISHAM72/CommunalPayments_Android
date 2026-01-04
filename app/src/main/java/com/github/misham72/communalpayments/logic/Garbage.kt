@@ -43,7 +43,7 @@ class Garbage(private val context: Context) {
             val readyNextPayment = context.getString(R.string.next_payment, data.nextPayment)
             val readyDaysAgo = context.getString(R.string.days_from_payment, data.daysFromPayment)
             val readyDaysLeft = context.getString(R.string.days_until_payment, data.daysUntilPayment)
-            val readyTariff = context.getString(R.string.price_tariff, data.priceTariff)
+            val readyTariff = context.getString(R.string.tariff, data.priceTariff)
 
 
             // Имя файла
