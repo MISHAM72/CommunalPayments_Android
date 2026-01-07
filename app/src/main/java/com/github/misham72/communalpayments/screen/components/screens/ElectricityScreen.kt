@@ -38,9 +38,12 @@ fun DisplayElectricityScreen() {
     var payment by remember { mutableStateOf("") }
 
 
-    Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(5.dp)
+    ) {
 
-        // ИСПРАВЛЕННЫЙ КОД:
         OutlinedTextField(
             value = currentReading, onValueChange = { currentReading = it }, label = { Text(stringResource(R.string.current_reading_label_electricity)) }, modifier = Modifier.fillMaxWidth()
         )
@@ -64,29 +67,19 @@ fun DisplayElectricityScreen() {
                 consumption = context.getString(R.string.consumption).format(result.consumption, result.unit)
                 payment = (context.getString(R.string.currency_rub).format(result.payment))
                 newElectricity.saveElectricityData(result)
-                // Сохранение теперь происходит автоматически в calculate()
-            }, modifier = Modifier.align(Alignment.CenterHorizontally)
+            }
         ) {
             Text(stringResource(R.string.calculate_and_save))
         }
-    }
 
+    }
 
     if (consumption.isNotEmpty()) {
         Card(modifier = Modifier.fillMaxWidth()) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(stringResource(R.string.result_electricity), fontWeight = FontWeight.Bold)
-
-               // Text(context.getString(R.string.consumption_label), fontWeight = FontWeight.Bold)
-
-               // Text(context.getString(R.string.payment_label), fontWeight = FontWeight.Bold, color = Color.Red)
-                // ✅ ПРАВИЛЬНО: используем ваши реальные переменные
-                // Вариант А: Просто выводим готовые строки
                 Text(consumption) // Уже содержит "Расход: - 20.50 кВт·ч"
                 Text(payment, fontWeight = FontWeight.Bold, color = Color.Red) // "102.50 руб."
-
-
-
                 Text(stringResource(R.string.date, fileManager.getCurrentDateTime())) // ← ИСПОЛЬЗУЕМ fileManager
             }
         }

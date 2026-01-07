@@ -34,18 +34,16 @@ fun DisplayCarInsurance() {
     val fileManager = remember { FileManager(context) }
     var newOsagoData by remember { mutableStateOf<Osago.OsagoData?>(null) }
 
-    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+    Column(modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Button(
             onClick = {
-
                 newOsagoData = newOsago.collectOsagoData()
                 newOsago.saveOsagoData(newOsagoData ?: return@Button)
-
-            }, modifier = Modifier.align(Alignment.CenterHorizontally),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF0D44FF)  // Более насыщенный и приятный голубой
-            )
-        ) {
+            },
+        )
+        {
             Text(stringResource(R.string.calculate_and_save))
         }
 

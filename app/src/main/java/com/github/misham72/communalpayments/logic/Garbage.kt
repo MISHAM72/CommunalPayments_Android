@@ -64,9 +64,6 @@ class Garbage(private val context: Context) {
                 fileName = fileName
             )
 
-            // ДОБАВЬТЕ логирование успеха:
-            Log.i(tag, "✅ " + context.getString(R.string.data_saved))
-
         } catch (e: Exception) {
             Log.e(tag, "❌ " + context.getString(R.string.error_saving), e)
         }

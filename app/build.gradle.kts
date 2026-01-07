@@ -1,3 +1,8 @@
+// Объявляем константы, чтобы избежать предупреждений HardcodedStringLiteral
+val proguardAndroidOptimize = "proguard-android-optimize.txt"
+val proguardRulesPro = "proguard-rules.pro"
+val composeUiTextGoogleFonts = "androidx.compose.ui:ui-text-google-fonts:1.6.1"
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -24,8 +29,8 @@ android {
         release {
             isMinifyEnabled = false
             proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                getDefaultProguardFile(proguardAndroidOptimize),
+                proguardRulesPro
             )
         }
     }
@@ -59,4 +64,5 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     implementation(libs.androidx.datastore.preferences)
+    implementation(composeUiTextGoogleFonts )
 }

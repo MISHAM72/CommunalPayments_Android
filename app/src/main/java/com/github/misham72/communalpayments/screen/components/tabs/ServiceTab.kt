@@ -19,7 +19,8 @@ import com.github.misham72.communalpayments.screen.navigation.models.InitialScre
 fun ServiceTab(
     service: InitialScreen, isSelected: Boolean, onClick: () -> Unit
 ) {
-    val backgroundColor = if (isSelected) Color(0xFF2196F3) else Color(0xFFE0E0E0)
+
+    val backgroundColor = if (isSelected) Color(0xFF0D44FF) else Color(0xFFE0E0E0)
     val textColor = if (isSelected) Color.White else Color.Black
 
     Box(

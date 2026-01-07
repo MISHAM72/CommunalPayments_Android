@@ -24,7 +24,8 @@
     <!-- СТАРЫЕ строки (оставьте для результатов): -->
     <string name="current_reading">Текущие показания: - %1$s %2$s</string>
     <string name="previous_reading">Предыдущие показания: - %1$s %2$s</string>
-    <string name="tariff">Тариф: - %1$s руб.</string>
+    <string name="tariff">Тариф: - %1$d руб.</string>
+
 
     <!-- НОВЫЕ строки для меток полей (без %s): -->
     <string name="current_reading_label_gas">Текущие показания,(м./куб.)</string>

@@ -28,6 +28,9 @@ import com.github.misham72.communalpayments.logic.Gas
 @Composable
 fun DisplayGasScreen() {
     val context = LocalContext.current  // ← вызов контента
+    val newGas = remember { Gas(context) } // Передаем context
+    val fileManager = remember { FileManager(context) } // ← ДОБАВИТЬ ЭТУ СТРОКУ
+
     var currentReading by remember { mutableStateOf("") }
     var previousReading by remember { mutableStateOf("") }
     var tariff by remember { mutableStateOf("") }
@@ -35,13 +38,13 @@ fun DisplayGasScreen() {
     var payment by remember { mutableStateOf("") }
 
 
-    val newGas = remember { Gas(context) } // Передаем context
-    val fileManager = remember { FileManager(context) } // ← ДОБАВИТЬ ЭТУ СТРОКУ
-
-
-    Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(5.dp)
+    ) {
         OutlinedTextField(
-            value = currentReading, onValueChange = { currentReading = it }, label = { Text(stringResource(R.string.current_reading_label_gas))}, modifier = Modifier.fillMaxWidth()
+            value = currentReading, onValueChange = { currentReading = it }, label = { Text(stringResource(R.string.current_reading_label_gas)) }, modifier = Modifier.fillMaxWidth()
         )
 
         OutlinedTextField(
@@ -62,9 +65,7 @@ fun DisplayGasScreen() {
                 consumption = context.getString(R.string.consumption).format(result.consumption, result.unit)  // Из waterData
                 payment = context.getString(R.string.currency_rub).format(result.payment)           // Из waterData
                 newGas.saveGasData(result)
-
-                // Сохранение теперь происходит автоматически в calculate()
-            }, modifier = Modifier.align(Alignment.CenterHorizontally)
+            }
         ) {
 
             Text(context.getString(R.string.calculate_and_save))

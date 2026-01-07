@@ -57,7 +57,7 @@ class Water(private val context: Context) {
             val readySeparator2 = "----------------------------------------------------------"   // Разделитель
             val readyCurrentReading = context.getString(R.string.current_reading, context.getString(R.string.format_two_decimals).format(data.current), data.unit)
             val readyPreviousReading = context.getString(R.string.previous_reading, context.getString(R.string.format_two_decimals).format(data.previous), data.unit)
-            val readyTariff = context.getString(R.string.tariff, context.getString(R.string.format_two_decimals).format(data.tariff))
+            val readyTariff = context.getString(R.string.tariff, data.tariff)
             val readyConsumption = context.getString(R.string.consumption, context.getString(R.string.format_two_decimals).format(data.consumption), data.unit)
             val readyPaymentSum = context.getString(R.string.payment_sum, context.getString(R.string.format_two_decimals).format(data.payment))
             val fileName = fileManager.getFileName(tag)

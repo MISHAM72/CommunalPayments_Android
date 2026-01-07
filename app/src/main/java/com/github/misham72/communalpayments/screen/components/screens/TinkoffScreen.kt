@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -40,10 +39,7 @@ fun DisplayTinkoffScreen() {
                 newTinkoffData = newTinkoff.collectTinkoffData()
                 newTinkoff.saveTinkoffData(newTinkoffData ?: return@Button)
 
-            }, modifier = Modifier.align(Alignment.CenterHorizontally),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF0D44FF)  // Более насыщенный и приятный голубой
-            )
+            }, modifier = Modifier.align(Alignment.CenterHorizontally)
         ) {
             Text(stringResource(R.string.calculate_and_save))
         }
