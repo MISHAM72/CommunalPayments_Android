@@ -1,7 +1,8 @@
 // Объявляем константы, чтобы избежать предупреждений HardcodedStringLiteral
-val proguardAndroidOptimize = "proguard-android-optimize.txt"
-val proguardRulesPro = "proguard-rules.pro"
-val composeUiTextGoogleFonts = "androidx.compose.ui:ui-text-google-fonts:1.6.1"
+val proguardAndroidOptimize: String = "proguard-android-optimize.txt"
+val proguardRulesPro: String = "proguard-rules.pro"
+val composeUiTextGoogleFonts: String = "androidx.compose.ui:ui-text-google-fonts:1.6.1"
+
 
 plugins {
     alias(libs.plugins.android.application)
@@ -11,9 +12,8 @@ plugins {
 
 android {
     namespace = "com.github.misham72.communalpayments"
-    compileSdk {
-        version = release(36)
-    }
+    compileSdk = 36
+
 
     defaultConfig {
         applicationId = "com.github.misham72.communalpayments"
@@ -21,7 +21,6 @@ android {
         targetSdk = 36
         versionCode = 1
         versionName = "1.0.0"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -29,8 +28,8 @@ android {
         release {
             isMinifyEnabled = false
             proguardFiles(
-                getDefaultProguardFile(proguardAndroidOptimize),
-                proguardRulesPro
+                getDefaultProguardFile(proguardAndroidOptimize), // ← Используем константу
+                proguardRulesPro                                   // ← Используем константу
             )
         }
     }
@@ -64,5 +63,6 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     implementation(libs.androidx.datastore.preferences)
-    implementation(composeUiTextGoogleFonts )
+    implementation(composeUiTextGoogleFonts)
 }
+

@@ -4,19 +4,21 @@
     <string name="summer_night">Летняя ночь сзади дома</string>
     <string name="app_title">Коммунальные платежи</string>
 
+    <string name="tariff">Тариф: - %.2f руб.</string>
+    <string name="tariff_label">Тариф, (руб.) - </string>
+    <string name="date">Дата: %1$s</string>
+
+
     // общие
     <string name="custom_ready_service">Услуга   -   %1$s</string>
-    <string name="template_service">Услуга: - %1$s</string>
     <string name="status_paid">🔴 ОПЛАЧЕНО</string>
     <string name="custom_status_paid">Статус: %1$s</string>
-    <string name="data_saved">Данные сохранены!</string>
     <string name="error_saving">Ошибка сохранения</string>
 
     // оплата по счетчику
     <string name="format_two_decimals"> %.2f</string>
 
-    <string name="payment_sum">Сумма оплаты: - %1$s руб.</string>
-    <string name="payment">К оплате: - %1$s руб.</string>
+    <string name="payment_sum">Сумма оплаты: - %.2f руб.</string>
     <string name="unit_cubic_meter"> м./куб.</string>
     <string name="unit_kilowatt_hour"> кВт/ч</string>
 
@@ -24,28 +26,22 @@
     <!-- СТАРЫЕ строки (оставьте для результатов): -->
     <string name="current_reading">Текущие показания: - %1$s %2$s</string>
     <string name="previous_reading">Предыдущие показания: - %1$s %2$s</string>
-    <string name="tariff">Тариф: - %1$d руб.</string>
 
 
     <!-- НОВЫЕ строки для меток полей (без %s): -->
-    <string name="current_reading_label_gas">Текущие показания,(м./куб.)</string>
-    <string name="previous_reading_label_gas">Предыдущие показания,(м./куб.)</string>
+    <string name="current_reading_label_gas">Текущие показания,(м./куб.) - </string>
+    <string name="previous_reading_label_gas">Предыдущие показания,(м./куб.) - </string>
+    <string name="current_reading_label_water">Текущие показания,(м./куб.) - </string>
+    <string name="previous_reading_label_water">Предыдущие показания,(м./куб.) - </string>
+    <string name="current_reading_label_electricity">Текущие показания,(кВт/ч) - </string>
+    <string name="previous_reading_label_electricity">Предыдущие показания,(кВт/ч) - </string>
 
-    <string name="current_reading_label_water">Текущие показания,(м./куб.)</string>
-    <string name="previous_reading_label_water">Предыдущие показания,(м./куб.)</string>
-    <string name="current_reading_label_electricity">Текущие показания,(кВт/ч)</string>
-    <string name="previous_reading_label_electricity">Предыдущие показания,(кВт/ч)</string>
-    <string name="tariff_label">Тариф, руб.</string>
 
     <!-- Эти строки используются в логике (с плейсхолдерами): -->
-    <string name="consumption">Расход: - %1$s %2$s</string>
-    <string name="currency_rub">К оплате: -%1$s руб.</string>
+    <string name="consumption">Расход: - %1$.2f %2$s</string>
+    <string name="currency_rub">К оплате: -%.2f руб.</string>
 
     <!-- Эти строки используются в UI как заголовки (без плейсхолдеров): -->
-    <string name="consumption_label">Расход: - </string>
-    <string name="payment_label">К оплате: - </string>
-
-
 
 
     // вкладки для пользователя общие
@@ -66,7 +62,7 @@
     <string name="next_payment">Следующая оплата: - %1$s</string>
     <string name="days_from_payment">Оплата была: - %1$d дней назад.</string>
     <string name="days_until_payment">Оплата через: - %1$d дней.</string>
-     // ключи
+    // ключи
     <string name="service_key_electricity">electricity</string>
     <string name="service_key_water">Water</string>
     <string name="service_key_gas">Gas</string>
@@ -80,11 +76,8 @@
     <string name="service_key_zont">zont</string>
 
     // логи
-    <string name="log_file_request">🔍 ЗАПРОС ФАЙЛА: %1$s</string>
-    <string name="log_file_read_success">✅ ФАЙЛ ПРОЧИТАН: %1$s, размер: %2$d символов</string>
     <string name="log_file_not_found">❌ ФАЙЛ НЕ НАЙДЕН: %1$s</string>
     <string name="log_file_read_error">❌ ОШИБКА ЧТЕНИЯ ФАЙЛА %1$s</string>
-    <string name="log_data_saved_to_file">✅ Данные сохранены в файл: %1$s (append=%2$b)</string>
     <string name="log_error_saving_to_file">❌ Ошибка сохранения в файл %1$s: %2$s</string>
 
 
@@ -101,11 +94,10 @@
     <string name="Edit_history">Редактировать историю</string>
     <string name="calculate_and_save">Рассчитать и Сохранить</string>
     <string name="result_tinkoff">Результаты Тинькоф:</string>
-    <string name="date">Дата: %1$s</string>
+
     <string name="previous_payment_with_value">Оплата была: - %1$s</string>
     <string name="next_payment_with_value">Дата оплаты: - %1$s</string>
     <string name="payment_made_with_value">Прошло: - %1$d дня.</string>
-    <string name="next_payment_in_days">След. оплата через: - %1$d дней.</string>
     <string name="result_garbage">Результаты Мусор:</string>
     <string name="result_zont">Результат по  ZONT:</string>
     <string name="result_internet">Результат по  Интернет:</string>
@@ -117,5 +109,16 @@
     <string name="result_water">Результат по воде:</string>
     <string name="result_gas">Результат по газу:</string>
     <string name="loading">Загрузка</string>
+
+
+    <!-- Интернет -->
+    <string name="day_of_payment_label">День платежа - </string>
+    <string name="period_months_label">Период,(мес.) - </string>
+
+    <string name="previous_payment_label">Последняя оплата:</string>
+    <string name="next_payment_label">Следующая оплата:</string>
+    <string name="days_from_payment_label">Прошло дней:</string>
+    <string name="days_until_payment_label">Дней до оплаты:</string>
+
 
 </resources>
