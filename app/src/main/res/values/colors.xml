@@ -4,4 +4,5 @@
     <color name="ic_launcher_background">#FFFFFF</color>
     <!-- Этот цвет нужен для файла winter_house_round.xml -->
     <color name="winter_house_background">#FFFFFF</color>
+    <color name="status_purple">#800080</color> <!-- или любой другой оттенок фиолетового -->
 </resources>

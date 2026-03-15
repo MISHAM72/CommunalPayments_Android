@@ -3,7 +3,8 @@ package com.github.misham72.communalpayments.presentation.theme
 import androidx.compose.ui.graphics.Color
 
 internal val primaryLight = Color(0xFF415F91)
-//internal val primaryLight = Color(0xFFD32F2F) // Ярко-красный
+
+// internal val primaryLight = Color(0xFFD32F2F). Ярко-красный
 internal val onPrimaryLight = Color(0xFFFFFFFF)
 internal val primaryContainerLight = Color(0xFFD6E3FF)
 internal val onPrimaryContainerLight = Color(0xFF284777)
@@ -112,6 +113,7 @@ internal val surfaceContainerHighLightHighContrast = Color(0xFFD3D4DB)
 internal val surfaceContainerHighestLightHighContrast = Color(0xFFC5C6CD)
 
 internal val primaryDark = Color(0xFFAAC7FF)
+
 //internal val primaryDark = Color(0xFFEF5350)  // Более мягкий красный для тёмного фона
 internal val onPrimaryDark = Color(0xFF0A305F)
 internal val primaryContainerDark = Color(0xFF284777)

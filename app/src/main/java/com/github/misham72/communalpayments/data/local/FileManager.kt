@@ -1,154 +1,85 @@
 package com.github.misham72.communalpayments.data.local
 
 import android.content.Context
-import android.util.Log
 import com.github.misham72.communalpayments.R
-import java.io.BufferedReader
-import java.io.FileNotFoundException
+import java.io.File
+import java.io.FileWriter
 import java.io.IOException
-import java.io.InputStreamReader
-import java.nio.charset.StandardCharsets
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 class FileManager(private val context: Context) {
 
+    // ✅ НОВЫЙ МЕТОД: Чтение истории
+    fun readHistory(serviceKey: String): String {
+        /** ✅Таким образом, эта функция подготавливает данные для визуального просмотра пользователем — показывает недавние платежи по выбранной услуге, собранные из отдельных файлов.*/
+        return try { // ✅Эта функция возвращает результат try-блока, а если возникнет исключение, вернётся строка с ошибкой.
 
-    fun savePeriodicPayment(
-        readyHeader: String,            // Пример: если занесли в историю заголовком будет строка из "🟩🟩🟩". Если нет — заголовок будет пустым
-        readyService: String,           // Пример: "Услуга: - Интернет."
-        readySeparator1: String,         // Пример: "-----------------------------------------------------------"
-        readyDateTime: String,          // Пример: "(27.12.2024 14:30)"
-        readyStatus: String,            // Пример: "Статус: 🔴 ОПЛАЧЕНО"
-        readySeparator2: String,         // Пример: "-----------------------------------------------------------"
-        readyPreviousPayment: String,   // Пример: "Предыдущая оплата: - 1500"
-        readyNextPayment: String,       // Пример: "Следующая оплата: - 1800"
-        readyDaysAgo: String,           // Пример: "Оплата была: - 5 дней назад."
-        readyDaysLeft: String,          // Пример: "След. оплата через: - 25 дней."
-        readyTariff: String,        // Пример: "Стоимость тарифа: - 5.00 руб."
-        fileName: String                // Имя файла для сохранения
-    ) {
-        val format = """
-        |$readyHeader
-        |$readyService
-        |$readySeparator1
-        |$readyDateTime
-        |$readyStatus
-        |$readySeparator2
-        |$readyPreviousPayment
-        |$readyNextPayment
-        |$readyDaysAgo
-        |$readyDaysLeft
-        |$readyTariff
-        """.trimMargin()
+            val directory = File(context.filesDir, context.getString(R.string.history)) // ✅1 - создаёт объект File, представляющий папку history во внутреннем хранилище приложения.
 
-        saveToFile(fileName, format, true)
+
+            if (!directory.exists()) {   // ✅2 - Проверка существования папки:
+                return context.getString(R.string.empty_history_calculation)
+            }
+            val files = directory.listFiles { file ->   // ✅3 - Это фильтрация: оставляем только файлы, чьи имена начинаются с serviceKey и заканчиваются на .txt.
+                file.name.startsWith(serviceKey) && file.name.endsWith(".txt")
+            }
+            if (files == null || files.isEmpty()) {
+                return context.getString(R.string.empty_history_calculation)   // ✅Нужно добавить проверку на null. Например, после получения списка файлов:
+            }
+            files.sortByDescending { it.lastModified() }   // ✅4 - Сортировка: files.sortByDescending { it.lastModified() } — сортирует по дате последнего изменения по убыванию (новые сверху).
+
+            val maxFiles = minOf(files.size, 10)    //✅ 5 - Определение количества файлов для чтения: val maxFiles = minOf(files.size, 10) — берём не больше 10.
+
+            val content = StringBuilder()   //✅ 6 - Создаём StringBuilder для накопления содержимого: val content = StringBuilder().
+
+            for (i in 0 until maxFiles) {   //✅ 7 - Цикл for (i in 0 until maxFiles): для каждого из первых maxFiles файлов (самых новых) читаем содержимое files[i].readText() и добавляем в content, затем добавляем разделитель \n\n---\n\n.
+                content.append(files[i].readText())   // ✅Склеивает содержимое этих файлов в одну строку, добавляя между ними разделитель --- для удобочитаемости.
+                content.append("\n***\n")
+            }
+            content.toString()   // ✅8 - После цикла возвращаем content.toString().
+
+        } catch (_: Exception) {
+            context.getString(R.string.error_reading_file)
+        }
     }
 
-    fun getFileName(serviceType: String): String {
-        // FileManager работает с файлами по ключам
-        return "${serviceType}_calculations.txt"
-    }
-
-    fun editFile(serviceType: String, content: String): Boolean {
-        val fileName = getFileName(serviceType)
+    // ✅ НОВЫЙ МЕТОД: Редактирование файла
+    fun editFile(serviceKey: String, newContent: String): Boolean {
         return try {
-            saveToFile(fileName, content, false)
+            val directory = File(context.filesDir, context.getString(R.string.history)) //* * 🔴Теперь у вас есть «адрес», где лежат файлы истории.
+            if (!directory.exists()) {
+                return false
+            }
+            val files = directory.listFiles { file -> //🔴 — метод просит операционную систему заглянуть в папку directory и перебрать всё, что там лежит.
+                file.name.startsWith(serviceKey) && file.name.endsWith(".txt") // 🔴Условие работает как сито: для каждого найденного файла проверяется, начинается ли его имя с serviceKey и заканчивается ли на .txt.
+            }
+            if (files == null || files.isEmpty()) return false
+            files.sortByDescending { it.lastModified() }   // 🔴Сортируем файлы по дате последнего изменения, чтобы самый свежий (последний расчёт) оказался первым:
+            val latestFile = files[0]   // 🔴Берём самый свежий файл:
+            val records = newContent.split("\n***\n")//.filter { it.isNotBlank() }  // 🔴Разделяем newContent на отдельные записи с помощью разделителя ***.
+            if (records.isEmpty()) return false
+            val lastRecord = records.first()   //🔴 Извлекаем последнюю запись — это та, которую пользователь мог изменить
+            latestFile.writeText(lastRecord)  //🔴 Перезаписываем последний файл этой записью:
             true
         } catch (_: Exception) {
             false
         }
     }
 
-    fun saveMeterPayment(   // // 3. FileManager внутри себя делает:- Собирает все строки в один большой текст
-
-        readyHeader: String,            // Пример: если занесли в историю заголовком будет строка из "🟩🟩🟩". Если нет — заголовок будет пустым
-        readyService: String,           // Пример: "Услуга   -   Свет"
-        readySeparator1: String,    // Пример: "----------------------------------------------------------"
-        readyDateTime: String,          // Пример: "(27.12.2024 14:30)"
-        readyStatus: String,            // Пример: "Статус: 🔴 ОПЛАЧЕНО"
-        readySeparator2: String,    // Пример: "----------------------------------------------------------"
-        readyCurrentReading: String,    // Пример: "Текущие показания: - 100.50 кВт/ч"
-        readyPreviousReading: String,   // Пример: "Пред. показания: - 80.00 кВт/ч"
-        readyTariff: String,
-        readyConsumption: String,       // Пример: "Расход: - 20.50 кВт/ч"
-        readyPaymentSum: String,        // Пример: "Сумма оплаты: - 102.50 руб."
-        fileName: String                // Имя файла для сохранения
-
-    ) {
-
-        val format = """
-        |$readyHeader
-        |$readyService
-        |$readySeparator1
-        |$readyDateTime
-        |$readyStatus
-        |$readySeparator2
-        |$readyCurrentReading
-        |$readyPreviousReading
-        |$readyTariff
-        |$readyConsumption
-        |$readyPaymentSum
-        
-        """.trimMargin()
-
-
-        saveToFile(fileName, format, true)
-    }
-
-    fun loadFromFile(serviceType: String): String {  // Этот метод используется для отображения истории в ваших экранах. Например, в ElectricityScreen может быть кнопка "Показать историю", которая вызывает:
-        val tag = "FileManager" // ← Единый тег для всех логов FileManager
-
-        val fileName = getFileName(serviceType)
-        val stringBuilder = StringBuilder()
-
-        try {
-            BufferedReader(
-                InputStreamReader(
-                    context.openFileInput(fileName), StandardCharsets.UTF_8
-                )
-            ).use { reader ->
-                var line: String?
-                while (reader.readLine().also { line = it } != null) {
-                    stringBuilder.append(line).append("\n")
-                }
+    // ✅ Общий метод сохранения
+    fun saveToFile(content: String, fileName: String): Boolean {
+        return try {
+            val directory = File(context.filesDir, context.getString(R.string.history))
+            if (!directory.exists()) {
+                directory.mkdirs()
             }
-        } catch (_: FileNotFoundException) {
-            Log.w(tag, context.getString(R.string.log_file_not_found, fileName)) // ← Заменили println на Log.w (предупреждение)
-            return context.getString(R.string.empty_history_message)
+            val file = File(directory, fileName)
+            FileWriter(file).use { writer ->
+                writer.write(content)
+            }
+            true
         } catch (e: IOException) {
-            Log.e(tag, context.getString(R.string.log_file_read_error, fileName), e) // ← Заменили println на Log.e (ошибка с исключением)
-            return context.getString(R.string.error_read_file_message, e.message)
-        }
-
-        return stringBuilder.toString()
-    }
-
-    private fun saveToFile(fileName: String, text: String, append: Boolean) {
-        try {
-            // Используем MODE_APPEND для добавления в конец файла
-            val mode = if (append) Context.MODE_APPEND else Context.MODE_PRIVATE
-
-
-            context.openFileOutput(fileName, mode).use { outputStream ->
-                // Если append = true, просто добавляем новые данные в конец файла
-                // Если append = false, файл очищается и записывается заново
-                outputStream.write(text.toByteArray(StandardCharsets.UTF_8))
-                outputStream.write("\n".toByteArray())  // Добавляем перенос строки
-            }
-        } catch (e: Exception) {
-            // Просто заменяем println на Log.e (и добавляем e для stack trace)
-            Log.e("FileManager", context.getString(R.string.log_error_saving_to_file, fileName, e.message), e)
+            e.printStackTrace()
+            false
         }
     }
-
-
-    fun getCurrentDateTime(): String {
-        val sdf = SimpleDateFormat(context.getString(R.string.format_date_time_file), Locale.getDefault())
-        return sdf.format(Date())
-    }
-
-    val formattedDateTime: String = getCurrentDateTime()
-
 }

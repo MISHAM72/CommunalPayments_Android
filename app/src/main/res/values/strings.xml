@@ -4,23 +4,36 @@
     <string name="summer_night">Летняя ночь сзади дома</string>
     <string name="app_title">Коммунальные платежи</string>
 
-    <string name="tariff">Тариф: - %.2f руб.</string>
-    <string name="tariff_label">Тариф, (руб.) - </string>
-    <string name="date">Дата: %1$s</string>
+    // ИСТОРИЯ
+    <string name="custom_ready_service">Услуга - %1$s</string>
+
+    // НАЗВАНИЯ ВКЛАДОК В ИСТОРИИ
+    <string name="service_display_name_electricity">Свет</string>
+    <string name="service_display_name_water">Вода</string>
+    <string name="service_display_name_gas">Газ</string>
+    <string name="service_display_name_internet">Интернет</string>
+    <string name="service_display_name_garbage">Мусор</string>
+    <string name="service_display_name_mts">Оператор телефона № 1</string>
+    <string name="service_display_name_osago">Автострахование</string>
+    <string name="service_display_name_taxes">Налог на бизнес</string>
+    <string name="service_display_name_tinkoff">Оператор телефона № 2</string>
+    <string name="service_display_name_troyka">Проездной билет</string>
+    <string name="service_display_name_zont">Отопление</string>
 
 
     // общие
-    <string name="custom_ready_service">Услуга   -   %1$s</string>
-    <string name="status_paid">🔴 ОПЛАЧЕНО</string>
+
+    <string name="status_calculated">  ПОДСЧИТАНО</string>
     <string name="custom_status_paid">Статус: %1$s</string>
     <string name="error_saving">Ошибка сохранения</string>
 
     // оплата по счетчику
     <string name="format_two_decimals"> %.2f</string>
-
     <string name="payment_sum">Сумма оплаты: - %.2f руб.</string>
     <string name="unit_cubic_meter"> м./куб.</string>
     <string name="unit_kilowatt_hour"> кВт/ч</string>
+    <string name="consumption">Расход: - %1$.2f %2$s</string>
+    <string name="currency_rub">К оплате: - %.2f руб.</string>
 
 
     <!-- СТАРЫЕ строки (оставьте для результатов): -->
@@ -29,43 +42,21 @@
 
 
     <!-- НОВЫЕ строки для меток полей (без %s): -->
-    <string name="current_reading_label_gas">Текущие показания,(м./куб.) - </string>
-    <string name="previous_reading_label_gas">Предыдущие показания,(м./куб.) - </string>
-    <string name="current_reading_label_water">Текущие показания,(м./куб.) - </string>
-    <string name="previous_reading_label_water">Предыдущие показания,(м./куб.) - </string>
+    <string name="previous_reading_label">Предыдущие показания,(м./куб.) - </string>
+    <string name="current_reading_label">Текущие показания,(м./куб.) - </string>
     <string name="current_reading_label_electricity">Текущие показания,(кВт/ч) - </string>
     <string name="previous_reading_label_electricity">Предыдущие показания,(кВт/ч) - </string>
 
 
     <!-- Эти строки используются в логике (с плейсхолдерами): -->
-    <string name="consumption">Расход: - %1$.2f %2$s</string>
-    <string name="currency_rub">К оплате: -%.2f руб.</string>
 
     <!-- Эти строки используются в UI как заголовки (без плейсхолдеров): -->
 
 
-    // вкладки для пользователя общие
-    <string name="service_display_name_electricity">Свет</string>
-    <string name="service_display_name_water">Вода</string>
-    <string name="service_display_name_gas">Газ</string>
-    <string name="service_display_name_internet">Интернет</string>
-    <string name="service_display_name_garbage">Мусор</string>
-    <string name="service_display_name_mts">МТС</string>
-    <string name="service_display_name_osago">Осаго</string>
-    <string name="service_display_name_taxes">Налоги</string>
-    <string name="service_display_name_tinkoff">Тинькофф</string>
-    <string name="service_display_name_troyka">Тройка</string>
-    <string name="service_display_name_zont">ZONT</string>
-
-    // оплата за период
-    <string name="previous_payment">Предыдущая оплата: - %1$s</string>
-    <string name="next_payment">Следующая оплата: - %1$s</string>
-    <string name="days_from_payment">Оплата была: - %1$d дней назад.</string>
-    <string name="days_until_payment">Оплата через: - %1$d дней.</string>
     // ключи
     <string name="service_key_electricity">electricity</string>
-    <string name="service_key_water">Water</string>
-    <string name="service_key_gas">Gas</string>
+    <string name="service_key_water">water</string>
+    <string name="service_key_gas">gas</string>
     <string name="service_key_internet">internet</string>
     <string name="service_key_garbage">garbage</string>
     <string name="service_key_mts">mts</string>
@@ -81,44 +72,99 @@
     <string name="log_error_saving_to_file">❌ Ошибка сохранения в файл %1$s: %2$s</string>
 
 
-    <string name="empty_history_message">История расчетов пуста</string>
+    <string name="empty_history_calculation">История расчетов пуста</string>
     <string name="error_read_file_message">Ошибка чтения файла: %1$s</string>
     <string name="format_date_time_file">dd-MM-yyyy _ HH:mm:ss</string>
 
 
-    <string name="History">История</string>
+    <string name="history">История</string>
     <string name="back">Назад</string>
     <string name="calculation_history">История расчетов</string>
     <string name="save">Сохранить</string>
     <string name="cancel">Отмена</string>
     <string name="Edit_history">Редактировать историю</string>
     <string name="calculate_and_save">Рассчитать и Сохранить</string>
-    <string name="result_tinkoff">Результаты Тинькоф:</string>
 
-    <string name="previous_payment_with_value">Оплата была: - %1$s</string>
-    <string name="next_payment_with_value">Дата оплаты: - %1$s</string>
-    <string name="payment_made_with_value">Прошло: - %1$d дня.</string>
+
+    <!-- Новые, разделенные ресурсы для статусов (ДОБАВИТЬ РЯДОМ СО СТАРЫМИ) -->
+    <!-- Текстовые названия статусов (без эмодзи) -->
+    <string name="status_text_paid">ОПЛАЧЕНО</string>
+    <string name="status_text_pending">ОЖИДАЕТ ОПЛАТЫ</string>
+    <string name="status_text_active">АКТИВНО</string>
+    <string name="status_text_under_review">НА ПРОВЕРКЕ</string>
+    <string name="status_text_cancelled">ОТМЕНЕНО</string>
+
+    <!-- Эмодзи для статусов (опционально, можно хранить и в коде)
+    <string name="emoji_paid">🔴💰</string>
+    <string name="emoji_pending">🟡</string>
+    <string name="emoji_active">🟢</string>
+    <string name="emoji_under_review">🔵</string>
+    <string name="emoji_cancelled">⚫</string>-->
+
+    // В файле res/values/strings.xml замените эмодзи
+    <string name="emoji_paid">🔴</string>   <!--  Деньги вместо красного круга --> -->
+    <string name="emoji_pending">⏳</string> <!-- Песочные часы вместо желтого круга -->
+    <string name="emoji_active">✅</string>  <!-- Галочка вместо зеленого круга -->
+    <string name="emoji_under_review">🔍</string> <!-- Лупа вместо синего круга -->
+    <string name="emoji_cancelled">🚫</string> <!-- Знак запрета вместо черного круга -->
+    <string name="emoji_calculated">🤓</string>
+    <!--<string name="paid_for">🔴 ОПЛАЧЕНО</string>-->
+    <string name="Replace_the_status_in_the_LAST_entry">Заменить статус в ПОСЛЕДНЕЙ записи:</string>
+    <string name="Edit_the_entire_text_To_replace_the_status_in_the_last_entry_click_on_the_button_above">Редактируйте весь текст. Для замены статуса в последней записи нажмите на кнопку выше</string>
+    <string name="to_be_paid">К оплате:</string>
+    <string name="date_label">Дата:</string>
+    <string name="status_label">Статус:</string>
+
+    <color name="status_red">#F44336</color>
+    <color name="status_yellow">#FFEB3B</color>
+    <color name="status_green">#4CAF50</color>
+    <color name="status_blue">#2196F3</color>
+    <color name="status_black">#212121</color>
+
+
+    <!-- <string name="status_pending">🟡 ОЖИДАЕТ ОПЛАТЫ</string>
+     <string name="status_active">🟢 АКТИВНО</string>
+     <string name="status_review">🔵 НА ПРОВЕРКЕ</string>
+     <string name="status_cancelled">⚫ ОТМЕНЕНО</string>-->
+
+
+    // ТЕКСТ НА ПОЛЯХ ПЛАТЕЖЕЙ ЗА ПЕРИОД (label)
+    <string name="day_of_payment_label">День платежа - </string>
+    <string name="period_months_label">Период, (в мес.) - </string>
+    <string name="tariff_label">Тариф:   руб.</string>
+
+    // НФЗВАНИЯ КАРТОЧЕК
     <string name="result_garbage">Результаты Мусор:</string>
     <string name="result_zont">Результат по  ZONT:</string>
     <string name="result_internet">Результат по  Интернет:</string>
     <string name="result_mts">Результаты МТС:</string>
-    <string name="result_taxes">Результаты Тинькоф:</string>
+    <string name="result_taxes">Результаты Налоги:</string>
     <string name="result_osago">Результаты Осаго:</string>
     <string name="result_troyka">Результаты Тройка:</string>
     <string name="result_electricity">Результат по свету:</string>
     <string name="result_water">Результат по воде:</string>
     <string name="result_gas">Результат по газу:</string>
+    <string name="result_tinkoff">Результаты Тинькоф:</string>
     <string name="loading">Загрузка</string>
 
+    // КАРТОЧКА ОПЛАТЫ ЗА ПЕРИОД
+    <string name="date">Сегодня: %1$s</string>
+    <string name="the_payment_was">Оплата была: - %1$s</string>
+    <string name="passed">Прошло: - %1$d дня.</string>
+    <string name="next_payment">Дата оплаты: - %1$s</string>
+    <string name="payment_in">Оплата через: - %1$d дней.</string>
+    <string name="tariff_card">Тариф:  %.2f руб.</string>
+    <string name="personal_account">Лицевой счёт</string>
+    <string name="enter_account_number">Введите лицевой счёт</string>
 
-    <!-- Интернет -->
-    <string name="day_of_payment_label">День платежа - </string>
-    <string name="period_months_label">Период,(мес.) - </string>
 
-    <string name="previous_payment_label">Последняя оплата:</string>
-    <string name="next_payment_label">Следующая оплата:</string>
-    <string name="days_from_payment_label">Прошло дней:</string>
-    <string name="days_until_payment_label">Дней до оплаты:</string>
-
-
+    <string name="file_not_found">Файл не найден: %1$s</string>
+    <string name="error_reading_file">Ошибка чтения файла %1$s</string>
+    <string name="error_saving_to_file">Ошибка сохранения в файл %1$s: %2$s</string>
+    <string name="error_invalid_input">Ошибка ввода</string>
+    <string name="yyyy_mm_dd_hh_mm_ss">yyyy-MM-dd HH:mm:ss</string>
+    <string name="change_personal_account">Изменить лицевой счёт</string>
+    Change your personal account
+    <string name="account_prefs">Настройки учетной записи</string>
 </resources>
+

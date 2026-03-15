@@ -3,7 +3,6 @@ val proguardAndroidOptimize: String = "proguard-android-optimize.txt"
 val proguardRulesPro: String = "proguard-rules.pro"
 val composeUiTextGoogleFonts: String = "androidx.compose.ui:ui-text-google-fonts:1.6.1"
 
-
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -13,8 +12,6 @@ plugins {
 android {
     namespace = "com.github.misham72.communalpayments"
     compileSdk = 36
-
-
     defaultConfig {
         applicationId = "com.github.misham72.communalpayments"
         minSdk = 24
@@ -28,8 +25,7 @@ android {
         release {
             isMinifyEnabled = false
             proguardFiles(
-                getDefaultProguardFile(proguardAndroidOptimize), // ← Используем константу
-                proguardRulesPro                                   // ← Используем константу
+                getDefaultProguardFile(proguardAndroidOptimize), proguardRulesPro
             )
         }
     }
@@ -41,11 +37,13 @@ android {
         compose = true
     }
 }
+
 kotlin {
     compilerOptions {
         jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
     }
 }
+
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -64,5 +62,8 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     implementation(libs.androidx.datastore.preferences)
     implementation(composeUiTextGoogleFonts)
+    // Зависимость для ViewModel в Compose — добавим через libs
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation("androidx.compose.material:material-icons-core:1.7.6")
+    implementation("androidx.compose.material:material-icons-extended:1.7.6")
 }
-

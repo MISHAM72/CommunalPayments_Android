@@ -32,8 +32,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.presentation.screen.components.ServiceTab
-import com.github.misham72.communalpayments.presentation.screen.screens.history.SimpleHistoryScreen
 import com.github.misham72.communalpayments.presentation.screen.navigation.getListInitialScreen
+import com.github.misham72.communalpayments.presentation.screen.screens.history.SimpleHistoryScreen
 
 @Composable
 fun ControlBetweenScreens() {
@@ -50,59 +50,28 @@ fun ControlBetweenScreens() {
     } else {
         // ОБЕРНУЛИ В Surface с цветом из темы
         Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.background  // ← ТЕПЕРЬ ФОН МЕНЯЕТСЯ
+            modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background  // ← ТЕПЕРЬ ФОН МЕНЯЕТСЯ
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(16.dp)
+                    .padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp) // равные отступы между элементами
+
             ) {
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                    modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        stringResource(R.string.app_title),
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onBackground  // ← ЦВЕТ ТЕКСТА ИЗ ТЕМЫ
+                        stringResource(R.string.app_title), fontSize = 24.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground  // ← ЦВЕТ ТЕКСТА ИЗ ТЕМЫ
                     )
                 }
-
                 // Горизонтальные вкладки с иконками
                 Row(
-                    modifier = Modifier
-                        .horizontalScroll(rememberScrollState())
-                        .padding(bottom = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    modifier = Modifier.horizontalScroll(rememberScrollState())
                 ) {
                     services.forEachIndexed { index, service ->
                         ServiceTab(
-                            service = service,
-                            isSelected = selectedService == index,
-                            onClick = { selectedService = index }
-                        )
-                    }
-                }
-
-                val service = services[selectedService]
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        service.name,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onBackground  // ← ЦВЕТ ТЕКСТА ИЗ ТЕМЫ
-                    )
-                    if (service.account.isNotEmpty()) {
-                        Text(
-                            service.account,
-                            color = MaterialTheme.colorScheme.error  // ← ВМЕСТО Color.Red
-                        )
+                            service = service, isSelected = selectedService == index, onClick = { selectedService = index })
                     }
                 }
 
@@ -111,9 +80,7 @@ fun ControlBetweenScreens() {
                     services[selectedService].screen()
                 }
                 Image(
-                    painter = painterResource(R.drawable.night),
-                    contentDescription = stringResource(R.string.summer_night),
-                    contentScale = ContentScale.FillWidth, // Растягивает по ширине, сохраняя пропорции
+                    painter = painterResource(R.drawable.night), contentDescription = stringResource(R.string.summer_night), contentScale = ContentScale.FillWidth, // Растягивает по ширине, сохраняя пропорции
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(250.dp)
@@ -121,12 +88,10 @@ fun ControlBetweenScreens() {
 
                 // Кнопка с кастомным цветом (если хотите)
                 Button(
-                    onClick = { showHistory = true },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(
+                    onClick = { showHistory = true }, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(
                     )
                 ) {
-                    Text(stringResource(R.string.History))
+                    Text(stringResource(R.string.history))
                 }
             }
         }
