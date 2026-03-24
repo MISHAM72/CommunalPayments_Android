@@ -1,13 +1,17 @@
 package com.github.misham72.communalpayments.presentation.screen.screens.tinkoff
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.github.misham72.communalpayments.data.local.AccountPreferences
 import com.github.misham72.communalpayments.domain.repository.TinkoffRepository
 import com.github.misham72.communalpayments.domain.userclasses.Tinkoff
+import com.github.misham72.communalpayments.domain.utils.ServiceKeys
+import com.github.misham72.communalpayments.presentation.screen.screens.garbage.GarbageViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 
 class TinkoffViewModel(
@@ -16,16 +20,18 @@ class TinkoffViewModel(
 ) : ViewModel() {
 
     companion object {
-        private const val SERVICE_KEY = "tinkoff"
+        private const val SERVICE_KEY = ServiceKeys.TINKOFF
     }
 
     // 1️⃣ СОСТОЯНИЕ ЭКРАНА (что храним)
     data class UiState(
         val paymentDay: String = "",      // день платежа
         val periodMonths: String = "",    // период в месяцах
-        val priceTariff: String = "", val accountNumber: String = "",
-        // 🔸 ДОБАВИТЬ НОВОЕ ПОЛЕ
-        val customServiceName: String = "", val showAccountDialog: Boolean = false,   // флаг для диалога
+        val priceTariff: String = "",
+        val accountNumber: String = "",
+        val customServiceName: String = "",
+        val customDate: String = "",
+        val showAccountDialog: Boolean = false,   // флаг для диалога
         val result: Tinkoff.TinkoffData? = null, val errorMessage: String? = null
     )
 
@@ -34,9 +40,9 @@ class TinkoffViewModel(
 
     init {
         val savedNumber = accountPrefs.getAccount(SERVICE_KEY)
-        // 🔸 ЗАГРУЗИТЬ СОХРАНЁННОЕ НАЗВАНИЕ
+        val saveDate = accountPrefs.getCustomDate(SERVICE_KEY)
         val savedName = accountPrefs.getCustomName(SERVICE_KEY)
-        _uiState.update { it.copy(accountNumber = savedNumber, customServiceName = savedName) }
+        _uiState.update { it.copy(accountNumber = savedNumber, customServiceName = savedName, customDate = saveDate) }
     }
 
     fun openAccountDialog() {
@@ -49,9 +55,10 @@ class TinkoffViewModel(
 
 
     // 🔸 ЗАМЕНИТЬ updateAccountNumber на updateAccountData (сохраняет и номер, и название)
-    fun updateAccountData(newNumber: String, newName: String) {
-        _uiState.update { it.copy(accountNumber = newNumber, customServiceName = newName) }
+    fun updateAccountData(newNumber: String, newName: String, newDate: String) {
+        _uiState.update { it.copy(accountNumber = newNumber, customServiceName = newName, customDate = newDate) }
         accountPrefs.saveAccount(SERVICE_KEY, newNumber)
+        accountPrefs.saveCustomDate(SERVICE_KEY, newDate)
         accountPrefs.saveCustomName(SERVICE_KEY, newName)
     }
 
@@ -85,11 +92,12 @@ class TinkoffViewModel(
         val data = tinkoff.collectTinkoffData(
             paymentDay, periodMonths, priceTariff, accountNumber = account
         )
+        viewModelScope.launch {
+            // 2️⃣ Data - КАК сохранить
+            tinkoffRepository.saveTinkoffPayment(data)
 
-        // 2️⃣ Data - КАК сохранить
-        tinkoffRepository.saveTinkoffPayment(data)
-
-        // 3️⃣ Обновляем UI
-        _uiState.update { it.copy(result = data, errorMessage = null) }
+            // 3️⃣ Обновляем UI
+            _uiState.update { it.copy(result = data, errorMessage = null) }
+        }
     }
 }

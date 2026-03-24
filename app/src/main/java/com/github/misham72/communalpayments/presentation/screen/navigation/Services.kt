@@ -6,6 +6,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.misham72.communalpayments.R
+import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 import com.github.misham72.communalpayments.presentation.screen.screens.electricity.DisplayElectricityScreen
 import com.github.misham72.communalpayments.presentation.screen.screens.electricity.ElectricityViewModelFactory
 import com.github.misham72.communalpayments.presentation.screen.screens.garbage.DisplayGarbageScreen
@@ -34,68 +35,68 @@ import com.github.misham72.communalpayments.presentation.screen.screens.water.Wa
 @Composable
 fun getListInitialScreen(): List<InitialScreen> {
     return listOf(
-        InitialScreen("⚡", stringResource(R.string.service_display_name_electricity), "ЛС: 2324 0001 3040", stringResource(R.string.service_key_electricity), {
+        InitialScreen("⚡", stringResource(R.string.service_display_name_electricity), "ЛС: 2324 0001 3040", ServiceKeys.ELECTRICITY, {
             val context = LocalContext.current
             DisplayElectricityScreen(
                 viewModel = viewModel(factory = ElectricityViewModelFactory(context))
             )
         }),
-        InitialScreen("🔥", stringResource(R.string.service_display_name_gas), "ЛС: 1230 0102 5113", stringResource(R.string.service_key_gas), {
+        InitialScreen("🔥", stringResource(R.string.service_display_name_gas), "ЛС: 1230 0102 5113", ServiceKeys.GAS, {
             val context = LocalContext.current
             DisplayGasScreen(
                 viewModel = viewModel(factory = GasViewModelFactory(context))
             )
         }),
-        InitialScreen("💧", stringResource(R.string.service_display_name_water), "ЛС: 000 007 894", stringResource(R.string.service_key_water), {
+        InitialScreen("💧", stringResource(R.string.service_display_name_water), "ЛС: 000 007 894", ServiceKeys.WATER, {
             val context = LocalContext.current
             DisplayWaterScreen(
                 viewModel = viewModel(factory = WaterViewModelFactory(context))
             )
         }),
-        InitialScreen("🗑️", stringResource(R.string.service_display_name_garbage), "ЛС: 210 1010 8366", stringResource(R.string.service_key_garbage), {
+        InitialScreen("🗑️", stringResource(R.string.service_display_name_garbage), "ЛС: 210 1010 8366", ServiceKeys.GARBAGE, {
             val context = LocalContext.current
             DisplayGarbageScreen(
                 viewModel = viewModel(factory = GarbageViewModelFactory(context))
             )
         }),
 
-        InitialScreen("🌡️", stringResource(R.string.service_display_name_zont), "тел. +7(910) 133-00-85", stringResource(R.string.service_key_zont), {
+        InitialScreen("🌡️", stringResource(R.string.service_display_name_zont), "тел. +7(910) 133-00-85", ServiceKeys.ZONT, {
             val context = LocalContext.current
             DisplayZONTScreen(
                 viewModel = viewModel(factory = ZONTViewModelFactory(context))
             )
         }),
-        InitialScreen("📶", stringResource(R.string.service_display_name_internet), "ЛС: 2300 0343 3205", stringResource(R.string.service_key_internet), {
+        InitialScreen("📶", stringResource(R.string.service_display_name_internet), "ЛС: 2300 0343 3205", ServiceKeys.INTERNET, {
             val context = LocalContext.current
             DisplayInternetScreen(
                 viewModel = viewModel(factory = InternetViewModelFactory(context))
             )
         }),
-        InitialScreen("\uD83D\uDD34\uD83D\uDCDE", stringResource(R.string.service_display_name_mts), "тел. +7(918) 48-48-989", stringResource(R.string.service_key_mts), {
+        InitialScreen("\uD83D\uDD34\uD83D\uDCDE", stringResource(R.string.service_display_name_mts), "тел. +7(918) 48-48-989", ServiceKeys.MTS, {
             val context = LocalContext.current
             DisplayMTSScreen(
                 viewModel = viewModel(factory = MTSViewModelFactory(context))
             )
         }),
-        InitialScreen("\uD83D\uDD35\uD83D\uDCDE", stringResource(R.string.service_display_name_tinkoff), "тел. +7(995) 00-585-44", stringResource(R.string.service_key_tinkoff), {
+        InitialScreen("\uD83D\uDD35\uD83D\uDCDE", stringResource(R.string.service_display_name_tinkoff), "тел. +7(995) 00-585-44", ServiceKeys.TINKOFF, {
             val context = LocalContext.current
             DisplayTinkoffScreen(
                 viewModel = viewModel(factory = TinkoffViewModelFactory(context))
             )
         }),
-        InitialScreen("💰", stringResource(R.string.service_display_name_taxes), "ИНН: 2323 0478 5694", stringResource(R.string.service_key_taxes), {
+        InitialScreen("💰", stringResource(R.string.service_display_name_taxes), "ИНН: 2323 0478 5694", ServiceKeys.TAXES, {
             val context = LocalContext.current
             DisplayTaxesScreen(
                 viewModel = viewModel(factory = TaxesViewModelFactory(context))
             )
         }),
-        InitialScreen("🚇", stringResource(R.string.service_display_name_troyka), "0048 747 011", stringResource(R.string.service_key_troyka), {
+        InitialScreen("🚇", stringResource(R.string.service_display_name_troyka), "0048 747 011", ServiceKeys.TROYKA, {
             val context = LocalContext.current
             DisplayTroykaScreen(
                 viewModel = viewModel(factory = TroykaViewModelFactory(context))
             )
         }),
-        InitialScreen("🚗", stringResource(R.string.service_display_name_osago), "№ XXX 0574 944 292", stringResource(R.string.service_key_osago), {
+        InitialScreen("🚗", stringResource(R.string.service_display_name_osago), "№ XXX 0574 944 292", ServiceKeys.OSAGO, {
             val context = LocalContext.current
             DisplayOsagoScreen(
                 viewModel = viewModel(factory = OsagoViewModelFactory(context))

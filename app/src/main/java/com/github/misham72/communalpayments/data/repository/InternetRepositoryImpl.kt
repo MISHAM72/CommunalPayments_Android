@@ -5,6 +5,7 @@ import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.data.local.FileManager
 import com.github.misham72.communalpayments.domain.repository.InternetRepository
 import com.github.misham72.communalpayments.domain.userclasses.Internet
+import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 
 class InternetRepositoryImpl(
     context: Context,
@@ -12,9 +13,9 @@ class InternetRepositoryImpl(
 ) : BasePeriodicRepositoryWithAccount(context, fileManager), InternetRepository
 {
 
-   override fun saveInternetPayment(data: Internet.InternetData) {
+   override suspend fun saveInternetPayment(data: Internet.InternetData) {
         val dateTime = getCurrentDateTime()
-        val fileName = getFileName(context.getString(R.string.service_key_internet))
+        val serviceKey = ServiceKeys.INTERNET
         val status = context.getString(R.string.status_calculated)
 
         // ✅ Используем НОВЫЙ метод formatInternetPayment со всеми полями
@@ -31,6 +32,6 @@ class InternetRepositoryImpl(
             customStatus = status
         )
 
-        fileManager.saveToFile(content, fileName)
+        fileManager.appendRecord(serviceKey, content)
     }
 }

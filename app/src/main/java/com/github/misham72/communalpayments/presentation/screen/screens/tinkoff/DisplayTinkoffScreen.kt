@@ -39,8 +39,8 @@ import com.github.misham72.communalpayments.R
 fun DisplayTinkoffScreen(viewModel: TinkoffViewModel) {
     val uiState by viewModel.uiState.collectAsState()
     var tempNumber by remember { mutableStateOf(uiState.accountNumber) }
-    // 🔸 ДОБАВИТЬ временную переменную для названия
     var tempName by remember { mutableStateOf(uiState.customServiceName) }
+    var tempDate by remember { mutableStateOf(uiState.customDate) }
 
     Column(
         modifier = Modifier
@@ -60,7 +60,11 @@ fun DisplayTinkoffScreen(viewModel: TinkoffViewModel) {
                 Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.change_personal_account))
             }
         }
-
+        if (uiState.customDate.isNotBlank()) {
+            Text(
+                text = "Дата платежа: ${uiState.customDate}", fontSize = 14.sp, color = Color.DarkGray, modifier = Modifier.padding(top = 4.dp)
+            )
+        }
 // Номер под названием (отдельная строка)
         if (uiState.accountNumber.isNotBlank()) {
             Text(
@@ -147,13 +151,16 @@ fun DisplayTinkoffScreen(viewModel: TinkoffViewModel) {
                     value = tempName, onValueChange = { tempName = it }, label = { Text("Название услуги") }, singleLine = true, modifier = Modifier.fillMaxWidth()
                 )
                 OutlinedTextField(
+                    value = tempDate, onValueChange = { tempDate = it }, label = { Text("Дата следующего платежа") }, singleLine = true, modifier = Modifier.fillMaxWidth()
+                )
+                OutlinedTextField(
                     value = tempNumber, onValueChange = { tempNumber = it }, label = { Text("Лицевой счёт") }, singleLine = true, modifier = Modifier.fillMaxWidth()
                 )
             }
         }, confirmButton = {
             TextButton(
                 onClick = {
-                    viewModel.updateAccountData(tempNumber, tempName)
+                    viewModel.updateAccountData(tempNumber, tempName, tempDate)
                     viewModel.closeAccountDialog()
                 }) {
                 Text(stringResource(R.string.save))

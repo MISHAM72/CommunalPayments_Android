@@ -5,13 +5,14 @@ import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.data.local.FileManager
 import com.github.misham72.communalpayments.domain.repository.TaxesRepository
 import com.github.misham72.communalpayments.domain.userclasses.Taxes
+import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 
 class TaxesRepositoryImpl(
     context: Context, fileManager: FileManager
 ) : BasePeriodicRepositoryWithAccount(context, fileManager), TaxesRepository {
-    override fun saveTaxesPayment(data: Taxes.TaxesData) {
+    override suspend fun saveTaxesPayment(data: Taxes.TaxesData) {
         val dateTime = getCurrentDateTime()
-        val fileName = getFileName(context.getString(R.string.service_key_taxes))
+        val serviceKey = ServiceKeys.TAXES
         val status = context.getString(R.string.status_calculated)
         val content = formatWithAccountNumber(
             accountNumber = data.accountNumber,
@@ -25,6 +26,6 @@ class TaxesRepositoryImpl(
             isHistory = data.isHistory,
             customStatus = status
         )
-        fileManager.saveToFile(content, fileName)
+        fileManager.appendRecord(serviceKey, content)
     }
 }

@@ -24,4 +24,14 @@ class AccountPreferences(context: Context) {
     fun getCustomName(serviceKey: String): String {
         return prefs.getString("name_$serviceKey", "") ?: ""
     }
+    ///////
+    fun saveCustomDate(serviceKey: String, date: String) {
+        prefs.edit { putString("date_$serviceKey", date) }
+    }
+
+    // 🔸 НОВЫЙ МЕТОД для загрузки названия услуги
+    fun getCustomDate(serviceKey: String): String {
+        return prefs.getString("date_$serviceKey", "") ?: ""
+    }
+
 }

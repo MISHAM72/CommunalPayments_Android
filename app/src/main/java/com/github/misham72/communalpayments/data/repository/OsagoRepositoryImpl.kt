@@ -5,13 +5,14 @@ import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.data.local.FileManager
 import com.github.misham72.communalpayments.domain.repository.OsagoRepository
 import com.github.misham72.communalpayments.domain.userclasses.Osago
+import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 
 class OsagoRepositoryImpl(
     context: Context, fileManager: FileManager
 ) : BasePeriodicRepositoryWithAccount(context, fileManager), OsagoRepository {
-    override fun saveOsagoPayment(data: Osago.OsagoData) {
+    override suspend fun saveOsagoPayment(data: Osago.OsagoData) {
         val dateTime = getCurrentDateTime()
-        val fileName = getFileName(context.getString(R.string.service_key_osago))
+        val serviceKey = ServiceKeys.OSAGO
         val status = context.getString(R.string.status_calculated)
 
         val content = formatWithAccountNumber(
@@ -26,6 +27,6 @@ class OsagoRepositoryImpl(
             isHistory = data.isHistory,
             customStatus = status
         )
-        fileManager.saveToFile(content, fileName)
+        fileManager.appendRecord(serviceKey, content)
     }
 }

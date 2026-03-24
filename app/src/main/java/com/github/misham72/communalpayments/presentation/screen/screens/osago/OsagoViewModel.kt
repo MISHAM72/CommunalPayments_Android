@@ -1,13 +1,17 @@
 package com.github.misham72.communalpayments.presentation.screen.screens.osago
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.github.misham72.communalpayments.data.local.AccountPreferences
 import com.github.misham72.communalpayments.domain.repository.OsagoRepository
 import com.github.misham72.communalpayments.domain.userclasses.Osago
+import com.github.misham72.communalpayments.domain.utils.ServiceKeys
+import com.github.misham72.communalpayments.presentation.screen.screens.garbage.GarbageViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 class OsagoViewModel(
     private val osago: Osago,                    // Домен
@@ -15,7 +19,7 @@ class OsagoViewModel(
 ) : ViewModel() {
 
     companion object {
-        private const val SERVICE_KEY = "osago"
+        private const val SERVICE_KEY = ServiceKeys.OSAGO
     }
 
     data class UiState(
@@ -23,7 +27,7 @@ class OsagoViewModel(
         val periodMonths: String = "",    // период в месяцах
         val priceTariff: String = "",     // тариф
         val accountNumber: String = "",
-        // 🔸 ДОБАВИТЬ НОВОЕ ПОЛЕ
+        val customDate: String = "",
         val customServiceName: String = "", val showAccountDialog: Boolean = false,   // флаг для диалога
         val result: Osago.OsagoData? = null, val errorMessage: String? = null
     )
@@ -35,7 +39,8 @@ class OsagoViewModel(
         val savedNumber = accountPrefs.getAccount(SERVICE_KEY)
         // 🔸 ЗАГРУЗИТЬ СОХРАНЁННОЕ НАЗВАНИЕ
         val savedName = accountPrefs.getCustomName(SERVICE_KEY)
-        _uiState.update { it.copy(accountNumber = savedNumber, customServiceName = savedName) }
+        val saveDate = accountPrefs.getCustomDate(SERVICE_KEY)
+        _uiState.update { it.copy(accountNumber = savedNumber, customServiceName = savedName, customDate = saveDate) }
     }
 
     fun openAccountDialog() {
@@ -48,9 +53,10 @@ class OsagoViewModel(
 
 
     // 🔸 ЗАМЕНИТЬ updateAccountNumber на updateAccountData (сохраняет и номер, и название)
-    fun updateAccountData(newNumber: String, newName: String) {
-        _uiState.update { it.copy(accountNumber = newNumber, customServiceName = newName) }
+    fun updateAccountData(newNumber: String, newName: String, newDate: String) {
+        _uiState.update { it.copy(accountNumber = newNumber, customServiceName = newName, customDate = newDate) }
         accountPrefs.saveAccount(SERVICE_KEY, newNumber)
+        accountPrefs.saveCustomDate(SERVICE_KEY, newDate)
         accountPrefs.saveCustomName(SERVICE_KEY, newName)
     }
 
@@ -83,11 +89,12 @@ class OsagoViewModel(
         val data = osago.collectOsagoData(
             paymentDay, periodMonths, priceTariff, accountNumber = account
         )
+        viewModelScope.launch {
+            // 2️⃣ Data - КАК сохранить
+            osagoRepository.saveOsagoPayment(data)
 
-        // 2️⃣ Data - КАК сохранить
-        osagoRepository.saveOsagoPayment(data)
-
-        // 3️⃣ Обновляем UI
-        _uiState.update { it.copy(result = data, errorMessage = null) }
+            // 3️⃣ Обновляем UI
+            _uiState.update { it.copy(result = data, errorMessage = null) }
+        }
     }
 }

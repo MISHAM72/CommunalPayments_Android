@@ -5,15 +5,16 @@ import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.data.local.FileManager
 import com.github.misham72.communalpayments.domain.repository.ElectricityRepository
 import com.github.misham72.communalpayments.domain.userclasses.Electricity
+import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 
 class ElectricityRepositoryImpl(
     context: Context,
     fileManager: FileManager
 ) : BaseMeterRepositoryWithAccount(context, fileManager), ElectricityRepository {
 
-    override fun saveElectricityPayment(data: Electricity.ElectricityData) {
+    override suspend fun saveElectricityPayment(data: Electricity.ElectricityData) {
         val dateTime = getCurrentDateTime()
-        val fileName = getFileName(context.getString(R.string.service_key_electricity))
+        val serviceKey = ServiceKeys.ELECTRICITY
         val status = context.getString(R.string.status_calculated)
 
         val content = formatWithAccountNumber(
@@ -29,6 +30,6 @@ class ElectricityRepositoryImpl(
             customStatus = status
         )
 
-        fileManager.saveToFile(content, fileName)
+        fileManager.appendRecord(serviceKey, content)
     }
 }

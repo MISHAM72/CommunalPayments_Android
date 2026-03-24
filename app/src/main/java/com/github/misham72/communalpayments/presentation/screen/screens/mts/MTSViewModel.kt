@@ -1,13 +1,17 @@
 package com.github.misham72.communalpayments.presentation.screen.screens.mts
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.github.misham72.communalpayments.data.local.AccountPreferences
 import com.github.misham72.communalpayments.domain.repository.MTSRepository
 import com.github.misham72.communalpayments.domain.userclasses.MTS
+import com.github.misham72.communalpayments.domain.utils.ServiceKeys
+import com.github.misham72.communalpayments.presentation.screen.screens.garbage.GarbageViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 class MTSViewModel(
     private val mts: MTS,                    // Домен
@@ -15,7 +19,7 @@ class MTSViewModel(
 ) : ViewModel() {
 
     companion object {
-        private const val SERVICE_KEY = "mts"
+        private const val SERVICE_KEY = ServiceKeys.MTS
     }
 
     // 1️⃣ СОСТОЯНИЕ ЭКРАНА (что храним)
@@ -23,7 +27,7 @@ class MTSViewModel(
         val paymentDay: String = "",      // день платежа
         val periodMonths: String = "",    // период в месяцах
         val priceTariff: String = "", val accountNumber: String = "",
-        // 🔸 ДОБАВИТЬ НОВОЕ ПОЛЕ
+        val customDate: String = "",
         val customServiceName: String = "", val showAccountDialog: Boolean = false,   // флаг для диалога
         val result: MTS.MTSData? = null, val errorMessage: String? = null
     )
@@ -33,9 +37,9 @@ class MTSViewModel(
 
     init {
         val savedNumber = accountPrefs.getAccount(SERVICE_KEY)
-        // 🔸 ЗАГРУЗИТЬ СОХРАНЁННОЕ НАЗВАНИЕ
+        val saveDate = accountPrefs.getCustomDate(SERVICE_KEY)
         val savedName = accountPrefs.getCustomName(SERVICE_KEY)
-        _uiState.update { it.copy(accountNumber = savedNumber, customServiceName = savedName) }
+        _uiState.update { it.copy(accountNumber = savedNumber, customServiceName = savedName, customDate = saveDate) }
     }
 
     fun openAccountDialog() {
@@ -48,9 +52,10 @@ class MTSViewModel(
 
 
     // 🔸 ЗАМЕНИТЬ updateAccountNumber на updateAccountData (сохраняет и номер, и название)
-    fun updateAccountData(newNumber: String, newName: String) {
-        _uiState.update { it.copy(accountNumber = newNumber, customServiceName = newName) }
+    fun updateAccountData(newNumber: String, newName: String, newDate: String) {
+        _uiState.update { it.copy(accountNumber = newNumber, customServiceName = newName, customDate = newDate) }
         accountPrefs.saveAccount(SERVICE_KEY, newNumber)
+        accountPrefs.saveCustomDate(SERVICE_KEY, newDate)
         accountPrefs.saveCustomName(SERVICE_KEY, newName)
     }
 
@@ -84,11 +89,12 @@ class MTSViewModel(
         val data = mts.collectMTSData(
             paymentDay, periodMonths, priceTariff, accountNumber = account
         )
+        viewModelScope.launch {
+            // 2️⃣ Data - КАК сохранить
+            mtsRepository.saveMTSPayment(data)
 
-        // 2️⃣ Data - КАК сохранить
-        mtsRepository.saveMTSPayment(data)
-
-        // 3️⃣ Обновляем UI
-        _uiState.update { it.copy(result = data, errorMessage = null) }
+            // 3️⃣ Обновляем UI
+            _uiState.update { it.copy(result = data, errorMessage = null) }
+        }
     }
 }

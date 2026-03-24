@@ -71,6 +71,7 @@
     <string name="log_file_read_error">❌ ОШИБКА ЧТЕНИЯ ФАЙЛА %1$s</string>
     <string name="log_error_saving_to_file">❌ Ошибка сохранения в файл %1$s: %2$s</string>
 
+    <string name="download_error_with_message">❌ ОШИБКА ЗАГРУЗКИ: %s</string>
 
     <string name="empty_history_calculation">История расчетов пуста</string>
     <string name="error_read_file_message">Ошибка чтения файла: %1$s</string>
@@ -93,13 +94,7 @@
     <string name="status_text_active">АКТИВНО</string>
     <string name="status_text_under_review">НА ПРОВЕРКЕ</string>
     <string name="status_text_cancelled">ОТМЕНЕНО</string>
-
-    <!-- Эмодзи для статусов (опционально, можно хранить и в коде)
-    <string name="emoji_paid">🔴💰</string>
-    <string name="emoji_pending">🟡</string>
-    <string name="emoji_active">🟢</string>
-    <string name="emoji_under_review">🔵</string>
-    <string name="emoji_cancelled">⚫</string>-->
+    <string name="service_prefix">Услуга_</string>
 
     // В файле res/values/strings.xml замените эмодзи
     <string name="emoji_paid">🔴</string>   <!--  Деньги вместо красного круга --> -->
@@ -166,5 +161,6 @@
     <string name="change_personal_account">Изменить лицевой счёт</string>
     Change your personal account
     <string name="account_prefs">Настройки учетной записи</string>
+    <string name="unknown_error">Не известная ошибка</string>
 </resources>
 

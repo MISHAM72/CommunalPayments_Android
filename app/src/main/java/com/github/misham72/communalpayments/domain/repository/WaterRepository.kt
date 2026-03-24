@@ -3,5 +3,5 @@ package com.github.misham72.communalpayments.domain.repository
 import com.github.misham72.communalpayments.domain.userclasses.Water
 
 interface WaterRepository {
-    fun saveWaterPayment(data: Water.WaterData)
+    suspend fun saveWaterPayment(data: Water.WaterData)
 }

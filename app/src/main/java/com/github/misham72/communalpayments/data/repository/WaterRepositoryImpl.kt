@@ -5,14 +5,15 @@ import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.data.local.FileManager
 import com.github.misham72.communalpayments.domain.repository.WaterRepository
 import com.github.misham72.communalpayments.domain.userclasses.Water
+import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 
 class WaterRepositoryImpl(
     context: Context, fileManager: FileManager
 ) : BaseMeterRepositoryWithAccount(context, fileManager), WaterRepository {
 
-    override fun saveWaterPayment(data: Water.WaterData) {
+    override suspend fun saveWaterPayment(data: Water.WaterData) {
         val dateTime = getCurrentDateTime()
-        val fileName = getFileName(context.getString(R.string.service_key_water))
+        val serviceKey = ServiceKeys.WATER
         val status = context.getString(R.string.status_calculated)
 
         val content = formatWithAccountNumber(
@@ -28,6 +29,6 @@ class WaterRepositoryImpl(
             customStatus = status
         )
 
-        fileManager.saveToFile(content, fileName)
+        fileManager.appendRecord(serviceKey, content)
     }
 }

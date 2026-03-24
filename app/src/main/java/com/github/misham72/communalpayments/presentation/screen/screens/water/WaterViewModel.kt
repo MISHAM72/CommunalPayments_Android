@@ -1,13 +1,17 @@
 package com.github.misham72.communalpayments.presentation.screen.screens.water
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.github.misham72.communalpayments.data.local.AccountPreferences
 import com.github.misham72.communalpayments.domain.repository.WaterRepository
 import com.github.misham72.communalpayments.domain.userclasses.Water
+import com.github.misham72.communalpayments.domain.utils.ServiceKeys
+import com.github.misham72.communalpayments.presentation.screen.screens.electricity.ElectricityViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 
 class WaterViewModel(
@@ -16,7 +20,7 @@ class WaterViewModel(
     private val accountPrefs: AccountPreferences
 ) : ViewModel() {
     companion object {
-        private const val SERVICE_KEY = "water"
+        private const val SERVICE_KEY = ServiceKeys.WATER
     }
 
     data class UiState( //✅ UiState как единый источник правды для экрана
@@ -24,7 +28,7 @@ class WaterViewModel(
         val previousReading: String = "",
         val tariff: String = "",
         val accountNumber: String = "",
-        // 🔸 ДОБАВИТЬ НОВОЕ ПОЛЕ
+        val customDate: String = "",
         val customServiceName: String = "",
         val showAccountDialog: Boolean = false,   // флаг для диалога
         val result: Water.WaterData? = null,
@@ -38,7 +42,9 @@ class WaterViewModel(
         val savedNumber = accountPrefs.getAccount(SERVICE_KEY)
         // 🔸 ЗАГРУЗИТЬ СОХРАНЁННОЕ НАЗВАНИЕ
         val savedName = accountPrefs.getCustomName(SERVICE_KEY)
-        _uiState.update { it.copy(accountNumber = savedNumber, customServiceName = savedName) }
+        val saveDate = accountPrefs.getCustomDate(SERVICE_KEY)
+
+        _uiState.update { it.copy(accountNumber = savedNumber, customServiceName = savedName, customDate = saveDate) }
     }
 
     fun openAccountDialog() {
@@ -51,10 +57,12 @@ class WaterViewModel(
 
 
     // 🔸 ЗАМЕНИТЬ updateAccountNumber на updateAccountData (сохраняет и номер, и название)
-    fun updateAccountData(newNumber: String, newName: String) {
-        _uiState.update { it.copy(accountNumber = newNumber, customServiceName = newName) }
+    fun updateAccountData(newNumber: String, newName: String, newDate: String) {
+        _uiState.update { it.copy(accountNumber = newNumber, customServiceName = newName, customDate = newDate) }
         accountPrefs.saveAccount(SERVICE_KEY, newNumber)
         accountPrefs.saveCustomName(SERVICE_KEY, newName)
+        accountPrefs.saveCustomDate(SERVICE_KEY, newDate)
+
     }
 
     fun onCurrentReadingChange(value: String) {
@@ -83,11 +91,12 @@ class WaterViewModel(
         val data = water.collectWaterData(
             current, previous, tariff, accountNumber = account
         )
+        viewModelScope.launch {
+            // ✅ 2. Сохранение (Repository сам добавит дату и отформатирует)
+            waterRepository.saveWaterPayment(data)
 
-        // ✅ 2. Сохранение (Repository сам добавит дату и отформатирует)
-        waterRepository.saveWaterPayment(data)
-
-        // ✅ 3. Обновление UI
-        _uiState.update { it.copy(result = data, errorMessage = null) }
+            // ✅ 3. Обновление UI
+            _uiState.update { it.copy(result = data, errorMessage = null) }
+        }
     }
 }

@@ -37,59 +37,68 @@ import com.github.misham72.communalpayments.presentation.screen.screens.history.
 
 @Composable
 fun ControlBetweenScreens() {
-    var selectedService by remember { mutableIntStateOf(0) }
-    var showHistory by remember { mutableStateOf(false) }
-    val services = getListInitialScreen()
+    var selectedService by remember { mutableIntStateOf(0) } //– индекс активной вкладки (0 – первый сервис).
+    var showHistory by remember { mutableStateOf(false) } // true – показываем историю, false – главный экран.
+    val services = getListInitialScreen() // – список всех сервисов (название, иконка, ключ для файлов, и сам экран для отрисовки).
 
     if (showHistory) {
-        SimpleHistoryScreen(
+        SimpleHistoryScreen( // экран истории
             onBack = { showHistory = false },
-
             initialService = services[selectedService].fileKey
         )
     } else {
-        // ОБЕРНУЛИ В Surface с цветом из темы
-        Surface(
-            modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background  // ← ТЕПЕРЬ ФОН МЕНЯЕТСЯ
+        Surface(// главный экран
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp) // равные отступы между элементами
-
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Row(
-                    modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        stringResource(R.string.app_title), fontSize = 24.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground  // ← ЦВЕТ ТЕКСТА ИЗ ТЕМЫ
+                        stringResource(R.string.app_title),
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onBackground
                     )
                 }
-                // Горизонтальные вкладки с иконками
+
                 Row(
                     modifier = Modifier.horizontalScroll(rememberScrollState())
                 ) {
                     services.forEachIndexed { index, service ->
                         ServiceTab(
-                            service = service, isSelected = selectedService == index, onClick = { selectedService = index })
+                            service = service,
+                            isSelected = selectedService == index,
+                            onClick = { selectedService = index }
+                        )
                     }
                 }
 
-                // Экран сервиса
                 Box(modifier = Modifier.weight(1f)) {
                     services[selectedService].screen()
                 }
+
                 Image(
-                    painter = painterResource(R.drawable.night), contentDescription = stringResource(R.string.summer_night), contentScale = ContentScale.FillWidth, // Растягивает по ширине, сохраняя пропорции
+                    painter = painterResource(R.drawable.night),
+                    contentDescription = stringResource(R.string.summer_night),
+                    contentScale = ContentScale.FillWidth,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(250.dp)
                 )
 
-                // Кнопка с кастомным цветом (если хотите)
                 Button(
-                    onClick = { showHistory = true }, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(
-                    )
+                    onClick = { showHistory = true },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors()
                 ) {
                     Text(stringResource(R.string.history))
                 }

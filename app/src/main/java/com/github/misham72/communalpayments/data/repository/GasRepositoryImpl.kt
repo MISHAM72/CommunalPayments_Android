@@ -5,15 +5,15 @@ import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.data.local.FileManager
 import com.github.misham72.communalpayments.domain.repository.GasRepository
 import com.github.misham72.communalpayments.domain.userclasses.Gas
+import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 
 class GasRepositoryImpl(
-    context: Context,
-    fileManager: FileManager
+    context: Context, fileManager: FileManager
 ) : BaseMeterRepositoryWithAccount(context, fileManager), GasRepository {
 
-    override fun saveGasPayment(data: Gas.GasData) {
+    override suspend fun saveGasPayment(data: Gas.GasData) {
         val dateTime = getCurrentDateTime()
-        val fileName = getFileName(context.getString(R.string.service_key_gas))
+        val serviceKey = ServiceKeys.GAS
         val status = context.getString(R.string.status_calculated)
 
         val content = formatWithAccountNumber(
@@ -29,6 +29,6 @@ class GasRepositoryImpl(
             customStatus = status
         )
 
-        fileManager.saveToFile(content, fileName)
+        fileManager.appendRecord(serviceKey, content)
     }
 }

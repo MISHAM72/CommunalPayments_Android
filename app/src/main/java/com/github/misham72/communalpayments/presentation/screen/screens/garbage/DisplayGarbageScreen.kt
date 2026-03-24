@@ -39,8 +39,8 @@ import com.github.misham72.communalpayments.R
 fun DisplayGarbageScreen(viewModel: GarbageViewModel) {
     val uiState by viewModel.uiState.collectAsState()
     var tempNumber by remember { mutableStateOf(uiState.accountNumber) }
-    // 🔸 ДОБАВИТЬ временную переменную для названия
     var tempName by remember { mutableStateOf(uiState.customServiceName) }
+    var tempDate by remember { mutableStateOf(uiState.customDate) }
 
     Column(
         modifier = Modifier
@@ -61,7 +61,12 @@ fun DisplayGarbageScreen(viewModel: GarbageViewModel) {
                 Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.change_personal_account))
             }
         }
-
+// Дата (добавлено)
+        if (uiState.customDate.isNotBlank()) {
+            Text(
+                text = "Дата платежа: ${uiState.customDate}", fontSize = 14.sp, color = Color.DarkGray, modifier = Modifier.padding(top = 4.dp)
+            )
+        }
 // Номер под названием (отдельная строка)
         if (uiState.accountNumber.isNotBlank()) {
             Text(
@@ -146,6 +151,10 @@ fun DisplayGarbageScreen(viewModel: GarbageViewModel) {
                 OutlinedTextField(
                     value = tempName, onValueChange = { tempName = it }, label = { Text("Название услуги") }, singleLine = true, modifier = Modifier.fillMaxWidth()
                 )
+                // Добавляем поле для даты
+                OutlinedTextField(
+                    value = tempDate, onValueChange = { tempDate = it }, label = { Text("Дата следующего платежа") }, singleLine = true, modifier = Modifier.fillMaxWidth()
+                )
                 OutlinedTextField(
                     value = tempNumber, onValueChange = { tempNumber = it }, label = { Text("Лицевой счёт") }, singleLine = true, modifier = Modifier.fillMaxWidth()
                 )
@@ -153,7 +162,7 @@ fun DisplayGarbageScreen(viewModel: GarbageViewModel) {
         }, confirmButton = {
             TextButton(
                 onClick = {
-                    viewModel.updateAccountData(tempNumber, tempName)
+                    viewModel.updateAccountData(tempNumber, tempName, tempDate)
                     viewModel.closeAccountDialog()
                 }) {
                 Text(stringResource(R.string.save))

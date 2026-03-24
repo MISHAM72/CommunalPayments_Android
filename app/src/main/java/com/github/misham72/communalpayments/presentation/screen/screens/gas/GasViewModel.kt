@@ -1,13 +1,17 @@
 package com.github.misham72.communalpayments.presentation.screen.screens.gas
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.github.misham72.communalpayments.data.local.AccountPreferences
 import com.github.misham72.communalpayments.domain.repository.GasRepository
 import com.github.misham72.communalpayments.domain.userclasses.Gas
+import com.github.misham72.communalpayments.domain.utils.ServiceKeys
+import com.github.misham72.communalpayments.presentation.screen.screens.electricity.ElectricityViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 class GasViewModeL(
     private val gas: Gas,
@@ -16,14 +20,20 @@ class GasViewModeL(
 ) : ViewModel() {
 
     companion object {
-        private const val SERVICE_KEY = "gas"
+        private const val SERVICE_KEY = ServiceKeys.GAS
     }
 
     data class UiState(
-        val currentReading: String = "", val previousReading: String = "", val tariff: String = "", val accountNumber: String = "",
+        val currentReading: String = "",
+        val previousReading: String = "",
+        val tariff: String = "",
+        val accountNumber: String = "",
         // 🔸 ДОБАВИТЬ НОВОЕ ПОЛЕ
-        val customServiceName: String = "", val showAccountDialog: Boolean = false,   // флаг для диалога
-        val result: Gas.GasData? = null, val errorMessage: String? = null
+        val customServiceName: String = "",
+        val customDate: String = "", // дата, сохранённая в SharedPreferences
+        val showAccountDialog: Boolean = false,   // флаг для диалога
+        val result: Gas.GasData? = null,
+        val errorMessage: String? = null
     )
 
     private val _uiState = MutableStateFlow(UiState())  //✅ MutableStateFlow для изменяемого состояния
@@ -33,8 +43,10 @@ class GasViewModeL(
         val savedNumber = accountPrefs.getAccount(SERVICE_KEY)
         // 🔸 ЗАГРУЗИТЬ СОХРАНЁННОЕ НАЗВАНИЕ
         val savedName = accountPrefs.getCustomName(SERVICE_KEY)
-        _uiState.update { it.copy(accountNumber = savedNumber, customServiceName = savedName) }
-    }
+        val saveDate = accountPrefs.getCustomDate(SERVICE_KEY)
+
+        _uiState.update { it.copy(accountNumber = savedNumber, customServiceName = savedName, customDate = saveDate) }
+         }
 
     fun openAccountDialog() {
         _uiState.update { it.copy(showAccountDialog = true) }
@@ -46,10 +58,11 @@ class GasViewModeL(
 
 
     // 🔸 ЗАМЕНИТЬ updateAccountNumber на updateAccountData (сохраняет и номер, и название)
-    fun updateAccountData(newNumber: String, newName: String) {
-        _uiState.update { it.copy(accountNumber = newNumber, customServiceName = newName) }
+    fun updateAccountData(newNumber: String, newName: String, newDate: String) {
+        _uiState.update { it.copy(accountNumber = newNumber, customServiceName = newName, customDate = newDate) }
         accountPrefs.saveAccount(SERVICE_KEY, newNumber)
         accountPrefs.saveCustomName(SERVICE_KEY, newName)
+        accountPrefs.saveCustomDate(SERVICE_KEY, newDate)
     }
 
 
@@ -83,11 +96,12 @@ class GasViewModeL(
         val data = gas.collectGasData(
             current, previous, tariff, accountNumber = account
         )
+        viewModelScope.launch {
+            // ✅ 2. Сохранение (Repository сам добавит дату и отформатирует) gas(data)
+            gasRepository.saveGasPayment(data)
 
-        // ✅ 2. Сохранение (Repository сам добавит дату и отформатирует) gas(data)
-        gasRepository.saveGasPayment(data)
-
-        // ✅ 3. Обновление UI
-        _uiState.update { it.copy(result = data, errorMessage = null) }
+            // ✅ 3. Обновление UI
+            _uiState.update { it.copy(result = data, errorMessage = null) }
+        }
     }
 }

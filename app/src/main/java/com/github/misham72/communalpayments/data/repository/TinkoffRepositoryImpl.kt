@@ -5,14 +5,15 @@ import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.data.local.FileManager
 import com.github.misham72.communalpayments.domain.repository.TinkoffRepository
 import com.github.misham72.communalpayments.domain.userclasses.Tinkoff
+import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 
 class TinkoffRepositoryImpl(
     context: Context, fileManager: FileManager
 ) : BasePeriodicRepositoryWithAccount(context, fileManager), TinkoffRepository {
 
-    override fun saveTinkoffPayment(data: Tinkoff.TinkoffData) {
+    override suspend fun saveTinkoffPayment(data: Tinkoff.TinkoffData) {
         val dateTime = getCurrentDateTime()
-        val fileName = getFileName(context.getString(R.string.service_key_tinkoff))
+        val serviceKey = ServiceKeys.TINKOFF
         val status = context.getString(R.string.status_calculated)
         val content = formatWithAccountNumber(
             accountNumber = data.accountNumber,
@@ -26,6 +27,6 @@ class TinkoffRepositoryImpl(
             isHistory = data.isHistory,
             customStatus = status
         )
-        fileManager.saveToFile(content, fileName)
+        fileManager.appendRecord(serviceKey, content)
     }
 }
