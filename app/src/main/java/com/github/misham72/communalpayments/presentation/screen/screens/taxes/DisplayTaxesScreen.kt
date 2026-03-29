@@ -1,5 +1,6 @@
 package com.github.misham72.communalpayments.presentation.screen.screens.taxes
 
+import android.app.DatePickerDialog
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -29,17 +30,21 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.misham72.communalpayments.R
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.GregorianCalendar
+import java.util.Locale
 
 @Composable
 fun DisplayTaxesScreen(viewModel: TaxesViewModel) {
     val uiState by viewModel.uiState.collectAsState()
     var tempNumber by remember { mutableStateOf(uiState.accountNumber) }
-    // 🔸 ДОБАВИТЬ временную переменную для названия
     var tempName by remember { mutableStateOf(uiState.customServiceName) }
     var tempDate by remember { mutableStateOf(uiState.customDate) }
 
@@ -64,7 +69,10 @@ fun DisplayTaxesScreen(viewModel: TaxesViewModel) {
         }
         if (uiState.customDate.isNotBlank()) {
             Text(
-                text = "Дата платежа: ${uiState.customDate}", fontSize = 14.sp, color = Color.DarkGray, modifier = Modifier.padding(top = 4.dp)
+                text = "Дата платежа: ${uiState.customDate}",
+                fontSize = 14.sp,
+                color = Color.DarkGray,
+                modifier = Modifier.padding(top = 4.dp)
             )
         }
 // Номер под названием (отдельная строка)
@@ -146,14 +154,32 @@ fun DisplayTaxesScreen(viewModel: TaxesViewModel) {
         }
     }
     if (uiState.showAccountDialog) {
+        val context = LocalContext.current
         AlertDialog(onDismissRequest = viewModel::closeAccountDialog, title = { Text("Редактирование") }, text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedTextField(
                     value = tempName, onValueChange = { tempName = it }, label = { Text("Название услуги") }, singleLine = true, modifier = Modifier.fillMaxWidth()
                 )
-                OutlinedTextField(
-                    value = tempDate, onValueChange = { tempDate = it }, label = { Text("Дата следующего платежа") }, singleLine = true, modifier = Modifier.fillMaxWidth()
-                )
+                Button(
+                    onClick = {
+                        val now = Calendar.getInstance()
+                        DatePickerDialog(
+                            context,
+                            { _, year, month, day ->
+                                val date = GregorianCalendar(year, month, day).time
+                                val newDate = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(date)
+                                // Сохраняем дату сразу (обновляет uiState и Preferences)
+                                viewModel.updateAccountData(tempNumber, tempName, newDate)
+                            },
+                            now.get(Calendar.YEAR),
+                            now.get(Calendar.MONTH),
+                            now.get(Calendar.DAY_OF_MONTH)
+                        ).show()
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Выбрать дату начала: ${uiState.customDate}")
+                }
                 OutlinedTextField(
                     value = tempNumber, onValueChange = { tempNumber = it }, label = { Text("Лицевой счёт") }, singleLine = true, modifier = Modifier.fillMaxWidth()
                 )

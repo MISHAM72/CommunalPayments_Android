@@ -1,5 +1,6 @@
 package com.github.misham72.communalpayments.presentation.screen.screens.troyka
 
+import android.app.DatePickerDialog
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -29,19 +30,21 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.misham72.communalpayments.R
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.GregorianCalendar
+import java.util.Locale
 
 @Composable
-fun DisplayTroykaScreen(
-    viewModel: TroykaViewModel
-) {
+fun DisplayTroykaScreen(viewModel: TroykaViewModel) {
     val uiState by viewModel.uiState.collectAsState()
     var tempNumber by remember { mutableStateOf(uiState.accountNumber) }
-    // 🔸 ДОБАВИТЬ временную переменную для названия
     var tempName by remember { mutableStateOf(uiState.customServiceName) }
     var tempDate by remember { mutableStateOf(uiState.customDate) }
 
@@ -49,15 +52,20 @@ fun DisplayTroykaScreen(
         modifier = Modifier
             .fillMaxSize()
             .padding(6.dp)
-            .verticalScroll(rememberScrollState()), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(1.dp)
-
+            .verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(1.dp)
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
                 text = if (uiState.customServiceName.isNotBlank()) uiState.customServiceName
-                else stringResource(R.string.service_display_name_troyka), fontSize = 20.sp, fontWeight = FontWeight.Bold
+                else stringResource(R.string.service_display_name_troyka),
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold
             )
             IconButton(onClick = { viewModel.openAccountDialog() }) {
                 Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.change_personal_account))
@@ -65,7 +73,10 @@ fun DisplayTroykaScreen(
         }
         if (uiState.customDate.isNotBlank()) {
             Text(
-                text = "Дата платежа: ${uiState.customDate}", fontSize = 14.sp, color = Color.DarkGray, modifier = Modifier.padding(top = 4.dp)
+                text = "Дата платежа: ${uiState.customDate}",
+                fontSize = 14.sp,
+                color = Color.DarkGray,
+                modifier = Modifier.padding(top = 4.dp)
             )
         }
 // Номер под названием (отдельная строка)
@@ -94,7 +105,8 @@ fun DisplayTroykaScreen(
 
         // Кнопка расчета
         Button(
-            onClick = viewModel::onCalculateClick, modifier = Modifier.fillMaxWidth()
+            onClick = viewModel::onCalculateClick,
+            modifier = Modifier.fillMaxWidth()
         ) {
             Text(stringResource(R.string.calculate_and_save))
         }
@@ -116,7 +128,8 @@ fun DisplayTroykaScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Text(
                         text = stringResource(R.string.result_troyka), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold
@@ -147,30 +160,52 @@ fun DisplayTroykaScreen(
         }
     }
     if (uiState.showAccountDialog) {
-        AlertDialog(onDismissRequest = viewModel::closeAccountDialog, title = { Text("Редактирование") }, text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedTextField(
-                    value = tempName, onValueChange = { tempName = it }, label = { Text("Название услуги") }, singleLine = true, modifier = Modifier.fillMaxWidth()
-                )
-                OutlinedTextField(
-                    value = tempDate, onValueChange = { tempDate = it }, label = { Text("Дата следующего платежа") }, singleLine = true, modifier = Modifier.fillMaxWidth()
-                )
-                OutlinedTextField(
-                    value = tempNumber, onValueChange = { tempNumber = it }, label = { Text("Лицевой счёт") }, singleLine = true, modifier = Modifier.fillMaxWidth()
-                )
-            }
-        }, confirmButton = {
-            TextButton(
-                onClick = {
-                    viewModel.updateAccountData(tempNumber, tempName, tempDate)
-                    viewModel.closeAccountDialog()
-                }) {
-                Text(stringResource(R.string.save))
-            }
-        }, dismissButton = {
-            TextButton(onClick = viewModel::closeAccountDialog) {
-                Text(stringResource(R.string.cancel))
-            }
-        })
+        val context = LocalContext.current
+        AlertDialog(
+            onDismissRequest = viewModel::closeAccountDialog,
+            title = { Text("Редактирование") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedTextField(
+                        value = tempName, onValueChange = { tempName = it }, label = { Text("Название услуги") }, singleLine = true, modifier = Modifier.fillMaxWidth()
+                    )
+                    // Кнопка выбора даты (с отображением сохранённой даты)
+                    Button(
+                        onClick = {
+                            val now = Calendar.getInstance()
+                            DatePickerDialog(
+                                context,
+                                { _, year, month, day ->
+                                    val date = GregorianCalendar(year, month, day).time
+                                    val newDate = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(date)
+                                    // Сохраняем дату сразу (обновляет uiState и Preferences)
+                                    viewModel.updateAccountData(tempNumber, tempName, newDate)
+                                },
+                                now.get(Calendar.YEAR),
+                                now.get(Calendar.MONTH),
+                                now.get(Calendar.DAY_OF_MONTH)
+                            ).show()
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Выбрать дату начала: ${uiState.customDate}")
+                    }
+                    OutlinedTextField(
+                        value = tempNumber, onValueChange = { tempNumber = it }, label = { Text("Лицевой счёт") }, singleLine = true, modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }, confirmButton = {
+                TextButton(
+                    onClick = {
+                        viewModel.updateAccountData(tempNumber, tempName, tempDate)
+                        viewModel.closeAccountDialog()
+                    }) {
+                    Text(stringResource(R.string.save))
+                }
+            }, dismissButton = {
+                TextButton(onClick = viewModel::closeAccountDialog) {
+                    Text(stringResource(R.string.cancel))
+                }
+            })
     }
 }

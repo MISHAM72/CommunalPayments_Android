@@ -3,6 +3,7 @@ package com.github.misham72.communalpayments.presentation.screen.screens.interne
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.github.misham72.communalpayments.data.calculators.PaymentDateCalculatorImpl
 import com.github.misham72.communalpayments.data.local.AccountPreferences
 import com.github.misham72.communalpayments.data.local.FileManager
 import com.github.misham72.communalpayments.data.repository.InternetRepositoryImpl
@@ -10,7 +11,8 @@ import com.github.misham72.communalpayments.domain.userclasses.Internet
 
 
 class InternetViewModelFactory(context: Context) : ViewModelProvider.Factory {
-    private val internet = Internet()
+    val calculator = PaymentDateCalculatorImpl()
+    private val internet = Internet(calculator)
     private val fileManager = FileManager(context)
     private val internetRepository = InternetRepositoryImpl(context, fileManager)
     private val accountPrefs = AccountPreferences(context.applicationContext)

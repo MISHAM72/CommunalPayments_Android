@@ -6,12 +6,14 @@ import com.github.misham72.communalpayments.data.local.AccountPreferences
 import com.github.misham72.communalpayments.domain.repository.InternetRepository
 import com.github.misham72.communalpayments.domain.userclasses.Internet
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
-import com.github.misham72.communalpayments.presentation.screen.screens.garbage.GarbageViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class InternetViewModel(
     private val internet: Internet,
@@ -30,9 +32,10 @@ class InternetViewModel(
         val priceTariff: String = "",     // тариф
         val accountNumber: String = "",
         val customDate: String = "",
-        // 🔸 ДОБАВИТЬ НОВОЕ ПОЛЕ
-        val customServiceName: String = "", val showAccountDialog: Boolean = false,   // флаг для диалога
-        val result: Internet.InternetData? = null, val errorMessage: String? = null
+        val customServiceName: String = "",
+        val showAccountDialog: Boolean = false,   // флаг для диалога
+        val result: Internet.InternetData? = null,
+        val errorMessage: String? = null
     )
 
     private val _uiState = MutableStateFlow(UiState())
@@ -75,6 +78,14 @@ class InternetViewModel(
         _uiState.update { it.copy(priceTariff = value) }
     }
 
+    private fun parseStartDate(dateString: String): Date {
+        return try {
+            SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).parse(dateString) ?: Date()
+        } catch (e: Exception) {
+            Date() // при ошибке используем текущую дату
+        }
+    }
+
     // 3️⃣ ГЛАВНАЯ ЛОГИКА (как в Electricity)
     fun onCalculateClick() {
         // Валидация
@@ -82,15 +93,19 @@ class InternetViewModel(
         val periodMonths = _uiState.value.periodMonths.toIntOrNull()
         val priceTariff = _uiState.value.priceTariff.toDoubleOrNull()
         val account = _uiState.value.accountNumber
-
         if (paymentDay == null || periodMonths == null || priceTariff == null) {
             _uiState.update { it.copy(errorMessage = "Invalid input") }
             return
         }
+        val startDate = parseStartDate(_uiState.value.customDate)
 
         // 1️⃣ Домен - ЧТО рассчитать
         val data = internet.collectInternetData(
-            paymentDay, periodMonths, priceTariff, accountNumber = account
+            paymentDay = paymentDay,
+            periodMonths = periodMonths,
+            startDate = startDate,
+            priceTariff = priceTariff,
+            accountNumber = account
         )
         viewModelScope.launch {
             // 2️⃣ Data - КАК сохранить

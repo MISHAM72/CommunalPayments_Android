@@ -3,6 +3,7 @@ package com.github.misham72.communalpayments.presentation.screen.screens.heating
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.github.misham72.communalpayments.data.calculators.PaymentDateCalculatorImpl
 import com.github.misham72.communalpayments.data.local.AccountPreferences
 import com.github.misham72.communalpayments.data.local.FileManager
 import com.github.misham72.communalpayments.data.repository.ZONTRepositoryImpl
@@ -10,7 +11,8 @@ import com.github.misham72.communalpayments.domain.userclasses.ZONT
 
 
 class ZONTViewModelFactory(context: Context) : ViewModelProvider.Factory {
-    private val zont = ZONT()
+    val calculator = PaymentDateCalculatorImpl()
+    private val zont = ZONT(calculator)
     private val fileManager = FileManager(context)
     private val zontRepository = ZONTRepositoryImpl(context, fileManager)
     private val accountPrefs = AccountPreferences(context.applicationContext)

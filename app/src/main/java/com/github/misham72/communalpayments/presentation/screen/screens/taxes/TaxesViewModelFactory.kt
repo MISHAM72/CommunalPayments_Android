@@ -3,13 +3,15 @@ package com.github.misham72.communalpayments.presentation.screen.screens.taxes
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.github.misham72.communalpayments.data.calculators.PaymentDateCalculatorImpl
 import com.github.misham72.communalpayments.data.local.AccountPreferences
 import com.github.misham72.communalpayments.data.local.FileManager
 import com.github.misham72.communalpayments.data.repository.TaxesRepositoryImpl
 import com.github.misham72.communalpayments.domain.userclasses.Taxes
 
 class TaxesViewModelFactory(context: Context) : ViewModelProvider.Factory {
-    private val taxes = Taxes()
+    val calculator = PaymentDateCalculatorImpl()
+    private val taxes = Taxes(calculator)
     private val fileManager = FileManager(context)
     private val taxesRepository = TaxesRepositoryImpl(context, fileManager)
 

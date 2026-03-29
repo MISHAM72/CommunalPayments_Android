@@ -12,6 +12,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class MTSViewModel(
     private val mts: MTS,                    // Домен
@@ -71,7 +74,13 @@ class MTSViewModel(
     fun onPriceTariffChange(value: String) {
         _uiState.update { it.copy(priceTariff = value) }
     }
-
+    private fun parseStartDate(dateString: String): Date {
+        return try {
+            SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).parse(dateString) ?: Date()
+        } catch (e: Exception) {
+            Date() // при ошибке используем текущую дату
+        }
+    }
     // 3️⃣ ГЛАВНАЯ ЛОГИКА (как в Electricity)
     fun onCalculateClick() {
         // Валидация
@@ -79,15 +88,19 @@ class MTSViewModel(
         val periodMonths = _uiState.value.periodMonths.toIntOrNull()
         val priceTariff = _uiState.value.priceTariff.toDoubleOrNull()
         val account = _uiState.value.accountNumber
-
         if (paymentDay == null || periodMonths == null || priceTariff == null) {
             _uiState.update { it.copy(errorMessage = "Invalid input") }
             return
         }
+        val startDate = parseStartDate(_uiState.value.customDate)
 
         // 1️⃣ Домен - ЧТО рассчитать
         val data = mts.collectMTSData(
-            paymentDay, periodMonths, priceTariff, accountNumber = account
+            paymentDay = paymentDay,
+            periodMonths = periodMonths,
+            startDate = startDate,
+            priceTariff = priceTariff,
+            accountNumber = account
         )
         viewModelScope.launch {
             // 2️⃣ Data - КАК сохранить

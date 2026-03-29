@@ -6,12 +6,14 @@ import com.github.misham72.communalpayments.data.local.AccountPreferences
 import com.github.misham72.communalpayments.domain.repository.ZONTRepository
 import com.github.misham72.communalpayments.domain.userclasses.ZONT
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
-import com.github.misham72.communalpayments.presentation.screen.screens.garbage.GarbageViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 
 class ZONTViewModel(
@@ -29,9 +31,11 @@ class ZONTViewModel(
         val periodMonths: String = "",    // период в месяцах
         val priceTariff: String = "",
         val accountNumber: String = "",
-        val customServiceName: String = "",
         val customDate: String = "",
-        val showAccountDialog: Boolean = false, val result: ZONT.ZONTData? = null, val errorMessage: String? = null
+        val customServiceName: String = "",
+        val showAccountDialog: Boolean = false,
+        val result: ZONT.ZONTData? = null,
+        val errorMessage: String? = null
     )
 
 
@@ -40,9 +44,8 @@ class ZONTViewModel(
 
     init {
         val savedNumber = accountPrefs.getAccount(SERVICE_KEY)
-        // 🔸 ЗАГРУЗИТЬ СОХРАНЁННОЕ НАЗВАНИЕ
-        val savedName = accountPrefs.getCustomName(SERVICE_KEY)
         val saveDate = accountPrefs.getCustomDate(SERVICE_KEY)
+        val savedName = accountPrefs.getCustomName(SERVICE_KEY)
         _uiState.update { it.copy(accountNumber = savedNumber, customServiceName = savedName, customDate = saveDate) }
     }
 
@@ -76,6 +79,14 @@ class ZONTViewModel(
         _uiState.update { it.copy(priceTariff = value) }
     }
 
+    private fun parseStartDate(dateString: String): Date {
+        return try {
+            SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).parse(dateString) ?: Date()
+        } catch (e: Exception) {
+            Date() // при ошибке используем текущую дату
+        }
+    }
+
     fun onCalculateClick() {
         // Валидация
         val paymentDay = _uiState.value.paymentDay.toIntOrNull()
@@ -87,10 +98,15 @@ class ZONTViewModel(
             _uiState.update { it.copy(errorMessage = "Invalid input") }
             return
         }
+        val startDate = parseStartDate(_uiState.value.customDate)
 
         // 1️⃣ Домен - ЧТО рассчитать
         val data = zont.collectZONTData(
-            paymentDay, periodMonths, priceTariff, accountNumber = account
+            paymentDay = paymentDay,
+            periodMonths = periodMonths,
+            startDate = startDate,
+            priceTariff = priceTariff,
+            accountNumber = account
         )
         viewModelScope.launch {
             // 2️⃣ Data - КАК сохранить

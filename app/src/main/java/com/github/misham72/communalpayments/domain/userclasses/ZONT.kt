@@ -1,24 +1,49 @@
 package com.github.misham72.communalpayments.domain.userclasses
 
-import com.github.misham72.communalpayments.domain.calculators.PeriodCalculator
+import com.github.misham72.communalpayments.domain.calculators.PaymentDateCalculator
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
-class ZONT {
+class ZONT(private val calculator: PaymentDateCalculator) {
 
     data class ZONTData(
-        val isHistory: Boolean, val previousPayment: String, val daysFromPayment: Long, val nextPayment: String, val daysUntilPayment: Long, val priceTariff: Double, val accountNumber: String
+        val isHistory: Boolean,
+        val previousPayment: String,
+        val daysFromPayment: Long,
+        val nextPayment: String,
+        val daysUntilPayment: Long,
+        val priceTariff: Double,
+        val accountNumber: String,
+        val startDate: Date?
     )
 
     fun collectZONTData(
-        paymentDay: Int, periodMonths: Int, priceTariff: Double, accountNumber: String
+        paymentDay: Int,
+        periodMonths: Int,
+        startDate: Date,
+        priceTariff: Double,
+        accountNumber: String
     ): ZONTData {
-        // 👇 2. РАСЧЕТ ВСЕХ НЕОБХОДИМЫХ ДАТ И СРОКОВ
-        val previousPayment = PeriodCalculator.getPreviousPaymentString(monthsPeriod = periodMonths, paymentDay = paymentDay)
-        val daysFromPayment = PeriodCalculator.calculateDaysFromPreviousPayment(periodMonths, paymentDay)
-        val nextPayment = PeriodCalculator.getNextPaymentString(periodMonths, paymentDay)
-        val daysUntilPayment = PeriodCalculator.calculateDaysToNextPayment(periodMonths, paymentDay)
+        // Используем переданный калькулятор
+        val previousDate = calculator.getPreviousPaymentDate(periodMonths, paymentDay, startDate)
+        val daysFrom = calculator.getDaysFromPreviousPayment(periodMonths, paymentDay, startDate)
+        val daysUntil = calculator.getDaysToNextPayment(periodMonths, paymentDay, startDate)
+        val nextDate = calculator.getNextPaymentDate(periodMonths, paymentDay, startDate)
+
+        val formatter = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
+        val previousPayment = formatter.format(previousDate)
+        val nextPayment = formatter.format(nextDate)
 
         return ZONTData(
-            isHistory = true, previousPayment = previousPayment, nextPayment = nextPayment, daysFromPayment = daysFromPayment, daysUntilPayment = daysUntilPayment, priceTariff = priceTariff, accountNumber = accountNumber
+            isHistory = true,
+            previousPayment = previousPayment,
+            daysFromPayment = daysFrom,
+            nextPayment = nextPayment,
+            daysUntilPayment = daysUntil,
+            priceTariff = priceTariff,
+            accountNumber = accountNumber,
+            startDate = startDate
         )
     }
 }

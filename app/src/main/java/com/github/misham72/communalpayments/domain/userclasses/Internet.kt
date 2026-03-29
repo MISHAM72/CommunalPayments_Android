@@ -1,13 +1,16 @@
 package com.github.misham72.communalpayments.domain.userclasses
 
-import com.github.misham72.communalpayments.domain.calculators.PeriodCalculator
+import com.github.misham72.communalpayments.domain.calculators.PaymentDateCalculator
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 /**
  * Чистый domain класс для интернет-платежей
  * НЕТ Context, НЕТ FileManager, НЕТ сохранения!
  * Только бизнес-логика и данные
  */
-class Internet {
+class Internet(private val calculator: PaymentDateCalculator) {
 
     data class InternetData(
         val isHistory: Boolean,
@@ -16,29 +19,36 @@ class Internet {
         val nextPayment: String,
         val daysUntilPayment: Long,
         val priceTariff: Double,
-        val accountNumber: String
+        val accountNumber: String,
+        val startDate: Date?
     )
 
     fun collectInternetData(
         paymentDay: Int,
         periodMonths: Int,
+        startDate: Date,
         priceTariff: Double,
         accountNumber: String
     ): InternetData {
-        // Расчет всех дат и сроков
-        val previousPayment = PeriodCalculator.getPreviousPaymentString(periodMonths, paymentDay)
-        val nextPayment = PeriodCalculator.getNextPaymentString(periodMonths, paymentDay)
-        val daysFromPayment = PeriodCalculator.calculateDaysFromPreviousPayment(periodMonths, paymentDay)
-        val daysUntilPayment = PeriodCalculator.calculateDaysToNextPayment(periodMonths, paymentDay)
+        // Используем переданный калькулятор
+        val previousDate = calculator.getPreviousPaymentDate(periodMonths, paymentDay, startDate)
+        val daysFrom = calculator.getDaysFromPreviousPayment(periodMonths, paymentDay, startDate)
+        val daysUntil = calculator.getDaysToNextPayment(periodMonths, paymentDay, startDate)
+        val nextDate = calculator.getNextPaymentDate(periodMonths, paymentDay, startDate)
+
+        val formatter = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
+        val previousPayment = formatter.format(previousDate)
+        val nextPayment = formatter.format(nextDate)
 
         return InternetData(
             isHistory = true,
             previousPayment = previousPayment,
-            daysFromPayment = daysFromPayment,
+            daysFromPayment = daysFrom,
             nextPayment = nextPayment,
-            daysUntilPayment = daysUntilPayment,
+            daysUntilPayment = daysUntil,
             priceTariff = priceTariff,
-            accountNumber = accountNumber
+            accountNumber = accountNumber,
+            startDate = startDate
         )
     }
 }
