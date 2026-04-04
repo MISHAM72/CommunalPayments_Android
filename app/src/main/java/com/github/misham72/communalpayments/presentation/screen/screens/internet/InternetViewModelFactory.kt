@@ -11,7 +11,7 @@ import com.github.misham72.communalpayments.domain.userclasses.Internet
 
 
 class InternetViewModelFactory(context: Context) : ViewModelProvider.Factory {
-    val calculator = PaymentDateCalculatorImpl()
+    val calculator: PaymentDateCalculatorImpl = PaymentDateCalculatorImpl()
     private val internet = Internet(calculator)
     private val fileManager = FileManager(context)
     private val internetRepository = InternetRepositoryImpl(context, fileManager)
@@ -19,7 +19,7 @@ class InternetViewModelFactory(context: Context) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(InternetViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST") return InternetViewModel(internet, internetRepository, accountPrefs) as T
+            @Suppress("HardcodedStringLiteral", "UNCHECKED_CAST") return InternetViewModel(internet, internetRepository, accountPrefs) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
     }

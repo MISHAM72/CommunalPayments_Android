@@ -35,7 +35,7 @@ class Osago(private val calculator: PaymentDateCalculator) {
         val previousPayment = formatter.format(previousDate)
         val nextPayment = formatter.format(nextDate)
 
-         // 3. СОЗДАНИЕ ОБЪЕКТА С ДАННЫМИ
+        // 3. СОЗДАНИЕ ОБЪЕКТА С ДАННЫМИ
         return OsagoData(
             isHistory = true,
             previousPayment = previousPayment,

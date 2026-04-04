@@ -16,7 +16,8 @@ class GasViewModelFactory(context: Context) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(GasViewModeL::class.java)) {
-            @Suppress("UNCHECKED_CAST") return GasViewModeL(gas, gasRepository, accountPrefs) as T
+            @Suppress("HardcodedStringLiteral", "UNCHECKED_CAST")
+            return GasViewModeL(gas, gasRepository, accountPrefs) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

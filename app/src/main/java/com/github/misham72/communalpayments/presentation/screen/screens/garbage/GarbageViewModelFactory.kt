@@ -10,7 +10,8 @@ import com.github.misham72.communalpayments.data.repository.GarbageRepositoryImp
 import com.github.misham72.communalpayments.domain.userclasses.Garbage
 
 class GarbageViewModelFactory(context: Context) : ViewModelProvider.Factory {
-    val calculator = PaymentDateCalculatorImpl()
+
+    val calculator: PaymentDateCalculatorImpl = PaymentDateCalculatorImpl()
     private val garbage = Garbage(calculator)
     private val fileManager = FileManager(context)
     private val garbageRepository = GarbageRepositoryImpl(context, fileManager)
@@ -18,7 +19,7 @@ class GarbageViewModelFactory(context: Context) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(GarbageViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
+            @Suppress("HardcodedStringLiteral", "UNCHECKED_CAST")
             return GarbageViewModel(garbage, garbageRepository, accountPrefs) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")

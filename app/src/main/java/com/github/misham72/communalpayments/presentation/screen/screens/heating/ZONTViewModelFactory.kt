@@ -11,7 +11,7 @@ import com.github.misham72.communalpayments.domain.userclasses.ZONT
 
 
 class ZONTViewModelFactory(context: Context) : ViewModelProvider.Factory {
-    val calculator = PaymentDateCalculatorImpl()
+    val calculator: PaymentDateCalculatorImpl = PaymentDateCalculatorImpl()
     private val zont = ZONT(calculator)
     private val fileManager = FileManager(context)
     private val zontRepository = ZONTRepositoryImpl(context, fileManager)
@@ -19,7 +19,7 @@ class ZONTViewModelFactory(context: Context) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(ZONTViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST") return ZONTViewModel(zont, zontRepository, accountPrefs) as T
+            @Suppress("HardcodedStringLiteral", "UNCHECKED_CAST") return ZONTViewModel(zont, zontRepository, accountPrefs) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

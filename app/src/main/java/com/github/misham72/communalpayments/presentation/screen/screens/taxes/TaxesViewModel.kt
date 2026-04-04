@@ -3,6 +3,7 @@ package com.github.misham72.communalpayments.presentation.screen.screens.taxes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.misham72.communalpayments.data.local.AccountPreferences
+import com.github.misham72.communalpayments.domain.model.ValidationError
 import com.github.misham72.communalpayments.domain.repository.TaxesRepository
 import com.github.misham72.communalpayments.domain.userclasses.Taxes
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
@@ -34,7 +35,8 @@ class TaxesViewModel(
         val customDate: String = "",
         val showAccountDialog: Boolean = false,
         val result: Taxes.TaxesData? = null,
-        val errorMessage: String? = null
+        val error: ValidationError? = null   // вместо errorMessage: String?
+
     )
 
     private val _uiState = MutableStateFlow(UiState())
@@ -44,7 +46,7 @@ class TaxesViewModel(
         val savedNumber = accountPrefs.getAccount(SERVICE_KEY)
         val saveDate = accountPrefs.getCustomDate(SERVICE_KEY)
         val savedName = accountPrefs.getCustomName(SERVICE_KEY)
-         _uiState.update { it.copy(accountNumber = savedNumber, customServiceName = savedName, customDate = saveDate) }
+        _uiState.update { it.copy(accountNumber = savedNumber, customServiceName = savedName, customDate = saveDate) }
     }
 
     fun openAccountDialog() {
@@ -76,6 +78,7 @@ class TaxesViewModel(
     fun onPriceTariffChange(value: String) {
         _uiState.update { it.copy(priceTariff = value) }
     }
+
     private fun parseStartDate(dateString: String): Date {
         return try {
             SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).parse(dateString) ?: Date()
@@ -83,6 +86,7 @@ class TaxesViewModel(
             Date() // при ошибке используем текущую дату
         }
     }
+
     // 3️⃣ ГЛАВНАЯ ЛОГИКА (как в Electricity)
     fun onCalculateClick() {
         // Валидация
@@ -91,7 +95,7 @@ class TaxesViewModel(
         val priceTariff = _uiState.value.priceTariff.toDoubleOrNull()
         val account = _uiState.value.accountNumber
         if (paymentDay == null || periodMonths == null || priceTariff == null) {
-            _uiState.update { it.copy(errorMessage = "Invalid input") }
+            _uiState.update { it.copy(error = ValidationError.InvalidInput) }
             return
         }
         val startDate = parseStartDate(_uiState.value.customDate)
@@ -109,7 +113,7 @@ class TaxesViewModel(
             taxesRepository.saveTaxesPayment(data)
 
             // 3️⃣ Обновляем UI
-            _uiState.update { it.copy(result = data, errorMessage = null) }
+            _uiState.update { it.copy(result = data, error = null) }
         }
     }
 }

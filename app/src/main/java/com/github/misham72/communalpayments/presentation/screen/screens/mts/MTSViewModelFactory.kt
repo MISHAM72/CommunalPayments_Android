@@ -10,7 +10,7 @@ import com.github.misham72.communalpayments.data.repository.MTSRepositoryImpl
 import com.github.misham72.communalpayments.domain.userclasses.MTS
 
 class MTSViewModelFactory(context: Context) : ViewModelProvider.Factory {
-    val calculator = PaymentDateCalculatorImpl()
+    val calculator: PaymentDateCalculatorImpl = PaymentDateCalculatorImpl()
     private val mts = MTS(calculator)
     private val fileManager = FileManager(context)
     private val mtsRepository = MTSRepositoryImpl(context, fileManager)
@@ -18,7 +18,7 @@ class MTSViewModelFactory(context: Context) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MTSViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST") return MTSViewModel(mts, mtsRepository, accountPrefs) as T
+            @Suppress("HardcodedStringLiteral", "UNCHECKED_CAST") return MTSViewModel(mts, mtsRepository, accountPrefs) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
     }

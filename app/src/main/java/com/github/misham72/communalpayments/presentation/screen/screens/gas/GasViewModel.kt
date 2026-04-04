@@ -3,10 +3,10 @@ package com.github.misham72.communalpayments.presentation.screen.screens.gas
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.misham72.communalpayments.data.local.AccountPreferences
+import com.github.misham72.communalpayments.domain.model.ValidationError
 import com.github.misham72.communalpayments.domain.repository.GasRepository
 import com.github.misham72.communalpayments.domain.userclasses.Gas
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
-import com.github.misham72.communalpayments.presentation.screen.screens.electricity.ElectricityViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -33,7 +33,7 @@ class GasViewModeL(
         val customDate: String = "", // дата, сохранённая в SharedPreferences
         val showAccountDialog: Boolean = false,   // флаг для диалога
         val result: Gas.GasData? = null,
-        val errorMessage: String? = null
+        val error: ValidationError? = null
     )
 
     private val _uiState = MutableStateFlow(UiState())  //✅ MutableStateFlow для изменяемого состояния
@@ -46,7 +46,7 @@ class GasViewModeL(
         val saveDate = accountPrefs.getCustomDate(SERVICE_KEY)
 
         _uiState.update { it.copy(accountNumber = savedNumber, customServiceName = savedName, customDate = saveDate) }
-         }
+    }
 
     fun openAccountDialog() {
         _uiState.update { it.copy(showAccountDialog = true) }
@@ -89,7 +89,7 @@ class GasViewModeL(
         //Если хоть одно поле пустое или содержит не число — показывает ошибку и останавливается.
 
         if (current == null || previous == null || tariff == null) {
-            _uiState.update { it.copy(errorMessage = "Invalid input") }
+            _uiState.update { it.copy(error = ValidationError.InvalidInput) }
             return
         }
         // ✅ 1. Бизнес-логика (без dateTime - это задача Repository)
@@ -101,7 +101,7 @@ class GasViewModeL(
             gasRepository.saveGasPayment(data)
 
             // ✅ 3. Обновление UI
-            _uiState.update { it.copy(result = data, errorMessage = null) }
+            _uiState.update { it.copy(result = data, error = null) }
         }
     }
 }

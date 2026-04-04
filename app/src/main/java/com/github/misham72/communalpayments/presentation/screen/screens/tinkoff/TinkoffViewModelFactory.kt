@@ -10,7 +10,7 @@ import com.github.misham72.communalpayments.data.repository.TinkoffRepositoryImp
 import com.github.misham72.communalpayments.domain.userclasses.Tinkoff
 
 class TinkoffViewModelFactory(context: Context) : ViewModelProvider.Factory {
-    val calculator = PaymentDateCalculatorImpl()
+    val calculator: PaymentDateCalculatorImpl = PaymentDateCalculatorImpl()
 
     private val tinkoff = Tinkoff(calculator)
     private val fileManager = FileManager(context)
@@ -19,7 +19,7 @@ class TinkoffViewModelFactory(context: Context) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(TinkoffViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST") return TinkoffViewModel(tinkoff, tinkoffRepository, accountPrefs) as T
+            @Suppress("HardcodedStringLiteral", "UNCHECKED_CAST") return TinkoffViewModel(tinkoff, tinkoffRepository, accountPrefs) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
     }

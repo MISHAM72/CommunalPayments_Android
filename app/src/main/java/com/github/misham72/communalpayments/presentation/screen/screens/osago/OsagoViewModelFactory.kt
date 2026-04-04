@@ -10,7 +10,7 @@ import com.github.misham72.communalpayments.data.repository.OsagoRepositoryImpl
 import com.github.misham72.communalpayments.domain.userclasses.Osago
 
 class OsagoViewModelFactory(context: Context) : ViewModelProvider.Factory {
-    val calculator = PaymentDateCalculatorImpl()
+    val calculator: PaymentDateCalculatorImpl = PaymentDateCalculatorImpl()
     private val osago = Osago(calculator)
     private val fileManager = FileManager(context)
     private val osagoRepository = OsagoRepositoryImpl(context, fileManager)
@@ -18,7 +18,7 @@ class OsagoViewModelFactory(context: Context) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(OsagoViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST") return OsagoViewModel(osago, osagoRepository, accountPrefs) as T
+            @Suppress("HardcodedStringLiteral", "UNCHECKED_CAST") return OsagoViewModel(osago, osagoRepository, accountPrefs) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
     }

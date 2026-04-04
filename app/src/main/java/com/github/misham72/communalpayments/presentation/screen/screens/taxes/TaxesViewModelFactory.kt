@@ -10,7 +10,7 @@ import com.github.misham72.communalpayments.data.repository.TaxesRepositoryImpl
 import com.github.misham72.communalpayments.domain.userclasses.Taxes
 
 class TaxesViewModelFactory(context: Context) : ViewModelProvider.Factory {
-    val calculator = PaymentDateCalculatorImpl()
+    val calculator: PaymentDateCalculatorImpl = PaymentDateCalculatorImpl()
     private val taxes = Taxes(calculator)
     private val fileManager = FileManager(context)
     private val taxesRepository = TaxesRepositoryImpl(context, fileManager)
@@ -18,7 +18,7 @@ class TaxesViewModelFactory(context: Context) : ViewModelProvider.Factory {
     private val accountPrefs = AccountPreferences(context.applicationContext)
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(TaxesViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST") return TaxesViewModel(taxes, taxesRepository, accountPrefs) as T
+            @Suppress("HardcodedStringLiteral", "UNCHECKED_CAST") return TaxesViewModel(taxes, taxesRepository, accountPrefs) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
     }

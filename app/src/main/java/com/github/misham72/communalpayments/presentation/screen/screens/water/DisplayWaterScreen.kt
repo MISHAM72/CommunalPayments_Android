@@ -34,6 +34,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.misham72.communalpayments.R
+import com.github.misham72.communalpayments.domain.model.ValidationError
 
 @Composable
 fun DisplayWaterScreen(viewModel: WaterViewModel) {
@@ -53,8 +54,7 @@ fun DisplayWaterScreen(viewModel: WaterViewModel) {
             modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = if (uiState.customServiceName.isNotBlank()) uiState.customServiceName
-                else stringResource(R.string.service_display_name_water), fontSize = 20.sp, fontWeight = FontWeight.Bold
+                text = uiState.customServiceName.ifBlank { stringResource(R.string.service_display_name_water) }, fontSize = 20.sp, fontWeight = FontWeight.Bold
             )
             IconButton(onClick = { viewModel.openAccountDialog() }) {
                 Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.change_personal_account))
@@ -63,12 +63,12 @@ fun DisplayWaterScreen(viewModel: WaterViewModel) {
 
         if (uiState.customDate.isNotBlank()) {
             Text(
-                text = "Дата платежа: ${uiState.customDate}", fontSize = 14.sp, color = Color.DarkGray, modifier = Modifier.padding(top = 4.dp)
+                text = stringResource(R.string.payment_date, uiState.customDate), fontSize = 14.sp, color = Color.DarkGray, modifier = Modifier.padding(top = 4.dp)
             )
         }
         if (uiState.accountNumber.isNotBlank()) {
             Text(
-                text = "Л/С: ${uiState.accountNumber}", fontSize = 14.sp, color = Color.Red, modifier = Modifier.padding(top = 4.dp)
+                text = stringResource(R.string.personal_account, uiState.accountNumber), fontSize = 14.sp, color = Color.Red, modifier = Modifier.padding(top = 4.dp)
             )
         }
         // Поля ввода (как у тебя - с ресурсами)
@@ -90,10 +90,14 @@ fun DisplayWaterScreen(viewModel: WaterViewModel) {
         ) {
             Text(stringResource(R.string.calculate_and_save))
         }
+        when (uiState.error) {
+            ValidationError.InvalidInput -> Text(
+                stringResource(R.string.error_invalid_input),
+                color = Color.Red
+            )
 
-        // Ошибка
-        uiState.errorMessage?.let {
-            Text(it, color = Color.Red)
+            null -> { /* ничего */
+            }
         }
 
         // Результат (как у тебя - с датой)
@@ -121,16 +125,16 @@ fun DisplayWaterScreen(viewModel: WaterViewModel) {
     }
     // 🔸 ЗАМЕНИТЬ ДИАЛОГ на новый с двумя полями
     if (uiState.showAccountDialog) {
-        AlertDialog(onDismissRequest = viewModel::closeAccountDialog, title = { Text("Редактирование") }, text = {
+        AlertDialog(onDismissRequest = viewModel::closeAccountDialog, title = { Text(stringResource(R.string.editing)) }, text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedTextField(
-                    value = tempName, onValueChange = { tempName = it }, label = { Text("Название услуги") }, singleLine = true, modifier = Modifier.fillMaxWidth()
+                    value = tempName, onValueChange = { tempName = it }, label = { Text(stringResource(R.string.service_name_label)) }, singleLine = true, modifier = Modifier.fillMaxWidth()
                 )
                 OutlinedTextField(
-                    value = tempDate, onValueChange = { tempDate = it }, label = { Text("Дата следующего платежа") }, singleLine = true, modifier = Modifier.fillMaxWidth()
+                    value = tempDate, onValueChange = { tempDate = it }, label = { Text(stringResource(R.string.next_payment_date)) }, singleLine = true, modifier = Modifier.fillMaxWidth()
                 )
                 OutlinedTextField(
-                    value = tempNumber, onValueChange = { tempNumber = it }, label = { Text("Лицевой счёт") }, singleLine = true, modifier = Modifier.fillMaxWidth()
+                    value = tempNumber, onValueChange = { tempNumber = it }, label = { Text(stringResource(R.string.personal_account_label)) }, singleLine = true, modifier = Modifier.fillMaxWidth()
                 )
             }
         }, confirmButton = {

@@ -10,7 +10,7 @@ import com.github.misham72.communalpayments.data.repository.TroykaRepositoryImpl
 import com.github.misham72.communalpayments.domain.userclasses.Troyka
 
 class TroykaViewModelFactory(context: Context) : ViewModelProvider.Factory {
-    val calculator = PaymentDateCalculatorImpl()
+    val calculator: PaymentDateCalculatorImpl = PaymentDateCalculatorImpl()
     private val troyka = Troyka(calculator)
     private val fileManager = FileManager(context)
     private val troykaRepository = TroykaRepositoryImpl(context, fileManager)
@@ -18,7 +18,7 @@ class TroykaViewModelFactory(context: Context) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(TroykaViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST") return TroykaViewModel(troyka, troykaRepository, accountPrefs) as T
+            @Suppress("HardcodedStringLiteral", "UNCHECKED_CAST") return TroykaViewModel(troyka, troykaRepository, accountPrefs) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
     }

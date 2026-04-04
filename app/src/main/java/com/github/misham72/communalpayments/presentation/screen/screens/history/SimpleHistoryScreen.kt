@@ -70,6 +70,7 @@ fun SimpleHistoryScreen(
     var selectedService by remember { mutableStateOf(initialService) }
     val fileManager = remember { FileManager(context) }
     val errorMessageTemplate = stringResource(R.string.download_error_with_message) // шаблон с %s
+    val unknownErrorText = stringResource(R.string.unknown_error) // ← получаем текст ошибки через stringResource
 
     //🔴//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //suspend — асинхронная функция, читает историю из файла и обновляет fileContent.
@@ -81,13 +82,12 @@ fun SimpleHistoryScreen(
     // Запускается каждый раз, когда меняется selectedService.
     //Сначала устанавливает текст загрузки, потом пытается прочитать файл.
     //В случае ошибки записывает сообщение об ошибке (из ресурсов) в fileContent.
-    @Suppress("QueryingResourceValues")
     LaunchedEffect(selectedService) {
         fileContent = loadingText
         fileContent = try {
             fileManager.readHistory(selectedService)
         } catch (e: Exception) {
-            errorMessageTemplate.format(e.localizedMessage ?: context.getString((R.string.unknown_error)))
+            errorMessageTemplate.format(e.localizedMessage ?: unknownErrorText) // ← используем полученную переменную
         }
     }
     //🔴//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -133,11 +133,7 @@ fun SimpleHistoryScreen(
             ).map { (key, nameRes) -> key to stringResource(nameRes) }
 
             services.forEach { (key, displayName) ->
-                FilterChip(
-                    selected = selectedService == key,
-                    onClick = { selectedService = key },
-                    label = { Text(displayName) }
-                )
+                FilterChip(selected = selectedService == key, onClick = { selectedService = key }, label = { Text(displayName) })
             }
         }
         //🔴/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

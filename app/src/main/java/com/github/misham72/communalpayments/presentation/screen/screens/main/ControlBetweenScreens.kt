@@ -94,7 +94,6 @@ fun ControlBetweenScreens() {
                         .fillMaxWidth()
                         .height(250.dp)
                 )
-
                 Button(
                     onClick = { showHistory = true },
                     modifier = Modifier.fillMaxWidth(),

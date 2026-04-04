@@ -36,6 +36,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.misham72.communalpayments.R
+import com.github.misham72.communalpayments.domain.model.ValidationError
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.GregorianCalendar
@@ -62,8 +63,7 @@ fun DisplayOsagoScreen(viewModel: OsagoViewModel) {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = if (uiState.customServiceName.isNotBlank()) uiState.customServiceName
-                else stringResource(R.string.service_display_name_osago),
+                text = uiState.customServiceName.ifBlank { stringResource(R.string.service_display_name_osago) },
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -73,7 +73,7 @@ fun DisplayOsagoScreen(viewModel: OsagoViewModel) {
         }
         if (uiState.customDate.isNotBlank()) {
             Text(
-                text = "Дата платежа: ${uiState.customDate}",
+                text = stringResource(R.string.payment_date, uiState.customDate),
                 fontSize = 14.sp,
                 color = Color.DarkGray,
                 modifier = Modifier.padding(top = 4.dp)
@@ -81,7 +81,7 @@ fun DisplayOsagoScreen(viewModel: OsagoViewModel) {
         }
         if (uiState.accountNumber.isNotBlank()) {
             Text(
-                text = "Л/С: ${uiState.accountNumber}",
+                text = stringResource(R.string.personal_account, uiState.accountNumber),
                 fontSize = 14.sp,
                 color = Color.Red,
                 modifier = Modifier.padding(top = 4.dp)
@@ -114,12 +114,14 @@ fun DisplayOsagoScreen(viewModel: OsagoViewModel) {
         ) {
             Text(stringResource(R.string.calculate_and_save))
         }
-        uiState.errorMessage?.let { error ->
-            Text(
-                text = error,
-                color = Color.Red,
-                modifier = Modifier.padding(8.dp)
+        when (uiState.error) {
+            ValidationError.InvalidInput -> Text(
+                stringResource(R.string.error_invalid_input),
+                color = Color.Red
             )
+
+            null -> { /* ничего */
+            }
         }
         uiState.result?.let { result ->
             Card(
@@ -170,13 +172,13 @@ fun DisplayOsagoScreen(viewModel: OsagoViewModel) {
         val context = LocalContext.current
         AlertDialog(
             onDismissRequest = viewModel::closeAccountDialog,
-            title = { Text("Редактирование") },
+            title = { Text(stringResource(R.string.editing)) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     OutlinedTextField(
                         value = tempName,
                         onValueChange = { tempName = it },
-                        label = { Text("Название услуги") },
+                        label = { Text(stringResource(R.string.service_name_label)) },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -199,12 +201,12 @@ fun DisplayOsagoScreen(viewModel: OsagoViewModel) {
                         },
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text("Выбрать дату начала: ${uiState.customDate}")
+                        Text(stringResource(R.string.select_start_date, uiState.customDate))
                     }
                     OutlinedTextField(
                         value = tempNumber,
                         onValueChange = { tempNumber = it },
-                        label = { Text("Лицевой счёт") },
+                        label = { Text(stringResource(R.string.personal_account_label)) },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth()
                     )

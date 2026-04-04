@@ -3,6 +3,7 @@ package com.github.misham72.communalpayments.presentation.screen.screens.electri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.misham72.communalpayments.data.local.AccountPreferences
+import com.github.misham72.communalpayments.domain.model.ValidationError
 import com.github.misham72.communalpayments.domain.repository.ElectricityRepository
 import com.github.misham72.communalpayments.domain.userclasses.Electricity
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
@@ -23,11 +24,17 @@ class ElectricityViewModel(
 
     /**Принимает пользовательский ввод (текущие показания, прошлые показания, тариф) и временно хранит их в UiState.*/
     data class UiState( //✅ UiState как единый источник правды для экрана
-        val currentReading: String = "", val previousReading: String = "", val tariff: String = "", val accountNumber: String = "",
-        val customServiceName: String = "", val showAccountDialog: Boolean = false,   // флаг для диалога
+        val currentReading: String = "",
+        val previousReading: String = "",
+        val tariff: String = "",
+        val accountNumber: String = "",
+        val customServiceName: String = "",
+        val showAccountDialog: Boolean = false,   // флаг для диалога
         val customDate: String = "", // дата, сохранённая в SharedPreferences
         val result: Electricity.ElectricityData? = null,
-        val errorMessage: String? = null
+        // val errorMessage: String? = null
+        val error: ValidationError? = null   // вместо errorMessage: String?
+
     )
 
     private val _uiState = MutableStateFlow(UiState())  //✅ MutableStateFlow для изменяемого состояния
@@ -85,9 +92,8 @@ class ElectricityViewModel(
         val tariff = _uiState.value.tariff.toDoubleOrNull() //Преобразует строки из полей ввода в числа (или null, если введена ерунда).
         val account = _uiState.value.accountNumber
         //Если хоть одно поле пустое или содержит не число — показывает ошибку и останавливается.
-
         if (current == null || previous == null || tariff == null) {
-            _uiState.update { it.copy(errorMessage = "invalid input") }
+            _uiState.update { it.copy(error = ValidationError.InvalidInput) }
             return
         }
         // ✅ 1. Бизнес-логика (без dateTime - это задача Repository)
@@ -99,7 +105,7 @@ class ElectricityViewModel(
             electricityRepository.saveElectricityPayment(data)
 
             // ✅ 3. Обновление UI
-            _uiState.update { it.copy(result = data, errorMessage = null) }
+            _uiState.update { it.copy(result = data, error = null) }
 
         }
     }

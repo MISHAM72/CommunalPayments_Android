@@ -3,6 +3,7 @@ package com.github.misham72.communalpayments.presentation.screen.screens.interne
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.misham72.communalpayments.data.local.AccountPreferences
+import com.github.misham72.communalpayments.domain.model.ValidationError
 import com.github.misham72.communalpayments.domain.repository.InternetRepository
 import com.github.misham72.communalpayments.domain.userclasses.Internet
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
@@ -35,7 +36,8 @@ class InternetViewModel(
         val customServiceName: String = "",
         val showAccountDialog: Boolean = false,   // флаг для диалога
         val result: Internet.InternetData? = null,
-        val errorMessage: String? = null
+        val error: ValidationError? = null   // вместо errorMessage: String?
+
     )
 
     private val _uiState = MutableStateFlow(UiState())
@@ -81,7 +83,7 @@ class InternetViewModel(
     private fun parseStartDate(dateString: String): Date {
         return try {
             SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).parse(dateString) ?: Date()
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             Date() // при ошибке используем текущую дату
         }
     }
@@ -94,7 +96,7 @@ class InternetViewModel(
         val priceTariff = _uiState.value.priceTariff.toDoubleOrNull()
         val account = _uiState.value.accountNumber
         if (paymentDay == null || periodMonths == null || priceTariff == null) {
-            _uiState.update { it.copy(errorMessage = "Invalid input") }
+            _uiState.update { it.copy(error = ValidationError.InvalidInput) }
             return
         }
         val startDate = parseStartDate(_uiState.value.customDate)
@@ -112,7 +114,7 @@ class InternetViewModel(
             internetRepository.saveInternetPayment(data)
 
             // 3️⃣ Обновляем UI
-            _uiState.update { it.copy(result = data, errorMessage = null) }
+            _uiState.update { it.copy(result = data, error = null) }
         }
     }
 }

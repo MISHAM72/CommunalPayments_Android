@@ -5,7 +5,6 @@
     <string name="app_title">Коммунальные платежи</string>
 
     // ИСТОРИЯ
-    <string name="custom_ready_service">Услуга - %1$s</string>
 
     // НАЗВАНИЯ ВКЛАДОК В ИСТОРИИ
     <string name="service_display_name_electricity">Свет</string>
@@ -24,12 +23,11 @@
     // общие
 
     <string name="status_calculated">  ПОДСЧИТАНО</string>
-    <string name="custom_status_paid">Статус: %1$s</string>
-    <string name="error_saving">Ошибка сохранения</string>
+
 
     // оплата по счетчику
     <string name="format_two_decimals"> %.2f</string>
-    <string name="payment_sum">Сумма оплаты: - %.2f руб.</string>
+
     <string name="unit_cubic_meter"> м./куб.</string>
     <string name="unit_kilowatt_hour"> кВт/ч</string>
     <string name="consumption">Расход: - %1$.2f %2$s</string>
@@ -42,40 +40,15 @@
 
 
     <!-- НОВЫЕ строки для меток полей (без %s): -->
-    <string name="previous_reading_label">Предыдущие показания,(м./куб.) - </string>
-    <string name="current_reading_label">Текущие показания,(м./куб.) - </string>
+
+
     <string name="current_reading_label_electricity">Текущие показания,(кВт/ч) - </string>
     <string name="previous_reading_label_electricity">Предыдущие показания,(кВт/ч) - </string>
 
 
-    <!-- Эти строки используются в логике (с плейсхолдерами): -->
-
-    <!-- Эти строки используются в UI как заголовки (без плейсхолдеров): -->
-
-
-    // ключи
-    <string name="service_key_electricity">electricity</string>
-    <string name="service_key_water">water</string>
-    <string name="service_key_gas">gas</string>
-    <string name="service_key_internet">internet</string>
-    <string name="service_key_garbage">garbage</string>
-    <string name="service_key_mts">mts</string>
-    <string name="service_key_osago">car_insurence</string>
-    <string name="service_key_troyka">troyka</string>
-    <string name="service_key_taxes">taxes</string>
-    <string name="service_key_tinkoff">tinkoff</string>
-    <string name="service_key_zont">zont</string>
-
-    // логи
-    <string name="log_file_not_found">❌ ФАЙЛ НЕ НАЙДЕН: %1$s</string>
-    <string name="log_file_read_error">❌ ОШИБКА ЧТЕНИЯ ФАЙЛА %1$s</string>
-    <string name="log_error_saving_to_file">❌ Ошибка сохранения в файл %1$s: %2$s</string>
-
     <string name="download_error_with_message">❌ ОШИБКА ЗАГРУЗКИ: %s</string>
 
     <string name="empty_history_calculation">История расчетов пуста</string>
-    <string name="error_read_file_message">Ошибка чтения файла: %1$s</string>
-    <string name="format_date_time_file">dd-MM-yyyy _ HH:mm:ss</string>
 
 
     <string name="history">История</string>
@@ -107,7 +80,7 @@
     <string name="Replace_the_status_in_the_LAST_entry">Заменить статус в ПОСЛЕДНЕЙ записи:</string>
     <string name="Edit_the_entire_text_To_replace_the_status_in_the_last_entry_click_on_the_button_above">Редактируйте весь текст. Для замены статуса в последней записи нажмите на кнопку выше</string>
     <string name="to_be_paid">К оплате:</string>
-    <string name="date_label">Дата:</string>
+
     <string name="status_label">Статус:</string>
 
     <color name="status_red">#F44336</color>
@@ -115,12 +88,6 @@
     <color name="status_green">#4CAF50</color>
     <color name="status_blue">#2196F3</color>
     <color name="status_black">#212121</color>
-
-
-    <!-- <string name="status_pending">🟡 ОЖИДАЕТ ОПЛАТЫ</string>
-     <string name="status_active">🟢 АКТИВНО</string>
-     <string name="status_review">🔵 НА ПРОВЕРКЕ</string>
-     <string name="status_cancelled">⚫ ОТМЕНЕНО</string>-->
 
 
     // ТЕКСТ НА ПОЛЯХ ПЛАТЕЖЕЙ ЗА ПЕРИОД (label)
@@ -143,24 +110,30 @@
     <string name="loading">Загрузка</string>
 
     // КАРТОЧКА ОПЛАТЫ ЗА ПЕРИОД
-    <string name="date">Сегодня: %1$s</string>
+
     <string name="the_payment_was">Оплата была: - %1$s</string>
     <string name="passed">Прошло: - %1$d дня.</string>
     <string name="next_payment">Дата оплаты: - %1$s</string>
     <string name="payment_in">Оплата через: - %1$d дней.</string>
     <string name="tariff_card">Тариф:  %.2f руб.</string>
-    <string name="personal_account">Лицевой счёт</string>
-    <string name="enter_account_number">Введите лицевой счёт</string>
 
 
-    <string name="file_not_found">Файл не найден: %1$s</string>
-    <string name="error_reading_file">Ошибка чтения файла %1$s</string>
-    <string name="error_saving_to_file">Ошибка сохранения в файл %1$s: %2$s</string>
-    <string name="error_invalid_input">Ошибка ввода</string>
     <string name="yyyy_mm_dd_hh_mm_ss">yyyy-MM-dd HH:mm:ss</string>
     <string name="change_personal_account">Изменить лицевой счёт</string>
-    Change your personal account
+
     <string name="account_prefs">Настройки учетной записи</string>
     <string name="unknown_error">Не известная ошибка</string>
+    <string name="editing">Редактирование</string>
+    <string name="service_name_label">Название услуги</string>
+    <string name="select_start_date">Выбрать дату начала: %s</string>
+
+    <string name="payment_date">Дата платежа: %s</string>
+    <string name="next_payment_date">Дата следующего платежа</string>
+
+    <string name="personal_account_label">Лицевой счёт</string>
+    <string name="personal_account_in_text_history">Лицевой счёт: %s</string>
+    <string name="personal_account">Л/С: %s</string>
+
+    <string name="error_invalid_input">Некорректный ввод</string>
 </resources>
 

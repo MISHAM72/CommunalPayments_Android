@@ -36,6 +36,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.misham72.communalpayments.R
+import com.github.misham72.communalpayments.domain.model.ValidationError
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.GregorianCalendar
@@ -62,8 +63,7 @@ fun DisplayTroykaScreen(viewModel: TroykaViewModel) {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = if (uiState.customServiceName.isNotBlank()) uiState.customServiceName
-                else stringResource(R.string.service_display_name_troyka),
+                text = uiState.customServiceName.ifBlank { stringResource(R.string.service_display_name_troyka) },
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -73,7 +73,7 @@ fun DisplayTroykaScreen(viewModel: TroykaViewModel) {
         }
         if (uiState.customDate.isNotBlank()) {
             Text(
-                text = "Дата платежа: ${uiState.customDate}",
+                text = stringResource(R.string.payment_date, uiState.customDate),
                 fontSize = 14.sp,
                 color = Color.DarkGray,
                 modifier = Modifier.padding(top = 4.dp)
@@ -82,7 +82,7 @@ fun DisplayTroykaScreen(viewModel: TroykaViewModel) {
 // Номер под названием (отдельная строка)
         if (uiState.accountNumber.isNotBlank()) {
             Text(
-                text = "Л/С: ${uiState.accountNumber}", fontSize = 14.sp, color = Color.Red, modifier = Modifier.padding(top = 4.dp)
+                text = stringResource(R.string.personal_account, uiState.accountNumber), fontSize = 14.sp, color = Color.Red, modifier = Modifier.padding(top = 4.dp)
             )
         }
         // Поле ввода - день платежа
@@ -111,11 +111,14 @@ fun DisplayTroykaScreen(viewModel: TroykaViewModel) {
             Text(stringResource(R.string.calculate_and_save))
         }
 
-        // Ошибка
-        uiState.errorMessage?.let { error ->
-            Text(
-                text = error, color = Color.Red, modifier = Modifier.padding(8.dp)
+        when (uiState.error) {
+            ValidationError.InvalidInput -> Text(
+                stringResource(R.string.error_invalid_input),
+                color = Color.Red
             )
+
+            null -> { /* ничего */
+            }
         }
 
         // Результат с ТВОИМИ ресурсами
@@ -163,11 +166,11 @@ fun DisplayTroykaScreen(viewModel: TroykaViewModel) {
         val context = LocalContext.current
         AlertDialog(
             onDismissRequest = viewModel::closeAccountDialog,
-            title = { Text("Редактирование") },
+            title = { Text(stringResource(R.string.editing)) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     OutlinedTextField(
-                        value = tempName, onValueChange = { tempName = it }, label = { Text("Название услуги") }, singleLine = true, modifier = Modifier.fillMaxWidth()
+                        value = tempName, onValueChange = { tempName = it }, label = { Text(stringResource(R.string.service_name_label)) }, singleLine = true, modifier = Modifier.fillMaxWidth()
                     )
                     // Кнопка выбора даты (с отображением сохранённой даты)
                     Button(
@@ -188,10 +191,10 @@ fun DisplayTroykaScreen(viewModel: TroykaViewModel) {
                         },
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text("Выбрать дату начала: ${uiState.customDate}")
+                        Text(stringResource(R.string.select_start_date, uiState.customDate))
                     }
                     OutlinedTextField(
-                        value = tempNumber, onValueChange = { tempNumber = it }, label = { Text("Лицевой счёт") }, singleLine = true, modifier = Modifier.fillMaxWidth()
+                        value = tempNumber, onValueChange = { tempNumber = it }, label = { Text(stringResource(R.string.personal_account_label)) }, singleLine = true, modifier = Modifier.fillMaxWidth()
                     )
                 }
             }, confirmButton = {

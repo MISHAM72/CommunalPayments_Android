@@ -3,10 +3,10 @@ package com.github.misham72.communalpayments.presentation.screen.screens.mts
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.misham72.communalpayments.data.local.AccountPreferences
+import com.github.misham72.communalpayments.domain.model.ValidationError
 import com.github.misham72.communalpayments.domain.repository.MTSRepository
 import com.github.misham72.communalpayments.domain.userclasses.MTS
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
-import com.github.misham72.communalpayments.presentation.screen.screens.garbage.GarbageViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -32,7 +32,9 @@ class MTSViewModel(
         val priceTariff: String = "", val accountNumber: String = "",
         val customDate: String = "",
         val customServiceName: String = "", val showAccountDialog: Boolean = false,   // флаг для диалога
-        val result: MTS.MTSData? = null, val errorMessage: String? = null
+        val result: MTS.MTSData? = null,
+        val error: ValidationError? = null   // вместо errorMessage: String?
+
     )
 
     private val _uiState = MutableStateFlow(UiState())
@@ -74,14 +76,15 @@ class MTSViewModel(
     fun onPriceTariffChange(value: String) {
         _uiState.update { it.copy(priceTariff = value) }
     }
+
     private fun parseStartDate(dateString: String): Date {
         return try {
             SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).parse(dateString) ?: Date()
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             Date() // при ошибке используем текущую дату
         }
-    }
-    // 3️⃣ ГЛАВНАЯ ЛОГИКА (как в Electricity)
+    }// 3️⃣ ГЛАВНАЯ ЛОГИКА (как в Electricity)
+
     fun onCalculateClick() {
         // Валидация
         val paymentDay = _uiState.value.paymentDay.toIntOrNull()
@@ -89,7 +92,7 @@ class MTSViewModel(
         val priceTariff = _uiState.value.priceTariff.toDoubleOrNull()
         val account = _uiState.value.accountNumber
         if (paymentDay == null || periodMonths == null || priceTariff == null) {
-            _uiState.update { it.copy(errorMessage = "Invalid input") }
+            _uiState.update { it.copy(error = ValidationError.InvalidInput) }
             return
         }
         val startDate = parseStartDate(_uiState.value.customDate)
@@ -107,7 +110,7 @@ class MTSViewModel(
             mtsRepository.saveMTSPayment(data)
 
             // 3️⃣ Обновляем UI
-            _uiState.update { it.copy(result = data, errorMessage = null) }
+            _uiState.update { it.copy(result = data, error = null) }
         }
     }
 }

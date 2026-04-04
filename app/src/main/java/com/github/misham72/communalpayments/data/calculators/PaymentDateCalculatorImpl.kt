@@ -57,6 +57,7 @@ class PaymentDateCalculatorImpl : PaymentDateCalculator {
             getPaymentDateForPeriod(nextPeriodStart, monthsPeriod, paymentDay, start)
         }
     }
+
     private fun getPaymentDateForPeriod(referenceDate: Calendar, monthsPeriod: Int, paymentDay: Int, start: Calendar): Calendar {
         val periodNumber = getPeriodNumber(referenceDate, monthsPeriod, start)
         val periodStart = getPeriodStartByNumber(periodNumber, monthsPeriod, start)

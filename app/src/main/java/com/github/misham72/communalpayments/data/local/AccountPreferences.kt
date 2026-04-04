@@ -4,34 +4,41 @@ import android.content.Context
 import androidx.core.content.edit
 import com.github.misham72.communalpayments.R
 
+@Suppress("HardcodedStringLiteral")
 class AccountPreferences(context: Context) {
-    private val prefs = context.getSharedPreferences(context.getString(R.string.account_prefs), Context.MODE_PRIVATE)
+
+    private companion object {
+        private const val KEY_ACCOUNT_PREFIX = "account_"
+        private const val KEY_NAME_PREFIX = "name_"
+        private const val KEY_DATE_PREFIX = "date_"
+    }
+
+    private val prefs = context.getSharedPreferences(
+        context.getString(R.string.account_prefs),
+        Context.MODE_PRIVATE
+    )
 
     fun saveAccount(serviceKey: String, number: String) {
-        prefs.edit { putString("account_$serviceKey", number) }
+        prefs.edit { putString("$KEY_ACCOUNT_PREFIX$serviceKey", number) }
     }
 
     fun getAccount(serviceKey: String): String {
-        return prefs.getString("account_$serviceKey", "") ?: ""
+        return prefs.getString("$KEY_ACCOUNT_PREFIX$serviceKey", "") ?: ""
     }
 
-    // 🔸 НОВЫЙ МЕТОД для сохранения названия услуги
     fun saveCustomName(serviceKey: String, name: String) {
-        prefs.edit { putString("name_$serviceKey", name) }
+        prefs.edit { putString("$KEY_NAME_PREFIX$serviceKey", name) }
     }
 
-    // 🔸 НОВЫЙ МЕТОД для загрузки названия услуги
     fun getCustomName(serviceKey: String): String {
-        return prefs.getString("name_$serviceKey", "") ?: ""
+        return prefs.getString("$KEY_NAME_PREFIX$serviceKey", "") ?: ""
     }
-    ///////
+
     fun saveCustomDate(serviceKey: String, date: String) {
-        prefs.edit { putString("date_$serviceKey", date) }
+        prefs.edit { putString("$KEY_DATE_PREFIX$serviceKey", date) }
     }
 
-    // 🔸 НОВЫЙ МЕТОД для загрузки названия услуги
     fun getCustomDate(serviceKey: String): String {
-        return prefs.getString("date_$serviceKey", "") ?: ""
+        return prefs.getString("$KEY_DATE_PREFIX$serviceKey", "") ?: ""
     }
-
 }
