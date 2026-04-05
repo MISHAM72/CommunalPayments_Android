@@ -1,5 +1,6 @@
 package com.github.misham72.communalpayments.presentation.screen.screens.electricity
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.misham72.communalpayments.data.local.AccountPreferences
@@ -61,6 +62,7 @@ class ElectricityViewModel(
 
     // 🔸 ЗАМЕНИТЬ updateAccountNumber на updateAccountData (сохраняет и номер, и название)
     fun updateAccountData(newNumber: String, newName: String, newDate: String) {
+        Log.d("ElectricityVM", "Saving: number=$newNumber, name=$newName, date=$newDate")
         _uiState.update { it.copy(accountNumber = newNumber, customServiceName = newName, customDate = newDate) }
         accountPrefs.saveAccount(SERVICE_KEY, newNumber)
         accountPrefs.saveCustomName(SERVICE_KEY, newName)

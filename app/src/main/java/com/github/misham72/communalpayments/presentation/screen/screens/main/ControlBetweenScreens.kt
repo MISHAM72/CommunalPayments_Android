@@ -1,5 +1,6 @@
 package com.github.misham72.communalpayments.presentation.screen.screens.main
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -25,29 +26,53 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import com.github.misham72.communalpayments.R
+import com.github.misham72.communalpayments.data.local.AccountPreferences
 import com.github.misham72.communalpayments.presentation.screen.components.ServiceTab
 import com.github.misham72.communalpayments.presentation.screen.navigation.getListInitialScreen
 import com.github.misham72.communalpayments.presentation.screen.screens.history.SimpleHistoryScreen
 
 @Composable
 fun ControlBetweenScreens() {
-    var selectedService by remember { mutableIntStateOf(0) } //– индекс активной вкладки (0 – первый сервис).
-    var showHistory by remember { mutableStateOf(false) } // true – показываем историю, false – главный экран.
-    val services = getListInitialScreen() // – список всех сервисов (название, иконка, ключ для файлов, и сам экран для отрисовки).
+    val context = LocalContext.current
+    val accountPrefs = remember { AccountPreferences(context.applicationContext) }
 
+    var selectedService by remember { mutableIntStateOf(0) }
+    var showHistory by remember { mutableStateOf(false) }
+    val services = getListInitialScreen()
+
+    var dueDates by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
+
+    // Перезагружаем даты при каждом возобновлении экрана
+    LifecycleResumeEffect(Unit) {
+        val dates = mutableMapOf<String, String>()
+        services.forEach { service ->
+            val date = accountPrefs.getCustomDate(service.fileKey)
+            if (date.isNotBlank()) {
+                dates[service.fileKey] = date
+            }
+        }
+        dueDates = dates
+        onPauseOrDispose { }
+    }
+
+    fun onNavigateBack() {
+        showHistory = false
+    }
     if (showHistory) {
-        SimpleHistoryScreen( // экран истории
-            onBack = { showHistory = false },
+        SimpleHistoryScreen(
+            onBack = { onNavigateBack() },
             initialService = services[selectedService].fileKey
         )
     } else {
-        Surface(// главный экран
+        Surface(
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background
         ) {
@@ -77,6 +102,7 @@ fun ControlBetweenScreens() {
                         ServiceTab(
                             service = service,
                             isSelected = selectedService == index,
+                            dueDate = dueDates[service.fileKey],
                             onClick = { selectedService = index }
                         )
                     }
@@ -94,6 +120,7 @@ fun ControlBetweenScreens() {
                         .fillMaxWidth()
                         .height(250.dp)
                 )
+
                 Button(
                     onClick = { showHistory = true },
                     modifier = Modifier.fillMaxWidth(),

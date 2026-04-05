@@ -44,6 +44,7 @@ import java.util.Locale
 
 @Composable
 fun DisplayTaxesScreen(viewModel: TaxesViewModel) {
+    val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
     var tempNumber by remember { mutableStateOf(uiState.accountNumber) }
     var tempName by remember { mutableStateOf(uiState.customServiceName) }
@@ -156,7 +157,6 @@ fun DisplayTaxesScreen(viewModel: TaxesViewModel) {
         }
     }
     if (uiState.showAccountDialog) {
-        val context = LocalContext.current
         AlertDialog(onDismissRequest = viewModel::closeAccountDialog, title = { Text(stringResource(R.string.editing)) }, text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedTextField(
@@ -170,8 +170,8 @@ fun DisplayTaxesScreen(viewModel: TaxesViewModel) {
                             { _, year, month, day ->
                                 val date = GregorianCalendar(year, month, day).time
                                 val newDate = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(date)
-                                // Сохраняем дату сразу (обновляет uiState и Preferences)
-                                viewModel.updateAccountData(tempNumber, tempName, newDate)
+                                tempDate = newDate  // обновляем временную переменную
+                                // НЕ вызываем updateAccountData здесь!
                             },
                             now.get(Calendar.YEAR),
                             now.get(Calendar.MONTH),
@@ -180,7 +180,7 @@ fun DisplayTaxesScreen(viewModel: TaxesViewModel) {
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(stringResource(R.string.select_start_date, uiState.customDate))
+                    Text(stringResource(R.string.select_start_date, tempDate))
                 }
                 OutlinedTextField(
                     value = tempNumber, onValueChange = { tempNumber = it }, label = { Text(stringResource(R.string.personal_account_label)) }, singleLine = true, modifier = Modifier.fillMaxWidth()

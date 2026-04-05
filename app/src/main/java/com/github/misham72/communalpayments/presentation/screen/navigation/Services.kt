@@ -1,6 +1,5 @@
 package com.github.misham72.communalpayments.presentation.screen.navigation
 
-
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -29,7 +28,6 @@ import com.github.misham72.communalpayments.presentation.screen.screens.troyka.D
 import com.github.misham72.communalpayments.presentation.screen.screens.troyka.TroykaViewModelFactory
 import com.github.misham72.communalpayments.presentation.screen.screens.water.DisplayWaterScreen
 import com.github.misham72.communalpayments.presentation.screen.screens.water.WaterViewModelFactory
-
 
 @Composable
 fun getListInitialScreen(): List<InitialScreen> {

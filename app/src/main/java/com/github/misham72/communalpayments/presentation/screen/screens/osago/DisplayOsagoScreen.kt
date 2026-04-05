@@ -44,6 +44,7 @@ import java.util.Locale
 
 @Composable
 fun DisplayOsagoScreen(viewModel: OsagoViewModel) {
+    val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
     var tempNumber by remember { mutableStateOf(uiState.accountNumber) }
     var tempName by remember { mutableStateOf(uiState.customServiceName) }
@@ -169,7 +170,6 @@ fun DisplayOsagoScreen(viewModel: OsagoViewModel) {
     }
 
     if (uiState.showAccountDialog) {
-        val context = LocalContext.current
         AlertDialog(
             onDismissRequest = viewModel::closeAccountDialog,
             title = { Text(stringResource(R.string.editing)) },
@@ -182,7 +182,6 @@ fun DisplayOsagoScreen(viewModel: OsagoViewModel) {
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth()
                     )
-                    // Кнопка выбора даты (с отображением сохранённой даты)
                     Button(
                         onClick = {
                             val now = Calendar.getInstance()
@@ -191,8 +190,8 @@ fun DisplayOsagoScreen(viewModel: OsagoViewModel) {
                                 { _, year, month, day ->
                                     val date = GregorianCalendar(year, month, day).time
                                     val newDate = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(date)
-                                    // Сохраняем дату сразу (обновляет uiState и Preferences)
-                                    viewModel.updateAccountData(tempNumber, tempName, newDate)
+                                    tempDate = newDate  // обновляем временную переменную
+                                    // НЕ вызываем updateAccountData здесь!
                                 },
                                 now.get(Calendar.YEAR),
                                 now.get(Calendar.MONTH),
@@ -201,7 +200,7 @@ fun DisplayOsagoScreen(viewModel: OsagoViewModel) {
                         },
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text(stringResource(R.string.select_start_date, uiState.customDate))
+                        Text(stringResource(R.string.select_start_date, tempDate))
                     }
                     OutlinedTextField(
                         value = tempNumber,

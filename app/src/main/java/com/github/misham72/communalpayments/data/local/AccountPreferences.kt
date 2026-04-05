@@ -1,6 +1,7 @@
 package com.github.misham72.communalpayments.data.local
 
 import android.content.Context
+import android.util.Log
 import androidx.core.content.edit
 import com.github.misham72.communalpayments.R
 
@@ -35,10 +36,14 @@ class AccountPreferences(context: Context) {
     }
 
     fun saveCustomDate(serviceKey: String, date: String) {
+        Log.d("AccountPrefs", "Saving date for $serviceKey: $date")
         prefs.edit { putString("$KEY_DATE_PREFIX$serviceKey", date) }
     }
 
     fun getCustomDate(serviceKey: String): String {
+        val date = prefs.getString("$KEY_DATE_PREFIX$serviceKey", "") ?: ""
+        Log.d("AccountPrefs", "Getting date for $serviceKey: $date")
+
         return prefs.getString("$KEY_DATE_PREFIX$serviceKey", "") ?: ""
     }
 }

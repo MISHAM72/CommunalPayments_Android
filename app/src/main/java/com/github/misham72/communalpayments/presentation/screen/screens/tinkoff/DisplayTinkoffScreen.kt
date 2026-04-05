@@ -44,6 +44,7 @@ import java.util.Locale
 
 @Composable
 fun DisplayTinkoffScreen(viewModel: TinkoffViewModel) {
+    val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
     var tempNumber by remember { mutableStateOf(uiState.accountNumber) }
     var tempName by remember { mutableStateOf(uiState.customServiceName) }
@@ -154,7 +155,6 @@ fun DisplayTinkoffScreen(viewModel: TinkoffViewModel) {
     }
 // 🔸 ЗАМЕНИТЬ ДИАЛОГ на новый с двумя полями
     if (uiState.showAccountDialog) {
-        val context = LocalContext.current
         AlertDialog(onDismissRequest = viewModel::closeAccountDialog, title = { Text(stringResource(R.string.editing)) }, text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedTextField(
@@ -165,16 +165,21 @@ fun DisplayTinkoffScreen(viewModel: TinkoffViewModel) {
                     onClick = {
                         val now = Calendar.getInstance()
                         DatePickerDialog(
-                            context, { _, year, month, day ->
+                            context,
+                            { _, year, month, day ->
                                 val date = GregorianCalendar(year, month, day).time
                                 val newDate = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(date)
-                                // Сохраняем дату сразу (обновляет uiState и Preferences)
-                                viewModel.updateAccountData(tempNumber, tempName, newDate)
-                            }, now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH)
+                                tempDate = newDate  // обновляем временную переменную
+                                // НЕ вызываем updateAccountData здесь!
+                            },
+                            now.get(Calendar.YEAR),
+                            now.get(Calendar.MONTH),
+                            now.get(Calendar.DAY_OF_MONTH)
                         ).show()
-                    }, modifier = Modifier.fillMaxWidth()
+                    },
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(stringResource(R.string.select_start_date, uiState.customDate))
+                    Text(stringResource(R.string.select_start_date, tempDate))
                 }
                 OutlinedTextField(
                     value = tempNumber, onValueChange = { tempNumber = it }, label = { Text(stringResource(R.string.personal_account_label)) }, singleLine = true, modifier = Modifier.fillMaxWidth()

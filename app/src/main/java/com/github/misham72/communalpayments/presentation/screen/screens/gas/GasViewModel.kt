@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class GasViewModeL(
+class GasViewModel(
     private val gas: Gas,
     private val gasRepository: GasRepository,
     private val accountPrefs: AccountPreferences
