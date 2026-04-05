@@ -1,5 +1,6 @@
 package com.github.misham72.communalpayments.presentation.screen.screens.main
 
+import android.app.Activity
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.horizontalScroll
@@ -12,8 +13,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -43,12 +50,12 @@ import com.github.misham72.communalpayments.presentation.screen.screens.history.
 fun ControlBetweenScreens() {
     val context = LocalContext.current
     val accountPrefs = remember { AccountPreferences(context.applicationContext) }
-
     var selectedService by remember { mutableIntStateOf(0) }
     var showHistory by remember { mutableStateOf(false) }
     val services = getListInitialScreen()
-
     var dueDates by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
+    var showMenu by remember { mutableStateOf(false) }
+
 
     // Перезагружаем даты при каждом возобновлении экрана
     LifecycleResumeEffect(Unit) {
@@ -93,6 +100,28 @@ fun ControlBetweenScreens() {
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onBackground
                     )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text("...")
+                        IconButton(onClick = { showMenu = true }) {
+                            Icon(Icons.Default.MoreVert, contentDescription = "Меню")
+                        }
+                    }
+                    DropdownMenu(
+                        expanded = showMenu,
+                        onDismissRequest = { showMenu = false }
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text("Выйти", fontSize = 20.sp) },
+                            onClick = {
+                                (context as? Activity)?.finishAffinity()
+                                showMenu = false
+                            }
+                        )
+                    }
                 }
 
                 Row(
