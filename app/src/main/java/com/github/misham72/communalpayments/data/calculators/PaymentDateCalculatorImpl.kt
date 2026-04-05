@@ -85,14 +85,26 @@ class PaymentDateCalculatorImpl : PaymentDateCalculator {
         val periodNumber = getPeriodNumber(referenceDate, monthsPeriod, start)
         return getPeriodStartByNumber(periodNumber, monthsPeriod, start)
     }
-
     private fun monthsBetween(start: Calendar, end: Calendar): Int {
+        val startYear = start.get(Calendar.YEAR)
+        val startMonth = start.get(Calendar.MONTH)
+        val startDay = start.get(Calendar.DAY_OF_MONTH)
+        val endYear = end.get(Calendar.YEAR)
+        val endMonth = end.get(Calendar.MONTH)
+        val endDay = end.get(Calendar.DAY_OF_MONTH)
+        var diff = (endYear - startYear) * 12 + (endMonth - startMonth)
+        if (endDay < startDay) {
+            diff--   // неполный месяц
+        }
+        return diff
+    }
+    /**private fun monthsBetween(start: Calendar, end: Calendar): Int {
         val startYear = start.get(Calendar.YEAR)
         val startMonth = start.get(Calendar.MONTH)
         val endYear = end.get(Calendar.YEAR)
         val endMonth = end.get(Calendar.MONTH)
         return (endYear - startYear) * 12 + (endMonth - startMonth)
-    }
+    }*/
 
     companion object {
         private const val MILLIS_IN_DAY = 24 * 60 * 60 * 1000L
