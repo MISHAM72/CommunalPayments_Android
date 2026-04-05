@@ -107,7 +107,7 @@ fun ControlBetweenScreens() {
                     ) {
                         Text("...")
                         IconButton(onClick = { showMenu = true }) {
-                            Icon(Icons.Default.MoreVert, contentDescription = "Меню")
+                            Icon(Icons.Default.MoreVert, contentDescription = stringResource(R.string.menu))
                         }
                     }
                     DropdownMenu(
@@ -115,7 +115,7 @@ fun ControlBetweenScreens() {
                         onDismissRequest = { showMenu = false }
                     ) {
                         DropdownMenuItem(
-                            text = { Text("Выйти", fontSize = 20.sp) },
+                            text = { Text(stringResource(R.string.exit), fontSize = 20.sp) },
                             onClick = {
                                 (context as? Activity)?.finishAffinity()
                                 showMenu = false

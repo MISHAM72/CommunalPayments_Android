@@ -135,5 +135,7 @@
     <string name="personal_account">Л/С: %s</string>
 
     <string name="error_invalid_input">Некорректный ввод</string>
+    <string name="menu">Меню</string>
+    <string name="exit">Выйти</string>
 </resources>
 
