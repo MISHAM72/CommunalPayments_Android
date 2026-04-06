@@ -1,21 +1,16 @@
 package com.github.misham72.communalpayments.presentation.screen.screens.gas
 
+import android.app.DatePickerDialog
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -25,6 +20,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,14 +32,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.domain.model.ValidationError
+import com.github.misham72.communalpayments.domain.utils.HistoryExporter
+import com.github.misham72.communalpayments.presentation.screen.components.ServiceTopBar
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.GregorianCalendar
 import java.util.Locale
-import android.app.DatePickerDialog
 
 @Composable
 fun DisplayGasScreen(viewModel: GasViewModel) {
+    val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
     var tempNumber by remember { mutableStateOf(uiState.accountNumber) }
@@ -52,22 +51,20 @@ fun DisplayGasScreen(viewModel: GasViewModel) {
 
     Column(
         modifier = Modifier
-            .fillMaxSize()
+            .fillMaxWidth()
             .padding(6.dp)
             .verticalScroll(rememberScrollState()), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(1.dp)
 
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = uiState.customServiceName.ifBlank { stringResource(R.string.service_display_name_gas) }, fontSize = 20.sp, fontWeight = FontWeight.Bold
-            )
-            IconButton(onClick = { viewModel.openAccountDialog() }) {
-                Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.change_personal_account))
+        ServiceTopBar(
+            title = uiState.customServiceName.ifBlank { stringResource(R.string.service_display_name_gas) },
+            onEditClick = { viewModel.openAccountDialog() },
+            onShareClick = {
+                scope.launch {
+                    HistoryExporter.shareSingleHistory(context, viewModel.getServiceKey())
+                }
             }
-        }
-        // Дата (добавлено)
+        )
         if (uiState.customDate.isNotBlank()) {
             Text(
                 text = stringResource(R.string.payment_date, uiState.customDate), fontSize = 14.sp, color = Color.DarkGray, modifier = Modifier.padding(top = 4.dp)
@@ -89,17 +86,20 @@ fun DisplayGasScreen(viewModel: GasViewModel) {
         OutlinedTextField(
             value = uiState.tariff, onValueChange = viewModel::onTariffChange, label = { Text(stringResource(R.string.tariff_label)) }, modifier = Modifier.fillMaxWidth()
         )
-
         // Кнопка
         Button(
             onClick = viewModel::onCalculateClick, modifier = Modifier.fillMaxWidth()
         ) {
             Text(stringResource(R.string.calculate_and_save))
         }
-
         when (uiState.error) {
             ValidationError.InvalidInput -> Text(
                 stringResource(R.string.error_invalid_input),
+                color = Color.Red
+            )
+
+            ValidationError.SavingError -> Text(
+                stringResource(R.string.error_saving),
                 color = Color.Red
             )
 

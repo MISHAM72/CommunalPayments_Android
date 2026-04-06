@@ -1,7 +1,6 @@
 package com.github.misham72.communalpayments.domain.userclasses
 
 import com.github.misham72.communalpayments.domain.calculators.MeterCalculator
-import java.util.Date
 
 class Gas {
 

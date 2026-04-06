@@ -28,16 +28,15 @@ class TinkoffViewModel(
 
     // 1️⃣ СОСТОЯНИЕ ЭКРАНА (что храним)
     data class UiState(
-        val paymentDay: String = "",      // день платежа
-        val periodMonths: String = "",    // период в месяцах
+        val paymentDay: String = "",
+        val periodMonths: String = "",
         val priceTariff: String = "",
         val accountNumber: String = "",
         val customDate: String = "",
         val customServiceName: String = "",
-        val showAccountDialog: Boolean = false,   // флаг для диалога
+        val showAccountDialog: Boolean = false,
         val result: Tinkoff.TinkoffData? = null,
-        val error: ValidationError? = null   // вместо errorMessage: String?
-
+        val error: ValidationError? = null,
     )
 
     private val _uiState = MutableStateFlow(UiState())
@@ -89,7 +88,8 @@ class TinkoffViewModel(
         }
     }
 
-    // 3️⃣ ГЛАВНАЯ ЛОГИКА (как в Electricity)
+    fun getServiceKey(): String = SERVICE_KEY
+
     fun onCalculateClick() {
         // Валидация
         val paymentDay = _uiState.value.paymentDay.toIntOrNull()
@@ -112,11 +112,10 @@ class TinkoffViewModel(
             accountNumber = account
         )
         viewModelScope.launch {
-            // 2️⃣ Data - КАК сохранить
             tinkoffRepository.saveTinkoffPayment(data)
-
-            // 3️⃣ Обновляем UI
-            _uiState.update { it.copy(result = data, error = null) }
+            _uiState.update {
+                it.copy(result = data, error = null)
+            }
         }
     }
 }

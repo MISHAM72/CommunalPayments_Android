@@ -36,10 +36,8 @@ class ZONTViewModel(
         val customServiceName: String = "",
         val showAccountDialog: Boolean = false,
         val result: ZONT.ZONTData? = null,
-        val error: ValidationError? = null   // вместо errorMessage: String?
-
+        val error: ValidationError? = null,   // вместо errorMessage: String?
     )
-
 
     private val _uiState = MutableStateFlow(UiState())
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
@@ -89,6 +87,8 @@ class ZONTViewModel(
         }
     }
 
+    fun getServiceKey(): String = SERVICE_KEY
+
     fun onCalculateClick() {
         // Валидация
         val paymentDay = _uiState.value.paymentDay.toIntOrNull()
@@ -111,11 +111,11 @@ class ZONTViewModel(
             accountNumber = account
         )
         viewModelScope.launch {
-            // 2️⃣ Data - КАК сохранить
             zontRepository.saveZONTPayment(data)
+            _uiState.update {
+                it.copy(result = data, error = null)
 
-            // 3️⃣ Обновляем UI
-            _uiState.update { it.copy(result = data, error = null) }
+            }
         }
     }
 }

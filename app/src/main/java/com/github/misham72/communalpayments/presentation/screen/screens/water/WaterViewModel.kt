@@ -32,8 +32,7 @@ class WaterViewModel(
         val customServiceName: String = "",
         val showAccountDialog: Boolean = false,   // флаг для диалога
         val result: Water.WaterData? = null,
-        val error: ValidationError? = null   // вместо errorMessage: String?
-
+        val error: ValidationError? = null
     )
 
     private val _uiState = MutableStateFlow(UiState())  //✅ MutableStateFlow для изменяемого состояния
@@ -41,10 +40,12 @@ class WaterViewModel(
 
     init {
         val savedNumber = accountPrefs.getAccount(SERVICE_KEY)
-        // 🔸 ЗАГРУЗИТЬ СОХРАНЁННОЕ НАЗВАНИЕ
         val savedName = accountPrefs.getCustomName(SERVICE_KEY)
         val saveDate = accountPrefs.getCustomDate(SERVICE_KEY)
-
+        val lastReading = accountPrefs.getLastReading(SERVICE_KEY)
+        if (lastReading.isNotBlank()) {
+            _uiState.update { it.copy(previousReading = lastReading) }
+        }
         _uiState.update { it.copy(accountNumber = savedNumber, customServiceName = savedName, customDate = saveDate) }
     }
 
@@ -78,6 +79,8 @@ class WaterViewModel(
         _uiState.update { it.copy(tariff = value) }
     }
 
+    fun getServiceKey(): String = SERVICE_KEY
+
     fun onCalculateClick() {
         val current = _uiState.value.currentReading.toDoubleOrNull() //Преобразует строки из полей ввода в числа (или null, если введена ерунда).
         val previous = _uiState.value.previousReading.toDoubleOrNull() //Преобразует строки из полей ввода в числа (или null, если введена ерунда).
@@ -91,12 +94,14 @@ class WaterViewModel(
         val data = water.collectWaterData(
             current, previous, tariff, accountNumber = account
         )
-        viewModelScope.launch {
-            // ✅ 2. Сохранение (Repository сам добавит дату и отформатирует)
-            waterRepository.saveWaterPayment(data)
 
-            // ✅ 3. Обновление UI
-            _uiState.update { it.copy(result = data, error = null) }
+        viewModelScope.launch {
+            waterRepository.saveWaterPayment(data)
+            accountPrefs.saveLastReading(SERVICE_KEY, current.toString())
+            _uiState.update {
+                it.copy(result = data, error = null)
+
+            }
         }
     }
 }

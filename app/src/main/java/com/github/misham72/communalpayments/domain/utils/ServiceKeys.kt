@@ -13,9 +13,4 @@ object ServiceKeys {
     const val TAXES: String = "taxes"
     const val TROYKA: String = "troyka"
     const val OSAGO: String = "osago"
-
-    // периоды оплаты в днях (можно использовать в будущем для цветов, уведомлений)
-    val periodDays: Map<String, Int> = mapOf(
-        ELECTRICITY to 30, GAS to 30, WATER to 30, ZONT to 30, INTERNET to 30, MTS to 30, TINKOFF to 30, GARBAGE to 30, TAXES to 365, TROYKA to 30, OSAGO to 365
-    )
 }

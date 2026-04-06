@@ -136,14 +136,7 @@ fun SimpleHistoryScreen(
                 FilterChip(selected = selectedService == key, onClick = { selectedService = key }, label = { Text(displayName) })
             }
         }
-        //🔴/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // Режим редактирования (if (isEditing) { ... })
-        //Если isEditing == true, показывается экран редактирования.
         if (isEditing) {
-            //🔴/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            // Автоскролл поля ввода.
-            // Автоскролл при входе в редактирование.
-            // При входе в редактирование через 100 мс скроллит поле ввода вниз.
             val editScrollState = rememberScrollState()
             LaunchedEffect(isEditing) {
                 if (isEditing) {
@@ -151,34 +144,21 @@ fun SimpleHistoryScreen(
                     editScrollState.animateScrollTo(editScrollState.maxValue)
                 }
             }
-            //🔴/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            // Колонка с содержимым редактирования. Внутренняя колонка с отступами.
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(16.dp)
             ) {
-                //🔴/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                // Поле для редактирования текста
-                //value — текущий текст.
-                //onValueChange — обновляет fileContent при вводе.
-                //weight(1f) — занимает всё доступное пространство по вертикали.
                 OutlinedTextField(
                     value = fileContent, onValueChange = { fileContent = it }, modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f), label = {
                         Text(stringResource(R.string.Edit_the_entire_text_To_replace_the_status_in_the_last_entry_click_on_the_button_above))
                     })
-                //🔴///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                // Заголовок «Заменить статус в ПОСЛЕДНЕЙ записи»
 
                 Text(
                     text = stringResource(R.string.Replace_the_status_in_the_LAST_entry), fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp)
                 )
-                //🔴/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                //Горизонтальные кнопки статусов
-                //Для каждого статуса оплаты (из перечисления PaymentStatus) создаётся кнопка.
-                //При нажатии вызывается addStatusToLastRecord, которая добавляет/заменяет статус в последней записи и обновляет fileContent.
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -187,9 +167,7 @@ fun SimpleHistoryScreen(
                 ) {
                     // Заменяем presetStatuses.forEach на это:
                     PaymentStatus.entries.forEach { paymentStatus ->
-                        // Получаем информацию для отображения из маппера
                         val displayInfo = StatusDisplayMapper.map(paymentStatus)
-                        // Собираем строку как раньше: эмодзи + текст
                         val statusString = stringResource(displayInfo.emojiResId) + " " + stringResource(displayInfo.textResId)
                         OutlinedButton(
                             onClick = {
@@ -204,11 +182,6 @@ fun SimpleHistoryScreen(
                         }
                     }
                 }
-                //🔴/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                // Кнопки «Сохранить» и «Отмена»
-                //При сохранении: асинхронно записывает изменения в файл, выходит из режима редактирования и обновляет историю.
-                //При отмене: просто перезагружает историю из файла (отменяя изменения) и выходит из редактирования.
-                // Объявляем scope один раз перед Row или внутри, но лучше перед Row
                 val scope = rememberCoroutineScope()
                 Row(
                     modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
@@ -235,17 +208,7 @@ fun SimpleHistoryScreen(
 
             }
         } else {
-            //🔴/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            // Режим просмотра (else)
-            //Если не в режиме редактирования, показывается карточка с историей и кнопка «Редактировать историю».
-
             val viewScrollState = rememberScrollState()
-            ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            // Карточка истории
-            //weight(1f) — занимает всё оставшееся место между верхними элементами и кнопкой.
-            //Внутри Box с прокруткой, синим фоном и отступами.
-            //buildAnnotatedString — строит текст с жирным выделением для строк, содержащих метки (услуга, дата, статус, к оплате).
-            //Text отображает отформатированный текст.
             Card(
                 Modifier
                     .fillMaxWidth()
@@ -260,10 +223,8 @@ fun SimpleHistoryScreen(
                         .verticalScroll(state = viewScrollState)
                     // .border(6.dp, Color.Red)  // ← красная рамка вокруг Card
                 ) {
-                    // stringResource(R.string.custom_ready_service) // Точная часть из strings.xml
-                    //stringResource(R.string.date_label)      // "Дата:"
-                    val statusLabel = stringResource(R.string.status_label)  // "Статус:"
-                    val toBePaidLabel = stringResource(R.string.to_be_paid)  // "К оплате:"
+                    val statusLabel = stringResource(R.string.status_label)
+                    val toBePaidLabel = stringResource(R.string.to_be_paid)
 
                     val formattedHistoryText = buildAnnotatedString {
                         // Разбиваем содержимое файла на строки
@@ -271,9 +232,8 @@ fun SimpleHistoryScreen(
 
                         lines.forEachIndexed { index, line ->
                             // Проверяем, содержит ли строка ключевые метки
-                            val isLabelLine = line.startsWith(stringResource(R.string.service_prefix)) ||  // Вместо line.contains(serviceLabelBase)
-                                    (line.startsWith("( ") && line.endsWith(" )")) ||  // ← ВОТ И ВСЁ!
-                                    // line.contains("Дата:") ||
+                            val isLabelLine = line.startsWith(stringResource(R.string.service_prefix)) ||
+                                    (line.startsWith("( ") && line.endsWith(" )")) ||
                                     line.contains(statusLabel) || line.contains(toBePaidLabel)
                             if (isLabelLine) {
                                 // Строки с метками делаем ЖИРНЫМИ

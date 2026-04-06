@@ -27,14 +27,15 @@ class MTSViewModel(
 
     // 1️⃣ СОСТОЯНИЕ ЭКРАНА (что храним)
     data class UiState(
-        val paymentDay: String = "",      // день платежа
-        val periodMonths: String = "",    // период в месяцах
-        val priceTariff: String = "", val accountNumber: String = "",
+        val paymentDay: String = "",
+        val periodMonths: String = "",
+        val priceTariff: String = "",
+        val accountNumber: String = "",
         val customDate: String = "",
-        val customServiceName: String = "", val showAccountDialog: Boolean = false,   // флаг для диалога
+        val customServiceName: String = "",
+        val showAccountDialog: Boolean = false,   // флаг для диалога
         val result: MTS.MTSData? = null,
-        val error: ValidationError? = null   // вместо errorMessage: String?
-
+        val error: ValidationError? = null,   // вместо errorMessage: String?
     )
 
     private val _uiState = MutableStateFlow(UiState())
@@ -83,7 +84,9 @@ class MTSViewModel(
         } catch (_: Exception) {
             Date() // при ошибке используем текущую дату
         }
-    }// 3️⃣ ГЛАВНАЯ ЛОГИКА (как в Electricity)
+    }
+
+    fun getServiceKey(): String = SERVICE_KEY
 
     fun onCalculateClick() {
         // Валидация
@@ -99,18 +102,14 @@ class MTSViewModel(
 
         // 1️⃣ Домен - ЧТО рассчитать
         val data = mts.collectMTSData(
-            paymentDay = paymentDay,
-            periodMonths = periodMonths,
-            startDate = startDate,
-            priceTariff = priceTariff,
-            accountNumber = account
+            paymentDay = paymentDay, periodMonths = periodMonths, startDate = startDate, priceTariff = priceTariff, accountNumber = account
         )
         viewModelScope.launch {
-            // 2️⃣ Data - КАК сохранить
             mtsRepository.saveMTSPayment(data)
+            _uiState.update {
+                it.copy(result = data, error = null)
 
-            // 3️⃣ Обновляем UI
-            _uiState.update { it.copy(result = data, error = null) }
+            }
         }
     }
 }

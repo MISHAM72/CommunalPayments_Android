@@ -26,16 +26,15 @@ class OsagoViewModel(
     }
 
     data class UiState(
-        val paymentDay: String = "",      // день платежа
-        val periodMonths: String = "",    // период в месяцах
-        val priceTariff: String = "",     // тариф
+        val paymentDay: String = "",
+        val periodMonths: String = "",
+        val priceTariff: String = "",
         val accountNumber: String = "",
         val customDate: String = "",
         val customServiceName: String = "",
-        val showAccountDialog: Boolean = false,   // флаг для диалога
+        val showAccountDialog: Boolean = false,
         val result: Osago.OsagoData? = null,
-        val error: ValidationError? = null   // вместо errorMessage: String?
-
+        val error: ValidationError? = null,
     )
 
     private val _uiState = MutableStateFlow(UiState())
@@ -87,7 +86,8 @@ class OsagoViewModel(
         }
     }
 
-    // 3️⃣ ГЛАВНАЯ ЛОГИКА (как в Electricity)
+    fun getServiceKey(): String = SERVICE_KEY
+
     fun onCalculateClick() {
         // Валидация
         val paymentDay = _uiState.value.paymentDay.toIntOrNull()
@@ -103,18 +103,13 @@ class OsagoViewModel(
 
         // 1️⃣ Домен - ЧТО рассчитать
         val data = osago.collectOsagoData(
-            paymentDay = paymentDay,
-            periodMonths = periodMonths,
-            startDate = startDate,
-            priceTariff = priceTariff,
-            accountNumber = account
+            paymentDay = paymentDay, periodMonths = periodMonths, startDate = startDate, priceTariff = priceTariff, accountNumber = account
         )
         viewModelScope.launch {
-            // 2️⃣ Data - КАК сохранить
             osagoRepository.saveOsagoPayment(data)
-
-            // 3️⃣ Обновляем UI
-            _uiState.update { it.copy(result = data, error = null) }
+            _uiState.update {
+                it.copy(result = data, error = null)
+            }
         }
     }
 }

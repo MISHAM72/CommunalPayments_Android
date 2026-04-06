@@ -1,7 +1,6 @@
 package com.github.misham72.communalpayments.presentation.screen.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.vector.ImageVector
 
 data class InitialScreen(
     val icon: String,

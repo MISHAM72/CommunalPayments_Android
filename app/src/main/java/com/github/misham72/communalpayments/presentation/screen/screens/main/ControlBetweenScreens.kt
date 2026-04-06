@@ -1,7 +1,8 @@
 package com.github.misham72.communalpayments.presentation.screen.screens.main
 
 import android.app.Activity
-import android.util.Log
+import android.content.Context
+import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -29,6 +30,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,12 +41,23 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.FileProvider
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.data.local.AccountPreferences
+import com.github.misham72.communalpayments.data.local.FileManager
+import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 import com.github.misham72.communalpayments.presentation.screen.components.ServiceTab
 import com.github.misham72.communalpayments.presentation.screen.navigation.getListInitialScreen
 import com.github.misham72.communalpayments.presentation.screen.screens.history.SimpleHistoryScreen
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+
 
 @Composable
 fun ControlBetweenScreens() {
@@ -55,6 +68,7 @@ fun ControlBetweenScreens() {
     val services = getListInitialScreen()
     var dueDates by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
     var showMenu by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
 
 
     // Перезагружаем даты при каждом возобновлении экрана
@@ -121,6 +135,15 @@ fun ControlBetweenScreens() {
                                 showMenu = false
                             }
                         )
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.export_history)) },
+                            onClick = {
+                                scope.launch {
+                                    shareHistoryAsync(context)
+                                }
+                                showMenu = false
+                            }
+                        )
                     }
                 }
 
@@ -159,5 +182,46 @@ fun ControlBetweenScreens() {
                 }
             }
         }
+    }
+}
+
+private const val DATE_FORMAT_FILENAME = "yyyyMMdd_HHmmss"
+private suspend fun shareHistoryAsync(context: Context) = withContext(Dispatchers.IO) {
+    val fileManager = FileManager(context.applicationContext)
+    val allHistory = StringBuilder()
+
+    val serviceKeys = listOf(
+        ServiceKeys.ELECTRICITY, ServiceKeys.GAS, ServiceKeys.WATER,
+        ServiceKeys.GARBAGE, ServiceKeys.ZONT, ServiceKeys.INTERNET,
+        ServiceKeys.MTS, ServiceKeys.TINKOFF, ServiceKeys.TAXES,
+        ServiceKeys.TROYKA, ServiceKeys.OSAGO
+    )
+
+    for (key in serviceKeys) {
+        val content = fileManager.readHistory(key)
+        if (content.isNotBlank()) {
+            allHistory.apply {
+                appendLine("=== $key ===")
+                appendLine(content)
+                appendLine()
+            }
+        }
+    }
+
+    if (allHistory.isEmpty()) return@withContext
+
+    val timeStamp = SimpleDateFormat(DATE_FORMAT_FILENAME, Locale.getDefault()).format(Date())
+    val fileName = "payment_history_$timeStamp.txt"
+    val file = File(context.cacheDir, fileName)
+    file.writeText(allHistory.toString())
+
+    withContext(Dispatchers.Main) {
+        val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_STREAM, uri)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        context.startActivity(Intent.createChooser(intent, context.getString(R.string.export_history)))
     }
 }

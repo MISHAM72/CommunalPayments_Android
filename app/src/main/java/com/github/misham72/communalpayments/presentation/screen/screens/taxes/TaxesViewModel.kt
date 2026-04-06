@@ -35,8 +35,7 @@ class TaxesViewModel(
         val customDate: String = "",
         val showAccountDialog: Boolean = false,
         val result: Taxes.TaxesData? = null,
-        val error: ValidationError? = null   // вместо errorMessage: String?
-
+        val error: ValidationError? = null,
     )
 
     private val _uiState = MutableStateFlow(UiState())
@@ -82,12 +81,13 @@ class TaxesViewModel(
     private fun parseStartDate(dateString: String): Date {
         return try {
             SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).parse(dateString) ?: Date()
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             Date() // при ошибке используем текущую дату
         }
     }
 
-    // 3️⃣ ГЛАВНАЯ ЛОГИКА (как в Electricity)
+    fun getServiceKey(): String = SERVICE_KEY
+
     fun onCalculateClick() {
         // Валидация
         val paymentDay = _uiState.value.paymentDay.toIntOrNull()
@@ -109,11 +109,10 @@ class TaxesViewModel(
             accountNumber = account
         )
         viewModelScope.launch {
-            // 2️⃣ Data - КАК сохранить
             taxesRepository.saveTaxesPayment(data)
-
-            // 3️⃣ Обновляем UI
-            _uiState.update { it.copy(result = data, error = null) }
+            _uiState.update {
+                it.copy(result = data, error = null)
+            }
         }
     }
 }

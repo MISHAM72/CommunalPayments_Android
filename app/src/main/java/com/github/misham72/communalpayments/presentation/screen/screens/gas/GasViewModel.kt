@@ -28,12 +28,11 @@ class GasViewModel(
         val previousReading: String = "",
         val tariff: String = "",
         val accountNumber: String = "",
-        // 🔸 ДОБАВИТЬ НОВОЕ ПОЛЕ
         val customServiceName: String = "",
         val customDate: String = "", // дата, сохранённая в SharedPreferences
         val showAccountDialog: Boolean = false,   // флаг для диалога
         val result: Gas.GasData? = null,
-        val error: ValidationError? = null
+        val error: ValidationError? = null,
     )
 
     private val _uiState = MutableStateFlow(UiState())  //✅ MutableStateFlow для изменяемого состояния
@@ -41,10 +40,12 @@ class GasViewModel(
 
     init {
         val savedNumber = accountPrefs.getAccount(SERVICE_KEY)
-        // 🔸 ЗАГРУЗИТЬ СОХРАНЁННОЕ НАЗВАНИЕ
         val savedName = accountPrefs.getCustomName(SERVICE_KEY)
         val saveDate = accountPrefs.getCustomDate(SERVICE_KEY)
-
+        val lastReading = accountPrefs.getLastReading(SERVICE_KEY)
+        if (lastReading.isNotBlank()) {
+            _uiState.update { it.copy(previousReading = lastReading) }
+        }
         _uiState.update { it.copy(accountNumber = savedNumber, customServiceName = savedName, customDate = saveDate) }
     }
 
@@ -65,7 +66,6 @@ class GasViewModel(
         accountPrefs.saveCustomDate(SERVICE_KEY, newDate)
     }
 
-
     fun onCurrentReadingChange(value: String) {
         _uiState.update { it.copy(currentReading = value) }
     }
@@ -77,6 +77,8 @@ class GasViewModel(
     fun onTariffChange(value: String) {
         _uiState.update { it.copy(tariff = value) }
     }
+
+    fun getServiceKey(): String = SERVICE_KEY
 
     fun onCalculateClick() {
         /** По команде (onCalculateClick) запускает цепочку действий:
@@ -92,16 +94,19 @@ class GasViewModel(
             _uiState.update { it.copy(error = ValidationError.InvalidInput) }
             return
         }
-        // ✅ 1. Бизнес-логика (без dateTime - это задача Repository)
+
         val data = gas.collectGasData(
             current, previous, tariff, accountNumber = account
         )
-        viewModelScope.launch {
-            // ✅ 2. Сохранение (Repository сам добавит дату и отформатирует) gas(data)
-            gasRepository.saveGasPayment(data)
 
-            // ✅ 3. Обновление UI
-            _uiState.update { it.copy(result = data, error = null) }
+        viewModelScope.launch {
+            gasRepository.saveGasPayment(data)
+            _uiState.update {
+                accountPrefs.saveLastReading(SERVICE_KEY, current.toString())
+                it.copy(result = data, error = null)
+
+
+            }
         }
     }
 }

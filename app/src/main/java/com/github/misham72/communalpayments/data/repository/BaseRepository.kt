@@ -18,10 +18,6 @@ abstract class BaseRepository(
         return SimpleDateFormat(context.getString(R.string.yyyy_mm_dd_hh_mm_ss), Locale.getDefault()).format(Date())
     }
 
-    protected fun getFileName(tag: String): String {
-        return "${tag}_${System.currentTimeMillis()}.txt"
-    }
-
     protected val headerSeparator: String = "----------------------------------------------------------"
     protected val historyHeader: String = "🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩"
 }

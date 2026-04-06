@@ -1,6 +1,11 @@
 // Объявляем константы, чтобы избежать предупреждений HardcodedStringLiteral
+@Suppress("HardcodedStringLiteral")
 val proguardAndroidOptimize: String = "proguard-android-optimize.txt"
+
+@Suppress("HardcodedStringLiteral")
 val proguardRulesPro: String = "proguard-rules.pro"
+
+@Suppress("HardcodedStringLiteral")
 val composeUiTextGoogleFonts: String = "androidx.compose.ui:ui-text-google-fonts:1.6.1"
 
 plugins {
@@ -16,8 +21,8 @@ android {
         applicationId = "com.github.misham72.communalpayments"
         minSdk = 24
         targetSdk = 36
-        versionCode = 4
-        versionName = "2.0.2"
+        versionCode = 6
+        versionName = "2.1.3"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
     }
@@ -64,10 +69,11 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     implementation(libs.androidx.datastore.preferences)
     implementation(composeUiTextGoogleFonts)
-    // Зависимость для ViewModel в Compose — добавим через libs
     implementation(libs.androidx.lifecycle.viewmodel.compose)
-    implementation("androidx.compose.material:material-icons-core:1.7.6")
-    implementation("androidx.compose.material:material-icons-extended:1.7.6")
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.0")
+
+    implementation(libs.androidx.compose.material.icons.core)
+    implementation(libs.androidx.compose.material.icons.extended)
+    implementation(libs.androidx.lifecycle.runtime.compose)
+    implementation(libs.androidx.work.runtime.ktx)
 }
 

@@ -17,7 +17,9 @@ import java.util.Date
 import java.util.Locale
 
 class GarbageViewModel(
-    private val garbage: Garbage, private val garbageRepository: GarbageRepository, private val accountPrefs: AccountPreferences
+    private val garbage: Garbage,
+    private val garbageRepository: GarbageRepository,
+    private val accountPrefs: AccountPreferences
 ) : ViewModel() {
 
     companion object {
@@ -26,13 +28,15 @@ class GarbageViewModel(
 
     // 1️⃣ СОСТОЯНИЕ ЭКРАНА (что храним)
     data class UiState(
-        val paymentDay: String = "",      // день платежа
-        val periodMonths: String = "",    // период в месяцах
-        val priceTariff: String = "",     // тариф
-        val accountNumber: String = "", val customDate: String = "", // дата, сохранённая в SharedPreferences
-        val customServiceName: String = "", val showAccountDialog: Boolean = false,   // флаг для диалога
-        val result: Garbage.GarbageData? = null, val error: ValidationError? = null   // вместо errorMessage: String?
-
+        val paymentDay: String = "",
+        val periodMonths: String = "",
+        val priceTariff: String = "",
+        val accountNumber: String = "",
+        val customDate: String = "",
+        val customServiceName: String = "",
+        val showAccountDialog: Boolean = false,
+        val result: Garbage.GarbageData? = null,
+        val error: ValidationError? = null,
     )
 
     private val _uiState = MutableStateFlow(UiState())
@@ -84,8 +88,9 @@ class GarbageViewModel(
         }
     }
 
+    fun getServiceKey(): String = SERVICE_KEY
+
     fun onCalculateClick() {
-        // Валидация
         val paymentDay = _uiState.value.paymentDay.toIntOrNull()
         val periodMonths = _uiState.value.periodMonths.toIntOrNull()
         val priceTariff = _uiState.value.priceTariff.toDoubleOrNull()
@@ -96,16 +101,21 @@ class GarbageViewModel(
         }
         val startDate = parseStartDate(_uiState.value.customDate)
 
-        // 1️⃣ Домен - ЧТО рассчитать
         val data = garbage.collectGarbageData(
-            paymentDay = paymentDay, periodMonths = periodMonths, startDate = startDate, priceTariff = priceTariff, accountNumber = account
+            paymentDay = paymentDay,
+            periodMonths = periodMonths,
+            startDate = startDate,
+            priceTariff = priceTariff,
+            accountNumber = account
         )
-        viewModelScope.launch {
-            // 2️⃣ Data - КАК сохранить
-            garbageRepository.saveGarbagePayment(data)
 
-            // 3️⃣ Обновляем UI
-            _uiState.update { it.copy(result = data, error = null) }
+        viewModelScope.launch {
+            garbageRepository.saveGarbagePayment(data)
+            _uiState.update {
+                it.copy(result = data, error = null)
+
+
+            }
         }
     }
 }

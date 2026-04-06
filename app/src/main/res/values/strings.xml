@@ -7,15 +7,16 @@
     // ИСТОРИЯ
 
     // НАЗВАНИЯ ВКЛАДОК В ИСТОРИИ
+
     <string name="service_display_name_electricity">Свет</string>
     <string name="service_display_name_water">Вода</string>
     <string name="service_display_name_gas">Газ</string>
     <string name="service_display_name_internet">Интернет</string>
     <string name="service_display_name_garbage">Мусор</string>
-    <string name="service_display_name_mts">Оператор телефона № 1</string>
+    <string name="service_display_name_mts">Телефона 1</string>
     <string name="service_display_name_osago">Автострахование</string>
     <string name="service_display_name_taxes">Налог на бизнес</string>
-    <string name="service_display_name_tinkoff">Оператор телефона № 2</string>
+    <string name="service_display_name_tinkoff"> Телефона 2</string>
     <string name="service_display_name_troyka">Проездной билет</string>
     <string name="service_display_name_zont">Отопление</string>
 
@@ -59,9 +60,6 @@
     <string name="Edit_history">Редактировать историю</string>
     <string name="calculate_and_save">Рассчитать и Сохранить</string>
 
-
-    <!-- Новые, разделенные ресурсы для статусов (ДОБАВИТЬ РЯДОМ СО СТАРЫМИ) -->
-    <!-- Текстовые названия статусов (без эмодзи) -->
     <string name="status_text_paid">ОПЛАЧЕНО</string>
     <string name="status_text_pending">ОЖИДАЕТ ОПЛАТЫ</string>
     <string name="status_text_active">АКТИВНО</string>
@@ -70,13 +68,13 @@
     <string name="service_prefix">Услуга_</string>
 
     // В файле res/values/strings.xml замените эмодзи
-    <string name="emoji_paid">🔴</string>   <!--  Деньги вместо красного круга --> -->
-    <string name="emoji_pending">⏳</string> <!-- Песочные часы вместо желтого круга -->
-    <string name="emoji_active">✅</string>  <!-- Галочка вместо зеленого круга -->
-    <string name="emoji_under_review">🔍</string> <!-- Лупа вместо синего круга -->
-    <string name="emoji_cancelled">🚫</string> <!-- Знак запрета вместо черного круга -->
+    <string name="emoji_paid">🔴</string>
+    <string name="emoji_pending">⏳</string>
+    <string name="emoji_active">✅</string>
+    <string name="emoji_under_review">🔍</string>
+    <string name="emoji_cancelled">🚫</string>
     <string name="emoji_calculated">🤓</string>
-    <!--<string name="paid_for">🔴 ОПЛАЧЕНО</string>-->
+
     <string name="Replace_the_status_in_the_LAST_entry">Заменить статус в ПОСЛЕДНЕЙ записи:</string>
     <string name="Edit_the_entire_text_To_replace_the_status_in_the_last_entry_click_on_the_button_above">Редактируйте весь текст. Для замены статуса в последней записи нажмите на кнопку выше</string>
     <string name="to_be_paid">К оплате:</string>
@@ -128,7 +126,6 @@
     <string name="select_start_date">Выбрать дату начала: %s</string>
 
     <string name="payment_date">Дата платежа: %s</string>
-    <string name="next_payment_date">Дата следующего платежа</string>
 
     <string name="personal_account_label">Лицевой счёт</string>
     <string name="personal_account_in_text_history">Лицевой счёт: %s</string>
@@ -137,5 +134,17 @@
     <string name="error_invalid_input">Некорректный ввод</string>
     <string name="menu">Меню</string>
     <string name="exit">Выйти</string>
+    <string name="error_saving">Ошибка сохранения данных</string>
+    <string name="data_saved">Данные сохранены</string>
+
+    <string name="notifications_about_upcoming_service_payments">Уведомления о скорых платежах по услугам</string>
+    <string name="payment_reminders">Напоминания о платежах</string>
+    <string name="payment_reminder_channel">Канал напоминаний о платежах</string>
+
+    <string name="payment_tomorrow">Завтра платеж по %s</string>
+    <string name="days_payment_for">Через %d дня(ей) платеж по %s</string>
+    <string name="export_history">Поделиться историей</string>
+    <string name="notifications">Напоминания: %1$s</string>
+
 </resources>
 
