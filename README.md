@@ -53,5 +53,4 @@
 
 📦 Релизы
 Последняя версия: v2.1.3
-Скачать APK
-
+[Скачать APK](https://github.com/misham72/CommunalPayments/releases/tag/v2.1.3)
