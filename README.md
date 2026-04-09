@@ -37,13 +37,13 @@
 
 ## 📱 Скриншоты
 
-*(добавьте позже, если хотите)*
+*(добавлю позже, если хотите)*
 
 ## 🏗 Сборка и запуск
 
 1. Клонируйте репозиторий:
-   ```bash
-   git clone https://github.com/MISHAM72/CommunalPayments_Android.git
+
+[git clone https://github.com/MISHAM72/CommunalPayments_Android.git](https://github.com/MISHAM72/CommunalPayments_Android.git)
 
 Откройте проект в Android Studio (последняя стабильная версия).
 
