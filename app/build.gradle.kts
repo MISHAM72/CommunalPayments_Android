@@ -21,12 +21,10 @@ android {
         applicationId = "com.github.misham72.communalpayments"
         minSdk = 24
         targetSdk = 36
-        versionCode = 6
-        versionName = "2.1.3"
+        versionCode = 7
+        versionName = "2.1.4"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-
     }
-
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -49,7 +47,6 @@ kotlin {
         jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
     }
 }
-
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -70,10 +67,10 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
     implementation(composeUiTextGoogleFonts)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
-
     implementation(libs.androidx.compose.material.icons.core)
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.androidx.appcompat)
 }
 

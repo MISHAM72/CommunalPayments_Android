@@ -1,0 +1,150 @@
+<resources>
+    // заголовок
+    <string name="app_name">CommunalPayments</string>
+    <string name="summer_night">Summer night at the back of the house</string>
+    <string name="app_title">Communal Payments</string>
+
+    // НАЗВАНИЯ ВКЛАДОК В ИСТОРИИ
+
+    <string name="service_display_name_electricity">Electricity</string>
+    <string name="service_display_name_water">Water</string>
+    <string name="service_display_name_gas">Gas</string>
+    <string name="service_display_name_internet">Internet</string>
+    <string name="service_display_name_garbage">Garbage</string>
+    <string name="service_display_name_mts">Phone number 1</string>
+    <string name="service_display_name_osago">Car insurance</string>
+    <string name="service_display_name_taxes">Business tax</string>
+    <string name="service_display_name_tinkoff"> Phone number 2</string>
+    <string name="service_display_name_troyka">Travel ticket</string>
+    <string name="service_display_name_zont">Heating</string>
+
+
+    // общие
+
+    <string name="status_calculated">CALCULATED</string>
+
+
+    // оплата по счетчику
+    <string name="format_two_decimals"> %.2f</string>
+
+    <string name="unit_cubic_meter">"м³ "</string>
+    <string name="unit_kilowatt_hour"> kW/h</string>
+    <string name="consumption">Expenditure: - %1$.2f %2$s</string>
+    <string name="currency_rub">To be paid: - %.2f US$.</string>
+
+    <string name="current_reading">Current readings: - %1$s %2$s</string>
+    <string name="previous_reading">Previous readings: - %1$s %2$s</string>
+
+    <string name="current_reading_label_electricity">Current readings (kW/h)- </string>
+    <string name="previous_reading_label_electricity">Previous readings (kW/h)- </string>
+
+
+    <string name="download_error_with_message">❌ DOWNLOAD ERROR: %s</string>
+    <string name="empty_history_calculation">Calculation history is empty</string>
+
+
+    <string name="history">History</string>
+    <string name="back">Back</string>
+    <string name="calculation_history">Calculation history</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="Edit_history">Edit story</string>
+    <string name="calculate_and_save">Calculate and Save</string>
+
+    <string name="status_text_paid">PAID FOR</string>
+    <string name="status_text_pending">AWAITING PAYMENT</string>
+    <string name="status_text_active">ACTIVELY</string>
+    <string name="status_text_under_review">UNDER REVIEW</string>
+    <string name="status_text_cancelled">CANCELLED</string>
+    <string name="service_prefix">Service</string>
+
+    // В файле res/values/strings.xml замените эмодзи
+    <string name="emoji_paid">🔴</string>
+    <string name="emoji_pending">⏳</string>
+    <string name="emoji_active">✅</string>
+    <string name="emoji_under_review">🔍</string>
+    <string name="emoji_cancelled">🚫</string>
+    <string name="emoji_calculated">🤓</string>
+
+    <string name="Replace_the_status_in_the_LAST_entry">Replace the status in the LAST entry:</string>
+    <string name="Edit_the_entire_text_To_replace_the_status_in_the_last_entry_click_on_the_button_above">Edit the entire text. To replace the status in the last entry, click on the button above</string>
+    <string name="to_be_paid">To be paid:</string>
+
+    <string name="status_label">Status:</string>
+
+    <color name="status_red">#F44336</color>
+    <color name="status_yellow">#FFEB3B</color>
+    <color name="status_green">#4CAF50</color>
+    <color name="status_blue">#2196F3</color>
+    <color name="status_black">#212121</color>
+
+
+    // ТЕКСТ НА ПОЛЯХ ПЛАТЕЖЕЙ ЗА ПЕРИОД (label)
+    <string name="day_of_payment_label">Payment day</string>
+    <string name="period_months_label">Period, (in months) - </string>
+    <string name="tariff_label">Tariff: US$.</string>
+
+    // НФЗВАНИЯ КАРТОЧЕК
+    <string name="result_garbage">Garbage results</string>
+    <string name="result_zont">Heating result:</string>
+    <string name="result_internet">Internet results:</string>
+    <string name="result_mts">Phone 1 Results:</string>
+    <string name="result_taxes">Tax results:</string>
+    <string name="result_osago">Car insurance results:</string>
+    <string name="result_troyka">" Travel ticket results:"</string>
+    <string name="result_electricity">Electricity result:</string>
+    <string name="result_water">Water result:</string>
+    <string name="result_gas">Gas result:</string>
+    <string name="result_tinkoff">Phone 2 Results:</string>
+    <string name="loading">Loading</string>
+
+    // КАРТОЧКА ОПЛАТЫ ЗА ПЕРИОД
+
+    <string name="the_payment_was">The payment was: - %1$s</string>
+    <string name="passed">Passed: - %1$d дня.</string>
+    <string name="next_payment">Payment date: - %1$s</string>
+    <string name="payment_in">Payment via: - %1$d day(s).</string>
+    <string name="tariff_card">Rate:  %.2f us$.</string>
+
+
+    <string name="yyyy_mm_dd_hh_mm_ss">yyyy-MM-dd HH:mm:ss</string>
+    <string name="change_personal_account">Change your personal account</string>
+
+    <string name="account_prefs">Account Settings</string>
+    <string name="unknown_error">Unknown error</string>
+    <string name="editing">Editing</string>
+    <string name="service_name_label">Name of the service</string>
+    <string name="select_start_date">Select start date: %s</string>
+
+    <string name="payment_date">Payment date: %s</string>
+
+    <string name="personal_account_label">Personal account</string>
+    <string name="personal_account_in_text_history">Personal account: %s</string>
+    <string name="personal_account">Account: %s</string>
+    <string name="personal_account_taxes">SSN: %s</string>
+    <string name="number_phone">Phone: %s</string>
+    <string name="contract_number">Contract №: %s</string>
+    <string name="policy_number">Policy №: %s</string>
+
+    <string name="error_invalid_input">Incorrect input</string>
+    <string name="menu">Menu</string>
+    <string name="exit">Exit</string>
+    <string name="error_saving">Data saving error</string>
+    <string name="data_saved">Data saved</string>
+
+    <string name="notifications_about_upcoming_service_payments">notifications_upcoming_payments</string>
+    <string name="payment_reminders">Payment Reminders</string>
+    <string name="payment_reminder_channel">Payment Reminder Channel</string>
+
+    <string name="payment_tomorrow">Payment due tomorrow %s</string>
+    <string name="days_payment_for">After %d day(s) payment for %s</string>
+    <string name="export_history">Export history</string>
+    <string name="notifications">Reminders: %1$s</string>
+
+    <string name="export_service_history">Export service history</string>
+    <string name="language">Language</string>
+    <string name="select_language">Select language</string>
+    <string name="russian">Russian</string>
+    <string name="english">English</string>
+</resources>
+

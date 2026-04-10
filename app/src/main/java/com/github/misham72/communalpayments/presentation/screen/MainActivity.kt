@@ -2,16 +2,18 @@ package com.github.misham72.communalpayments.presentation.screen
 
 import android.os.Build
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.core.app.ActivityCompat
 import com.github.misham72.communalpayments.presentation.screen.screens.main.ControlBetweenScreens
 import com.github.misham72.communalpayments.presentation.theme.AppTheme
 import android.Manifest
+import androidx.appcompat.app.AppCompatActivity
+import com.github.misham72.communalpayments.domain.utils.LanguageManager
 
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        LanguageManager.applySavedLanguage(this)
         super.onCreate(savedInstanceState)
         // Запрашиваем разрешение на уведомления для Android 13+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {

@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
@@ -25,6 +26,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -46,6 +48,7 @@ import androidx.lifecycle.compose.LifecycleResumeEffect
 import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.data.local.AccountPreferences
 import com.github.misham72.communalpayments.data.local.FileManager
+import com.github.misham72.communalpayments.domain.utils.LanguageManager
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 import com.github.misham72.communalpayments.presentation.screen.components.ServiceTab
 import com.github.misham72.communalpayments.presentation.screen.navigation.getListInitialScreen
@@ -58,7 +61,6 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-
 @Composable
 fun ControlBetweenScreens() {
     val context = LocalContext.current
@@ -69,7 +71,7 @@ fun ControlBetweenScreens() {
     var dueDates by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
     var showMenu by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
-
+    var showLanguageDialog by remember { mutableStateOf(false) }
 
     // Перезагружаем даты при каждом возобновлении экрана
     LifecycleResumeEffect(Unit) {
@@ -89,35 +91,25 @@ fun ControlBetweenScreens() {
     }
     if (showHistory) {
         SimpleHistoryScreen(
-            onBack = { onNavigateBack() },
-            initialService = services[selectedService].fileKey
+            onBack = { onNavigateBack() }, initialService = services[selectedService].fileKey
         )
     } else {
         Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.background
+            modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                    .padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                    modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        stringResource(R.string.app_title),
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onBackground
+                        stringResource(R.string.app_title), fontSize = 24.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground
                     )
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+                        modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text("...")
                         IconButton(onClick = { showMenu = true }) {
@@ -125,38 +117,58 @@ fun ControlBetweenScreens() {
                         }
                     }
                     DropdownMenu(
-                        expanded = showMenu,
-                        onDismissRequest = { showMenu = false }
-                    ) {
-                        DropdownMenuItem(
-                            text = { Text(stringResource(R.string.exit), fontSize = 20.sp) },
-                            onClick = {
-                                (context as? Activity)?.finishAffinity()
-                                showMenu = false
+                        expanded = showMenu, onDismissRequest = { showMenu = false }) {
+                        DropdownMenuItem(text = { Text(stringResource(R.string.exit), fontSize = 20.sp) }, onClick = {
+                            (context as? Activity)?.finishAffinity()
+                            showMenu = false
+                        })
+                        DropdownMenuItem(text = { Text(stringResource(R.string.export_history)) }, onClick = {
+                            scope.launch {
+                                shareHistoryAsync(context)
                             }
-                        )
-                        DropdownMenuItem(
-                            text = { Text(stringResource(R.string.export_history)) },
-                            onClick = {
-                                scope.launch {
-                                    shareHistoryAsync(context)
-                                }
-                                showMenu = false
-                            }
-                        )
+                            showMenu = false
+                        })
+                        DropdownMenuItem(text = { Text(stringResource(R.string.language)) }, onClick = {
+                            showMenu = false
+                            showLanguageDialog = true
+                        })
                     }
                 }
-
+                if (showLanguageDialog) {
+                    AlertDialog(
+                        onDismissRequest = { showLanguageDialog = false },
+                        title = { Text(stringResource(R.string.select_language)) },
+                        text = {
+                            Column {
+                                TextButton(onClick = {
+                                    LanguageManager.setLanguage(context, LanguageManager.DEFAULT_LANG)
+                                    showLanguageDialog = false
+                                    (context as? Activity)?.recreate()
+                                }) {
+                                    Text(stringResource(R.string.russian))
+                                }
+                                TextButton(onClick = {
+                                    LanguageManager.setLanguage(context, LanguageManager.ENGLISH_LANG)
+                                    showLanguageDialog = false
+                                    (context as? Activity)?.recreate()
+                                }) {
+                                    Text(stringResource(R.string.english))
+                                }
+                            }
+                        },
+                        confirmButton = {
+                            TextButton(onClick = { showLanguageDialog = false }) {
+                                Text(stringResource(R.string.cancel))
+                            }
+                        }
+                    )
+                }
                 Row(
                     modifier = Modifier.horizontalScroll(rememberScrollState())
                 ) {
                     services.forEachIndexed { index, service ->
                         ServiceTab(
-                            service = service,
-                            isSelected = selectedService == index,
-                            dueDate = dueDates[service.fileKey],
-                            onClick = { selectedService = index }
-                        )
+                            service = service, isSelected = selectedService == index, dueDate = dueDates[service.fileKey], onClick = { selectedService = index })
                     }
                 }
 
@@ -165,18 +177,13 @@ fun ControlBetweenScreens() {
                 }
 
                 Image(
-                    painter = painterResource(R.drawable.night),
-                    contentDescription = stringResource(R.string.summer_night),
-                    contentScale = ContentScale.FillWidth,
-                    modifier = Modifier
+                    painter = painterResource(R.drawable.night), contentDescription = stringResource(R.string.summer_night), contentScale = ContentScale.FillWidth, modifier = Modifier
                         .fillMaxWidth()
                         .height(250.dp)
                 )
 
                 Button(
-                    onClick = { showHistory = true },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors()
+                    onClick = { showHistory = true }, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors()
                 ) {
                     Text(stringResource(R.string.history))
                 }
@@ -185,16 +192,14 @@ fun ControlBetweenScreens() {
     }
 }
 
+@Suppress("HardcodedStringLiteral")
 private const val DATE_FORMAT_FILENAME = "yyyyMMdd_HHmmss"
 private suspend fun shareHistoryAsync(context: Context) = withContext(Dispatchers.IO) {
     val fileManager = FileManager(context.applicationContext)
     val allHistory = StringBuilder()
 
     val serviceKeys = listOf(
-        ServiceKeys.ELECTRICITY, ServiceKeys.GAS, ServiceKeys.WATER,
-        ServiceKeys.GARBAGE, ServiceKeys.ZONT, ServiceKeys.INTERNET,
-        ServiceKeys.MTS, ServiceKeys.TINKOFF, ServiceKeys.TAXES,
-        ServiceKeys.TROYKA, ServiceKeys.OSAGO
+        ServiceKeys.ELECTRICITY, ServiceKeys.GAS, ServiceKeys.WATER, ServiceKeys.GARBAGE, ServiceKeys.ZONT, ServiceKeys.INTERNET, ServiceKeys.MTS, ServiceKeys.TINKOFF, ServiceKeys.TAXES, ServiceKeys.TROYKA, ServiceKeys.OSAGO
     )
 
     for (key in serviceKeys) {

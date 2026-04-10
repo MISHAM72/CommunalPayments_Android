@@ -130,6 +130,10 @@
     <string name="personal_account_label">Лицевой счёт</string>
     <string name="personal_account_in_text_history">Лицевой счёт: %s</string>
     <string name="personal_account">Л/С: %s</string>
+    <string name="personal_account_taxes">ИНН: %s</string>
+    <string name="number_phone">Тел: %s</string>
+    <string name="contract_number">Договор №: %s</string>
+    <string name="policy_number">Полис №: %s</string>
 
     <string name="error_invalid_input">Некорректный ввод</string>
     <string name="menu">Меню</string>
@@ -145,6 +149,12 @@
     <string name="days_payment_for">Через %d дня(ей) платеж по %s</string>
     <string name="export_history">Поделиться историей</string>
     <string name="notifications">Напоминания: %1$s</string>
+
+    <string name="export_service_history">Поделиться историей услуги</string>
+    <string name="language">Язык</string>
+    <string name="select_language">Выберете язык</string>
+    <string name="russian">Русский</string>
+    <string name="english">English</string>
 
 </resources>
 
