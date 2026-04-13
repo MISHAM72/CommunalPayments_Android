@@ -146,5 +146,7 @@
     <string name="select_language">Select language</string>
     <string name="russian">Russian</string>
     <string name="english">English</string>
+    <string name="copy_amount">📋 Copy amount</string>
+    <string name="amount_copied">Amound %s copied</string>
 </resources>
 

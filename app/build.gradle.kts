@@ -21,8 +21,8 @@ android {
         applicationId = "com.github.misham72.communalpayments"
         minSdk = 24
         targetSdk = 36
-        versionCode = 8
-        versionName = "2.2.4"
+        versionCode = 9
+        versionName = "2.3.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

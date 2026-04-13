@@ -55,6 +55,8 @@ fun rememberClockCuCuSoundPlayer(): MediaPlayer? = rememberSoundPlayer(R.raw.clo
 @Composable
 fun rememberChangeListSoundPlayer(): MediaPlayer? = rememberSoundPlayer(R.raw.change_list_sound)
 
+@Composable
+fun rememberCopyButtonSoundPlayer(): MediaPlayer? = rememberSoundPlayer(R.raw.copy_sound)
 
 
 @Composable
