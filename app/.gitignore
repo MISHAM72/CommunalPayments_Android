@@ -1,9 +1,14 @@
-
-# Файлы, сгенерированные Android Studio и Gradle
+cat > .gitignore << 'EOF'
 *.iml
-.gradle/
-build/
-local.properties
-
-# Файлы настроек самой среды разработки (IDE)
+.gradle
+/local.properties
 .idea/
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+.kotlin/
+*.log
+EOF
