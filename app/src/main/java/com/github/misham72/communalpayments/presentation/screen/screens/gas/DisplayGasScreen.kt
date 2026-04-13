@@ -34,6 +34,7 @@ import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.domain.model.ValidationError
 import com.github.misham72.communalpayments.domain.utils.HistoryExporter
 import com.github.misham72.communalpayments.presentation.screen.components.ServiceTopBar
+import com.github.misham72.communalpayments.presentation.utils.rememberCoinSoundPlayer
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -44,6 +45,7 @@ import java.util.Locale
 fun DisplayGasScreen(viewModel: GasViewModel) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
+    val coinSound = rememberCoinSoundPlayer()
     val uiState by viewModel.uiState.collectAsState()
     var tempNumber by remember { mutableStateOf(uiState.accountNumber) }
     var tempName by remember { mutableStateOf(uiState.customServiceName) }
@@ -88,7 +90,11 @@ fun DisplayGasScreen(viewModel: GasViewModel) {
         )
         // Кнопка
         Button(
-            onClick = viewModel::onCalculateClick, modifier = Modifier.fillMaxWidth()
+            onClick = {
+                coinSound?.start()
+                viewModel::onCalculateClick.invoke()
+            },
+            modifier = Modifier.fillMaxWidth()
         ) {
             Text(stringResource(R.string.calculate_and_save))
         }

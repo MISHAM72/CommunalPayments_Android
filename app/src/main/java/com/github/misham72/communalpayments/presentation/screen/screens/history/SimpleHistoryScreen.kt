@@ -43,6 +43,21 @@ import com.github.misham72.communalpayments.data.local.FileManager
 import com.github.misham72.communalpayments.domain.model.PaymentStatus
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 import com.github.misham72.communalpayments.presentation.mapper.StatusDisplayMapper
+import com.github.misham72.communalpayments.presentation.utils.rememberBoilerSoundPlayer
+import com.github.misham72.communalpayments.presentation.utils.rememberButtonBuckSoundPlayer
+import com.github.misham72.communalpayments.presentation.utils.rememberCancelButtonSoundPlayer
+import com.github.misham72.communalpayments.presentation.utils.rememberCarSoundPlayer
+import com.github.misham72.communalpayments.presentation.utils.rememberEditHistoryButtonSoundPlayer
+import com.github.misham72.communalpayments.presentation.utils.rememberGarbageSoundPlayer
+import com.github.misham72.communalpayments.presentation.utils.rememberGasSoundPlayer
+import com.github.misham72.communalpayments.presentation.utils.rememberInternetSoundPlayer
+import com.github.misham72.communalpayments.presentation.utils.rememberMTSSoundPlayer
+import com.github.misham72.communalpayments.presentation.utils.rememberOsagoSoundPlayer
+import com.github.misham72.communalpayments.presentation.utils.rememberSaveButtonSoundPlayer
+import com.github.misham72.communalpayments.presentation.utils.rememberTaxesSoundPlayer
+import com.github.misham72.communalpayments.presentation.utils.rememberTinkoffSoundPlayer
+import com.github.misham72.communalpayments.presentation.utils.rememberWaterSoundPlayer
+import com.github.misham72.communalpayments.presentation.utils.rememberlightSoundPlayer
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -71,7 +86,25 @@ fun SimpleHistoryScreen(
     val fileManager = remember { FileManager(context) }
     val errorMessageTemplate = stringResource(R.string.download_error_with_message) // шаблон с %s
     val unknownErrorText = stringResource(R.string.unknown_error) // ← получаем текст ошибки через stringResource
+    val buttonBuckSound = rememberButtonBuckSoundPlayer()
+    val editHistorySound = rememberEditHistoryButtonSoundPlayer()
+    val saveSound = rememberSaveButtonSoundPlayer()
+    val cancelSound = rememberCancelButtonSoundPlayer()
 
+    // ↓↓↓ ДОБАВИТЬ ЭТИ 11 ПЛЕЕРОВ ↓↓↓
+    val light = rememberlightSoundPlayer()
+    val gasSound = rememberGasSoundPlayer()
+    val waterSound = rememberWaterSoundPlayer()
+    val garbageSound = rememberGarbageSoundPlayer()
+    val boilerSound = rememberBoilerSoundPlayer()
+    val internetSound = rememberInternetSoundPlayer()
+    val mtsSound = rememberMTSSoundPlayer()
+    val tinkoffSound = rememberTinkoffSoundPlayer()
+    val taxesSound = rememberTaxesSoundPlayer()
+    val carSound = rememberCarSoundPlayer()
+    val osagoSound = rememberOsagoSoundPlayer()
+
+    // ↑↑↑ КОНЕЦ ДОБАВЛЕНИЯ ↑↑↑
     //🔴//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //suspend — асинхронная функция, читает историю из файла и обновляет fileContent.
     suspend fun refreshHistory() {
@@ -100,7 +133,10 @@ fun SimpleHistoryScreen(
         //🔴////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         //При нажатии вызывает onBack, переданный извне.
         Button(
-            onClick = onBack, modifier = Modifier.fillMaxWidth()
+            onClick = {
+                buttonBuckSound?.start()
+                onBack()
+            }, modifier = Modifier.fillMaxWidth()
         ) {
             Text(stringResource(R.string.back))
         }
@@ -122,18 +158,40 @@ fun SimpleHistoryScreen(
                 ServiceKeys.ELECTRICITY to R.string.service_display_name_electricity,
                 ServiceKeys.GAS to R.string.service_display_name_gas,
                 ServiceKeys.WATER to R.string.service_display_name_water,
+                ServiceKeys.GARBAGE to R.string.service_display_name_garbage,
                 ServiceKeys.ZONT to R.string.service_display_name_zont,
                 ServiceKeys.INTERNET to R.string.service_display_name_internet,
                 ServiceKeys.MTS to R.string.service_display_name_mts,
                 ServiceKeys.TINKOFF to R.string.service_display_name_tinkoff,
-                ServiceKeys.GARBAGE to R.string.service_display_name_garbage,
                 ServiceKeys.TAXES to R.string.service_display_name_taxes,
                 ServiceKeys.TROYKA to R.string.service_display_name_troyka,
                 ServiceKeys.OSAGO to R.string.service_display_name_osago
             ).map { (key, nameRes) -> key to stringResource(nameRes) }
 
             services.forEach { (key, displayName) ->
-                FilterChip(selected = selectedService == key, onClick = { selectedService = key }, label = { Text(displayName) })
+                // Определяем звук для каждой услуги
+                val sound = when (key) {
+                    ServiceKeys.ELECTRICITY -> light
+                    ServiceKeys.GAS -> gasSound
+                    ServiceKeys.WATER -> waterSound
+                    ServiceKeys.GARBAGE -> garbageSound
+                    ServiceKeys.ZONT -> boilerSound
+                    ServiceKeys.INTERNET -> internetSound
+                    ServiceKeys.MTS -> mtsSound
+                    ServiceKeys.TINKOFF -> tinkoffSound
+                    ServiceKeys.TAXES -> taxesSound
+                    ServiceKeys.TROYKA -> carSound
+                    ServiceKeys.OSAGO -> osagoSound
+                    else -> null
+                }
+
+                FilterChip(
+                    selected = selectedService == key,
+                    onClick = {
+                        sound?.start()
+                        selectedService = key
+                    },
+                    label = { Text(displayName) })
             }
         }
         if (isEditing) {
@@ -187,6 +245,16 @@ fun SimpleHistoryScreen(
                     modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Button(onClick = {
+                        cancelSound?.start()
+                        scope.launch {
+                            refreshHistory()
+                            isEditing = false
+                        }
+                    }) {
+                        Text(stringResource(R.string.cancel))
+                    }
+                    Button(onClick = {
+                        saveSound?.start()
                         scope.launch {
                             fileManager.saveToFile(fileContent, "$selectedService.txt")
                             isEditing = false
@@ -195,19 +263,11 @@ fun SimpleHistoryScreen(
                     }) {
                         Text(stringResource(R.string.save))
                     }
-
-                    Button(onClick = {
-                        scope.launch {
-                            refreshHistory()
-                            isEditing = false
-                        }
-                    }) {
-                        Text(stringResource(R.string.cancel))
-                    }
                 }
 
             }
         } else {
+
             val viewScrollState = rememberScrollState()
             Card(
                 Modifier
@@ -263,6 +323,7 @@ fun SimpleHistoryScreen(
             Spacer(modifier = Modifier.height(16.dp))
             Button(
                 onClick = {
+                    editHistorySound?.start()
                     isEditing = true
                 }, modifier = Modifier.fillMaxWidth()
             ) {

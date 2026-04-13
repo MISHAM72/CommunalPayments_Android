@@ -35,6 +35,7 @@ import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.domain.model.ValidationError
 import com.github.misham72.communalpayments.domain.utils.HistoryExporter
 import com.github.misham72.communalpayments.presentation.screen.components.ServiceTopBar
+import com.github.misham72.communalpayments.presentation.utils.rememberCoinSoundPlayer
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -45,6 +46,7 @@ import java.util.Locale
 fun DisplayOsagoScreen(viewModel: OsagoViewModel) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
+    val coinSound = rememberCoinSoundPlayer()
     val uiState by viewModel.uiState.collectAsState()
     var tempNumber by remember { mutableStateOf(uiState.accountNumber) }
     var tempName by remember { mutableStateOf(uiState.customServiceName) }
@@ -105,7 +107,10 @@ fun DisplayOsagoScreen(viewModel: OsagoViewModel) {
             singleLine = true
         )
         Button(
-            onClick = viewModel::onCalculateClick,
+            onClick = {
+                coinSound?.start()
+                viewModel::onCalculateClick.invoke()
+            },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(stringResource(R.string.calculate_and_save))

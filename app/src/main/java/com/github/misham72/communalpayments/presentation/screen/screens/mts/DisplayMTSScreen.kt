@@ -35,6 +35,7 @@ import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.domain.model.ValidationError
 import com.github.misham72.communalpayments.domain.utils.HistoryExporter
 import com.github.misham72.communalpayments.presentation.screen.components.ServiceTopBar
+import com.github.misham72.communalpayments.presentation.utils.rememberCoinSoundPlayer
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -46,6 +47,7 @@ import java.util.Locale
 fun DisplayMTSScreen(viewModel: MTSViewModel) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
+    val coinSound = rememberCoinSoundPlayer()
     val uiState by viewModel.uiState.collectAsState()
     var tempNumber by remember { mutableStateOf(uiState.accountNumber) }
     var tempDate by remember { mutableStateOf(uiState.customDate) }
@@ -97,7 +99,10 @@ fun DisplayMTSScreen(viewModel: MTSViewModel) {
 
         // Кнопка расчета
         Button(
-            onClick = viewModel::onCalculateClick, modifier = Modifier.fillMaxWidth()
+            onClick = {
+                coinSound?.start()
+                viewModel::onCalculateClick.invoke()
+            }, modifier = Modifier.fillMaxWidth()
         ) {
             Text(stringResource(R.string.calculate_and_save))
         }

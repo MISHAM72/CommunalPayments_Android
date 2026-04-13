@@ -15,6 +15,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.github.misham72.communalpayments.R
+import com.github.misham72.communalpayments.presentation.utils.rememberChangeListSoundPlayer
+import com.github.misham72.communalpayments.presentation.utils.rememberClockCuCuSoundPlayer
 
 @Composable
 fun ServiceTopBar(
@@ -23,6 +25,8 @@ fun ServiceTopBar(
     onShareClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val clockCuCuSound = rememberClockCuCuSoundPlayer()
+    val changeListSound = rememberChangeListSoundPlayer()
     Row(
         modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
@@ -34,13 +38,24 @@ fun ServiceTopBar(
             fontWeight = FontWeight.Bold
         )
         Row {
-            IconButton(onClick = onEditClick) {
+            IconButton(
+                onClick =
+                    {
+                        changeListSound?.start()
+                        onEditClick()
+                    }) {
                 Icon(
                     Icons.Default.Edit,
                     contentDescription = stringResource(R.string.change_personal_account)
                 )
             }
-            IconButton(onClick = onShareClick) {
+            IconButton(
+                onClick =
+                    {
+                        clockCuCuSound?.start()
+                        onShareClick()
+                    }) {
+
                 Icon(
                     Icons.Default.Share,
                     contentDescription = stringResource(R.string.export_history)

@@ -53,6 +53,18 @@ import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 import com.github.misham72.communalpayments.presentation.screen.components.ServiceTab
 import com.github.misham72.communalpayments.presentation.screen.navigation.getListInitialScreen
 import com.github.misham72.communalpayments.presentation.screen.screens.history.SimpleHistoryScreen
+import com.github.misham72.communalpayments.presentation.utils.rememberBoilerSoundPlayer
+import com.github.misham72.communalpayments.presentation.utils.rememberCarSoundPlayer
+import com.github.misham72.communalpayments.presentation.utils.rememberGarbageSoundPlayer
+import com.github.misham72.communalpayments.presentation.utils.rememberGasSoundPlayer
+import com.github.misham72.communalpayments.presentation.utils.rememberHistorySoundPlayer
+import com.github.misham72.communalpayments.presentation.utils.rememberInternetSoundPlayer
+import com.github.misham72.communalpayments.presentation.utils.rememberMTSSoundPlayer
+import com.github.misham72.communalpayments.presentation.utils.rememberOsagoSoundPlayer
+import com.github.misham72.communalpayments.presentation.utils.rememberTaxesSoundPlayer
+import com.github.misham72.communalpayments.presentation.utils.rememberTinkoffSoundPlayer
+import com.github.misham72.communalpayments.presentation.utils.rememberWaterSoundPlayer
+import com.github.misham72.communalpayments.presentation.utils.rememberlightSoundPlayer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -72,6 +84,7 @@ fun ControlBetweenScreens() {
     var showMenu by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     var showLanguageDialog by remember { mutableStateOf(false) }
+    val historySound = rememberHistorySoundPlayer()
 
     // Перезагружаем даты при каждом возобновлении экрана
     LifecycleResumeEffect(Unit) {
@@ -163,12 +176,45 @@ fun ControlBetweenScreens() {
                         }
                     )
                 }
-                Row(
+                //Создание плееров (по одному на каждый тип звука)
+                val light = rememberlightSoundPlayer()
+                val gasSound = rememberGasSoundPlayer()
+                val waterSound = rememberWaterSoundPlayer()
+                val garbageSound = rememberGarbageSoundPlayer()
+                val boilerSound = rememberBoilerSoundPlayer()
+                val internetSound = rememberInternetSoundPlayer()
+                val mtsSound = rememberMTSSoundPlayer()
+                val tinkoffSound = rememberTinkoffSoundPlayer()
+                val taxesSound = rememberTaxesSoundPlayer()
+                val carSound = rememberCarSoundPlayer()
+                val osagoSound = rememberOsagoSoundPlayer()
+
+
+                Row(            //Определение звука для каждой услуги (when)
                     modifier = Modifier.horizontalScroll(rememberScrollState())
                 ) {
                     services.forEachIndexed { index, service ->
+                        val sound = when (service.fileKey) {
+                            ServiceKeys.ELECTRICITY -> light
+                            ServiceKeys.GAS -> gasSound               // 🔥 → звук газа
+                            ServiceKeys.WATER -> waterSound            // 💧 → звук воды
+                            ServiceKeys.GARBAGE -> garbageSound
+                            ServiceKeys.ZONT -> boilerSound
+                            ServiceKeys.INTERNET -> internetSound
+                            ServiceKeys.MTS -> mtsSound
+                            ServiceKeys.TINKOFF -> tinkoffSound
+                            ServiceKeys.TAXES -> taxesSound
+                            ServiceKeys.TROYKA -> carSound
+                            ServiceKeys.OSAGO -> osagoSound             // 🚗 → звук ОСАГО
+                            else -> null  // Для остальных пока без звука
+                        }
+                        //Передача звука в кнопку
                         ServiceTab(
-                            service = service, isSelected = selectedService == index, dueDate = dueDates[service.fileKey], onClick = { selectedService = index })
+                            service = service,
+                            isSelected = selectedService == index,
+                            dueDate = dueDates[service.fileKey],
+                            onClick = { selectedService = index },
+                            onSound = { sound?.start() })    // ← Передаём запуск звука
                     }
                 }
 
@@ -183,7 +229,10 @@ fun ControlBetweenScreens() {
                 )
 
                 Button(
-                    onClick = { showHistory = true }, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors()
+                    onClick = {
+                        historySound?.start()
+                        showHistory = true
+                    }, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors()
                 ) {
                     Text(stringResource(R.string.history))
                 }

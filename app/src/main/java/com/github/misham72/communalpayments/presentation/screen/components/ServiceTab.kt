@@ -18,11 +18,13 @@ import com.github.misham72.communalpayments.presentation.screen.navigation.Initi
 
 @Composable
 fun ServiceTab(
+    modifier: Modifier = Modifier,
     service: InitialScreen,
     isSelected: Boolean,
     dueDate: String?,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    onSound: (() -> Unit)? = null  // ← НОВЫЙ ПАРАМЕТР
+
 ) {
     val backgroundColor = if (dueDate != null) {
         val daysLeft = DateUtils.daysUntil(dueDate)
@@ -40,9 +42,11 @@ fun ServiceTab(
     }
 
     val finalBackground = if (isSelected) backgroundColor.copy(alpha = 0.5f) else backgroundColor
-
     Button(
-        onClick = onClick,
+        onClick = {
+            onSound?.invoke()  // ← Сначала звук (если передан)
+            onClick()          // ← Потом переключение вкладки
+        },
         modifier = modifier.padding(horizontal = 4.dp),
         elevation = ButtonDefaults.buttonElevation(
             defaultElevation = if (isSelected) 12.dp else 0.dp,

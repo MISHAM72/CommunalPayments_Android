@@ -20,6 +20,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,21 +34,23 @@ import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.domain.model.ValidationError
 import com.github.misham72.communalpayments.domain.utils.HistoryExporter
 import com.github.misham72.communalpayments.presentation.screen.components.ServiceTopBar
+import com.github.misham72.communalpayments.presentation.utils.rememberCoinSoundPlayer
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.GregorianCalendar
 import java.util.Locale
-import androidx.compose.runtime.rememberCoroutineScope
-import kotlinx.coroutines.launch
 
 @Composable
 fun DisplayElectricityScreen(viewModel: ElectricityViewModel) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current   // <-- добавить
+    val coinSound = rememberCoinSoundPlayer()
     val uiState by viewModel.uiState.collectAsState()
     var tempNumber by remember { mutableStateOf(uiState.accountNumber) }
     var tempName by remember { mutableStateOf(uiState.customServiceName) }
     var tempDate by remember { mutableStateOf(uiState.customDate) }
+
 
     Column(
         modifier = Modifier
@@ -84,9 +87,13 @@ fun DisplayElectricityScreen(viewModel: ElectricityViewModel) {
         OutlinedTextField(
             value = uiState.tariff, onValueChange = viewModel::onTariffChange, label = { Text(stringResource(R.string.tariff_label)) }, modifier = Modifier.fillMaxWidth()
         )
-        // Кнопка
+        //
         Button(
-            onClick = viewModel::onCalculateClick, modifier = Modifier.fillMaxWidth()
+            onClick = {
+                coinSound?.start()
+                viewModel::onCalculateClick.invoke()
+            },
+            modifier = Modifier.fillMaxWidth()
         ) {
             Text(stringResource(R.string.calculate_and_save))
         }
@@ -127,7 +134,9 @@ fun DisplayElectricityScreen(viewModel: ElectricityViewModel) {
             }
         }
     }
+
     if (uiState.showAccountDialog) {
+
         AlertDialog(
             onDismissRequest = viewModel::closeAccountDialog,
             title = { Text(stringResource(R.string.editing)) },
