@@ -1,3 +1,5 @@
+
+@file:Suppress("UnstableApiUsage")
 pluginManagement {
     repositories {
         google()
@@ -13,6 +15,7 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-
+@Suppress("HardcodedStringLiteral")
 rootProject.name = "CommunalPayments_Android"
+@Suppress("HardcodedStringLiteral")
 include(":app")

@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.edit
 import androidx.core.os.LocaleListCompat
-
+@Suppress("HardcodedStringLiteral")
 object LanguageManager {
     private const val PREFS_NAME = "app_prefs"
     private const val KEY_LANG = "selected_language"

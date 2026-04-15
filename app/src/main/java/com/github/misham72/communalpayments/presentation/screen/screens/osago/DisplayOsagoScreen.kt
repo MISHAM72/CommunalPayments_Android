@@ -1,5 +1,6 @@
 package com.github.misham72.communalpayments.presentation.screen.screens.osago
 
+import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
@@ -40,6 +41,8 @@ import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.domain.model.ValidationError
 import com.github.misham72.communalpayments.domain.utils.HistoryExporter
 import com.github.misham72.communalpayments.presentation.screen.components.ServiceTopBar
+import com.github.misham72.communalpayments.presentation.utils.BankPaymentHelper
+import com.github.misham72.communalpayments.presentation.utils.rememberBankButtonSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberCoinSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberCopyButtonSoundPlayer
 import kotlinx.coroutines.launch
@@ -48,13 +51,16 @@ import java.util.Calendar
 import java.util.GregorianCalendar
 import java.util.Locale
 
+@SuppressLint("LocalContextGetResourceValueCall")
 @Composable
 fun DisplayOsagoScreen(viewModel: OsagoViewModel) {
+    var showBankDialog by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val clipboardManager = LocalClipboardManager.current
     val coinSound = rememberCoinSoundPlayer()
     val copySound = rememberCopyButtonSoundPlayer()
+    val bankSound = rememberBankButtonSoundPlayer()
     val uiState by viewModel.uiState.collectAsState()
     var tempNumber by remember { mutableStateOf(uiState.accountNumber) }
     var tempName by remember { mutableStateOf(uiState.customServiceName) }
@@ -64,74 +70,47 @@ fun DisplayOsagoScreen(viewModel: OsagoViewModel) {
         modifier = Modifier
             .fillMaxSize()
             .padding(6.dp)
-            .verticalScroll(rememberScrollState()),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(1.dp)
+            .verticalScroll(rememberScrollState()), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(1.dp)
     ) {
-        ServiceTopBar(
-            title = uiState.customServiceName.ifBlank { stringResource(R.string.service_display_name_osago) },
-            onEditClick = { viewModel.openAccountDialog() },
-            onShareClick = {
-                scope.launch {
-                    HistoryExporter.shareSingleHistory(context, viewModel.getServiceKey())
-                }
+        ServiceTopBar(title = uiState.customServiceName.ifBlank { stringResource(R.string.service_display_name_osago) }, onEditClick = { viewModel.openAccountDialog() }, onShareClick = {
+            scope.launch {
+                HistoryExporter.shareSingleHistory(context, viewModel.getServiceKey())
             }
-        )
+        })
         if (uiState.customDate.isNotBlank()) {
             Text(
-                text = stringResource(R.string.payment_date, uiState.customDate),
-                fontSize = 14.sp,
-                color = Color.DarkGray,
-                modifier = Modifier.padding(top = 4.dp)
+                text = stringResource(R.string.payment_date, uiState.customDate), fontSize = 14.sp, color = Color.DarkGray, modifier = Modifier.padding(top = 4.dp)
             )
         }
         if (uiState.accountNumber.isNotBlank()) {
             Text(
-                text = stringResource(R.string.policy_number, uiState.accountNumber),
-                fontSize = 14.sp,
-                color = Color.Red,
-                modifier = Modifier.padding(top = 4.dp)
+                text = stringResource(R.string.policy_number, uiState.accountNumber), fontSize = 14.sp, color = Color.Red, modifier = Modifier.padding(top = 4.dp)
             )
         }
         OutlinedTextField(
-            value = uiState.paymentDay,
-            onValueChange = viewModel::onPaymentDayChange,
-            label = { Text(stringResource(R.string.day_of_payment_label)) },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true
+            value = uiState.paymentDay, onValueChange = viewModel::onPaymentDayChange, label = { Text(stringResource(R.string.day_of_payment_label)) }, modifier = Modifier.fillMaxWidth(), singleLine = true
         )
         OutlinedTextField(
-            value = uiState.periodMonths,
-            onValueChange = viewModel::onPeriodMonthsChange,
-            label = { Text(stringResource(R.string.period_months_label)) },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true
+            value = uiState.periodMonths, onValueChange = viewModel::onPeriodMonthsChange, label = { Text(stringResource(R.string.period_months_label)) }, modifier = Modifier.fillMaxWidth(), singleLine = true
         )
         OutlinedTextField(
-            value = uiState.priceTariff,
-            onValueChange = viewModel::onPriceTariffChange,
-            label = { Text(stringResource(R.string.tariff_label)) },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true
+            value = uiState.priceTariff, onValueChange = viewModel::onPriceTariffChange, label = { Text(stringResource(R.string.tariff_label)) }, modifier = Modifier.fillMaxWidth(), singleLine = true
         )
         Button(
             onClick = {
                 coinSound?.start()
                 viewModel::onCalculateClick.invoke()
-            },
-            modifier = Modifier.fillMaxWidth()
+            }, modifier = Modifier.fillMaxWidth()
         ) {
             Text(stringResource(R.string.calculate_and_save))
         }
         when (uiState.error) {
             ValidationError.InvalidInput -> Text(
-                stringResource(R.string.error_invalid_input),
-                color = Color.Red
+                stringResource(R.string.error_invalid_input), color = Color.Red
             )
 
             ValidationError.SavingError -> Text(
-                stringResource(R.string.error_saving),
-                color = Color.Red
+                stringResource(R.string.error_saving), color = Color.Red
             )
 
             null -> { /* ничего */
@@ -139,43 +118,30 @@ fun DisplayOsagoScreen(viewModel: OsagoViewModel) {
         }
         uiState.result?.let { result ->
             Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+                modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
             ) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                        .padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Text(
-                        text = stringResource(R.string.result_osago),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
+                        text = stringResource(R.string.result_osago), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = stringResource(R.string.the_payment_was, result.previousPayment),
-                        fontWeight = FontWeight.Bold,
-                        color = Color(red = 0.02f, green = 0.4f, blue = 0.0f)
+                        text = stringResource(R.string.the_payment_was, result.previousPayment), fontWeight = FontWeight.Bold, color = Color(red = 0.02f, green = 0.4f, blue = 0.0f)
                     )
                     Text(
-                        text = stringResource(R.string.passed, result.daysFromPayment),
-                        fontWeight = FontWeight.Bold,
-                        color = Color(red = 0.02f, green = 0.4f, blue = 0.0f)
+                        text = stringResource(R.string.passed, result.daysFromPayment), fontWeight = FontWeight.Bold, color = Color(red = 0.02f, green = 0.4f, blue = 0.0f)
                     )
                     Text(
-                        text = stringResource(R.string.next_payment, result.nextPayment),
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Red
+                        text = stringResource(R.string.next_payment, result.nextPayment), fontWeight = FontWeight.Bold, color = Color.Red
                     )
                     Text(
-                        text = stringResource(R.string.payment_in, result.daysUntilPayment),
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Red
+                        text = stringResource(R.string.payment_in, result.daysUntilPayment), fontWeight = FontWeight.Bold, color = Color.Red
                     )
                     Text(
-                        text = stringResource(R.string.tariff_card, result.priceTariff),
-                        style = MaterialTheme.typography.titleMedium
+                        text = stringResource(R.string.tariff_card, result.priceTariff), style = MaterialTheme.typography.titleMedium
                     )
                 }
             }
@@ -187,72 +153,94 @@ fun DisplayOsagoScreen(viewModel: OsagoViewModel) {
                     copySound?.start()
                     clipboardManager.setText(AnnotatedString(result.priceTariff.toString()))
                     Toast.makeText(context, context.getString(R.string.amount_copied, result.priceTariff), Toast.LENGTH_SHORT).show()
-                },
-                modifier = Modifier.fillMaxWidth()
+                }, modifier = Modifier.fillMaxWidth()
             ) {
                 Text(stringResource(R.string.copy_amount))
             }
+            Button(
+                onClick = {
+                    bankSound?.start()
+                    showBankDialog = true
+                }, modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(stringResource(R.string.select_bank_to_pay))
+            }
         }
     }
-
-    if (uiState.showAccountDialog) {
-        AlertDialog(
-            onDismissRequest = viewModel::closeAccountDialog,
-            title = { Text(stringResource(R.string.editing)) },
-            text = {
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    OutlinedTextField(
-                        value = tempName,
-                        onValueChange = { tempName = it },
-                        label = { Text(stringResource(R.string.service_name_label)) },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    Button(
-                        onClick = {
-                            val now = Calendar.getInstance()
-                            DatePickerDialog(
-                                context,
-                                { _, year, month, day ->
-                                    val date = GregorianCalendar(year, month, day).time
-                                    val newDate = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(date)
-                                    tempDate = newDate  // обновляем временную переменную
-                                    // НЕ вызываем updateAccountData здесь!
-                                },
-                                now.get(Calendar.YEAR),
-                                now.get(Calendar.MONTH),
-                                now.get(Calendar.DAY_OF_MONTH)
-                            ).show()
-                        },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(stringResource(R.string.select_start_date, tempDate))
-                    }
-                    OutlinedTextField(
-                        value = tempNumber,
-                        onValueChange = { tempNumber = it },
-                        label = { Text(stringResource(R.string.personal_account_label)) },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        // Сохраняем имя и номер (дата уже сохранена)
-                        viewModel.updateAccountData(tempNumber, tempName, tempDate)
-                        viewModel.closeAccountDialog()
-                    }
-                ) {
-                    Text(stringResource(R.string.save))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = viewModel::closeAccountDialog) {
-                    Text(stringResource(R.string.cancel))
+    if (showBankDialog) {
+        // Проверяем, какие банки из нашего списка установлены на телефоне
+        val installedBanks = remember {
+            BankPaymentHelper.supportedBanks.filter { bank ->
+                try {
+                    context.packageManager.getPackageInfo(bank.packageName, 0)
+                    true
+                } catch (_: Exception) {
+                    false
                 }
             }
-        )
+        }
+        /**В AlertDialog мы проверяем список банков через PackageManager,
+         * фильтруем только установленные и показываем их кнопками.*/
+        AlertDialog(onDismissRequest = { showBankDialog = false }, title = { Text(stringResource(R.string.select_bank)) }, text = {
+            Column {
+                if (installedBanks.isEmpty()) {
+                    Text(stringResource(R.string.there_are_no_installed_banking_applications))
+                } else {
+                    installedBanks.forEach { bank ->
+                        TextButton(
+                            onClick = {
+                                showBankDialog = false
+                                BankPaymentHelper.openBankApp(context, bank)
+                            }) {
+                            Text(bank.name)
+                        }
+                    }
+                }
+            }
+        }, confirmButton = {
+            TextButton(onClick = { showBankDialog = false }) {
+                Text(stringResource(R.string.cancel))
+            }
+        })
+    }
+    if (uiState.showAccountDialog) {
+        AlertDialog(onDismissRequest = viewModel::closeAccountDialog, title = { Text(stringResource(R.string.editing)) }, text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedTextField(
+                    value = tempName, onValueChange = { tempName = it }, label = { Text(stringResource(R.string.service_name_label)) }, singleLine = true, modifier = Modifier.fillMaxWidth()
+                )
+                Button(
+                    onClick = {
+                        val now = Calendar.getInstance()
+                        DatePickerDialog(
+                            context, { _, year, month, day ->
+                                val date = GregorianCalendar(year, month, day).time
+                                val newDate = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(date)
+                                tempDate = newDate  // обновляем временную переменную
+                                // НЕ вызываем updateAccountData здесь!
+                            }, now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH)
+                        ).show()
+                    }, modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(stringResource(R.string.select_start_date, tempDate))
+                }
+                OutlinedTextField(
+                    value = tempNumber, onValueChange = { tempNumber = it }, label = { Text(stringResource(R.string.personal_account_label)) }, singleLine = true, modifier = Modifier.fillMaxWidth()
+                )
+            }
+        }, confirmButton = {
+            TextButton(
+                onClick = {
+                    // Сохраняем имя и номер (дата уже сохранена)
+                    viewModel.updateAccountData(tempNumber, tempName, tempDate)
+                    viewModel.closeAccountDialog()
+                }) {
+                Text(stringResource(R.string.save))
+            }
+        }, dismissButton = {
+            TextButton(onClick = viewModel::closeAccountDialog) {
+                Text(stringResource(R.string.cancel))
+            }
+        })
     }
 }

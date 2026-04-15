@@ -58,6 +58,9 @@ fun rememberChangeListSoundPlayer(): MediaPlayer? = rememberSoundPlayer(R.raw.ch
 @Composable
 fun rememberCopyButtonSoundPlayer(): MediaPlayer? = rememberSoundPlayer(R.raw.copy_sound)
 
+@Composable
+fun rememberBankButtonSoundPlayer(): MediaPlayer? = rememberSoundPlayer(R.raw.bank_sound)
+
 
 @Composable
 fun rememberlightSoundPlayer(): MediaPlayer? = rememberSoundPlayer(R.raw.light)

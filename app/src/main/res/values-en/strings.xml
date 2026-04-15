@@ -147,6 +147,16 @@
     <string name="russian">Russian</string>
     <string name="english">English</string>
     <string name="copy_amount">📋 Copy amount</string>
-    <string name="amount_copied">Amound %s copied</string>
+    <string name="amount_copied">Amound %.2f ₽ copied</string>
+    <string name="mir_pay_app_is_not_installed">Mir Pay app is not installed</string>
+    <string name="could_not_open_app_store">Couldn\'t open the app store</string>
+    <string name="pay_via_mir_pay">💳 Pay via Mir Pay</string>
+    <string name="market">Market</string>
+    <string name="details">Details</string>
+    <string name="there_are_no_installed_banking_applications">There are no installed banking applications</string>
+    <string name="select_bank">Select bank</string>
+    <string name="select_bank_to_pay">Select bank to pay</string>
+    <string name="could_not_open_the_app_store">Could not open the app store</string>
+    <string name="app_is_not_installed">App %1$s is not installed</string>
 </resources>
 

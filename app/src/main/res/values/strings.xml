@@ -157,9 +157,24 @@
     <string name="english">English</string>
 
     <!-- Кнопка копирования суммы -->
-    <string name="copy_amount">📋 Копировать сумму</string>
+   <string name="copy_amount">📋 Копировать сумму</string>
 
+    <string name="amount_copied">Сумма %.2f ₽ скопирована</string>
     <!-- Toast сообщение -->
-    <string name="amount_copied">Сумма %s ₽ скопирована</string>
+
+
+    <string name="mir_pay_app_is_not_installed">Приложение Mir Pay не установлено</string>
+    <string name="could_not_open_app_store">Не удалось открыть магазин приложений</string>
+    <string name="pay_via_mir_pay">💳 Оплатить через Mir Pay</string>
+    <string name="market">market</string>
+    <string name="details">details</string>
+    <string name="there_are_no_installed_banking_applications">Нет установленных банковских приложений.</string>
+
+    <string name="select_bank">Выберите банк</string>
+    <string name="select_bank_to_pay">🏦 Выбрать банк для оплаты</string>
+    <string name="could_not_open_the_app_store">Не удалось открыть магазин приложений</string>
+    <string name="app_is_not_installed">Приложение %1$s не установлено</string>
+
+
 </resources>
 
