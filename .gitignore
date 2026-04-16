@@ -10,3 +10,5 @@
 local.properties
 .kotlin/
 *.log
+keystore.properties
+app/release/app/release/

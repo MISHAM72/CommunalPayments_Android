@@ -17,6 +17,16 @@ plugins {
 android {
     namespace = "com.github.misham72.communalpayments"
     compileSdk = 36
+
+        // Добавляем конфигурацию подписи
+        signingConfigs {
+            create("release") {
+                storeFile = file("/Users/mikhail/Documents/ANDROID STUDIO/КЛЮЧ - RuStore/communal_payments_keystore.jks")
+                storePassword = "shelgdaivb4"
+                keyAlias = "communal_payments_key"
+                keyPassword = "shelgdaivb4"
+            }
+        }
     defaultConfig {
         applicationId = "com.github.misham72.communalpayments"
         minSdk = 24
@@ -26,11 +36,16 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
+        debug {
+            // Debug подписываем тем же ключом, что и Release
+            signingConfig = signingConfigs.getByName("release")
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile(proguardAndroidOptimize), proguardRulesPro
             )
+            signingConfig = signingConfigs.getByName("release")
         }
     }
     compileOptions {
