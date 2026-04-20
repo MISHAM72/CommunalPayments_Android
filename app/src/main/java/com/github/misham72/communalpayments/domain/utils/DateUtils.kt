@@ -9,10 +9,12 @@ object DateUtils {
         return try {
             val sdf = SimpleDateFormat(format, Locale.getDefault())
             val dueDate = sdf.parse(dateStr)
-            val today = Calendar.getInstance().time
-            val diff = dueDate.time - today.time
+            val dueTime = dueDate?.time ?: return Int.MAX_VALUE
+            val todayTime = Calendar.getInstance().timeInMillis
+            val diff = dueTime - todayTime
             (diff / (24 * 60 * 60 * 1000)).toInt()
-        } catch (e: Exception) {
+
+        } catch (_: Exception) {
             Int.MAX_VALUE
         }
     }
