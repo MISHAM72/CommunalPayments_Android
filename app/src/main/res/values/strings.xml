@@ -139,10 +139,8 @@
     <string name="menu">Меню</string>
     <string name="exit">Выйти</string>
     <string name="error_saving">Ошибка сохранения данных</string>
-    <string name="data_saved">Данные сохранены</string>
 
     <string name="notifications_about_upcoming_service_payments">Уведомления о скорых платежах по услугам</string>
-    <string name="payment_reminders">Напоминания о платежах</string>
     <string name="payment_reminder_channel">Канал напоминаний о платежах</string>
 
     <string name="payment_tomorrow">Завтра платеж по %s</string>
@@ -150,24 +148,18 @@
     <string name="export_history">Поделиться историей</string>
     <string name="notifications">Напоминания: %1$s</string>
 
-    <string name="export_service_history">Поделиться историей услуги</string>
     <string name="language">Язык</string>
     <string name="select_language">Выберете язык</string>
     <string name="russian">Русский</string>
     <string name="english">English</string>
 
     <!-- Кнопка копирования суммы -->
-   <string name="copy_amount">📋 Копировать сумму</string>
+    <string name="copy_amount">📋 Копировать сумму</string>
 
     <string name="amount_copied">Сумма %.2f ₽ скопирована</string>
     <!-- Toast сообщение -->
 
 
-    <string name="mir_pay_app_is_not_installed">Приложение Mir Pay не установлено</string>
-    <string name="could_not_open_app_store">Не удалось открыть магазин приложений</string>
-    <string name="pay_via_mir_pay">💳 Оплатить через Mir Pay</string>
-    <string name="market">market</string>
-    <string name="details">details</string>
     <string name="there_are_no_installed_banking_applications">Нет установленных банковских приложений.</string>
 
     <string name="select_bank">Выберите банк</string>

@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <queries>
         <package android:name="ru.sberbankmobile" />
         <package android:name="com.idamob.tinkoff.android" />
         <package android:name="ru.vtb24.mobilebanking.android" />
         <package android:name="ru.alfabank.mobile.android" />
-        <package android:name="ru.zhuck.webapp"/>
+        <package android:name="ru.zhuck.webapp" />
         <package android:name="ru.yoo.money" />
-        <package android:name="ru.bcs.bcsbank"/>
+        <package android:name="ru.bcs.bcsbank" />
     </queries>
     <application
         android:name=".app.CommunalPaymentsApp"

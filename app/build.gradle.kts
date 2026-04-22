@@ -1,8 +1,8 @@
 import java.util.Properties
 
+/** build.gradle.kts — подробные пояснения к программе (файл с инструкциями для печати конкретной детали). if Graidle 3D printer*/
 plugins {
     alias(libs.plugins.android.application)  // Подключаем AGP, Настройка задачи для AGP: В блоке android { ... } вы даете указания главному прорабу: какую версию SDK использовать, как подписывать приложение и какой функционал включить.
-    alias(libs.plugins.kotlin.android)    // Подключаем Kotlin Gradle Plugin
     alias(libs.plugins.kotlin.compose)    // Подключаем Compose Compiler Plugin
 }
 
@@ -17,7 +17,7 @@ val composeUiTextGoogleFonts: String = "androidx.compose.ui:ui-text-google-fonts
 
 android {  // ... настройки AGP ...
     namespace = "com.github.misham72.communalpayments"
-    compileSdk = 36
+    compileSdk = 37
 
     // Загружаем свойства из файла keystore.properties. Блок загрузки, относятся только к вашему ключу подписи.
     val keystoreProperties = Properties()
@@ -42,17 +42,17 @@ android {  // ... настройки AGP ...
         targetSdk = 36  //Версия Android, под которую вы оптимизировали приложение.
         versionCode = 12
         versionName = "2.4.0"
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"  // Стандартный раннер для тестов на устройстве/эмуляторе. Если вы не пишете тесты, эта строка всё равно нужна для корректной работы тестовой инфраструктуры.
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"  // Стандартный раннер для тестов на устройстве/эмуляторе. Если вы не пишете тесты, эта строка всё равно нужна для корректной работы
     }
     // Мы видим блок buildTypes, который определяет конфигурации для отладочной (debug) и релизной (release) сборок приложения.
     buildTypes {
         debug { // Debug подписываем тем же ключом, что и Release. debug — это встроенный тип сборки, который используется по умолчанию при нажатии кнопки Run (зелёный треугольник) в Android Studio.
-            signingConfig = signingConfigs.getByName("release")  // — здесь мы принудительно назначаем отладочной сборке ту же подпись, что и у релизной. Это делается для удобства тестирования: если вы устанавливаете приложение поверх старой версии (например, обновляете Debug поверх Release), подписи совпадают, и конфликта не возникает.
+            signingConfig = signingConfigs.getByName("release")  // — здесь мы принудительно назначаем отладочной сборке ту же подпись, что и у релизной. Это делается для удобства тестирования:
         }
         release {
-            isMinifyEnabled = false  // — отключает минификацию (сжатие и обфускацию) кода. В вашем случае это false, потому что вы, вероятно, не хотите усложнять отладку или столкнуться с проблемами обфускации на учебном проекте. Для реального продакшена обычно ставят true, чтобы уменьшить размер APK и затруднить декомпиляцию.
+            isMinifyEnabled = false  // — отключает минификацию (сжатие и обфускацию) кода. В вашем случае это false, потому что вы, вероятно, не хотите усложнять отладку или столкнуться с проблемами обфускации на учебном проекте.
             proguardFiles(
-                getDefaultProguardFile(proguardAndroidOptimize), proguardRulesPro  // — указывает файлы справилами для ProGuard/R8. Даже если минификация отключена, эти файлы всё равно могут использоваться для оптимизацииили удаления неиспользуемого кода.
+                getDefaultProguardFile(proguardAndroidOptimize), proguardRulesPro  // — указывает файлы справилами для ProGuard/R8.
             )
             signingConfig = signingConfigs.getByName("release")  // Без этой строки APK будет неподписанным или подписанным отладочным ключом по умолчанию, что недопустимо для публикации.
         }
@@ -63,7 +63,7 @@ android {  // ... настройки AGP ...
         targetCompatibility = JavaVersion.VERSION_11
     }
     buildFeatures { //  он включает поддержку Jetpack Compose в проекте. Это необходимо, чтобы использовать @Composable функции и всю экосистему Compose.
-        compose = true  //  Явная команда прорабу включить поддержку Compose Gradle подключает компилятор Compose (androidx.compose.compiler), который обрабатывает аннотации @Composable. Становятся доступны специальные инструменты для предпросмотра (@Preview), которые позволяют видеть UI прямо в Android Studio без запуска приложения. Без этой настройки ваш код с @Composable функциями просто не скомпилируется.
+        compose = true  //  Явная команда прорабу включить поддержку Compose Gradle подключает компилятор Compose (androidx.compose.compiler), который обрабатывает аннотации @Composable. Становятся доступны специальные инструменты для предпросмотра
     }
 }
 

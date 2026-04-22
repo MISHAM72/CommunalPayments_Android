@@ -130,10 +130,8 @@
     <string name="menu">Menu</string>
     <string name="exit">Exit</string>
     <string name="error_saving">Data saving error</string>
-    <string name="data_saved">Data saved</string>
 
     <string name="notifications_about_upcoming_service_payments">notifications_upcoming_payments</string>
-    <string name="payment_reminders">Payment Reminders</string>
     <string name="payment_reminder_channel">Payment Reminder Channel</string>
 
     <string name="payment_tomorrow">Payment due tomorrow %s</string>
@@ -141,18 +139,12 @@
     <string name="export_history">Export history</string>
     <string name="notifications">Reminders: %1$s</string>
 
-    <string name="export_service_history">Export service history</string>
     <string name="language">Language</string>
     <string name="select_language">Select language</string>
     <string name="russian">Russian</string>
     <string name="english">English</string>
     <string name="copy_amount">📋 Copy amount</string>
     <string name="amount_copied">Amound %.2f ₽ copied</string>
-    <string name="mir_pay_app_is_not_installed">Mir Pay app is not installed</string>
-    <string name="could_not_open_app_store">Couldn\'t open the app store</string>
-    <string name="pay_via_mir_pay">💳 Pay via Mir Pay</string>
-    <string name="market">Market</string>
-    <string name="details">Details</string>
     <string name="there_are_no_installed_banking_applications">There are no installed banking applications</string>
     <string name="select_bank">Select bank</string>
     <string name="select_bank_to_pay">Select bank to pay</string>

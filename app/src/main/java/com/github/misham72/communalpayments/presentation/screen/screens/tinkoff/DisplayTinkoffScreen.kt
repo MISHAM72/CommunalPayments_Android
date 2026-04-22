@@ -182,7 +182,8 @@ fun DisplayTinkoffScreen(viewModel: TinkoffViewModel) {
             Button(
                 onClick = {
                     bankSound?.start()
-                    showBankDialog = true }, modifier = Modifier.fillMaxWidth()
+                    showBankDialog = true
+                }, modifier = Modifier.fillMaxWidth()
             ) {
                 Text(stringResource(R.string.select_bank_to_pay))
             }
