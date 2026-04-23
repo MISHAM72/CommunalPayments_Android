@@ -97,4 +97,5 @@ dependencies {   // это список библиотек, которые вы 
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.androidx.appcompat)
+    androidTestImplementation("org.assertj:assertj-core:3.24.2")
 }

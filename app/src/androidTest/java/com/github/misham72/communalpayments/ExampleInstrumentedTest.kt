@@ -5,8 +5,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 
 import org.junit.Test
 import org.junit.runner.RunWith
-
-import org.junit.Assert.*
+import org.assertj.core.api.Assertions.assertThat
 
 /**
  * Instrumented test, which will execute on an Android device.
@@ -17,8 +16,7 @@ import org.junit.Assert.*
 class ExampleInstrumentedTest {
     @Test
     fun useAppContext() {
-        // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("com.github.misham72.CommunalPayments", appContext.packageName)
+        assertThat(appContext.packageName).isEqualTo("com.github.misham72.communalpayments")
     }
 }
