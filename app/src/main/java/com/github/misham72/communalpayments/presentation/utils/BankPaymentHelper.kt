@@ -17,7 +17,7 @@ object BankPaymentHelper {
 
     // Список поддерживаемых банков (пока один)
     @Suppress("HardcodedStringLiteral")
-    val supportedBanks = listOf(
+    val supportedBanks: List<BankInfo> = listOf(
         BankInfo("СберБанк", "ru.sberbankmobile"),
         BankInfo("Т-Банк", "com.idamob.tinkoff.android"),
         BankInfo("ВТБ", "ru.vtb24.mobilebanking.android"),

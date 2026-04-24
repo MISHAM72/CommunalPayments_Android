@@ -10,7 +10,7 @@ import com.github.misham72.communalpayments.R
 
 /**@Composable
 fun rememberCoinSoundPlayer(): MediaPlayer {
-val context = LocalContext.current
+val context = LocalContext. Current
 val mediaPlayer = remember { MediaPlayer.create(context, R.raw.coin_spin) }
 DisposableEffect(Unit) {
 onDispose { mediaPlayer.release() }

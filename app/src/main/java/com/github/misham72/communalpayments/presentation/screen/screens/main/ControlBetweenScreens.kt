@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -114,8 +115,8 @@ fun ControlBetweenScreens() {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(16.dp)
-                    .navigationBarsPadding(), verticalArrangement = Arrangement.spacedBy(16.dp)
+                    .padding(4.dp)
+                    .navigationBarsPadding()
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically
@@ -219,15 +220,18 @@ fun ControlBetweenScreens() {
                             onSound = { sound?.start() })    // ← Передаём запуск звука
                     }
                 }
-
+                Spacer(modifier = Modifier.height(9.dp))
                 Box(modifier = Modifier.weight(1f)) {
+
                     services[selectedService].screen()
                 }
-
                 Image(
-                    painter = painterResource(R.drawable.night), contentDescription = stringResource(R.string.summer_night), contentScale = ContentScale.FillWidth, modifier = Modifier
+                    painter = painterResource(R.drawable.night),
+                    contentDescription = stringResource(R.string.summer_night),
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
                         .fillMaxWidth()
-                        .height(250.dp)
+                        .weight(0.7f)
                 )
 
                 Button(

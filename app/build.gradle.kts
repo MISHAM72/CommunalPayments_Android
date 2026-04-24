@@ -1,6 +1,6 @@
 import java.util.Properties
 
-/** build.gradle.kts — подробные пояснения к программе (файл с инструкциями для печати конкретной детали). if Graidle 3D printer*/
+/** Build.gradle.kts — подробные пояснения к программе (файл с инструкциями для печати конкретной детали), if Gradle 3D printer*/
 plugins {
     alias(libs.plugins.android.application)  // Подключаем AGP, Настройка задачи для AGP: В блоке android { ... } вы даете указания главному прорабу: какую версию SDK использовать, как подписывать приложение и какой функционал включить.
     alias(libs.plugins.kotlin.compose)    // Подключаем Compose Compiler Plugin
@@ -46,13 +46,13 @@ android {  // ... настройки AGP ...
     }
     // Мы видим блок buildTypes, который определяет конфигурации для отладочной (debug) и релизной (release) сборок приложения.
     buildTypes {
-        debug { // Debug подписываем тем же ключом, что и Release. debug — это встроенный тип сборки, который используется по умолчанию при нажатии кнопки Run (зелёный треугольник) в Android Studio.
+        debug { // Debug подписываем тем же ключом, что и Release. Debug — это встроенный тип сборки, который используется по умолчанию при нажатии кнопки Run (зелёный треугольник) в Android Studio.
             signingConfig = signingConfigs.getByName("release")  // — здесь мы принудительно назначаем отладочной сборке ту же подпись, что и у релизной. Это делается для удобства тестирования:
         }
         release {
             isMinifyEnabled = false  // — отключает минификацию (сжатие и обфускацию) кода. В вашем случае это false, потому что вы, вероятно, не хотите усложнять отладку или столкнуться с проблемами обфускации на учебном проекте.
             proguardFiles(
-                getDefaultProguardFile(proguardAndroidOptimize), proguardRulesPro  // — указывает файлы справилами для ProGuard/R8.
+                getDefaultProguardFile(proguardAndroidOptimize), proguardRulesPro  // — указывает файлы с правилами для ProGuard/R8.
             )
             signingConfig = signingConfigs.getByName("release")  // Без этой строки APK будет неподписанным или подписанным отладочным ключом по умолчанию, что недопустимо для публикации.
         }
@@ -62,7 +62,7 @@ android {  // ... настройки AGP ...
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-    buildFeatures { //  он включает поддержку Jetpack Compose в проекте. Это необходимо, чтобы использовать @Composable функции и всю экосистему Compose.
+    buildFeatures { // Он включает поддержку Jetpack Compose в проекте. Это необходимо, чтобы использовать @Composable функции и всю экосистему Compose.
         compose = true  //  Явная команда прорабу включить поддержку Compose Gradle подключает компилятор Compose (androidx.compose.compiler), который обрабатывает аннотации @Composable. Становятся доступны специальные инструменты для предпросмотра
     }
 }
@@ -72,7 +72,7 @@ kotlin {
         jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
     }
 }
-dependencies {   // это список библиотек, которые вы подключаете к своему проекту. Каждая строка добавляет определённый готовый код, чтобы вам не приходилось писать всё с нуля.
+dependencies {   // Это список библиотек, которые вы подключаете к своему проекту. Каждая строка добавляет определённый готовый код, чтобы вам не приходилось писать всё с нуля.
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)  // — связка Compose с жизненным циклом и ViewModel.
     implementation(libs.androidx.activity.compose)
@@ -97,5 +97,6 @@ dependencies {   // это список библиотек, которые вы 
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.androidx.appcompat)
-    androidTestImplementation("org.assertj:assertj-core:3.24.2")
+    androidTestImplementation(libs.assertj.core)
+    testImplementation(libs.assertj.core)
 }

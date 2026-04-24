@@ -14,7 +14,7 @@ import java.util.Locale
 
 object HistoryExporter {
     private const val DATE_FORMAT_FILENAME = "yyyyMMdd_HHmmss"
-    suspend fun shareSingleHistory(context: Context, serviceKey: String) = withContext(Dispatchers.IO) {
+    suspend fun shareSingleHistory(context: Context, serviceKey: String): Unit = withContext(Dispatchers.IO) {
         val fileManager = FileManager(context.applicationContext)
         val content = fileManager.readHistory(serviceKey)
         if (content.isBlank()) return@withContext

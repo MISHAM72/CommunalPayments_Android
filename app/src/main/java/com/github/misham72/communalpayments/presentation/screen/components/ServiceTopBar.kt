@@ -2,6 +2,8 @@ package com.github.misham72.communalpayments.presentation.screen.components
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Share
@@ -13,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.presentation.utils.rememberChangeListSoundPlayer
@@ -28,7 +31,9 @@ fun ServiceTopBar(
     val clockCuCuSound = rememberClockCuCuSoundPlayer()
     val changeListSound = rememberChangeListSoundPlayer()
     Row(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth()
+        .height(33.dp) // явно задаём высоту 48 dp (было ~56-64)
+        .padding(horizontal = 2.dp), // убираем вертикальный padding, оставляем горизонтальный
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = androidx.compose.foundation.layout.Arrangement.SpaceBetween
     ) {

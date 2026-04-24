@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -16,6 +17,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -69,49 +71,80 @@ fun DisplayTaxesScreen(viewModel: TaxesViewModel) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(6.dp)
+            .padding(1.dp)
             .verticalScroll(rememberScrollState()), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(1.dp)
 
     ) {
-        ServiceTopBar(title = uiState.customServiceName.ifBlank { stringResource(R.string.service_display_name_taxes) }, onEditClick = { viewModel.openAccountDialog() }, onShareClick = {
-            scope.launch {
-                HistoryExporter.shareSingleHistory(context, viewModel.getServiceKey())
-            }
-        })
+        ServiceTopBar(
+            title = uiState.customServiceName.ifBlank { stringResource(R.string.service_display_name_taxes) },
+            onEditClick = { viewModel.openAccountDialog() },
+            onShareClick = {
+                scope.launch {
+                    HistoryExporter.shareSingleHistory(context, viewModel.getServiceKey())
+                }
+            },
+            modifier = Modifier.height(28.dp)
+        )
         if (uiState.customDate.isNotBlank()) {
             Text(
-                text = stringResource(R.string.payment_date, uiState.customDate), fontSize = 14.sp, color = Color.DarkGray, modifier = Modifier.padding(top = 4.dp)
+                text = stringResource(R.string.payment_date, uiState.customDate), fontSize = 14.sp, color = Color.Black, modifier = Modifier.padding(top = 1.dp)
             )
         }
 // Номер под названием (отдельная строка)
         if (uiState.accountNumber.isNotBlank()) {
             Text(
-                text = stringResource(R.string.personal_account_taxes, uiState.accountNumber), fontSize = 14.sp, color = Color.Red, modifier = Modifier.padding(top = 4.dp)
+                text = stringResource(R.string.personal_account_taxes, uiState.accountNumber), fontSize = 14.sp, color = Color.Red, modifier = Modifier.padding(top = 1.dp)
             )
         }
         // Поле ввода - день платежа
         OutlinedTextField(
-            value = uiState.paymentDay, onValueChange = viewModel::onPaymentDayChange, label = { Text(stringResource(R.string.day_of_payment_label)) },  // явный текст
-            modifier = Modifier.fillMaxWidth(), singleLine = true
+            value = uiState.paymentDay,
+            onValueChange = viewModel::onPaymentDayChange,
+            label = { Text(stringResource(R.string.day_of_payment_label)) },  // явный текст
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = 48.dp, max = 56.dp),
+            singleLine = true,
+            textStyle = LocalTextStyle.current.copy(
+                fontSize = 14.sp,
+                lineHeight = 20.sp
+            )
         )
 
         // Поле ввода - период в месяцах
         OutlinedTextField(
-            value = uiState.periodMonths, onValueChange = viewModel::onPeriodMonthsChange, label = { Text(stringResource(R.string.period_months_label)) },  // явный текст
-            modifier = Modifier.fillMaxWidth(), singleLine = true
+            value = uiState.periodMonths,
+            onValueChange = viewModel::onPeriodMonthsChange,
+            label = { Text(stringResource(R.string.period_months_label)) },  // явный текст
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = 48.dp, max = 56.dp),
+            singleLine = true,
+            textStyle = LocalTextStyle.current.copy(
+                fontSize = 14.sp,
+                lineHeight = 20.sp
+            )
         )
 
         // Поле ввода - тариф
         OutlinedTextField(
-            value = uiState.priceTariff, onValueChange = viewModel::onPriceTariffChange, label = { Text(stringResource(R.string.tariff_label)) },  // явный текст
-            modifier = Modifier.fillMaxWidth(), singleLine = true
+            value = uiState.priceTariff,
+            onValueChange = viewModel::onPriceTariffChange,
+            label = { Text(stringResource(R.string.tariff_label)) },  // явный текст
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = 48.dp, max = 56.dp),
+            singleLine = true,
+            textStyle = LocalTextStyle.current.copy(
+                fontSize = 14.sp,
+                lineHeight = 20.sp
+            )
         )
-
-        // Кнопка расчета
+        Spacer(modifier = Modifier.height(3.dp))
         Button(
             onClick = {
                 coinSound?.start()
-                viewModel::onCalculateClick.invoke()
+                viewModel.onCalculateClick()
             }, modifier = Modifier.fillMaxWidth()
         ) {
             Text(stringResource(R.string.calculate_and_save))
@@ -188,6 +221,7 @@ fun DisplayTaxesScreen(viewModel: TaxesViewModel) {
                 Text(stringResource(R.string.select_bank_to_pay))
             }
         }
+        Spacer(modifier = Modifier.height(10.dp))
     }
     if (showBankDialog) {
         // Проверяем, какие банки из нашего списка установлены на телефоне

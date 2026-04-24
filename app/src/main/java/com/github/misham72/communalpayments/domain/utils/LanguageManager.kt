@@ -9,8 +9,8 @@ import androidx.core.os.LocaleListCompat
 object LanguageManager {
     private const val PREFS_NAME = "app_prefs"
     private const val KEY_LANG = "selected_language"
-    const val DEFAULT_LANG = "ru"
-    const val ENGLISH_LANG = "en"
+    const val DEFAULT_LANG: String = "ru"
+    const val ENGLISH_LANG: String = "en"
 
     fun setLanguage(context: Context, languageCode: String) {
         val locale = LocaleListCompat.forLanguageTags(languageCode)

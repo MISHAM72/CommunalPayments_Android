@@ -29,7 +29,7 @@ class FileManager(private val context: Context) {
             val file = File(directory, "$serviceKey.txt")
             val existingText = if (file.exists()) file.readText() else ""
             val newText = if (existingText.isNotEmpty()) {
-                recordText + "\n***\n" + existingText
+                "$recordText\n***\n$existingText"
             } else {
                 recordText
             }

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -15,6 +16,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -64,44 +66,78 @@ fun DisplayGasScreen(viewModel: GasViewModel) {
     var tempNumber by remember { mutableStateOf(uiState.accountNumber) }
     var tempName by remember { mutableStateOf(uiState.customServiceName) }
     var tempDate by remember { mutableStateOf(uiState.customDate) }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(6.dp)
-            .verticalScroll(rememberScrollState()), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(1.dp)
-
+            .padding(1.dp)
+            .verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(1.dp)
     ) {
-        ServiceTopBar(title = uiState.customServiceName.ifBlank { stringResource(R.string.service_display_name_gas) }, onEditClick = { viewModel.openAccountDialog() }, onShareClick = {
-            scope.launch {
-                HistoryExporter.shareSingleHistory(context, viewModel.getServiceKey())
-            }
-        })
+        ServiceTopBar(
+            title = uiState.customServiceName.ifBlank { stringResource(R.string.service_display_name_gas) },
+            onEditClick = { viewModel.openAccountDialog() },
+            onShareClick = {
+                scope.launch {
+                    HistoryExporter.shareSingleHistory(context, viewModel.getServiceKey())
+                }
+            },
+            modifier = Modifier.height(28.dp)
+        )
         if (uiState.customDate.isNotBlank()) {
             Text(
-                text = stringResource(R.string.payment_date, uiState.customDate), fontSize = 14.sp, color = Color.DarkGray, modifier = Modifier.padding(top = 4.dp)
+                text = stringResource(R.string.payment_date, uiState.customDate), fontSize = 14.sp, color = Color.Black, modifier = Modifier.padding(top = 1.dp)
             )
         }
         if (uiState.accountNumber.isNotBlank()) {
             Text(
-                text = stringResource(R.string.personal_account, uiState.accountNumber), fontSize = 14.sp, color = Color.Red, modifier = Modifier.padding(top = 4.dp)
+                text = stringResource(R.string.personal_account, uiState.accountNumber), fontSize = 14.sp, color = Color.Red, modifier = Modifier.padding(top = 1.dp)
             )
         }
         OutlinedTextField(
-            value = uiState.currentReading, onValueChange = viewModel::onCurrentReadingChange, label = { Text(stringResource(R.string.current_reading_label_electricity)) }, modifier = Modifier.fillMaxWidth()
+            value = uiState.currentReading,
+            onValueChange = viewModel::onCurrentReadingChange,
+            label = { Text(stringResource(R.string.current_reading_label_electricity)) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = 48.dp, max = 56.dp), // сужаем
+            textStyle = LocalTextStyle.current.copy(
+                fontSize = 14.sp,
+                lineHeight = 20.sp
+            )
         )
 
         OutlinedTextField(
-            value = uiState.previousReading, onValueChange = viewModel::onPreviousReadingChange, label = { Text(stringResource(R.string.previous_reading_label_electricity)) }, modifier = Modifier.fillMaxWidth()
+            value = uiState.previousReading,
+            onValueChange = viewModel::onPreviousReadingChange,
+            label = { Text(stringResource(R.string.previous_reading_label_electricity)) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = 48.dp, max = 56.dp), // сужаем
+            textStyle = LocalTextStyle.current.copy(
+                fontSize = 14.sp,
+                lineHeight = 20.sp
+            )
         )
 
         OutlinedTextField(
-            value = uiState.tariff, onValueChange = viewModel::onTariffChange, label = { Text(stringResource(R.string.tariff_label)) }, modifier = Modifier.fillMaxWidth()
+            value = uiState.tariff,
+            onValueChange = viewModel::onTariffChange,
+            label = { Text(stringResource(R.string.tariff_label)) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = 48.dp, max = 56.dp), // сужаем
+            textStyle = LocalTextStyle.current.copy(
+                fontSize = 14.sp,
+                lineHeight = 20.sp
+            )
         )
-        // Кнопка
+        Spacer(modifier = Modifier.height(3.dp))
         Button(
             onClick = {
                 coinSound?.start()
-                viewModel::onCalculateClick.invoke()
+                viewModel.onCalculateClick()
             }, modifier = Modifier.fillMaxWidth()
         ) {
             Text(stringResource(R.string.calculate_and_save))
@@ -161,6 +197,7 @@ fun DisplayGasScreen(viewModel: GasViewModel) {
                 Text(stringResource(R.string.select_bank_to_pay))
             }
         }
+        Spacer(modifier = Modifier.height(10.dp)) // небольшой отступ для красоты
     }
     if (showBankDialog) {
         // Проверяем, какие банки из нашего списка установлены на телефоне
@@ -200,7 +237,6 @@ fun DisplayGasScreen(viewModel: GasViewModel) {
     if (uiState.showAccountDialog) {
         AlertDialog(onDismissRequest = viewModel::closeAccountDialog, title = { Text(stringResource(R.string.editing)) }, text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                // Поле для названия услуги
                 OutlinedTextField(
                     value = tempName, onValueChange = { tempName = it }, label = { Text(stringResource(R.string.service_name_label)) }, singleLine = true, modifier = Modifier.fillMaxWidth()
                 )

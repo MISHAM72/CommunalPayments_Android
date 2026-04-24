@@ -20,7 +20,7 @@ class Water {
         tariff: Double,
         accountNumber: String
     ): WaterData {
-        val result = MeterCalculator.calculate(current, previous, tariff)   // ✅ Запрашивает расчёты у калькулятора, Зачем? разделить ответственность, отвечает  только за математику. Это делает код чище и переиспользуемым.
+        val result = MeterCalculator.calculate(current, previous, tariff)   // ✅ Запрашивает расчёты у калькулятора, Зачем? Разделить ответственность, отвечает только за математику. Это делает код чище и переиспользуемым.
 
         return WaterData(
             isHistory = true,

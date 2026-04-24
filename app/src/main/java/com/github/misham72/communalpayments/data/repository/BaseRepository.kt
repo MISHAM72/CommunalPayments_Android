@@ -8,8 +8,8 @@ import java.util.Date
 import java.util.Locale
 
 /**
- * Базовый репозиторий для всех типов платежей
- * Содержит общие методы для работы с датой и файлами
+ * Базовый репозиторий для всех типов платежей.
+ * Содержит общие методы для работы с датой и файлами.
  */
 abstract class BaseRepository(
     protected val context: Context, protected val fileManager: FileManager

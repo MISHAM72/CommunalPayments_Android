@@ -58,7 +58,7 @@ fun ServiceTab(
         )
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(service.icon, fontSize = 24.sp)
+            Text(service.icon, fontSize = 28.sp)
             Text(service.name, fontSize = 12.sp, fontWeight = FontWeight.Medium, color = contentColor)
 
         }
