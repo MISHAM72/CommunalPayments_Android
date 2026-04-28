@@ -35,6 +35,7 @@
     <string name="current_reading">Current readings: - %1$s %2$s</string>
     <string name="previous_reading">Previous readings: - %1$s %2$s</string>
 
+    <string name="previous_reading_pdf">previous_reading</string>
     <string name="current_reading_label_electricity">Current readings (kW/h)- </string>
     <string name="previous_reading_label_electricity">Previous readings (kW/h)- </string>
 
@@ -150,5 +151,32 @@
     <string name="select_bank_to_pay">Select bank to pay</string>
     <string name="could_not_open_the_app_store">Could not open the app store</string>
     <string name="app_is_not_installed">App %1$s is not installed</string>
+    <string name="service_display_name_hostel">Hostel</string>
+    <string name="address">address: %s</string>
+    <string name="result_hostel">result_hostel</string>
+    <string name="number_of_the_apartment_or_room">number_of_the_apartment_or_room</string>
+    <string name="theme">theme</string>
+    <string name="select_theme">select_theme</string>
+    <string name="system_default">system_default</string>
+    <string name="light">light</string>
+    <string name="dark">dark</string>
+    <string name="current_reading_pdf">current_reading</string>
+    <string name="ru">ru</string>
+    <string name="mo">mo</string>
+    <string name="send_pdf">send_pdf</string>
+    <string name="formed">formed</string>
+    <string name="pdf_title_history">pdf_title_history: %s</string>
+    <string name="pdf_table_date">pdf_table_date</string>
+    <string name="pdf_table_previous">pdf_table_previous</string>
+    <string name="pdf_table_current">pdf_table_current</string>
+    <string name="pdf_table_consumption">pdf_table_consumption</string>
+    <string name="pdf_table_tariff">pdf_table_tariff</string>
+    <string name="pdf_table_amount">pdf_table_amount</string>
+    <string name="pdf_table_status">pdf_table_status</string>
+    <string name="pdf_table_period">pdf_table_period</string>
+    <string name="pdf_table_payment_day">pdf_table_payment_day</string>
+    <string name="pdf_all_history_title">pdf_all_history_title</string>
+    <string name="pdf_generated">pdf_generated: %s</string>
+    <string name="export_all_pdf_title">export_all_pdf_title</string>
 </resources>
 

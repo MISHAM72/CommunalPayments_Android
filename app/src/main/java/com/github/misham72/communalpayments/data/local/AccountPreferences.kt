@@ -49,4 +49,30 @@ class AccountPreferences(context: Context) {
     fun getLastReading(serviceKey: String): String {
         return prefs.getString("last_reading_$serviceKey", "") ?: ""
     }
+
+    fun saveTariff(serviceKey: String, tariff: String) {
+        prefs.edit { putString("tariff_$serviceKey", tariff) }
+    }
+
+    fun getTariff(serviceKey: String): String {
+        return prefs.getString("tariff_$serviceKey", "") ?: ""
+    }
+
+    fun savePeriodMonths(serviceKey: String, value: String) {
+        prefs.edit { putString("PeriodMonths_$serviceKey", value) }
+    }
+
+    fun getPeriodMonths(serviceKey: String): String {
+        return prefs.getString("PeriodMonths_$serviceKey", "") ?: ""
+    }
+
+    fun savedPaymentDay(serviceKey: String, value: String) {
+        prefs.edit { putString("PaymentDay_$serviceKey", value) }
+    }
+
+    fun getPaymentDay(serviceKey: String): String {
+        return prefs.getString("PaymentDay_$serviceKey", "") ?: ""
+    }
+
+
 }

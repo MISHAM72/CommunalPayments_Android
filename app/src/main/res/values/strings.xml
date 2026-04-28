@@ -19,6 +19,7 @@
     <string name="service_display_name_tinkoff"> Телефона 2</string>
     <string name="service_display_name_troyka">Проездной билет</string>
     <string name="service_display_name_zont">Отопление</string>
+    <string name="service_display_name_hostel">Общежитие</string>
 
 
     // общие
@@ -39,12 +40,13 @@
     <string name="current_reading">Текущие показания: - %1$s %2$s</string>
     <string name="previous_reading">Предыдущие показания: - %1$s %2$s</string>
 
-
+    <string name="current_reading_pdf">Текущие показания:</string>
+    <string name="previous_reading_pdf">Предыдущие показания:</string>
     <!-- НОВЫЕ строки для меток полей (без %s): -->
 
 
-    <string name="current_reading_label_electricity">Текущие показания,(кВт/ч) - </string>
-    <string name="previous_reading_label_electricity">Предыдущие показания,(кВт/ч) - </string>
+    <string name="current_reading_label_electricity">Текущие показания, (кВт.ч) - </string>
+    <string name="previous_reading_label_electricity">Предыдущие показания, (кВт.ч) - </string>
 
 
     <string name="download_error_with_message">❌ ОШИБКА ЗАГРУЗКИ: %s</string>
@@ -91,12 +93,12 @@
     // ТЕКСТ НА ПОЛЯХ ПЛАТЕЖЕЙ ЗА ПЕРИОД (label)
     <string name="day_of_payment_label">День платежа - </string>
     <string name="period_months_label">Период, (в мес.) - </string>
-    <string name="tariff_label">Тариф:   руб.</string>
+    <string name="tariff_label">Тариф: руб.</string>
 
     // НФЗВАНИЯ КАРТОЧЕК
     <string name="result_garbage">Результаты Мусор:</string>
     <string name="result_zont">Результат по  ZONT:</string>
-    <string name="result_internet">Результат по  Интернет:</string>
+    <string name="result_internet">Результат по Интернет:</string>
     <string name="result_mts">Результаты МТС:</string>
     <string name="result_taxes">Результаты Налоги:</string>
     <string name="result_osago">Результаты Осаго:</string>
@@ -113,7 +115,7 @@
     <string name="passed">Прошло: - %1$d дня.</string>
     <string name="next_payment">Дата оплаты: - %1$s</string>
     <string name="payment_in">Оплата через: - %1$d дней.</string>
-    <string name="tariff_card">Тариф:  %.2f руб.</string>
+    <string name="tariff_card">Тариф: %.2f руб.</string>
 
 
     <string name="yyyy_mm_dd_hh_mm_ss">yyyy-MM-dd HH:mm:ss</string>
@@ -127,7 +129,7 @@
 
     <string name="payment_date">Дата платежа: %s</string>
 
-    <string name="personal_account_label">Лицевой счёт</string>
+    <string name="personal_account_label">Лицевой счёт: -  </string>
     <string name="personal_account_in_text_history">Лицевой счёт: %s</string>
     <string name="personal_account">Л/С: %s</string>
     <string name="personal_account_taxes">ИНН: %s</string>
@@ -167,6 +169,33 @@
     <string name="could_not_open_the_app_store">Не удалось открыть магазин приложений</string>
     <string name="app_is_not_installed">Приложение %1$s не установлено</string>
 
+    <string name="address">Адрес: %s</string>
+    <string name="result_hostel">Результаты по общежитию</string>
+    <string name="number_of_the_apartment_or_room">Номер квартиры/комнаты</string>
 
+    <string name="theme">Тема</string>
+    <string name="select_theme">Выберите тему</string>
+    <string name="system_default">Как в системе</string>
+    <string name="light">Светлая</string>
+    <string name="dark">Тёмная</string>
+    <string name="ru">руб.</string>
+    <string name="mo">мес.</string>
+    <string name="send_pdf">Отправить PDF</string>
+    <string name="formed">"Сформировано: - "</string>
+    <string name="pdf_title_history">История: %s</string>
+
+    <string name="pdf_table_date">Дата</string>
+    <string name="pdf_table_previous">Предыдущие</string>
+    <string name="pdf_table_current">Текущие</string>
+    <string name="pdf_table_consumption">Расход</string>
+    <string name="pdf_table_tariff">Тариф</string>
+    <string name="pdf_table_amount">Сумма</string>
+    <string name="pdf_table_status">Статус</string>
+    <string name="pdf_table_period">Период (мес)</string>
+    <string name="pdf_table_payment_day">День платежа</string>
+
+    <string name="pdf_all_history_title">Общая история</string>
+    <string name="pdf_generated">Сформировано: %s</string> <!-- можешь переиспользовать formed, но он без даты -->
+    <string name="export_all_pdf_title">Общая история PDF</string>
 </resources>
 

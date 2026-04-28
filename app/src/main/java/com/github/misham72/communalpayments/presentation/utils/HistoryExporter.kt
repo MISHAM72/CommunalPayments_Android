@@ -1,4 +1,4 @@
-package com.github.misham72.communalpayments.domain.utils
+package com.github.misham72.communalpayments.presentation.utils
 
 import android.content.Context
 import android.content.Intent

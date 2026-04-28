@@ -41,7 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.domain.model.ValidationError
-import com.github.misham72.communalpayments.domain.utils.HistoryExporter
+import com.github.misham72.communalpayments.presentation.utils.HistoryExporter
 import com.github.misham72.communalpayments.presentation.screen.components.ServiceTopBar
 import com.github.misham72.communalpayments.presentation.utils.BankPaymentHelper
 import com.github.misham72.communalpayments.presentation.utils.rememberBankButtonSoundPlayer
@@ -76,24 +76,21 @@ fun DisplayWaterScreen(viewModel: WaterViewModel) {
 
     ) {
         ServiceTopBar(
-            title = uiState.customServiceName.ifBlank { stringResource(R.string.service_display_name_water) },
-            onEditClick = { viewModel.openAccountDialog() },
-            onShareClick = {
+            onPdfExport = { viewModel.onPdfExport(context) }, title = uiState.customServiceName.ifBlank { stringResource(R.string.service_display_name_water) }, onEditClick = { viewModel.openAccountDialog() }, onShareClick = {
                 scope.launch {
                     HistoryExporter.shareSingleHistory(context, viewModel.getServiceKey())
                 }
-            },
-            modifier = Modifier.height(28.dp)
+            }, modifier = Modifier.height(28.dp)
         )
 
         if (uiState.customDate.isNotBlank()) {
             Text(
-                text = stringResource(R.string.payment_date, uiState.customDate), fontSize = 14.sp, color = Color.Black, modifier = Modifier.padding(top = 1.dp)
+                text = stringResource(R.string.payment_date, uiState.customDate), fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurface, modifier = Modifier.padding(top = 1.dp)
             )
         }
         if (uiState.accountNumber.isNotBlank()) {
             Text(
-                text = stringResource(R.string.personal_account, uiState.accountNumber), fontSize = 14.sp, color = Color.Red, modifier = Modifier.padding(top = 1.dp)
+                text = stringResource(R.string.personal_account, uiState.accountNumber), fontSize = 14.sp, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(top = 1.dp)
             )
         }
         // Поля ввода (как у тебя - с ресурсами)
@@ -105,8 +102,7 @@ fun DisplayWaterScreen(viewModel: WaterViewModel) {
                 .fillMaxWidth()
                 .heightIn(min = 48.dp, max = 56.dp), // сужаем
             textStyle = LocalTextStyle.current.copy(
-                fontSize = 14.sp,
-                lineHeight = 20.sp
+                fontSize = 14.sp, lineHeight = 20.sp
             )
         )
 
@@ -118,21 +114,16 @@ fun DisplayWaterScreen(viewModel: WaterViewModel) {
                 .fillMaxWidth()
                 .heightIn(min = 48.dp, max = 56.dp), // сужаем
             textStyle = LocalTextStyle.current.copy(
-                fontSize = 14.sp,
-                lineHeight = 20.sp
+                fontSize = 14.sp, lineHeight = 20.sp
             )
         )
 
         OutlinedTextField(
-            value = uiState.tariff,
-            onValueChange = viewModel::onTariffChange,
-            label = { Text(stringResource(R.string.tariff_label)) },
-            modifier = Modifier
+            value = uiState.tariff, onValueChange = viewModel::onTariffChange, label = { Text(stringResource(R.string.tariff_label)) }, modifier = Modifier
                 .fillMaxWidth()
                 .heightIn(min = 48.dp, max = 56.dp), // сужаем
             textStyle = LocalTextStyle.current.copy(
-                fontSize = 14.sp,
-                lineHeight = 20.sp
+                fontSize = 14.sp, lineHeight = 20.sp
             )
         )
         Spacer(modifier = Modifier.height(3.dp))

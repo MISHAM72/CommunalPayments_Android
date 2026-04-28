@@ -1,5 +1,6 @@
 package com.github.misham72.communalpayments.presentation.screen.screens.gas
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.misham72.communalpayments.data.local.AccountPreferences
@@ -7,6 +8,7 @@ import com.github.misham72.communalpayments.domain.model.ValidationError
 import com.github.misham72.communalpayments.domain.repository.GasRepository
 import com.github.misham72.communalpayments.domain.userclasses.Gas
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
+import com.github.misham72.communalpayments.presentation.utils.PdfHistoryExporter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -43,10 +45,17 @@ class GasViewModel(
         val savedName = accountPrefs.getCustomName(SERVICE_KEY)
         val saveDate = accountPrefs.getCustomDate(SERVICE_KEY)
         val lastReading = accountPrefs.getLastReading(SERVICE_KEY)
+        val savedTariff = accountPrefs.getTariff(SERVICE_KEY)
         if (lastReading.isNotBlank()) {
             _uiState.update { it.copy(previousReading = lastReading) }
         }
-        _uiState.update { it.copy(accountNumber = savedNumber, customServiceName = savedName, customDate = saveDate) }
+        _uiState.update { it.copy(accountNumber = savedNumber, customServiceName = savedName, customDate = saveDate, tariff = savedTariff) }
+    }
+
+    fun onPdfExport(context: Context) {
+        viewModelScope.launch {
+            PdfHistoryExporter.exportAndShare(context, SERVICE_KEY)
+        }
     }
 
     fun openAccountDialog() {
@@ -103,6 +112,7 @@ class GasViewModel(
             gasRepository.saveGasPayment(data)
             _uiState.update {
                 accountPrefs.saveLastReading(SERVICE_KEY, current.toString())
+                accountPrefs.saveTariff(SERVICE_KEY, tariff.toString())
                 it.copy(result = data, error = null)
 
 

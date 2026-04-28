@@ -1,12 +1,12 @@
-package com.github.misham72.communalpayments.presentation.screen.screens.garbage
+package com.github.misham72.communalpayments.presentation.screen.screens.hostel
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.misham72.communalpayments.data.local.AccountPreferences
 import com.github.misham72.communalpayments.domain.model.ValidationError
-import com.github.misham72.communalpayments.domain.repository.GarbageRepository
-import com.github.misham72.communalpayments.domain.userclasses.Garbage
+import com.github.misham72.communalpayments.domain.repository.HostelRepository
+import com.github.misham72.communalpayments.domain.userclasses.Hostel
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 import com.github.misham72.communalpayments.presentation.utils.PdfHistoryExporter
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,14 +18,14 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class GarbageViewModel(
-    private val garbage: Garbage,
-    private val garbageRepository: GarbageRepository,
+class HostelViewModel(
+    private val hostel: Hostel,
+    private val hostelRepository: HostelRepository,
     private val accountPrefs: AccountPreferences
 ) : ViewModel() {
 
     companion object {
-        private const val SERVICE_KEY = ServiceKeys.GARBAGE
+        private const val SERVICE_KEY = ServiceKeys.HOSTEL
     }
 
     // 1️⃣ СОСТОЯНИЕ ЭКРАНА (что храним)
@@ -37,7 +37,7 @@ class GarbageViewModel(
         val customDate: String = "",
         val customServiceName: String = "",
         val showAccountDialog: Boolean = false,
-        val result: Garbage.GarbageData? = null,
+        val result: Hostel.HostelData? = null,
         val error: ValidationError? = null,
     )
 
@@ -51,7 +51,6 @@ class GarbageViewModel(
         val savedDay = accountPrefs.getPaymentDay(SERVICE_KEY)
         val savedPeriod = accountPrefs.getPeriodMonths(SERVICE_KEY)
         val savedTariff = accountPrefs.getTariff(SERVICE_KEY)
-
         _uiState.update { it.copy(accountNumber = savedNumber, customServiceName = savedName, customDate = saveDate, paymentDay = savedDay, periodMonths = savedPeriod, priceTariff = savedTariff) }
     }
 
@@ -96,7 +95,7 @@ class GarbageViewModel(
         return try {
             SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).parse(dateString) ?: Date()
         } catch (_: Exception) {
-            Date() // при ошибке используем текущую дату
+            Date()
         }
     }
 
@@ -113,7 +112,7 @@ class GarbageViewModel(
         }
         val startDate = parseStartDate(_uiState.value.customDate)
 
-        val data = garbage.collectGarbageData(
+        val data = hostel.collectHostelData(
             paymentDay = paymentDay,
             periodMonths = periodMonths,
             startDate = startDate,
@@ -122,7 +121,7 @@ class GarbageViewModel(
         )
 
         viewModelScope.launch {
-            garbageRepository.saveGarbagePayment(data)
+            hostelRepository.saveHostelPayment(data)
             _uiState.update {
                 accountPrefs.savedPaymentDay(SERVICE_KEY, paymentDay.toString())
                 accountPrefs.savePeriodMonths(SERVICE_KEY, periodMonths.toString())

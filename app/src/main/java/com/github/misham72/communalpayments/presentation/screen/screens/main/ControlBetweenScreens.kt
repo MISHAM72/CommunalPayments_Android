@@ -1,8 +1,6 @@
 package com.github.misham72.communalpayments.presentation.screen.screens.main
 
 import android.app.Activity
-import android.content.Context
-import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -45,21 +43,22 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.FileProvider
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.data.local.AccountPreferences
-import com.github.misham72.communalpayments.data.local.FileManager
-import com.github.misham72.communalpayments.domain.utils.LanguageManager
+import com.github.misham72.communalpayments.presentation.utils.LanguageManager
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 import com.github.misham72.communalpayments.presentation.screen.components.ServiceTab
 import com.github.misham72.communalpayments.presentation.screen.navigation.getListInitialScreen
 import com.github.misham72.communalpayments.presentation.screen.screens.history.SimpleHistoryScreen
+import com.github.misham72.communalpayments.presentation.theme.ThemePrefs
+import com.github.misham72.communalpayments.presentation.utils.PdfHistoryExporter
 import com.github.misham72.communalpayments.presentation.utils.rememberBoilerSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberCarSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberGarbageSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberGasSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberHistorySoundPlayer
+import com.github.misham72.communalpayments.presentation.utils.rememberHostelSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberInternetSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberMTSSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberOsagoSoundPlayer
@@ -67,13 +66,7 @@ import com.github.misham72.communalpayments.presentation.utils.rememberTaxesSoun
 import com.github.misham72.communalpayments.presentation.utils.rememberTinkoffSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberWaterSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberlightSoundPlayer
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.io.File
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 @Composable
 fun ControlBetweenScreens() {
@@ -86,6 +79,7 @@ fun ControlBetweenScreens() {
     var showMenu by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     var showLanguageDialog by remember { mutableStateOf(false) }
+    var showThemeDialog by remember { mutableStateOf(false) }
     val historySound = rememberHistorySoundPlayer()
 
     // Перезагружаем даты при каждом возобновлении экрана
@@ -138,9 +132,9 @@ fun ControlBetweenScreens() {
                             (context as? Activity)?.finishAffinity()
                             showMenu = false
                         })
-                        DropdownMenuItem(text = { Text(stringResource(R.string.export_history)) }, onClick = {
+                        DropdownMenuItem(text = { Text(stringResource(R.string.export_all_pdf_title)) }, onClick = {
                             scope.launch {
-                                shareHistoryAsync(context)
+                                PdfHistoryExporter.exportAllHistoryPdf(context)
                             }
                             showMenu = false
                         })
@@ -148,6 +142,13 @@ fun ControlBetweenScreens() {
                             showMenu = false
                             showLanguageDialog = true
                         })
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.theme)) },
+                            onClick = {
+                                showMenu = false
+                                showThemeDialog = true
+                            }
+                        )
                     }
                 }
                 if (showLanguageDialog) {
@@ -179,6 +180,44 @@ fun ControlBetweenScreens() {
                         }
                     )
                 }
+                if (showThemeDialog) {
+                    AlertDialog(
+                        onDismissRequest = { showThemeDialog = false },
+                        title = { Text(stringResource(R.string.select_theme)) },
+                        text = {
+                            Column {
+                                TextButton(onClick = {
+                                    ThemePrefs.setThemeMode(context, ThemePrefs.MODE_SYSTEM)
+                                    showThemeDialog = false
+                                    (context as? Activity)?.recreate()
+                                }) {
+                                    Text(stringResource(R.string.system_default))
+                                }
+                                TextButton(onClick = {
+                                    ThemePrefs.setThemeMode(context, ThemePrefs.MODE_LIGHT)
+                                    showThemeDialog = false
+                                    (context as? Activity)?.recreate()
+                                }) {
+                                    Text(stringResource(R.string.light))
+                                }
+                                TextButton(onClick = {
+                                    ThemePrefs.setThemeMode(context, ThemePrefs.MODE_DARK)
+                                    showThemeDialog = false
+                                    (context as? Activity)?.recreate()
+                                }) {
+                                    Text(stringResource(R.string.dark))
+                                }
+                            }
+                        },
+                        confirmButton = {
+                            TextButton(onClick = { showThemeDialog = false }) {
+                                Text(stringResource(R.string.cancel))
+                            }
+                        }
+                    )
+                }
+
+
                 //Создание плееров (по одному на каждый тип звука)
                 val light = rememberlightSoundPlayer()
                 val gasSound = rememberGasSoundPlayer()
@@ -191,13 +230,14 @@ fun ControlBetweenScreens() {
                 val taxesSound = rememberTaxesSoundPlayer()
                 val carSound = rememberCarSoundPlayer()
                 val osagoSound = rememberOsagoSoundPlayer()
+                val hostelSound = rememberHostelSoundPlayer()
 
 
-                Row(            //Определение звука для каждой услуги (when)
+                Row(            //Определение звука для каждой услуги (when). Row с горизонтальным скроллом — чтобы все чипсы поместились.
                     modifier = Modifier.horizontalScroll(rememberScrollState())
                 ) {
-                    services.forEachIndexed { index, service ->
-                        val sound = when (service.fileKey) {
+                    services.forEachIndexed { index, service ->   //services — список всех услуг (получен из getListInitialScreen()).forEachIndexed — для каждой услуги создаётся ServiceTab (кастомный компонент-чипс).
+                        val sound = when (service.fileKey) {  // sound — выбирается соответствующий звук для нажатия на чипс (чтобы при переключении играл специфичный звук, если задан).
                             ServiceKeys.ELECTRICITY -> light
                             ServiceKeys.GAS -> gasSound               // 🔥 → звук газа
                             ServiceKeys.WATER -> waterSound            // 💧 → звук воды
@@ -208,11 +248,12 @@ fun ControlBetweenScreens() {
                             ServiceKeys.TINKOFF -> tinkoffSound
                             ServiceKeys.TAXES -> taxesSound
                             ServiceKeys.TROYKA -> carSound
-                            ServiceKeys.OSAGO -> osagoSound             // 🚗 → звук ОСАГО
+                            ServiceKeys.OSAGO -> osagoSound  // 🚗 → звук ОСАГО
+                            ServiceKeys.HOSTEL -> hostelSound
                             else -> null  // Для остальных пока без звука
                         }
                         //Передача звука в кнопку
-                        ServiceTab(
+                        ServiceTab(   // ServiceTab — отображает название услуги, эмодзи/иконку, дату следующего платежа (если есть). По клику меняет selectedService (индекс выбранной вкладки) и запускает звук.
                             service = service,
                             isSelected = selectedService == index,
                             dueDate = dueDates[service.fileKey],
@@ -221,9 +262,9 @@ fun ControlBetweenScreens() {
                     }
                 }
                 Spacer(modifier = Modifier.height(9.dp))
-                Box(modifier = Modifier.weight(1f)) {
 
-                    services[selectedService].screen()
+                Box(modifier = Modifier.weight(1f)) {   // Box — контейнер, в который помещается UI текущей услуги, weight(1f) — заставляет его растянуться на всю высоту внутри Column. Сейчас внутри Box ровно один элемент — результат вызова.
+                    services[selectedService].screen()   // — динамически подставляет экран выбранной услуги.
                 }
                 Image(
                     painter = painterResource(R.drawable.night),
@@ -244,44 +285,5 @@ fun ControlBetweenScreens() {
                 }
             }
         }
-    }
-}
-
-@Suppress("HardcodedStringLiteral")
-private const val DATE_FORMAT_FILENAME = "yyyyMMdd_HHmmss"
-private suspend fun shareHistoryAsync(context: Context) = withContext(Dispatchers.IO) {
-    val fileManager = FileManager(context.applicationContext)
-    val allHistory = StringBuilder()
-
-    val serviceKeys = listOf(
-        ServiceKeys.ELECTRICITY, ServiceKeys.GAS, ServiceKeys.WATER, ServiceKeys.GARBAGE, ServiceKeys.ZONT, ServiceKeys.INTERNET, ServiceKeys.MTS, ServiceKeys.TINKOFF, ServiceKeys.TAXES, ServiceKeys.TROYKA, ServiceKeys.OSAGO
-    )
-
-    for (key in serviceKeys) {
-        val content = fileManager.readHistory(key)
-        if (content.isNotBlank()) {
-            allHistory.apply {
-                appendLine("=== $key ===")
-                appendLine(content)
-                appendLine()
-            }
-        }
-    }
-
-    if (allHistory.isEmpty()) return@withContext
-
-    val timeStamp = SimpleDateFormat(DATE_FORMAT_FILENAME, Locale.getDefault()).format(Date())
-    val fileName = "payment_history_$timeStamp.txt"
-    val file = File(context.cacheDir, fileName)
-    file.writeText(allHistory.toString())
-
-    withContext(Dispatchers.Main) {
-        val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
-        val intent = Intent(Intent.ACTION_SEND).apply {
-            type = "text/plain"
-            putExtra(Intent.EXTRA_STREAM, uri)
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        }
-        context.startActivity(Intent.createChooser(intent, context.getString(R.string.export_history)))
     }
 }

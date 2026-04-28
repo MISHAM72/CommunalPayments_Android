@@ -1,5 +1,6 @@
-package com.github.misham72.communalpayments.presentation.screen.screens.mts
+package com.github.misham72.communalpayments.presentation.screen.screens.hostel
 
+import androidx.compose.runtime.setValue
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.widget.Toast
@@ -28,7 +29,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -55,7 +55,7 @@ import java.util.Locale
 
 @SuppressLint("LocalContextGetResourceValueCall")
 @Composable
-fun DisplayMTSScreen(viewModel: MTSViewModel) {
+fun DisplayHostelScreen(viewModel: HostelViewModel) {
     var showBankDialog by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -65,19 +65,20 @@ fun DisplayMTSScreen(viewModel: MTSViewModel) {
     val bankSound = rememberBankButtonSoundPlayer()
     val uiState by viewModel.uiState.collectAsState()
     var tempNumber by remember { mutableStateOf(uiState.accountNumber) }
-    var tempDate by remember { mutableStateOf(uiState.customDate) }
     var tempName by remember { mutableStateOf(uiState.customServiceName) }
+    var tempDate by remember { mutableStateOf(uiState.customDate) }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(1.dp)
             .verticalScroll(rememberScrollState()), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(1.dp)
-
     ) {
         ServiceTopBar(
             onPdfExport = { viewModel.onPdfExport(context) },
-            title = uiState.customServiceName.ifBlank { stringResource(R.string.service_display_name_mts) }, onEditClick = { viewModel.openAccountDialog() }, onShareClick = {
+            title = uiState.customServiceName.ifBlank { stringResource(R.string.service_display_name_hostel) },
+            onEditClick = { viewModel.openAccountDialog() },
+            onShareClick = {
                 scope.launch {
                     HistoryExporter.shareSingleHistory(context, viewModel.getServiceKey())
                 }
@@ -89,9 +90,10 @@ fun DisplayMTSScreen(viewModel: MTSViewModel) {
                 text = stringResource(R.string.payment_date, uiState.customDate), fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurface, modifier = Modifier.padding(top = 1.dp)
             )
         }
+// Номер под названием (отдельная строка)
         if (uiState.accountNumber.isNotBlank()) {
             Text(
-                text = stringResource(R.string.number_phone, uiState.accountNumber), fontSize = 14.sp, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(top = 1.dp)
+                text = stringResource(R.string.address, uiState.accountNumber), fontSize = 14.sp, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(top = 1.dp)
             )
         }
         // Поле ввода - день платежа
@@ -113,7 +115,7 @@ fun DisplayMTSScreen(viewModel: MTSViewModel) {
         OutlinedTextField(
             value = uiState.periodMonths,
             onValueChange = viewModel::onPeriodMonthsChange,
-            label = { Text(stringResource(R.string.period_months_label)) },  // явный текст
+            label = { Text(stringResource(R.string.period_months_label)) },
             modifier = Modifier
                 .fillMaxWidth()
                 .heightIn(min = 48.dp, max = 56.dp),
@@ -128,7 +130,7 @@ fun DisplayMTSScreen(viewModel: MTSViewModel) {
         OutlinedTextField(
             value = uiState.priceTariff,
             onValueChange = viewModel::onPriceTariffChange,
-            label = { Text(stringResource(R.string.tariff_label)) },  // явный текст
+            label = { Text(stringResource(R.string.tariff_label)) },
             modifier = Modifier
                 .fillMaxWidth()
                 .heightIn(min = 48.dp, max = 56.dp),
@@ -160,7 +162,6 @@ fun DisplayMTSScreen(viewModel: MTSViewModel) {
             null -> { /* ничего */
             }
         }
-
         // Результат с ТВОИМИ ресурсами
         uiState.result?.let { result ->
             Card(
@@ -174,7 +175,7 @@ fun DisplayMTSScreen(viewModel: MTSViewModel) {
                         .padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Text(
-                        text = stringResource(R.string.result_mts), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold
+                        text = stringResource(R.string.result_hostel), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold
                     )
 
                     // ✅ ТВОИ оригинальные ресурсы!
@@ -185,7 +186,6 @@ fun DisplayMTSScreen(viewModel: MTSViewModel) {
                     Text(
                         text = stringResource(R.string.passed, result.daysFromPayment), fontWeight = FontWeight.Bold, color = Color(red = 0.02f, green = 0.4f, blue = 0.0f)
                     )
-
                     Text(
                         text = stringResource(R.string.next_payment, result.nextPayment), fontWeight = FontWeight.Bold, color = Color.Red
                     )
@@ -199,6 +199,8 @@ fun DisplayMTSScreen(viewModel: MTSViewModel) {
                     )
                 }
             }
+
+            // Отступ
             Spacer(modifier = Modifier.height(8.dp))
 
             // Кнопка ПОД Card
@@ -206,8 +208,13 @@ fun DisplayMTSScreen(viewModel: MTSViewModel) {
                 onClick = {
                     copySound?.start()
                     clipboardManager.setText(AnnotatedString(result.priceTariff.toString()))
-                    Toast.makeText(context, context.getString(R.string.amount_copied, result.priceTariff), Toast.LENGTH_SHORT).show()
-                }, modifier = Modifier.fillMaxWidth()
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.amount_copied, result.priceTariff),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                },
+                modifier = Modifier.fillMaxWidth()
             ) {
                 Text(stringResource(R.string.copy_amount))
             }
@@ -271,8 +278,7 @@ fun DisplayMTSScreen(viewModel: MTSViewModel) {
                             context, { _, year, month, day ->
                                 val date = GregorianCalendar(year, month, day).time
                                 val newDate = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(date)
-                                tempDate = newDate  // обновляем временную переменную
-                                // НЕ вызываем updateAccountData здесь!
+                                tempDate = newDate
                             }, now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH)
                         ).show()
                     }, modifier = Modifier.fillMaxWidth()
@@ -280,7 +286,7 @@ fun DisplayMTSScreen(viewModel: MTSViewModel) {
                     Text(stringResource(R.string.select_start_date, tempDate))
                 }
                 OutlinedTextField(
-                    value = tempNumber, onValueChange = { tempNumber = it }, label = { Text(stringResource(R.string.personal_account_label)) }, singleLine = true, modifier = Modifier.fillMaxWidth()
+                    value = tempNumber, onValueChange = { tempNumber = it }, label = { Text(stringResource(R.string.number_of_the_apartment_or_room)) }, singleLine = true, modifier = Modifier.fillMaxWidth()
                 )
             }
         }, confirmButton = {

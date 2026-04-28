@@ -1,5 +1,6 @@
 package com.github.misham72.communalpayments.presentation.screen.screens.heating
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.misham72.communalpayments.data.local.AccountPreferences
@@ -7,6 +8,7 @@ import com.github.misham72.communalpayments.domain.model.ValidationError
 import com.github.misham72.communalpayments.domain.repository.ZONTRepository
 import com.github.misham72.communalpayments.domain.userclasses.ZONT
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
+import com.github.misham72.communalpayments.presentation.utils.PdfHistoryExporter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -46,7 +48,16 @@ class ZONTViewModel(
         val savedNumber = accountPrefs.getAccount(SERVICE_KEY)
         val saveDate = accountPrefs.getCustomDate(SERVICE_KEY)
         val savedName = accountPrefs.getCustomName(SERVICE_KEY)
-        _uiState.update { it.copy(accountNumber = savedNumber, customServiceName = savedName, customDate = saveDate) }
+        val savedDay = accountPrefs.getPaymentDay(SERVICE_KEY)
+        val savedPeriod = accountPrefs.getPeriodMonths(SERVICE_KEY)
+        val savedTariff = accountPrefs.getTariff(SERVICE_KEY)
+        _uiState.update { it.copy(accountNumber = savedNumber, customServiceName = savedName, customDate = saveDate, paymentDay = savedDay, periodMonths = savedPeriod, priceTariff = savedTariff) }
+    }
+
+    fun onPdfExport(context: Context) {
+        viewModelScope.launch {
+            PdfHistoryExporter.exportAndShare(context, SERVICE_KEY)
+        }
     }
 
     fun openAccountDialog() {
@@ -113,6 +124,9 @@ class ZONTViewModel(
         viewModelScope.launch {
             zontRepository.saveZONTPayment(data)
             _uiState.update {
+                accountPrefs.savedPaymentDay(SERVICE_KEY, paymentDay.toString())
+                accountPrefs.savePeriodMonths(SERVICE_KEY, periodMonths.toString())
+                accountPrefs.saveTariff(SERVICE_KEY, priceTariff.toString())
                 it.copy(result = data, error = null)
 
             }

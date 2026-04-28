@@ -50,6 +50,7 @@ import com.github.misham72.communalpayments.presentation.utils.rememberCarSoundP
 import com.github.misham72.communalpayments.presentation.utils.rememberEditHistoryButtonSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberGarbageSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberGasSoundPlayer
+import com.github.misham72.communalpayments.presentation.utils.rememberHostelSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberInternetSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberMTSSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberOsagoSoundPlayer
@@ -103,6 +104,7 @@ fun SimpleHistoryScreen(
     val taxesSound = rememberTaxesSoundPlayer()
     val carSound = rememberCarSoundPlayer()
     val osagoSound = rememberOsagoSoundPlayer()
+    val hostelSound = rememberHostelSoundPlayer()
 
     // ↑↑↑ КОНЕЦ ДОБАВЛЕНИЯ ↑↑↑
     //🔴//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -167,7 +169,8 @@ fun SimpleHistoryScreen(
                 ServiceKeys.TINKOFF to R.string.service_display_name_tinkoff,
                 ServiceKeys.TAXES to R.string.service_display_name_taxes,
                 ServiceKeys.TROYKA to R.string.service_display_name_troyka,
-                ServiceKeys.OSAGO to R.string.service_display_name_osago
+                ServiceKeys.OSAGO to R.string.service_display_name_osago,
+                ServiceKeys.HOSTEL to R.string.service_display_name_hostel
             ).map { (key, nameRes) -> key to stringResource(nameRes) }
 
             services.forEach { (key, displayName) ->
@@ -184,6 +187,7 @@ fun SimpleHistoryScreen(
                     ServiceKeys.TAXES -> taxesSound
                     ServiceKeys.TROYKA -> carSound
                     ServiceKeys.OSAGO -> osagoSound
+                    ServiceKeys.HOSTEL -> hostelSound
                     else -> null
                 }
 

@@ -14,6 +14,8 @@ import com.github.misham72.communalpayments.presentation.screen.screens.gas.Disp
 import com.github.misham72.communalpayments.presentation.screen.screens.gas.GasViewModelFactory
 import com.github.misham72.communalpayments.presentation.screen.screens.heating.DisplayZONTScreen
 import com.github.misham72.communalpayments.presentation.screen.screens.heating.ZONTViewModelFactory
+import com.github.misham72.communalpayments.presentation.screen.screens.hostel.DisplayHostelScreen
+import com.github.misham72.communalpayments.presentation.screen.screens.hostel.HostelViewModelFactory
 import com.github.misham72.communalpayments.presentation.screen.screens.internet.DisplayInternetScreen
 import com.github.misham72.communalpayments.presentation.screen.screens.internet.InternetViewModelFactory
 import com.github.misham72.communalpayments.presentation.screen.screens.mts.DisplayMTSScreen
@@ -97,6 +99,12 @@ fun getListInitialScreen(): List<InitialScreen> {
             val context = LocalContext.current
             DisplayOsagoScreen(
                 viewModel = viewModel(factory = OsagoViewModelFactory(context))
+            )
+        }),
+        InitialScreen("\uD83D\uDECF\uFE0F ", stringResource(R.string.service_display_name_hostel), ServiceKeys.HOSTEL, {
+            val context = LocalContext.current
+            DisplayHostelScreen(
+                viewModel = viewModel(factory = HostelViewModelFactory(context))
             )
         })
     )

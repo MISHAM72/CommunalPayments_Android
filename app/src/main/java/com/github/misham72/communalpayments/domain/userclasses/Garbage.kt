@@ -15,6 +15,7 @@ class Garbage(private val calculator: PaymentDateCalculator) {
         val nextPayment: String,
         val daysUntilPayment: Long,
         val priceTariff: Double,
+        val periodMonths: String,
         val accountNumber: String,
         val startDate: Date?
     )
@@ -44,6 +45,7 @@ class Garbage(private val calculator: PaymentDateCalculator) {
             nextPayment = nextPayment,
             daysUntilPayment = daysUntil,
             priceTariff = priceTariff,
+            periodMonths = periodMonths.toString(),
             accountNumber = accountNumber,
             startDate = startDate
         )

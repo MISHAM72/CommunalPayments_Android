@@ -35,7 +35,8 @@ class PaymentNotificationWorker(
             ServiceKeys.TINKOFF to appContext.getString(R.string.service_display_name_tinkoff),
             ServiceKeys.TAXES to appContext.getString(R.string.service_display_name_taxes),
             ServiceKeys.TROYKA to appContext.getString(R.string.service_display_name_troyka),
-            ServiceKeys.OSAGO to appContext.getString(R.string.service_display_name_osago)
+            ServiceKeys.OSAGO to appContext.getString(R.string.service_display_name_osago),
+            ServiceKeys.HOSTEL to appContext.getString(R.string.service_display_name_hostel)
         )
 
         for ((key, name) in serviceNames) {

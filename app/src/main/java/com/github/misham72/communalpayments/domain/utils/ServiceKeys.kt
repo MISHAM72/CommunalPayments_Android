@@ -13,4 +13,5 @@ object ServiceKeys {
     const val TAXES: String = "taxes"
     const val TROYKA: String = "troyka"
     const val OSAGO: String = "osago"
+    const val HOSTEL: String = "hostel"
 }

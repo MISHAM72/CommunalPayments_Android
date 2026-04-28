@@ -1,5 +1,6 @@
 package com.github.misham72.communalpayments.presentation.screen.components
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -7,10 +8,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -26,14 +33,19 @@ fun ServiceTopBar(
     title: String,
     onEditClick: () -> Unit,
     onShareClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onPdfExport: () -> Unit = {}   // новый параметр с пустой реализацией по умолчанию
+
 ) {
     val clockCuCuSound = rememberClockCuCuSoundPlayer()
     val changeListSound = rememberChangeListSoundPlayer()
+    var showMenu by remember { mutableStateOf(false) }
+
     Row(
-        modifier = modifier.fillMaxWidth()
-        .height(33.dp) // явно задаём высоту 48 dp (было ~56-64)
-        .padding(horizontal = 2.dp), // убираем вертикальный padding, оставляем горизонтальный
+        modifier = modifier
+            .fillMaxWidth()
+            .height(33.dp)
+            .padding(horizontal = 2.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = androidx.compose.foundation.layout.Arrangement.SpaceBetween
     ) {
@@ -44,27 +56,49 @@ fun ServiceTopBar(
         )
         Row {
             IconButton(
-                onClick =
-                    {
-                        changeListSound?.start()
-                        onEditClick()
-                    }) {
+                onClick = {
+                    changeListSound?.start()
+                    onEditClick()
+                }
+            ) {
                 Icon(
                     Icons.Default.Edit,
                     contentDescription = stringResource(R.string.change_personal_account)
                 )
             }
-            IconButton(
-                onClick =
-                    {
-                        clockCuCuSound?.start()
-                        onShareClick()
-                    }) {
 
-                Icon(
-                    Icons.Default.Share,
-                    contentDescription = stringResource(R.string.export_history)
-                )
+            // Кнопка, открывающая меню
+            Box {
+                IconButton(
+                    onClick = {
+                        clockCuCuSound?.start()
+                        showMenu = true
+                    }
+                ) {
+                    Icon(
+                        Icons.Default.Share,
+                        contentDescription = stringResource(R.string.export_history)
+                    )
+                }
+                DropdownMenu(
+                    expanded = showMenu,
+                    onDismissRequest = { showMenu = false }
+                ) {
+                    DropdownMenuItem(
+                        text = { Text("Поделиться TXT") },
+                        onClick = {
+                            showMenu = false
+                            onShareClick()
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Экспорт PDF") },
+                        onClick = {
+                            showMenu = false
+                            onPdfExport()
+                        }
+                    )
+                }
             }
         }
     }

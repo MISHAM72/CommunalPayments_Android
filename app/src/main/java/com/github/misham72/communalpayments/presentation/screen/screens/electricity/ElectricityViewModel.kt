@@ -1,5 +1,6 @@
 package com.github.misham72.communalpayments.presentation.screen.screens.electricity
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.misham72.communalpayments.data.local.AccountPreferences
@@ -7,6 +8,7 @@ import com.github.misham72.communalpayments.domain.model.ValidationError
 import com.github.misham72.communalpayments.domain.repository.ElectricityRepository
 import com.github.misham72.communalpayments.domain.userclasses.Electricity
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
+import com.github.misham72.communalpayments.presentation.utils.PdfHistoryExporter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -14,9 +16,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class ElectricityViewModel(
-    private val electricity: Electricity, //✅ Зависимости приходят через конструктор (внедрение зависимостей)
-    private val electricityRepository: ElectricityRepository,  //✅ Зависимости приходят через конструктор (внедрение зависимостей)
-    private val accountPrefs: AccountPreferences   // новая зависимость
+    private val electricity: Electricity,
+    private val electricityRepository: ElectricityRepository,
+    private val accountPrefs: AccountPreferences
 ) : ViewModel() {  //✅ Класс наследуется от ViewModel() — будет жить при поворотах
     companion object {
         private const val SERVICE_KEY = ServiceKeys.ELECTRICITY
@@ -45,10 +47,24 @@ class ElectricityViewModel(
         val savedName = accountPrefs.getCustomName(SERVICE_KEY)
         val saveDate = accountPrefs.getCustomDate(SERVICE_KEY)
         val lastReading = accountPrefs.getLastReading(SERVICE_KEY)
+        val savedTariff = accountPrefs.getTariff(SERVICE_KEY)
         if (lastReading.isNotBlank()) {
             _uiState.update { it.copy(previousReading = lastReading) }
         }
-        _uiState.update { it.copy(accountNumber = savedNumber, customServiceName = savedName, customDate = saveDate) }
+        _uiState.update {
+            it.copy(
+                accountNumber = savedNumber,
+                customServiceName = savedName,
+                customDate = saveDate,
+                tariff = savedTariff
+            )
+        }
+    }
+
+    fun onPdfExport(context: Context) {
+        viewModelScope.launch {
+            PdfHistoryExporter.exportAndShare(context, SERVICE_KEY)
+        }
     }
 
     fun openAccountDialog() {
@@ -100,10 +116,11 @@ class ElectricityViewModel(
             current, previous, tariff, accountNumber = account
         )
 
-        viewModelScope.launch {
+        viewModelScope.launch {   // Кирпич (тариф) уже на витрине, но нам ещё нужно: Занести запись в складскую книгу (сохранить платёж в файл истории).
             electricityRepository.saveElectricityPayment(data)
             _uiState.update {
                 accountPrefs.saveLastReading(SERVICE_KEY, current.toString())
+                accountPrefs.saveTariff(SERVICE_KEY, tariff.toString())
                 it.copy(result = data, error = null)
 
 

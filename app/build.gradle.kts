@@ -1,3 +1,4 @@
+import org.gradle.kotlin.dsl.implementation
 import java.util.Properties
 
 /** Build.gradle.kts — подробные пояснения к программе (файл с инструкциями для печати конкретной детали), if Gradle 3D printer*/

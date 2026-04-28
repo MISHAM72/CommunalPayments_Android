@@ -15,7 +15,7 @@ class TinkoffRepositoryImpl(
         val dateTime = getCurrentDateTime()
         val serviceKey = ServiceKeys.TINKOFF
         val status = context.getString(R.string.status_calculated)
-        val content = formatWithAccountNumber(
+        var content = formatWithAccountNumber(
             accountNumber = data.accountNumber,
             dateTime = dateTime,
             serviceName = context.getString(R.string.service_display_name_tinkoff),
@@ -27,6 +27,10 @@ class TinkoffRepositoryImpl(
             isHistory = data.isHistory,
             customStatus = status
         )
+        // Добавляем период, если он задан
+        if (data.periodMonths.isNotBlank()) {
+            content += "\nПериод: ${data.periodMonths} мес."
+        }
         fileManager.appendRecord(serviceKey, content)
     }
 }

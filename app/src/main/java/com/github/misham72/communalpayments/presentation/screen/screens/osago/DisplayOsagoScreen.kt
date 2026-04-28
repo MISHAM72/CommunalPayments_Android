@@ -41,7 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.domain.model.ValidationError
-import com.github.misham72.communalpayments.domain.utils.HistoryExporter
+import com.github.misham72.communalpayments.presentation.utils.HistoryExporter
 import com.github.misham72.communalpayments.presentation.screen.components.ServiceTopBar
 import com.github.misham72.communalpayments.presentation.utils.BankPaymentHelper
 import com.github.misham72.communalpayments.presentation.utils.rememberBankButtonSoundPlayer
@@ -75,21 +75,22 @@ fun DisplayOsagoScreen(viewModel: OsagoViewModel) {
             .verticalScroll(rememberScrollState()), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(1.dp)
     ) {
         ServiceTopBar(
+            onPdfExport = { viewModel.onPdfExport(context) },
             title = uiState.customServiceName.ifBlank { stringResource(R.string.service_display_name_osago) }, onEditClick = { viewModel.openAccountDialog() }, onShareClick = {
-            scope.launch {
-                HistoryExporter.shareSingleHistory(context, viewModel.getServiceKey())
-            }
-        },
+                scope.launch {
+                    HistoryExporter.shareSingleHistory(context, viewModel.getServiceKey())
+                }
+            },
             modifier = Modifier.height(28.dp)
         )
         if (uiState.customDate.isNotBlank()) {
             Text(
-                text = stringResource(R.string.payment_date, uiState.customDate), fontSize = 14.sp, color = Color.Black, modifier = Modifier.padding(top = 1.dp)
+                text = stringResource(R.string.payment_date, uiState.customDate), fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurface, modifier = Modifier.padding(top = 1.dp)
             )
         }
         if (uiState.accountNumber.isNotBlank()) {
             Text(
-                text = stringResource(R.string.policy_number, uiState.accountNumber), fontSize = 14.sp, color = Color.Red, modifier = Modifier.padding(top = 1.dp)
+                text = stringResource(R.string.policy_number, uiState.accountNumber), fontSize = 14.sp, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(top = 1.dp)
             )
         }
         OutlinedTextField(

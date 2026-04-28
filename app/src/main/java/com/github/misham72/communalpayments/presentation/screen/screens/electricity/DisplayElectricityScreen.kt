@@ -40,7 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.domain.model.ValidationError
-import com.github.misham72.communalpayments.domain.utils.HistoryExporter
+import com.github.misham72.communalpayments.presentation.utils.HistoryExporter
 import com.github.misham72.communalpayments.presentation.screen.components.ServiceTopBar
 import com.github.misham72.communalpayments.presentation.utils.BankPaymentHelper
 import com.github.misham72.communalpayments.presentation.utils.rememberBankButtonSoundPlayer
@@ -76,6 +76,7 @@ fun DisplayElectricityScreen(viewModel: ElectricityViewModel) {
         verticalArrangement = Arrangement.spacedBy(1.dp)
     ) {
         ServiceTopBar(
+            onPdfExport = { viewModel.onPdfExport(context) },
             title = uiState.customServiceName.ifBlank { stringResource(R.string.service_display_name_electricity) },
             onEditClick = { viewModel.openAccountDialog() },
             onShareClick = {
@@ -87,12 +88,12 @@ fun DisplayElectricityScreen(viewModel: ElectricityViewModel) {
         )
         if (uiState.customDate.isNotBlank()) {
             Text(
-                text = stringResource(R.string.payment_date, uiState.customDate), fontSize = 14.sp, color = Color.Black, modifier = Modifier.padding(top = 1.dp)
+                text = stringResource(R.string.payment_date, uiState.customDate), fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurface, modifier = Modifier.padding(top = 1.dp)
             )
         }
         if (uiState.accountNumber.isNotBlank()) {
             Text(
-                text = stringResource(R.string.personal_account, uiState.accountNumber), fontSize = 14.sp, color = Color.Red, modifier = Modifier.padding(top = 1.dp)
+                text = stringResource(R.string.personal_account, uiState.accountNumber), fontSize = 14.sp, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(top = 1.dp)
             )
         }
         OutlinedTextField(
@@ -217,7 +218,6 @@ fun DisplayElectricityScreen(viewModel: ElectricityViewModel) {
                 }
             }
         }
-
         AlertDialog(onDismissRequest = { showBankDialog = false }, title = { Text(stringResource(R.string.select_bank)) }, text = {
             Column {
                 if (installedBanks.isEmpty()) {
@@ -239,6 +239,7 @@ fun DisplayElectricityScreen(viewModel: ElectricityViewModel) {
                 Text(stringResource(R.string.cancel))
             }
         })
+
     }
     if (uiState.showAccountDialog) {
         AlertDialog(onDismissRequest = viewModel::closeAccountDialog, title = { Text(stringResource(R.string.editing)) }, text = {

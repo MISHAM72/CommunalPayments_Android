@@ -98,3 +98,6 @@ fun rememberCarSoundPlayer(): MediaPlayer? = rememberSoundPlayer(R.raw.car_pass)
 @Composable
 fun rememberOsagoSoundPlayer(): MediaPlayer? = rememberSoundPlayer(R.raw.osago_sound)
 
+@Composable
+fun rememberHostelSoundPlayer(): MediaPlayer? = rememberSoundPlayer(R.raw.mens_chrap_soundmp3)
+
