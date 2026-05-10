@@ -7,13 +7,13 @@ plugins {
     alias(libs.plugins.kotlin.compose)    // Подключаем Compose Compiler Plugin
 }
 
-//@Suppress("HardcodedStringLiteral")
+@Suppress("HardcodedStringLiteral")
 val proguardAndroidOptimize: String = "proguard-android-optimize.txt"
 
-//@Suppress("HardcodedStringLiteral")
+@Suppress("HardcodedStringLiteral")
 val proguardRulesPro: String = "proguard-rules.pro"
 
-//@Suppress("HardcodedStringLiteral")
+@Suppress("HardcodedStringLiteral")
 val composeUiTextGoogleFonts: String = "androidx.compose.ui:ui-text-google-fonts:1.6.1"
 
 android {  // ... настройки AGP ...
@@ -26,7 +26,7 @@ android {  // ... настройки AGP ...
     if (keystorePropertiesFile.exists()) {
         keystoreProperties.load(keystorePropertiesFile.inputStream())
     }
-
+    @Suppress("HardcodedStringLiteral")
     // Добавляем конфигурацию подписи, относятся только к вашему ключу подписи.
     signingConfigs {
         create("release") {
@@ -39,12 +39,13 @@ android {  // ... настройки AGP ...
     defaultConfig {
         applicationId = "com.github.misham72.communalpayments" // Это уникальный идентификатор
         // вашего приложения в системе Android и в магазинах приложений (Google Play, RuStore).
-        minSdk = 24  // Минимальная версия Android, на которой будет работать приложение.
-        targetSdk = 36  //Версия Android, под которую вы оптимизировали приложение.
-        versionCode = 12
-        versionName = "2.4.1"
+        minSdk = 26
+        targetSdk = 36
+        versionCode = 15
+        versionName = "2.4.4"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"  // Стандартный раннер для тестов на устройстве/эмуляторе. Если вы не пишете тесты, эта строка всё равно нужна для корректной работы
     }
+    @Suppress("HardcodedStringLiteral")
     // Мы видим блок buildTypes, который определяет конфигурации для отладочной (debug) и релизной (release) сборок приложения.
     buildTypes {
         debug { // Debug подписываем тем же ключом, что и Release. Debug — это встроенный тип сборки, который используется по умолчанию при нажатии кнопки Run (зелёный треугольник) в Android Studio.

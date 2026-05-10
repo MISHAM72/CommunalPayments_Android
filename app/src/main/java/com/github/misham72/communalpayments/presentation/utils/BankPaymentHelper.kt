@@ -44,6 +44,7 @@ object BankPaymentHelper {
     // Функция для открытия страницы приложения в магазине
     private fun openInStore(context: Context, bank: BankInfo) {
         try {
+            @Suppress("HardcodedStringLiteral")
             val storeIntent = Intent(Intent.ACTION_VIEW, "market://details?id=${bank.packageName}".toUri())
             context.startActivity(storeIntent)
         } catch (_: Exception) {

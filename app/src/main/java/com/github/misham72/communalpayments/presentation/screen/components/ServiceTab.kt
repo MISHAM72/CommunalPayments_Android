@@ -15,7 +15,6 @@ import androidx.compose.ui.unit.sp
 import com.github.misham72.communalpayments.domain.utils.DateUtils
 import com.github.misham72.communalpayments.presentation.screen.navigation.InitialScreen
 
-
 @Composable
 fun ServiceTab(
     modifier: Modifier = Modifier,

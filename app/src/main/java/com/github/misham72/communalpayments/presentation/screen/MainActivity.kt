@@ -11,24 +11,31 @@ import android.Manifest
 import androidx.appcompat.app.AppCompatActivity
 import com.github.misham72.communalpayments.presentation.theme.ThemePrefs
 import com.github.misham72.communalpayments.presentation.utils.LanguageManager
+import androidx.core.view.WindowCompat
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.ui.Modifier
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)  // 1. Сначала всегда super
+
+        // 2. Затем все инициализации, использующие Context
         LanguageManager.applySavedLanguage(this)
 
-        // Определяем, включена ли системная тёмная тема (без @Composable)
         val isSystemDarkTheme = (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
-
         val themeMode = ThemePrefs.getThemeMode(this)
         val useDarkTheme = when (themeMode) {
             ThemePrefs.MODE_LIGHT -> false
             ThemePrefs.MODE_DARK -> true
-            else -> isSystemDarkTheme  // MODE_SYSTEM
+            else -> isSystemDarkTheme
         }
 
-        super.onCreate(savedInstanceState)
+        // 3. Настройка edge-to-edge
+        WindowCompat.setDecorFitsSystemWindows(window, false)
 
-        // Запрашиваем разрешение на уведомления для Android 13+
+        // 4. Запрос разрешений
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             ActivityCompat.requestPermissions(
                 this,
@@ -37,9 +44,16 @@ class MainActivity : AppCompatActivity() {
             )
         }
 
+        // 5. Установка контента
         setContent {
             AppTheme(darkTheme = useDarkTheme, dynamicColor = false) {
-                ControlBetweenScreens()
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .systemBarsPadding()
+                ) {
+                    ControlBetweenScreens()
+                }
             }
         }
     }

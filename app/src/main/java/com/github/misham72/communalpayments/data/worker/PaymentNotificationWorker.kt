@@ -3,7 +3,6 @@ package com.github.misham72.communalpayments.data.worker
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
-import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
@@ -57,17 +56,16 @@ class PaymentNotificationWorker(
         val channelId = context.getString(R.string.payment_reminder_channel) + "_" + key
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            // Создаём канал с уникальным именем
-            val channel = NotificationChannel(
-                channelId,
-                context.getString(R.string.notifications, serviceName), // человекочитаемое имя
-                NotificationManager.IMPORTANCE_HIGH
-            ).apply {
-                description = context.getString(R.string.notifications_about_upcoming_service_payments)
-            }
-            notificationManager.createNotificationChannel(channel)
+        // Создаём канал с уникальным именем
+        val channel = NotificationChannel(
+            channelId,
+            context.getString(R.string.notifications, serviceName), // человекочитаемое имя
+            NotificationManager.IMPORTANCE_HIGH
+        ).apply {
+            description = context.getString(R.string.notifications_about_upcoming_service_payments)
         }
+        notificationManager.createNotificationChannel(channel)
+
 
         val message = when (daysLeft) {
             1 -> context.getString(R.string.payment_tomorrow, serviceName)
@@ -75,7 +73,7 @@ class PaymentNotificationWorker(
         }
 
         val notification = NotificationCompat.Builder(context, channelId)
-            .setSmallIcon(R.mipmap.winter_house_foreground)
+            .setSmallIcon(R.mipmap.winter_house)
             .setContentText(message)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)

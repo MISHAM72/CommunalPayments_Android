@@ -85,14 +85,14 @@ fun ServiceTopBar(
                     onDismissRequest = { showMenu = false }
                 ) {
                     DropdownMenuItem(
-                        text = { Text("Поделиться TXT") },
+                        text = { Text(stringResource(R.string.export_txt)) },
                         onClick = {
                             showMenu = false
                             onShareClick()
                         }
                     )
                     DropdownMenuItem(
-                        text = { Text("Экспорт PDF") },
+                        text = { Text(stringResource(R.string.export_pdf)) },
                         onClick = {
                             showMenu = false
                             onPdfExport()

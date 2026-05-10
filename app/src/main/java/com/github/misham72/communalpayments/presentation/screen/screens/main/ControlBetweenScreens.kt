@@ -98,6 +98,7 @@ fun ControlBetweenScreens() {
     fun onNavigateBack() {
         showHistory = false
     }
+
     if (showHistory) {
         SimpleHistoryScreen(
             onBack = { onNavigateBack() }, initialService = services[selectedService].fileKey
@@ -116,7 +117,7 @@ fun ControlBetweenScreens() {
                     modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        stringResource(R.string.app_title), fontSize = 24.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground
+                        stringResource(R.string.app_name), fontSize = 24.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground
                     )
                     Row(
                         modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically

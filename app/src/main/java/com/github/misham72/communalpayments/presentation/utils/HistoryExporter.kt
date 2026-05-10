@@ -12,6 +12,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+@Suppress("HardcodedStringLiteral")
 object HistoryExporter {
     private const val DATE_FORMAT_FILENAME = "yyyyMMdd_HHmmss"
     suspend fun shareSingleHistory(context: Context, serviceKey: String): Unit = withContext(Dispatchers.IO) {

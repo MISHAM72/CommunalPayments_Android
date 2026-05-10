@@ -1,8 +1,7 @@
 <resources>
     // заголовок
-    <string name="app_name">CommunalPayments</string>
+    <string name="app_name">Коммунальные платежи</string>
     <string name="summer_night">Summer night at the back of the house</string>
-    <string name="app_title">Communal Payments</string>
 
     // НАЗВАНИЯ ВКЛАДОК В ИСТОРИИ
 
@@ -178,5 +177,8 @@
     <string name="pdf_all_history_title">pdf_all_history_title</string>
     <string name="pdf_generated">pdf_generated: %s</string>
     <string name="export_all_pdf_title">export_all_pdf_title</string>
+    <string name="period_months_format">period: %d mo.</string>
+    <string name="export_txt">export_txt</string>
+    <string name="export_pdf">export_pdf</string>
 </resources>
 

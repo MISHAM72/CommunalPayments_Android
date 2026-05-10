@@ -30,7 +30,7 @@ class HostelRepositoryImpl(
         )
         // Добавляем период, если он задан
         if (data.periodMonths.isNotBlank()) {
-            content += "\nПериод: ${data.periodMonths} мес."
+            content += context.getString(R.string.period_months_format)
         }
         fileManager.appendRecord(serviceKey, content)
     }

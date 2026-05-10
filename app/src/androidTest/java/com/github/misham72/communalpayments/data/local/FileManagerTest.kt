@@ -29,7 +29,7 @@ class FileManagerTest {
     }
 
     // ========== readHistory ==========
-
+    @Suppress("HardcodedStringLiteral")
     @Test   // Зачем? JUnit находит и запускает методы с этой аннотацией.
     fun readHistory_returnsEmptyMessage_whenFileDoesNotExist() {
         runBlocking {   // runBlocking { ... } для тестирования suspend-функций, зачем? Превращает корутину в обычную блокирующую операцию (для тестов)
@@ -39,10 +39,11 @@ class FileManagerTest {
         }
     }
 
+    @Suppress("HardcodedStringLiteral")
     @Test   // Зачем? JUnit находит и запускает методы с этой аннотацией.
     fun readHistory_returnsFileContent_whenFileExists() {
         runBlocking {   // runBlocking { ... } для тестирования suspend-функций, зачем? Превращает корутину в обычную блокирующую операцию (для тестов)
-            val serviceKey = "electricity"
+            val serviceKey = context.getString(com.github.misham72.communalpayments.R.string.service_display_name_electricity)
             val content = "2025-01-01: 100 kWh\n2025-02-01: 120 kWh"
             fileManager.saveToFile(content, "$serviceKey.txt")
             val result = fileManager.readHistory(serviceKey)
@@ -51,7 +52,7 @@ class FileManagerTest {
     }
 
     // ========== saveToFile ==========
-
+    @Suppress("HardcodedStringLiteral")
     @Test
     fun saveToFile_createsFileWithContent() {
         val fileName = "test_save.txt"
@@ -67,7 +68,7 @@ class FileManagerTest {
     }
 
     // ========== appendRecord ==========
-
+    @Suppress("HardcodedStringLiteral")
     @Test
     fun appendRecord_createsFileWithFirstRecord() {
         runBlocking {   // runBlocking { ... } для тестирования suspend-функций, зачем? Превращает корутину в обычную блокирующую операцию (для тестов)
@@ -80,6 +81,8 @@ class FileManagerTest {
             assertThat(file.readText()).isEqualTo(record)    // Зачем? Проверяют, соответствует ли реальное поведение ожидаемому.
         }
     }
+
+    @Suppress("HardcodedStringLiteral")
     @Test
     fun appendRecord_addsNewRecordAtTop() {
         // runBlocking { } – только если тестируемый метод является suspend fun. Если нет – runBlocking не нужен.

@@ -1,8 +1,7 @@
 <resources>
     // заголовок
-    <string name="app_name">CommunalPayments</string>
+    <string name="app_name">Коммунальные платежи</string>
     <string name="summer_night">Летняя ночь сзади дома</string>
-    <string name="app_title">Коммунальные платежи</string>
 
     // ИСТОРИЯ
 
@@ -197,5 +196,9 @@
     <string name="pdf_all_history_title">Общая история</string>
     <string name="pdf_generated">Сформировано: %s</string> <!-- можешь переиспользовать formed, но он без даты -->
     <string name="export_all_pdf_title">Общая история PDF</string>
+    <string name="period_months_format">Период: %d мес.</string>
+    <string name="export_txt">Поделиться TXT</string>
+    <string name="export_pdf">Экспорт PDF</string>
+
 </resources>
 
