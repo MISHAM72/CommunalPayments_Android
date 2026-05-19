@@ -3,14 +3,14 @@ package com.github.misham72.communalpayments.data.repository
 import android.content.Context
 import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.data.local.FileManager
+import com.github.misham72.communalpayments.domain.model.OsagoData
 import com.github.misham72.communalpayments.domain.repository.OsagoRepository
-import com.github.misham72.communalpayments.domain.userclasses.Osago
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 
 class OsagoRepositoryImpl(
     context: Context, fileManager: FileManager
 ) : BasePeriodicRepositoryWithAccount(context, fileManager), OsagoRepository {
-    override suspend fun saveOsagoPayment(data: Osago.OsagoData) {
+    override suspend fun saveOsagoPayment(data: OsagoData) {
         val dateTime = getCurrentDateTime()
         val serviceKey = ServiceKeys.OSAGO
         val status = context.getString(R.string.status_calculated)

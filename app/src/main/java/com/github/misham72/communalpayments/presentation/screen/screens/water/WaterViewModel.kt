@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.misham72.communalpayments.data.local.AccountPreferences
 import com.github.misham72.communalpayments.domain.model.ValidationError
+import com.github.misham72.communalpayments.domain.model.WaterData
 import com.github.misham72.communalpayments.domain.repository.WaterRepository
 import com.github.misham72.communalpayments.domain.userclasses.Water
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
@@ -33,7 +34,7 @@ class WaterViewModel(
         val customDate: String = "",
         val customServiceName: String = "",
         val showAccountDialog: Boolean = false,   // флаг для диалога
-        val result: Water.WaterData? = null,
+        val result: WaterData? = null,
         val error: ValidationError? = null
     )
 
@@ -91,9 +92,9 @@ class WaterViewModel(
     fun getServiceKey(): String = SERVICE_KEY
 
     fun onCalculateClick() {
-        val current = _uiState.value.currentReading.toDoubleOrNull() //Преобразует строки из полей ввода в числа (или null, если введена ерунда).
-        val previous = _uiState.value.previousReading.toDoubleOrNull() //Преобразует строки из полей ввода в числа (или null, если введена ерунда).
-        val tariff = _uiState.value.tariff.toDoubleOrNull() //Преобразует строки из полей ввода в числа (или null, если введена ерунда).
+        val current = _uiState.value.currentReading.toDoubleOrNull()
+        val previous = _uiState.value.previousReading.toDoubleOrNull()
+        val tariff = _uiState.value.tariff.toDoubleOrNull()
         val account = _uiState.value.accountNumber
 
         if (current == null || previous == null || tariff == null) {
@@ -108,9 +109,15 @@ class WaterViewModel(
             waterRepository.saveWaterPayment(data)
             accountPrefs.saveLastReading(SERVICE_KEY, current.toString())
             accountPrefs.saveTariff(SERVICE_KEY, tariff.toString())
-            _uiState.update {
-                it.copy(result = data, error = null)
 
+            // ✅ Переносим текущее показание в предыдущее прямо сейчас
+            _uiState.update { currentState ->
+                currentState.copy(
+                    previousReading = currentState.currentReading, // перенос
+                    currentReading = "",                           // очистка для следующего ввода
+                    result = data,
+                    error = null
+                )
             }
         }
     }

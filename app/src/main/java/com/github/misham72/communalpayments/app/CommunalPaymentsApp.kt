@@ -3,7 +3,6 @@ package com.github.misham72.communalpayments.app
 import android.app.Application
 import com.github.misham72.communalpayments.data.worker.NotificationScheduler
 
-@Suppress("ClassHasOnlyDependenciesInSamePackage")
 class CommunalPaymentsApp : Application() {
     override fun onCreate() {
         super.onCreate()

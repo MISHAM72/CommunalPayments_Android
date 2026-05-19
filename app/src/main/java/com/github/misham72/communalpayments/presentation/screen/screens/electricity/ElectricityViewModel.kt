@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.misham72.communalpayments.data.local.AccountPreferences
+import com.github.misham72.communalpayments.domain.model.ElectricityData
 import com.github.misham72.communalpayments.domain.model.ValidationError
 import com.github.misham72.communalpayments.domain.repository.ElectricityRepository
 import com.github.misham72.communalpayments.domain.userclasses.Electricity
@@ -33,7 +34,7 @@ class ElectricityViewModel(
         val customServiceName: String = "",
         val showAccountDialog: Boolean = false,   // флаг для диалога
         val customDate: String = "", // дата, сохранённая в SharedPreferences
-        val result: Electricity.ElectricityData? = null,
+        val result: ElectricityData? = null,
         val error: ValidationError? = null,
 
         )
@@ -118,12 +119,17 @@ class ElectricityViewModel(
 
         viewModelScope.launch {   // Кирпич (тариф) уже на витрине, но нам ещё нужно: Занести запись в складскую книгу (сохранить платёж в файл истории).
             electricityRepository.saveElectricityPayment(data)
-            _uiState.update {
-                accountPrefs.saveLastReading(SERVICE_KEY, current.toString())
-                accountPrefs.saveTariff(SERVICE_KEY, tariff.toString())
-                it.copy(result = data, error = null)
+            accountPrefs.saveLastReading(SERVICE_KEY, current.toString())
+            accountPrefs.saveTariff(SERVICE_KEY, tariff.toString())
 
-
+            // ✅ Переносим текущее показание в предыдущее прямо сейчас
+            _uiState.update { currentState ->
+                currentState.copy(
+                    previousReading = currentState.currentReading, // перенос
+                    currentReading = "",                           // очистка для следующего ввода
+                    result = data,
+                    error = null
+                )
             }
         }
     }

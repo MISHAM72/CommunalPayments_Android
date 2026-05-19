@@ -18,7 +18,7 @@ class MTSViewModelFactory(context: Context) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MTSViewModel::class.java)) {
-            @Suppress("HardcodedStringLiteral", "UNCHECKED_CAST") return MTSViewModel(mts, mtsRepository, accountPrefs) as T
+            @Suppress("HardcodedStringLiteral") return MTSViewModel(mts, mtsRepository, accountPrefs) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
     }

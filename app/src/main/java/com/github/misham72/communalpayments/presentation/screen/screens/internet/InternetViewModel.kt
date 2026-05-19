@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.misham72.communalpayments.data.local.AccountPreferences
+import com.github.misham72.communalpayments.domain.model.InternetData
 import com.github.misham72.communalpayments.domain.model.ValidationError
 import com.github.misham72.communalpayments.domain.repository.InternetRepository
 import com.github.misham72.communalpayments.domain.userclasses.Internet
@@ -35,7 +36,7 @@ class InternetViewModel(
         val customDate: String = "",
         val customServiceName: String = "",
         val showAccountDialog: Boolean = false,
-        val result: Internet.InternetData? = null,
+        val result: InternetData? = null,
         val error: ValidationError? = null,
     )
 

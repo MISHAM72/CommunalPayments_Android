@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.misham72.communalpayments.data.local.AccountPreferences
+import com.github.misham72.communalpayments.domain.model.HostelData
 import com.github.misham72.communalpayments.domain.model.ValidationError
 import com.github.misham72.communalpayments.domain.repository.HostelRepository
 import com.github.misham72.communalpayments.domain.userclasses.Hostel
@@ -37,7 +38,7 @@ class HostelViewModel(
         val customDate: String = "",
         val customServiceName: String = "",
         val showAccountDialog: Boolean = false,
-        val result: Hostel.HostelData? = null,
+        val result: HostelData? = null,
         val error: ValidationError? = null,
     )
 

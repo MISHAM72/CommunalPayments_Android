@@ -18,7 +18,7 @@ class OsagoViewModelFactory(context: Context) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(OsagoViewModel::class.java)) {
-            @Suppress("HardcodedStringLiteral", "UNCHECKED_CAST") return OsagoViewModel(osago, osagoRepository, accountPrefs) as T
+            @Suppress("HardcodedStringLiteral") return OsagoViewModel(osago, osagoRepository, accountPrefs) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
     }

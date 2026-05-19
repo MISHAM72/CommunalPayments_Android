@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.misham72.communalpayments.data.local.AccountPreferences
+import com.github.misham72.communalpayments.domain.model.GasData
 import com.github.misham72.communalpayments.domain.model.ValidationError
 import com.github.misham72.communalpayments.domain.repository.GasRepository
 import com.github.misham72.communalpayments.domain.userclasses.Gas
@@ -33,7 +34,7 @@ class GasViewModel(
         val customServiceName: String = "",
         val customDate: String = "", // дата, сохранённая в SharedPreferences
         val showAccountDialog: Boolean = false,   // флаг для диалога
-        val result: Gas.GasData? = null,
+        val result: GasData? = null,
         val error: ValidationError? = null,
     )
 
@@ -110,12 +111,17 @@ class GasViewModel(
 
         viewModelScope.launch {
             gasRepository.saveGasPayment(data)
-            _uiState.update {
-                accountPrefs.saveLastReading(SERVICE_KEY, current.toString())
-                accountPrefs.saveTariff(SERVICE_KEY, tariff.toString())
-                it.copy(result = data, error = null)
+            accountPrefs.saveLastReading(SERVICE_KEY, current.toString())
+            accountPrefs.saveTariff(SERVICE_KEY, tariff.toString())
 
-
+            // ✅ Переносим текущее показание в предыдущее прямо сейчас
+            _uiState.update { currentState ->
+                currentState.copy(
+                    previousReading = currentState.currentReading, // перенос
+                    currentReading = "",                           // очистка для следующего ввода
+                    result = data,
+                    error = null
+                )
             }
         }
     }

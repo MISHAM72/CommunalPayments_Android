@@ -94,11 +94,11 @@ object PdfHistoryExporter {
                         isMeter = true
                     }
 
-                    trimmed.startsWith("Расход:") -> consumption = trimmed.substringAfter(":").replace("-", "").trim()
-                    trimmed.startsWith("К оплате:") -> amount = trimmed.substringAfter(":").replace("-", "").replace(context.getString(R.string.ru), "").trim()
-                    trimmed.startsWith("Тариф:") -> tariff = trimmed.substringAfter(":").replace(context.getString(R.string.ru), "").trim()
-                    trimmed.startsWith("Дата оплаты:") -> paymentDay = trimmed.substringAfter(":").trim()
-                    trimmed.startsWith("Период:") -> periodMonths = trimmed.substringAfter(":").replace(context.getString(R.string.mo), "").trim()
+                    trimmed.startsWith(context.getString(R.string.consumption)) -> consumption = trimmed.substringAfter(":").replace("-", "").trim()
+                    trimmed.startsWith(context.getString(R.string.to_be_paid)) -> amount = trimmed.substringAfter(":").replace("-", "").replace(context.getString(R.string.ru), "").trim()
+                    trimmed.startsWith(context.getString(R.string.tariff)) -> tariff = trimmed.substringAfter(":").replace(context.getString(R.string.ru), "").trim()
+                    trimmed.startsWith(context.getString(R.string.payment_date)) -> paymentDay = trimmed.substringAfter(":").trim()
+                    trimmed.startsWith(context.getString(R.string.period)) -> periodMonths = trimmed.substringAfter(":").replace(context.getString(R.string.mo), "").trim()
                     // Статусы с эмодзи (эмодзи остаются)
                     trimmed.startsWith("\uD83D\uDD34") -> status = trimmed   // 🔴
                     trimmed.startsWith("\u23F3") -> status = trimmed          // ⏳
@@ -173,7 +173,7 @@ object PdfHistoryExporter {
         val label = context.getString(R.string.formed)
         val labelWidth = labelPaint.measureText(label)
         canvas.drawText(label, leftMargin, y, labelPaint)
-        val dateStr = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault()).format(Date())
+        val dateStr = SimpleDateFormat(context.getString(R.string.yyyy_mm_dd_hh_mm_ss), Locale.getDefault()).format(Date())
         canvas.drawText(dateStr, leftMargin + labelWidth, y, infoPaint) // infoPaint с синим и подчёркиванием
         y += 25
 
@@ -207,7 +207,7 @@ object PdfHistoryExporter {
             canvas.drawText(context.getString(R.string.pdf_table_previous), xPrev, y, headerFont)
             canvas.drawText(context.getString(R.string.pdf_table_current), xCurr, y, headerFont)
             canvas.drawText(context.getString(R.string.pdf_table_consumption), xCons, y, headerFont)
-            canvas.drawText(context.getString(R.string.pdf_table_tariff), xTariff, y, headerFont)
+            canvas.drawText(context.getString(R.string.tariff), xTariff, y, headerFont)
             canvas.drawText(context.getString(R.string.pdf_table_amount), xAmnt, y, headerFont)
             canvas.drawText(context.getString(R.string.pdf_table_status), xStat, y, headerFont)
             y += 25   // Если убрать, то данные смещаются на заголовки
@@ -232,7 +232,7 @@ object PdfHistoryExporter {
             canvas.drawText(context.getString(R.string.pdf_table_date), xDate, y, headerFont)
             canvas.drawText(context.getString(R.string.pdf_table_period), xPer, y, headerFont)
             canvas.drawText(context.getString(R.string.pdf_table_payment_day), xDay, y, headerFont)
-            canvas.drawText(context.getString(R.string.pdf_table_tariff), xTariff, y, headerFont)
+            canvas.drawText(context.getString(R.string.tariff), xTariff, y, headerFont)
             canvas.drawText(context.getString(R.string.pdf_table_status), xStat, y, headerFont)
             y += 25
 
@@ -374,7 +374,7 @@ object PdfHistoryExporter {
         // Главный заголовок (только на первой странице)
         canvas.drawText(context.getString(R.string.pdf_all_history_title), leftMargin, y, titlePaint)
         y += 35
-        val dateStr = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault()).format(Date())
+        val dateStr = SimpleDateFormat(context.getString(R.string.yyyy_mm_dd_hh_mm_ss), Locale.getDefault()).format(Date())
         canvas.drawText(
             context.getString(R.string.pdf_generated, dateStr),
             leftMargin, y, infoFont
@@ -384,9 +384,16 @@ object PdfHistoryExporter {
         val grouped = records.groupBy { it.first }
 
         val serviceOrder = listOf(
-            "Свет", "Вода", "Газ", "Мусор", "Отопление", "Интернет",
-            "Телефона 1", "Телефона 2", "Налог на бизнес", "Проездной билет",
-            "Автострахование", "Общежитие"
+            context.getString(R.string.service_display_name_electricity),
+            context.getString(R.string.service_display_name_water),
+            context.getString(R.string.service_display_name_gas),
+            context.getString(R.string.service_display_name_garbage),
+            context.getString(R.string.service_display_name_mts),
+            context.getString(R.string.service_display_name_tinkoff),
+            context.getString(R.string.service_display_name_taxes),
+            context.getString(R.string.service_display_name_troyka),
+            context.getString(R.string.service_display_name_osago),
+            context.getString(R.string.service_display_name_hostel),
         )
         val orderMap = serviceOrder.withIndex().associate { it.value to it.index }
         val sortedGroups = grouped.entries.sortedBy { orderMap[it.key] ?: Int.MAX_VALUE }
@@ -398,9 +405,9 @@ object PdfHistoryExporter {
 
         // Вспомогательная функция для рисования заголовков колонок
         fun drawColumnHeaders(canvas: Canvas, yPos: Float) {
-            canvas.drawText("Дата", xDate, yPos, headerFont)
-            canvas.drawText("Сумма", xAmount, yPos, headerFont)
-            canvas.drawText("Статус", xStatus, yPos, headerFont)
+            canvas.drawText(context.getString(R.string.pdf_table_date), xDate, yPos, headerFont)
+            canvas.drawText(context.getString(R.string.pdf_table_amount), xAmount, yPos, headerFont)
+            canvas.drawText(context.getString(R.string.status_label), xStatus, yPos, headerFont)
         }
 
         for ((serviceName, serviceRecords) in sortedGroups) {
@@ -417,7 +424,7 @@ object PdfHistoryExporter {
             val account = accountMap[serviceName]?.takeIf { it.isNotBlank() }
             if (account != null) {
                 canvas.drawText(serviceName, leftMargin, y, serviceHeaderFont)
-                val accountLabel = " (л/с: $account)"
+                val accountLabel = context.getString(R.string.personal_account)
                 val serviceNameWidth = serviceHeaderFont.measureText(serviceName)
                 canvas.drawText(accountLabel, leftMargin + serviceNameWidth, y, accountPaint)
             } else {
@@ -430,7 +437,7 @@ object PdfHistoryExporter {
             y += 20
 
             // Сортировка записей внутри услуги
-            val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+            val dateFormat = SimpleDateFormat(context.getString(R.string.yyyy_mm_dd_hh_mm_ss), Locale.getDefault())
             val sortedRecords = serviceRecords.sortedByDescending { record ->
                 try {
                     dateFormat.parse(record.second.date)?.time ?: 0L

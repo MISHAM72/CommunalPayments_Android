@@ -111,6 +111,7 @@
     <string name="change_personal_account">Change your personal account</string>
 
     <string name="account_prefs">Account Settings</string>
+    <string name="total_mount_year">total_mount %1$d year</string>
     <string name="unknown_error">Unknown error</string>
     <string name="editing">Editing</string>
     <string name="service_name_label">Name of the service</string>
@@ -129,6 +130,7 @@
     <string name="error_invalid_input">Incorrect input</string>
     <string name="menu">Menu</string>
     <string name="exit">Exit</string>
+    <string name="error">error</string>
     <string name="error_saving">Data saving error</string>
 
     <string name="notifications_about_upcoming_service_payments">notifications_upcoming_payments</string>
@@ -169,7 +171,6 @@
     <string name="pdf_table_previous">pdf_table_previous</string>
     <string name="pdf_table_current">pdf_table_current</string>
     <string name="pdf_table_consumption">pdf_table_consumption</string>
-    <string name="pdf_table_tariff">pdf_table_tariff</string>
     <string name="pdf_table_amount">pdf_table_amount</string>
     <string name="pdf_table_status">pdf_table_status</string>
     <string name="pdf_table_period">pdf_table_period</string>
@@ -180,5 +181,16 @@
     <string name="period_months_format">period: %d mo.</string>
     <string name="export_txt">export_txt</string>
     <string name="export_pdf">export_pdf</string>
+    <string name="In_total">In_total</string>
+    <string name="Annual_costs_for_all_services">Annual_costs_for_all_services</string>
+    <string name="error_load_default">error_load_default</string>
+    <string name="amount_format">%,.2f ₽t</string>
+    <string name="amount_format_whole">>%,.0f</string>
+    <string name="back_with_arrow">back_with_arrow</string>
+    <string name="tariff">tariff</string>
+    <string name="period">period</string>
+    <string name="no_data">no_data</string>
+
+
 </resources>
 

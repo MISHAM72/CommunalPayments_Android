@@ -3,15 +3,15 @@ package com.github.misham72.communalpayments.data.repository
 import android.content.Context
 import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.data.local.FileManager
+import com.github.misham72.communalpayments.domain.model.GasData
 import com.github.misham72.communalpayments.domain.repository.GasRepository
-import com.github.misham72.communalpayments.domain.userclasses.Gas
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 
 class GasRepositoryImpl(
     context: Context, fileManager: FileManager
 ) : BaseMeterRepositoryWithAccount(context, fileManager), GasRepository {
 
-    override suspend fun saveGasPayment(data: Gas.GasData) {
+    override suspend fun saveGasPayment(data: GasData) {
         val dateTime = getCurrentDateTime()
         val serviceKey = ServiceKeys.GAS
         val status = context.getString(R.string.status_calculated)

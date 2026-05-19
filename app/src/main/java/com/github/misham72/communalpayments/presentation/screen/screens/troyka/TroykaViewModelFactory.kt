@@ -18,7 +18,7 @@ class TroykaViewModelFactory(context: Context) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(TroykaViewModel::class.java)) {
-            @Suppress("HardcodedStringLiteral", "UNCHECKED_CAST") return TroykaViewModel(troyka, troykaRepository, accountPrefs) as T
+            @Suppress("HardcodedStringLiteral") return TroykaViewModel(troyka, troykaRepository, accountPrefs) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
     }

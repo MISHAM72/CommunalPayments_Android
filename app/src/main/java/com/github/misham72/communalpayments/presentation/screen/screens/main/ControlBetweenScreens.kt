@@ -67,21 +67,36 @@ import com.github.misham72.communalpayments.presentation.utils.rememberTinkoffSo
 import com.github.misham72.communalpayments.presentation.utils.rememberWaterSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberlightSoundPlayer
 import kotlinx.coroutines.launch
+import com.github.misham72.communalpayments.data.local.FileManager
+import com.github.misham72.communalpayments.data.repository.AnalyticsRepositoryImpl
+import com.github.misham72.communalpayments.domain.userclasses.GetAllServicesYearlySummaryUseCase
+import com.github.misham72.communalpayments.presentation.screen.screens.analytics.AllServicesSummaryScreen
+import com.github.misham72.communalpayments.presentation.screen.screens.analytics.AllServicesSummaryViewModelFactory
+import com.github.misham72.communalpayments.presentation.utils.rememberInTotalSoundPlayer
 
 @Composable
 fun ControlBetweenScreens() {
     val context = LocalContext.current
     val accountPrefs = remember { AccountPreferences(context.applicationContext) }
     var selectedService by remember { mutableIntStateOf(0) }
-    var showHistory by remember { mutableStateOf(false) }
+    val showHistory = remember { mutableStateOf(false) }
+    val showAllServicesSummary = remember { mutableStateOf(false) }   // новый флаг
     val services = getListInitialScreen()
+    val amountLabel = stringResource(R.string.to_be_paid)
+    val tariffLabel = stringResource(R.string.tariff_label)
+    // Зависимости для сводной аналитики по всем услугам
+    val fileManager = remember { FileManager(context) }
+    val analyticsRepo = remember { AnalyticsRepositoryImpl(fileManager) }
+    val getAllServicesUseCase = remember { GetAllServicesYearlySummaryUseCase(analyticsRepo) }
+    val defaultError = stringResource(R.string.error_load_default)
+    val allServicesFactory = remember { AllServicesSummaryViewModelFactory(getAllServicesUseCase, defaultError) }
     var dueDates by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
     var showMenu by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     var showLanguageDialog by remember { mutableStateOf(false) }
     var showThemeDialog by remember { mutableStateOf(false) }
     val historySound = rememberHistorySoundPlayer()
-
+    val mockingPipeSound = rememberInTotalSoundPlayer()
     // Перезагружаем даты при каждом возобновлении экрана
     LifecycleResumeEffect(Unit) {
         val dates = mutableMapOf<String, String>()
@@ -96,12 +111,18 @@ fun ControlBetweenScreens() {
     }
 
     fun onNavigateBack() {
-        showHistory = false
+        showHistory.value = false
     }
 
-    if (showHistory) {
+    if (showAllServicesSummary.value) {
+        AllServicesSummaryScreen(
+            onBack = { showAllServicesSummary.value = false },
+            viewModelFactory = allServicesFactory
+        )
+    } else if (showHistory.value) {
         SimpleHistoryScreen(
-            onBack = { onNavigateBack() }, initialService = services[selectedService].fileKey
+            onBack = { onNavigateBack() },
+            initialService = services[selectedService].fileKey
         )
     } else {
         Surface(
@@ -276,13 +297,31 @@ fun ControlBetweenScreens() {
                         .weight(0.7f)
                 )
 
-                Button(
-                    onClick = {
-                        historySound?.start()
-                        showHistory = true
-                    }, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors()
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Text(stringResource(R.string.history))
+                    Button(
+                        onClick = {
+                            mockingPipeSound?.start()
+                            showAllServicesSummary.value = true
+                        },
+                        modifier = Modifier.weight(1f),
+                        colors = ButtonDefaults.buttonColors()
+                    ) {
+                        Text(stringResource(R.string.In_total))
+                    }
+                    Button(
+                        onClick = {
+                            historySound?.start()
+                            showHistory.value = true
+                        },
+                        modifier = Modifier.weight(1f),
+                        colors = ButtonDefaults.buttonColors()
+                    ) {
+                        Text(stringResource(R.string.history))
+                    }
+
                 }
             }
         }

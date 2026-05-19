@@ -1,7 +1,7 @@
 package com.github.misham72.communalpayments.domain.repository
 
-import com.github.misham72.communalpayments.domain.userclasses.Garbage
+import com.github.misham72.communalpayments.domain.model.GarbageData
 
 interface GarbageRepository {
-    suspend fun saveGarbagePayment(data: Garbage.GarbageData)
+    suspend fun saveGarbagePayment(data: GarbageData)
 }

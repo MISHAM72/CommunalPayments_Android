@@ -3,15 +3,15 @@ package com.github.misham72.communalpayments.data.repository
 import android.content.Context
 import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.data.local.FileManager
+import com.github.misham72.communalpayments.domain.model.TinkoffData
 import com.github.misham72.communalpayments.domain.repository.TinkoffRepository
-import com.github.misham72.communalpayments.domain.userclasses.Tinkoff
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 
 class TinkoffRepositoryImpl(
     context: Context, fileManager: FileManager
 ) : BasePeriodicRepositoryWithAccount(context, fileManager), TinkoffRepository {
 
-    override suspend fun saveTinkoffPayment(data: Tinkoff.TinkoffData) {
+    override suspend fun saveTinkoffPayment(data: TinkoffData) {
         val dateTime = getCurrentDateTime()
         val serviceKey = ServiceKeys.TINKOFF
         val status = context.getString(R.string.status_calculated)

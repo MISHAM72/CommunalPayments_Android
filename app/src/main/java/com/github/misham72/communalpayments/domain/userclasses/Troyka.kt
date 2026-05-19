@@ -2,23 +2,12 @@ package com.github.misham72.communalpayments.domain.userclasses
 
 
 import com.github.misham72.communalpayments.domain.calculators.PaymentDateCalculator
+import com.github.misham72.communalpayments.domain.model.TroykaData
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
 class Troyka(private val calculator: PaymentDateCalculator) {
-    data class TroykaData(
-        val isHistory: Boolean,
-        val previousPayment: String,
-        val nextPayment: String,
-        val daysFromPayment: Long,
-        val daysUntilPayment: Long,
-        val priceTariff: Double,
-        val periodMonths: String,
-        val accountNumber: String,
-        val startDate: Date?
-
-    )
 
     fun collectTroykaData(
         paymentDay: Int,

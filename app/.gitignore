@@ -1,10 +1,10 @@
 cat > .gitignore << 'EOF'
 *.iml
 .gradle
-/local.properties
+/local.properties   # ← ваш API-ключ
 .idea/
 .DS_Store
-/build
+/build   # ← сюда попадает сгенерированный BuildConfig.java
 /captures
 .externalNativeBuild
 .cxx

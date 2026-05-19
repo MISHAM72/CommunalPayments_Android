@@ -3,14 +3,14 @@ package com.github.misham72.communalpayments.data.repository
 import android.content.Context
 import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.data.local.FileManager
+import com.github.misham72.communalpayments.domain.model.GarbageData
 import com.github.misham72.communalpayments.domain.repository.GarbageRepository
-import com.github.misham72.communalpayments.domain.userclasses.Garbage
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 
 class GarbageRepositoryImpl(
     context: Context, fileManager: FileManager
 ) : BasePeriodicRepositoryWithAccount(context, fileManager), GarbageRepository {
-    override suspend fun saveGarbagePayment(data: Garbage.GarbageData) {
+    override suspend fun saveGarbagePayment(data: GarbageData) {
         val dateTime = getCurrentDateTime()
         val serviceKey = ServiceKeys.GARBAGE
         val status = context.getString(R.string.status_calculated)

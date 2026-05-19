@@ -19,7 +19,7 @@ class TinkoffViewModelFactory(context: Context) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(TinkoffViewModel::class.java)) {
-            @Suppress("HardcodedStringLiteral", "UNCHECKED_CAST") return TinkoffViewModel(tinkoff, tinkoffRepository, accountPrefs) as T
+            @Suppress("HardcodedStringLiteral") return TinkoffViewModel(tinkoff, tinkoffRepository, accountPrefs) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
     }

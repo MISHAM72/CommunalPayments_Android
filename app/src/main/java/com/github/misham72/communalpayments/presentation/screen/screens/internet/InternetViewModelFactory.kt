@@ -19,7 +19,7 @@ class InternetViewModelFactory(context: Context) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(InternetViewModel::class.java)) {
-            @Suppress("HardcodedStringLiteral", "UNCHECKED_CAST") return InternetViewModel(internet, internetRepository, accountPrefs) as T
+            @Suppress("HardcodedStringLiteral") return InternetViewModel(internet, internetRepository, accountPrefs) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
     }

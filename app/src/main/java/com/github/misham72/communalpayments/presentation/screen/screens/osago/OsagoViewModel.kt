@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.misham72.communalpayments.data.local.AccountPreferences
+import com.github.misham72.communalpayments.domain.model.OsagoData
 import com.github.misham72.communalpayments.domain.model.ValidationError
 import com.github.misham72.communalpayments.domain.repository.OsagoRepository
 import com.github.misham72.communalpayments.domain.userclasses.Osago
@@ -35,7 +36,7 @@ class OsagoViewModel(
         val customDate: String = "",
         val customServiceName: String = "",
         val showAccountDialog: Boolean = false,
-        val result: Osago.OsagoData? = null,
+        val result: OsagoData? = null,
         val error: ValidationError? = null,
     )
 

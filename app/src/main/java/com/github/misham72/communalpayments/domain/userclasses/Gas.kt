@@ -1,12 +1,9 @@
 package com.github.misham72.communalpayments.domain.userclasses
 
 import com.github.misham72.communalpayments.domain.calculators.MeterCalculator
+import com.github.misham72.communalpayments.domain.model.GasData
 
 class Gas {
-
-    data class GasData(
-        val isHistory: Boolean, val current: Double, val previous: Double, val tariff: Double, val consumption: Double, val payment: Double, val accountNumber: String
-    )
 
     fun collectGasData(                    //✅ Принимает сырые данные/
         current: Double, previous: Double, tariff: Double, accountNumber: String

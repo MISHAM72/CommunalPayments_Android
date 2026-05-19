@@ -48,8 +48,6 @@
     <string name="previous_reading_label_electricity">Предыдущие показания, (кВт.ч) - </string>
 
 
-    <string name="download_error_with_message">❌ ОШИБКА ЗАГРУЗКИ: %s</string>
-
     <string name="empty_history_calculation">История расчетов пуста</string>
 
 
@@ -121,7 +119,7 @@
     <string name="change_personal_account">Изменить лицевой счёт</string>
 
     <string name="account_prefs">Настройки учетной записи</string>
-    <string name="unknown_error">Не известная ошибка</string>
+
     <string name="editing">Редактирование</string>
     <string name="service_name_label">Название услуги</string>
     <string name="select_start_date">Выбрать дату начала: %s</string>
@@ -139,7 +137,7 @@
     <string name="error_invalid_input">Некорректный ввод</string>
     <string name="menu">Меню</string>
     <string name="exit">Выйти</string>
-    <string name="error_saving">Ошибка сохранения данных</string>
+
 
     <string name="notifications_about_upcoming_service_payments">Уведомления о скорых платежах по услугам</string>
     <string name="payment_reminder_channel">Канал напоминаний о платежах</string>
@@ -187,7 +185,6 @@
     <string name="pdf_table_previous">Предыдущие</string>
     <string name="pdf_table_current">Текущие</string>
     <string name="pdf_table_consumption">Расход</string>
-    <string name="pdf_table_tariff">Тариф</string>
     <string name="pdf_table_amount">Сумма</string>
     <string name="pdf_table_status">Статус</string>
     <string name="pdf_table_period">Период (мес)</string>
@@ -199,6 +196,21 @@
     <string name="period_months_format">Период: %d мес.</string>
     <string name="export_txt">Поделиться TXT</string>
     <string name="export_pdf">Экспорт PDF</string>
+    <string name="In_total">📋 Всего</string>
+    <string name="Annual_costs_for_all_services">Годовые расходы по всем услугам</string>
 
+    <string name="error">Ошибка</string>
+    <string name="error_saving">Ошибка сохранения данных</string>
+    <string name="total_mount_year">Общая сумма за %1$d год</string>
+    <string name="unknown_error">Не известная ошибка</string>
+    <string name="download_error_with_message">❌ ОШИБКА ЗАГРУЗКИ: %s</string>
+    <string name="error_load_default">Ошибка загрузки</string>
+
+    <string name="amount_format">%,.2f ₽</string>
+    <string name="amount_format_whole">%,.0f</string>
+    <string name="back_with_arrow">← Назад</string>
+    <string name="tariff">Тариф</string>
+    <string name="period">Период:</string>
+    <string name="no_data">Нет данных</string>
 </resources>
 

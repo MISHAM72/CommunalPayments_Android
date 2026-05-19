@@ -1,20 +1,10 @@
 package com.github.misham72.communalpayments.domain.userclasses
 
 import com.github.misham72.communalpayments.domain.calculators.MeterCalculator
+import com.github.misham72.communalpayments.domain.model.ElectricityData
 
 // ✅ Чистый domain - нет Context, нет Android зависимостей!
 class Electricity {
-
-    data class ElectricityData(
-//Data class — это чертёж (какие поля будут у объекта).
-        val isHistory: Boolean,
-        val current: Double,
-        val previous: Double,
-        val tariff: Double,
-        val consumption: Double,
-        val payment: Double,
-        val accountNumber: String
-    )
 
     fun collectElectricityData(
         //Функция — это действие, которое по этому чертежу создаёт реальный объект с конкретными числами.

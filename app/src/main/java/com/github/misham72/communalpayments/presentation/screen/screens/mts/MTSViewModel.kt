@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.misham72.communalpayments.data.local.AccountPreferences
+import com.github.misham72.communalpayments.domain.model.MTSData
 import com.github.misham72.communalpayments.domain.model.ValidationError
 import com.github.misham72.communalpayments.domain.repository.MTSRepository
 import com.github.misham72.communalpayments.domain.userclasses.MTS
@@ -36,7 +37,7 @@ class MTSViewModel(
         val customDate: String = "",
         val customServiceName: String = "",
         val showAccountDialog: Boolean = false,   // флаг для диалога
-        val result: MTS.MTSData? = null,
+        val result: MTSData? = null,
         val error: ValidationError? = null,   // вместо errorMessage: String?
     )
 

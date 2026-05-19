@@ -1,6 +1,5 @@
 package com.github.misham72.communalpayments.presentation.screen.screens.hostel
 
-
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -20,7 +19,7 @@ class HostelViewModelFactory(context: Context) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(HostelViewModel::class.java)) {
-            @Suppress("HardcodedStringLiteral", "UNCHECKED_CAST")
+            @Suppress("HardcodedStringLiteral")
             return HostelViewModel(hostel, hostelRepository, accountPrefs) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")

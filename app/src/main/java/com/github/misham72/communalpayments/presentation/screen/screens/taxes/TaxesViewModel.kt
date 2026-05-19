@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.misham72.communalpayments.data.local.AccountPreferences
+import com.github.misham72.communalpayments.domain.model.TaxesData
 import com.github.misham72.communalpayments.domain.model.ValidationError
 import com.github.misham72.communalpayments.domain.repository.TaxesRepository
 import com.github.misham72.communalpayments.domain.userclasses.Taxes
@@ -36,7 +37,7 @@ class TaxesViewModel(
         val customServiceName: String = "",
         val customDate: String = "",
         val showAccountDialog: Boolean = false,
-        val result: Taxes.TaxesData? = null,
+        val result: TaxesData? = null,
         val error: ValidationError? = null,
     )
 

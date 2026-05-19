@@ -299,8 +299,8 @@ fun SimpleHistoryScreen(
                         lines.forEachIndexed { index, line ->
                             // Проверяем, содержит ли строка ключевые метки
                             val isLabelLine = line.startsWith(stringResource(R.string.service_prefix)) ||
-                                    (line.startsWith("( ") && line.endsWith(" )")) ||
-                                    line.contains(statusLabel) || line.contains(toBePaidLabel)
+                                (line.startsWith("( ") && line.endsWith(" )")) ||
+                                line.contains(statusLabel) || line.contains(toBePaidLabel)
                             if (isLabelLine) {
                                 // Строки с метками делаем ЖИРНЫМИ
                                 withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
@@ -356,7 +356,6 @@ fun addStatusToLastRecord(content: String, newStatus: String): String {
 
     // Вставляем новый статус
     lines.add(0, newStatus)
-
     // Собираем обратно
     return before + "\n" + lines.joinToString("\n")
 }

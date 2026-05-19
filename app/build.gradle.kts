@@ -1,33 +1,21 @@
-import org.gradle.kotlin.dsl.implementation
 import java.util.Properties
 
-/** Build.gradle.kts — подробные пояснения к программе (файл с инструкциями для печати конкретной детали), if Gradle 3D printer*/
 plugins {
-    alias(libs.plugins.android.application)  // Подключаем AGP, Настройка задачи для AGP: В блоке android { ... } вы даете указания главному прорабу: какую версию SDK использовать, как подписывать приложение и какой функционал включить.
-    alias(libs.plugins.kotlin.compose)    // Подключаем Compose Compiler Plugin
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.compose)
 }
 
-@Suppress("HardcodedStringLiteral")
-val proguardAndroidOptimize: String = "proguard-android-optimize.txt"
-
-@Suppress("HardcodedStringLiteral")
-val proguardRulesPro: String = "proguard-rules.pro"
-
-@Suppress("HardcodedStringLiteral")
-val composeUiTextGoogleFonts: String = "androidx.compose.ui:ui-text-google-fonts:1.6.1"
-
-android {  // ... настройки AGP ...
+android {
     namespace = "com.github.misham72.communalpayments"
     compileSdk = 37
 
-    // Загружаем свойства из файла keystore.properties. Блок загрузки, относятся только к вашему ключу подписи.
+    // Загружаем keystore.properties (для подписи)
     val keystoreProperties = Properties()
     val keystorePropertiesFile = rootProject.file("keystore.properties")
     if (keystorePropertiesFile.exists()) {
         keystoreProperties.load(keystorePropertiesFile.inputStream())
     }
-    @Suppress("HardcodedStringLiteral")
-    // Добавляем конфигурацию подписи, относятся только к вашему ключу подписи.
+
     signingConfigs {
         create("release") {
             storeFile = file(keystoreProperties["storeFile"] as String)
@@ -36,49 +24,61 @@ android {  // ... настройки AGP ...
             keyPassword = keystoreProperties["keyPassword"] as String
         }
     }
+
     defaultConfig {
-        applicationId = "com.github.misham72.communalpayments" // Это уникальный идентификатор
-        // вашего приложения в системе Android и в магазинах приложений (Google Play, RuStore).
+        applicationId = "com.github.misham72.communalpayments"
         minSdk = 26
         targetSdk = 36
-        versionCode = 15
-        versionName = "2.4.4"
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"  // Стандартный раннер для тестов на устройстве/эмуляторе. Если вы не пишете тесты, эта строка всё равно нужна для корректной работы
+        versionCode = 16
+        versionName = "2.5.4"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // Чтение API-ключа из local.properties
+        val localProperties = Properties()
+        val localFile = rootProject.file("local.properties")
+        if (localFile.exists()) {
+            localProperties.load(localFile.inputStream())
+        }
+        val deepSeekApiKey: String = localProperties.getProperty("DEEPSEEK_API_KEY", "")
+        buildConfigField("String", "DEEPSEEK_API_KEY", "\"$deepSeekApiKey\"")
     }
-    @Suppress("HardcodedStringLiteral")
-    // Мы видим блок buildTypes, который определяет конфигурации для отладочной (debug) и релизной (release) сборок приложения.
+
     buildTypes {
-        debug { // Debug подписываем тем же ключом, что и Release. Debug — это встроенный тип сборки, который используется по умолчанию при нажатии кнопки Run (зелёный треугольник) в Android Studio.
-            signingConfig = signingConfigs.getByName("release")  // — здесь мы принудительно назначаем отладочной сборке ту же подпись, что и у релизной. Это делается для удобства тестирования:
+        debug {
+            signingConfig = signingConfigs.getByName("release")
         }
         release {
-            isMinifyEnabled = false  // — отключает минификацию (сжатие и обфускацию) кода. В вашем случае это false, потому что вы, вероятно, не хотите усложнять отладку или столкнуться с проблемами обфускации на учебном проекте.
+            isMinifyEnabled = false
             proguardFiles(
-                getDefaultProguardFile(proguardAndroidOptimize), proguardRulesPro  // — указывает файлы с правилами для ProGuard/R8.
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
             )
-            signingConfig = signingConfigs.getByName("release")  // Без этой строки APK будет неподписанным или подписанным отладочным ключом по умолчанию, что недопустимо для публикации.
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 
-    compileOptions {  // заботится о совместимости языка
+    compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-    buildFeatures { // Он включает поддержку Jetpack Compose в проекте. Это необходимо, чтобы использовать @Composable функции и всю экосистему Compose.
-        compose = true  //  Явная команда прорабу включить поддержку Compose Gradle подключает компилятор Compose (androidx.compose.compiler), который обрабатывает аннотации @Composable. Становятся доступны специальные инструменты для предпросмотра
+
+    buildFeatures {
+        compose = true
+        buildConfig = true
     }
 }
 
 kotlin {
-    compilerOptions {// — управляет генерацией байт-кода Kotlin.
+    compilerOptions {
         jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
     }
 }
-dependencies {   // Это список библиотек, которые вы подключаете к своему проекту. Каждая строка добавляет определённый готовый код, чтобы вам не приходилось писать всё с нуля.
+
+dependencies {
     implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)  // — связка Compose с жизненным циклом и ViewModel.
+    implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
-    implementation(platform(libs.androidx.compose.bom))  // — специальный "набор версий", чтобы все библиотеки Compose были совместимы друг с другом.
+    implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
@@ -89,11 +89,11 @@ dependencies {   // Это список библиотек, которые вы 
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
-    debugImplementation(libs.androidx.compose.ui.tooling)   //— инструменты для отладки Compose в режиме разработки
+    debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     implementation(libs.androidx.datastore.preferences)
-    implementation(composeUiTextGoogleFonts)
-    implementation(libs.androidx.lifecycle.viewmodel.compose)  // — связка Compose с жизненным циклом и ViewModel.
+    implementation("androidx.compose.ui:ui-text-google-fonts:1.6.1")
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.compose.material.icons.core)
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.androidx.lifecycle.runtime.compose)
@@ -101,4 +101,9 @@ dependencies {   // Это список библиотек, которые вы 
     implementation(libs.androidx.appcompat)
     androidTestImplementation(libs.assertj.core)
     testImplementation(libs.assertj.core)
+
+    // DeepSeek API
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("com.google.code.gson:gson:2.10.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 }

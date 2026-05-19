@@ -3,14 +3,14 @@ package com.github.misham72.communalpayments.data.repository
 import android.content.Context
 import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.data.local.FileManager
+import com.github.misham72.communalpayments.domain.model.TaxesData
 import com.github.misham72.communalpayments.domain.repository.TaxesRepository
-import com.github.misham72.communalpayments.domain.userclasses.Taxes
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 
 class TaxesRepositoryImpl(
     context: Context, fileManager: FileManager
 ) : BasePeriodicRepositoryWithAccount(context, fileManager), TaxesRepository {
-    override suspend fun saveTaxesPayment(data: Taxes.TaxesData) {
+    override suspend fun saveTaxesPayment(data: TaxesData) {
         val dateTime = getCurrentDateTime()
         val serviceKey = ServiceKeys.TAXES
         val status = context.getString(R.string.status_calculated)

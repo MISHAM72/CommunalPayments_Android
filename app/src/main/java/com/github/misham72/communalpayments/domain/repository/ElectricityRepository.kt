@@ -1,7 +1,7 @@
 package com.github.misham72.communalpayments.domain.repository
 
-import com.github.misham72.communalpayments.domain.userclasses.Electricity
+import com.github.misham72.communalpayments.domain.model.ElectricityData
 
 interface ElectricityRepository {
-    suspend fun saveElectricityPayment(data: Electricity.ElectricityData)
+    suspend fun saveElectricityPayment(data: ElectricityData)
 }

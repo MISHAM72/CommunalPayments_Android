@@ -4,8 +4,8 @@ package com.github.misham72.communalpayments.data.repository
 import android.content.Context
 import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.data.local.FileManager
+import com.github.misham72.communalpayments.domain.model.MTSData
 import com.github.misham72.communalpayments.domain.repository.MTSRepository
-import com.github.misham72.communalpayments.domain.userclasses.MTS
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 
 
@@ -13,7 +13,7 @@ class MTSRepositoryImpl(
     context: Context, fileManager: FileManager
 ) : BasePeriodicRepositoryWithAccount(context, fileManager), MTSRepository {
 
-    override suspend fun saveMTSPayment(data: MTS.MTSData) {
+    override suspend fun saveMTSPayment(data: MTSData) {
         val dateTime = getCurrentDateTime()
         val serviceKey = ServiceKeys.MTS
         val status = context.getString(R.string.status_calculated)

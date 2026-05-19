@@ -1,24 +1,12 @@
 package com.github.misham72.communalpayments.domain.userclasses
 
 import com.github.misham72.communalpayments.domain.calculators.PaymentDateCalculator
+import com.github.misham72.communalpayments.domain.model.MTSData
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
 class MTS(private val calculator: PaymentDateCalculator) {
-
-    data class MTSData(
-        val isHistory: Boolean,
-        val previousPayment: String,
-        val daysFromPayment: Long,
-        val nextPayment: String,
-        val daysUntilPayment: Long,
-        val priceTariff: Double,
-        val periodMonths: String,
-        val accountNumber: String,
-        val startDate: Date?
-    )
-
     fun collectMTSData(
         paymentDay: Int,
         periodMonths: Int,

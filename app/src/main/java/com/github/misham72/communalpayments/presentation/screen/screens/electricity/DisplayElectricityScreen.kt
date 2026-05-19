@@ -55,7 +55,7 @@ import java.util.Locale
 @SuppressLint("LocalContextGetResourceValueCall")
 @Composable
 fun DisplayElectricityScreen(viewModel: ElectricityViewModel) {
-    var showBankDialog by remember { mutableStateOf(false) }
+    val showBankDialog = remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     val context = LocalContext.current   // <-- добавить
     val clipboardManager = LocalClipboardManager.current
@@ -193,10 +193,11 @@ fun DisplayElectricityScreen(viewModel: ElectricityViewModel) {
             ) {
                 Text(stringResource(R.string.copy_amount))
             }
+            // Кнопка, открывающая диалог
             Button(
                 onClick = {
                     bankSound?.start()
-                    showBankDialog = true
+                    showBankDialog.value = true  // присваивание через .value
                 }, modifier = Modifier.fillMaxWidth()
             ) {
                 /** Кнопка "Выбрать банк для оплаты" в экране расчета вызывает
@@ -206,7 +207,8 @@ fun DisplayElectricityScreen(viewModel: ElectricityViewModel) {
         }
         Spacer(modifier = Modifier.height(10.dp)) // небольшой отступ для красоты
     }
-    if (showBankDialog) {
+    // ✅ Условие отображения диалога
+    if (showBankDialog.value) {
         // Проверяем, какие банки из нашего списка установлены на телефоне
         val installedBanks = remember {
             BankPaymentHelper.supportedBanks.filter { bank ->
@@ -218,7 +220,7 @@ fun DisplayElectricityScreen(viewModel: ElectricityViewModel) {
                 }
             }
         }
-        AlertDialog(onDismissRequest = { showBankDialog = false }, title = { Text(stringResource(R.string.select_bank)) }, text = {
+        AlertDialog(onDismissRequest = { showBankDialog.value = false }, title = { Text(stringResource(R.string.select_bank)) }, text = {
             Column {
                 if (installedBanks.isEmpty()) {
                     Text(stringResource(R.string.there_are_no_installed_banking_applications))
@@ -226,7 +228,7 @@ fun DisplayElectricityScreen(viewModel: ElectricityViewModel) {
                     installedBanks.forEach { bank ->
                         TextButton(
                             onClick = {
-                                showBankDialog = false
+                                showBankDialog.value = false
                                 BankPaymentHelper.openBankApp(context, bank)
                             }) {
                             Text(bank.name)
@@ -235,7 +237,7 @@ fun DisplayElectricityScreen(viewModel: ElectricityViewModel) {
                 }
             }
         }, confirmButton = {
-            TextButton(onClick = { showBankDialog = false }) {
+            TextButton(onClick = { showBankDialog.value = false }) {
                 Text(stringResource(R.string.cancel))
             }
         })

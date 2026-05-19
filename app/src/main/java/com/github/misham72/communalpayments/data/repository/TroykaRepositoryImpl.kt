@@ -3,15 +3,15 @@ package com.github.misham72.communalpayments.data.repository
 import android.content.Context
 import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.data.local.FileManager
+import com.github.misham72.communalpayments.domain.model.TroykaData
 import com.github.misham72.communalpayments.domain.repository.TroykaRepository
-import com.github.misham72.communalpayments.domain.userclasses.Troyka
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 
 class TroykaRepositoryImpl(
     context: Context, fileManager: FileManager
 ) : BasePeriodicRepositoryWithAccount(context, fileManager), TroykaRepository {
 
-    override suspend fun saveTroykaPayment(data: Troyka.TroykaData) {
+    override suspend fun saveTroykaPayment(data: TroykaData) {
         val dateTime = getCurrentDateTime()
         val serviceKey = ServiceKeys.TROYKA
         val status = context.getString(R.string.status_calculated)

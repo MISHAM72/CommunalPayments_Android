@@ -16,7 +16,7 @@ class ElectricityViewModelFactory(context: Context) : ViewModelProvider.Factory 
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(ElectricityViewModel::class.java)) {
-            @Suppress("HardcodedStringLiteral", "UNCHECKED_CAST")
+            @Suppress("HardcodedStringLiteral")
             return ElectricityViewModel(electricity, electricityRepository, accountPrefs) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")

@@ -1,7 +1,8 @@
 package com.github.misham72.communalpayments.domain.repository
 
-import com.github.misham72.communalpayments.domain.userclasses.Tinkoff
+import com.github.misham72.communalpayments.domain.model.TinkoffData
+
 
 interface TinkoffRepository {
-    suspend fun saveTinkoffPayment(data: Tinkoff.TinkoffData)
+    suspend fun saveTinkoffPayment(data: TinkoffData)
 }

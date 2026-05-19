@@ -1,23 +1,12 @@
 package com.github.misham72.communalpayments.domain.userclasses
 
 import com.github.misham72.communalpayments.domain.calculators.PaymentDateCalculator
+import com.github.misham72.communalpayments.domain.model.TinkoffData
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
 class Tinkoff(private val calculator: PaymentDateCalculator) {
-    data class TinkoffData(   // - отвечает за хранение структуры данных
-        val isHistory: Boolean,
-        val previousPayment: String,
-        val daysFromPayment: Long,
-        val nextPayment: String,
-        val daysUntilPayment: Long,
-        val priceTariff: Double,
-        val periodMonths: String,
-        val accountNumber: String,
-        val startDate: Date?
-    )
-
     fun collectTinkoffData(   // — отвечает только за расчет данных
         paymentDay: Int,
         periodMonths: Int,

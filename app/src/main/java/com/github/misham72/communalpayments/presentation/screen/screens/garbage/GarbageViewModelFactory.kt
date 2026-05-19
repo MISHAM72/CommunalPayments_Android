@@ -19,7 +19,7 @@ class GarbageViewModelFactory(context: Context) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(GarbageViewModel::class.java)) {
-            @Suppress("HardcodedStringLiteral", "UNCHECKED_CAST")
+            @Suppress("HardcodedStringLiteral")
             return GarbageViewModel(garbage, garbageRepository, accountPrefs) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")

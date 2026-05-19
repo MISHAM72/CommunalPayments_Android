@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.misham72.communalpayments.data.local.AccountPreferences
 import com.github.misham72.communalpayments.domain.model.ValidationError
+import com.github.misham72.communalpayments.domain.model.ZONTData
 import com.github.misham72.communalpayments.domain.repository.ZONTRepository
 import com.github.misham72.communalpayments.domain.userclasses.ZONT
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
@@ -37,7 +38,7 @@ class ZONTViewModel(
         val customDate: String = "",
         val customServiceName: String = "",
         val showAccountDialog: Boolean = false,
-        val result: ZONT.ZONTData? = null,
+        val result: ZONTData? = null,
         val error: ValidationError? = null,   // вместо errorMessage: String?
     )
 

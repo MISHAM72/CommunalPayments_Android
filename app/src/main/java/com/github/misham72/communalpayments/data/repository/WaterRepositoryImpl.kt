@@ -3,15 +3,15 @@ package com.github.misham72.communalpayments.data.repository
 import android.content.Context
 import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.data.local.FileManager
+import com.github.misham72.communalpayments.domain.model.WaterData
 import com.github.misham72.communalpayments.domain.repository.WaterRepository
-import com.github.misham72.communalpayments.domain.userclasses.Water
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 
 class WaterRepositoryImpl(
     context: Context, fileManager: FileManager
 ) : BaseMeterRepositoryWithAccount(context, fileManager), WaterRepository {
 
-    override suspend fun saveWaterPayment(data: Water.WaterData) {
+    override suspend fun saveWaterPayment(data: WaterData) {
         val dateTime = getCurrentDateTime()
         val serviceKey = ServiceKeys.WATER
         val status = context.getString(R.string.status_calculated)

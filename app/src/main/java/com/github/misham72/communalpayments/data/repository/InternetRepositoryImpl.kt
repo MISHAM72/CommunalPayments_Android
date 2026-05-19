@@ -3,15 +3,15 @@ package com.github.misham72.communalpayments.data.repository
 import android.content.Context
 import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.data.local.FileManager
+import com.github.misham72.communalpayments.domain.model.InternetData
 import com.github.misham72.communalpayments.domain.repository.InternetRepository
-import com.github.misham72.communalpayments.domain.userclasses.Internet
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 
 class InternetRepositoryImpl(
     context: Context,
     fileManager: FileManager
 ) : BasePeriodicRepositoryWithAccount(context, fileManager), InternetRepository {
-    override suspend fun saveInternetPayment(data: Internet.InternetData) {
+    override suspend fun saveInternetPayment(data: InternetData) {
         val dateTime = getCurrentDateTime()
         val serviceKey = ServiceKeys.INTERNET
         val status = context.getString(R.string.status_calculated)

@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.misham72.communalpayments.data.local.AccountPreferences
+import com.github.misham72.communalpayments.domain.model.TinkoffData
 import com.github.misham72.communalpayments.domain.model.ValidationError
 import com.github.misham72.communalpayments.domain.repository.TinkoffRepository
 import com.github.misham72.communalpayments.domain.userclasses.Tinkoff
@@ -37,7 +38,7 @@ class TinkoffViewModel(
         val customDate: String = "",
         val customServiceName: String = "",
         val showAccountDialog: Boolean = false,
-        val result: Tinkoff.TinkoffData? = null,
+        val result: TinkoffData? = null,
         val error: ValidationError? = null,
     )
 

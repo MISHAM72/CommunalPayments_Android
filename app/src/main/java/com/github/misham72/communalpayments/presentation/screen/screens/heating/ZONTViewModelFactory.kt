@@ -19,7 +19,7 @@ class ZONTViewModelFactory(context: Context) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(ZONTViewModel::class.java)) {
-            @Suppress("HardcodedStringLiteral", "UNCHECKED_CAST") return ZONTViewModel(zont, zontRepository, accountPrefs) as T
+            @Suppress("HardcodedStringLiteral") return ZONTViewModel(zont, zontRepository, accountPrefs) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

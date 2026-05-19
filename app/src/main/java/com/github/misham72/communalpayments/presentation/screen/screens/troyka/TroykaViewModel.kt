@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.misham72.communalpayments.data.local.AccountPreferences
+import com.github.misham72.communalpayments.domain.model.TroykaData
 import com.github.misham72.communalpayments.domain.model.ValidationError
 import com.github.misham72.communalpayments.domain.repository.TroykaRepository
 import com.github.misham72.communalpayments.domain.userclasses.Troyka
@@ -37,7 +38,7 @@ class TroykaViewModel(
         val customDate: String = "",
         val customServiceName: String = "",
         val showAccountDialog: Boolean = false,
-        val result: Troyka.TroykaData? = null,
+        val result: TroykaData? = null,
         val error: ValidationError? = null,
     )
 

@@ -56,7 +56,7 @@ import java.util.Locale
 @SuppressLint("LocalContextGetResourceValueCall")
 @Composable
 fun DisplayTinkoffScreen(viewModel: TinkoffViewModel) {
-    var showBankDialog by remember { mutableStateOf(false) }
+    val showBankDialog = remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val clipboardManager = LocalClipboardManager.current
@@ -215,14 +215,14 @@ fun DisplayTinkoffScreen(viewModel: TinkoffViewModel) {
             Button(
                 onClick = {
                     bankSound?.start()
-                    showBankDialog = true
+                    showBankDialog.value = true
                 }, modifier = Modifier.fillMaxWidth()
             ) {
                 Text(stringResource(R.string.select_bank_to_pay))
             }
         }
     }
-    if (showBankDialog) {
+    if (showBankDialog.value) {
         // Проверяем, какие банки из нашего списка установлены на телефоне
         val installedBanks = remember {
             BankPaymentHelper.supportedBanks.filter { bank ->
@@ -236,7 +236,7 @@ fun DisplayTinkoffScreen(viewModel: TinkoffViewModel) {
         }
         /**В AlertDialog мы проверяем список банков через PackageManager,
          * фильтруем только установленные и показываем их кнопками.*/
-        AlertDialog(onDismissRequest = { showBankDialog = false }, title = { Text(stringResource(R.string.select_bank)) }, text = {
+        AlertDialog(onDismissRequest = { showBankDialog.value = false }, title = { Text(stringResource(R.string.select_bank)) }, text = {
             Column {
                 if (installedBanks.isEmpty()) {
                     Text(stringResource(R.string.there_are_no_installed_banking_applications))
@@ -244,7 +244,7 @@ fun DisplayTinkoffScreen(viewModel: TinkoffViewModel) {
                     installedBanks.forEach { bank ->
                         TextButton(
                             onClick = {
-                                showBankDialog = false
+                                showBankDialog.value = false
                                 BankPaymentHelper.openBankApp(context, bank)
                             }) {
                             Text(bank.name)
@@ -253,7 +253,7 @@ fun DisplayTinkoffScreen(viewModel: TinkoffViewModel) {
                 }
             }
         }, confirmButton = {
-            TextButton(onClick = { showBankDialog = false }) {
+            TextButton(onClick = { showBankDialog.value = false }) {
                 Text(stringResource(R.string.cancel))
             }
         })

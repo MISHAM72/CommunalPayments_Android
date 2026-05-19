@@ -3,8 +3,8 @@ package com.github.misham72.communalpayments.data.repository
 import android.content.Context
 import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.data.local.FileManager
+import com.github.misham72.communalpayments.domain.model.ElectricityData
 import com.github.misham72.communalpayments.domain.repository.ElectricityRepository
-import com.github.misham72.communalpayments.domain.userclasses.Electricity
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 
 class ElectricityRepositoryImpl(
@@ -12,7 +12,7 @@ class ElectricityRepositoryImpl(
     fileManager: FileManager
 ) : BaseMeterRepositoryWithAccount(context, fileManager), ElectricityRepository {
 
-    override suspend fun saveElectricityPayment(data: Electricity.ElectricityData) {
+    override suspend fun saveElectricityPayment(data: ElectricityData) {
         val dateTime = getCurrentDateTime()
         val serviceKey = ServiceKeys.ELECTRICITY
         val status = context.getString(R.string.status_calculated)

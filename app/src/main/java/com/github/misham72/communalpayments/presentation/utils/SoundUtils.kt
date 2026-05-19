@@ -101,3 +101,5 @@ fun rememberOsagoSoundPlayer(): MediaPlayer? = rememberSoundPlayer(R.raw.osago_s
 @Composable
 fun rememberHostelSoundPlayer(): MediaPlayer? = rememberSoundPlayer(R.raw.mens_chrap_soundmp3)
 
+@Composable
+fun rememberInTotalSoundPlayer(): MediaPlayer? = rememberSoundPlayer(R.raw.mocking_pipe_sound)
