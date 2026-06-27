@@ -11,13 +11,13 @@ class InternetRepositoryImpl(
     context: Context,
     fileManager: FileManager
 ) : BasePeriodicRepositoryWithAccount(context, fileManager), InternetRepository {
+
     override suspend fun saveInternetPayment(data: InternetData) {
         val dateTime = getCurrentDateTime()
         val serviceKey = ServiceKeys.INTERNET
         val status = context.getString(R.string.status_calculated)
 
-        // ✅ Используем НОВЫЙ метод formatInternetPayment со всеми полями
-        var content = formatWithAccountNumber(
+        val content = formatWithAccountNumber(
             accountNumber = data.accountNumber,
             dateTime = dateTime,
             serviceName = context.getString(R.string.service_display_name_internet),
@@ -27,12 +27,10 @@ class InternetRepositoryImpl(
             daysUntilPayment = data.daysUntilPayment,
             priceTariff = data.priceTariff,
             isHistory = data.isHistory,
-            customStatus = status
+            customStatus = status,
+            nextPaymentDate = data.nextPayment,   // ← передаём день платежа
+            periodMonths = data.periodMonths  // ← передаём период
         )
-        // Добавляем период, если он задан
-        if (data.periodMonths.isNotBlank()) {
-            content += context.getString(R.string.period_months_format)
-        }
         fileManager.appendRecord(serviceKey, content)
     }
 }

@@ -10,6 +10,8 @@ interface PeriodicAccountNumberSupport {
         nextPayment: String,         // дата следующего
         daysUntilPayment: Long,      // дней осталось
         priceTariff: Double,          // тариф
-        isHistory: Boolean, customStatus: String
+        isHistory: Boolean, customStatus: String,
+        nextPaymentDate: String = "",
+        periodMonths: String = ""
     ): String
 }

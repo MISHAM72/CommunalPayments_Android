@@ -68,10 +68,16 @@ import com.github.misham72.communalpayments.presentation.utils.rememberWaterSoun
 import com.github.misham72.communalpayments.presentation.utils.rememberlightSoundPlayer
 import kotlinx.coroutines.launch
 import com.github.misham72.communalpayments.data.local.FileManager
+import com.github.misham72.communalpayments.data.local.IncomeFileManager
 import com.github.misham72.communalpayments.data.repository.AnalyticsRepositoryImpl
+import com.github.misham72.communalpayments.data.repository.IncomeRepositoryImpl
+import com.github.misham72.communalpayments.domain.userclasses.AddIncomeUseCase
 import com.github.misham72.communalpayments.domain.userclasses.GetAllServicesYearlySummaryUseCase
+import com.github.misham72.communalpayments.domain.userclasses.GetYearlyIncomeUseCase
+import com.github.misham72.communalpayments.domain.userclasses.UpdateIncomeUseCase
 import com.github.misham72.communalpayments.presentation.screen.screens.analytics.AllServicesSummaryScreen
 import com.github.misham72.communalpayments.presentation.screen.screens.analytics.AllServicesSummaryViewModelFactory
+import com.github.misham72.communalpayments.presentation.screen.screens.analytics.IncomeViewModelFactory
 import com.github.misham72.communalpayments.presentation.utils.rememberInTotalSoundPlayer
 
 @Composable
@@ -82,14 +88,19 @@ fun ControlBetweenScreens() {
     val showHistory = remember { mutableStateOf(false) }
     val showAllServicesSummary = remember { mutableStateOf(false) }   // новый флаг
     val services = getListInitialScreen()
-    val amountLabel = stringResource(R.string.to_be_paid)
-    val tariffLabel = stringResource(R.string.tariff_label)
     // Зависимости для сводной аналитики по всем услугам
     val fileManager = remember { FileManager(context) }
     val analyticsRepo = remember { AnalyticsRepositoryImpl(fileManager) }
     val getAllServicesUseCase = remember { GetAllServicesYearlySummaryUseCase(analyticsRepo) }
     val defaultError = stringResource(R.string.error_load_default)
     val allServicesFactory = remember { AllServicesSummaryViewModelFactory(getAllServicesUseCase, defaultError) }
+    // Зависимости для доходов
+    val incomeFileManager = remember { IncomeFileManager(context) }
+    val incomeRepo = remember { IncomeRepositoryImpl(incomeFileManager) }
+    val getIncomeUseCase = remember { GetYearlyIncomeUseCase(incomeRepo) }
+    val addIncomeUseCase = remember { AddIncomeUseCase(incomeRepo) }
+    val updateIncomeUseCase = remember { UpdateIncomeUseCase(incomeRepo) }
+    val incomeFactory = remember { IncomeViewModelFactory(getIncomeUseCase, addIncomeUseCase, updateIncomeUseCase) }
     var dueDates by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
     var showMenu by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
@@ -117,7 +128,8 @@ fun ControlBetweenScreens() {
     if (showAllServicesSummary.value) {
         AllServicesSummaryScreen(
             onBack = { showAllServicesSummary.value = false },
-            viewModelFactory = allServicesFactory
+            expensesFactory = allServicesFactory,
+            incomeFactory = incomeFactory
         )
     } else if (showHistory.value) {
         SimpleHistoryScreen(

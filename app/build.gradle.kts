@@ -6,6 +6,7 @@ plugins {
 }
 
 android {
+    val releaseConfig = "release"
     namespace = "com.github.misham72.communalpayments"
     compileSdk = 37
 
@@ -17,7 +18,7 @@ android {
     }
 
     signingConfigs {
-        create("release") {
+        create(releaseConfig) {
             storeFile = file(keystoreProperties["storeFile"] as String)
             storePassword = keystoreProperties["storePassword"] as String
             keyAlias = keystoreProperties["keyAlias"] as String
@@ -45,7 +46,7 @@ android {
 
     buildTypes {
         debug {
-            signingConfig = signingConfigs.getByName("release")
+            signingConfig = signingConfigs.getByName(releaseConfig)
         }
         release {
             isMinifyEnabled = false
@@ -53,7 +54,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            signingConfig = signingConfigs.getByName("release")
+            signingConfig = signingConfigs.getByName(releaseConfig)
         }
     }
 
@@ -92,7 +93,7 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     implementation(libs.androidx.datastore.preferences)
-    implementation("androidx.compose.ui:ui-text-google-fonts:1.6.1")
+    implementation(libs.google.fonts)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.compose.material.icons.core)
     implementation(libs.androidx.compose.material.icons.extended)
@@ -101,9 +102,7 @@ dependencies {
     implementation(libs.androidx.appcompat)
     androidTestImplementation(libs.assertj.core)
     testImplementation(libs.assertj.core)
-
-    // DeepSeek API
-    implementation("com.squareup.okhttp3:okhttp:4.12.0")
-    implementation("com.google.code.gson:gson:2.10.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    implementation(libs.okhttp)
+    implementation(libs.gson)
+    implementation(libs.coroutines.android)
 }

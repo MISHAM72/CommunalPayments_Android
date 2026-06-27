@@ -17,7 +17,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
 
 object PdfHistoryExporter {
 
@@ -97,8 +98,8 @@ object PdfHistoryExporter {
                     trimmed.startsWith(context.getString(R.string.consumption)) -> consumption = trimmed.substringAfter(":").replace("-", "").trim()
                     trimmed.startsWith(context.getString(R.string.to_be_paid)) -> amount = trimmed.substringAfter(":").replace("-", "").replace(context.getString(R.string.ru), "").trim()
                     trimmed.startsWith(context.getString(R.string.tariff)) -> tariff = trimmed.substringAfter(":").replace(context.getString(R.string.ru), "").trim()
-                    trimmed.startsWith(context.getString(R.string.payment_date)) -> paymentDay = trimmed.substringAfter(":").trim()
-                    trimmed.startsWith(context.getString(R.string.period)) -> periodMonths = trimmed.substringAfter(":").replace(context.getString(R.string.mo), "").trim()
+                    trimmed.startsWith(context.getString(R.string.day_of_payment_format).substringBefore("%")) -> paymentDay = trimmed.substringAfter(":").trim()
+                    trimmed.startsWith("Период:") -> periodMonths = trimmed.substringAfter(":").replace("%d", "").replace("мес.", "").trim()
                     // Статусы с эмодзи (эмодзи остаются)
                     trimmed.startsWith("\uD83D\uDD34") -> status = trimmed   // 🔴
                     trimmed.startsWith("\u23F3") -> status = trimmed          // ⏳
@@ -177,12 +178,14 @@ object PdfHistoryExporter {
         canvas.drawText(dateStr, leftMargin + labelWidth, y, infoPaint) // infoPaint с синим и подчёркиванием
         y += 25
 
-        // Лицевой счёт – тоже ярким шрифтом 👇
         if (accountNumber.isNotBlank()) {
-            val label2 = context.getString(R.string.personal_account_label)
-            val label2Width = labelPaint.measureText(label2)
+            val cleaned = accountNumber.trim()
+            val label2 = context.getString(R.string.personal_account_label) // "Л/С:" без пробела
+            val labelWidth = labelPaint.measureText(label2)
+            // Отступ между меткой и номером
+            val gap = 10f
             canvas.drawText(label2, leftMargin, y, labelPaint)
-            canvas.drawText(accountNumber, leftMargin + label2Width, y, infoPaint)
+            canvas.drawText(cleaned, leftMargin + labelWidth + gap, y, infoPaint)
             y += 25
         }
 
@@ -208,7 +211,7 @@ object PdfHistoryExporter {
             canvas.drawText(context.getString(R.string.pdf_table_current), xCurr, y, headerFont)
             canvas.drawText(context.getString(R.string.pdf_table_consumption), xCons, y, headerFont)
             canvas.drawText(context.getString(R.string.tariff), xTariff, y, headerFont)
-            canvas.drawText(context.getString(R.string.pdf_table_amount), xAmnt, y, headerFont)
+            canvas.drawText(context.getString(R.string.amount), xAmnt, y, headerFont)
             canvas.drawText(context.getString(R.string.pdf_table_status), xStat, y, headerFont)
             y += 25   // Если убрать, то данные смещаются на заголовки
             for (r in records) {
@@ -406,7 +409,7 @@ object PdfHistoryExporter {
         // Вспомогательная функция для рисования заголовков колонок
         fun drawColumnHeaders(canvas: Canvas, yPos: Float) {
             canvas.drawText(context.getString(R.string.pdf_table_date), xDate, yPos, headerFont)
-            canvas.drawText(context.getString(R.string.pdf_table_amount), xAmount, yPos, headerFont)
+            canvas.drawText(context.getString(R.string.amount), xAmount, yPos, headerFont)
             canvas.drawText(context.getString(R.string.status_label), xStatus, yPos, headerFont)
         }
 
@@ -424,14 +427,18 @@ object PdfHistoryExporter {
             val account = accountMap[serviceName]?.takeIf { it.isNotBlank() }
             if (account != null) {
                 canvas.drawText(serviceName, leftMargin, y, serviceHeaderFont)
-                val accountLabel = context.getString(R.string.personal_account)
                 val serviceNameWidth = serviceHeaderFont.measureText(serviceName)
-                canvas.drawText(accountLabel, leftMargin + serviceNameWidth, y, accountPaint)
+                val accountLabel = context.getString(R.string.personal_account_label) // "Л/С:" (без пробела)
+                // Не добавляем пробел в метку
+                val labelWidth = accountPaint.measureText(accountLabel)
+                // Отступ между текстами (например, 10 пикселей)
+                val gap = 10f
+                canvas.drawText(accountLabel, leftMargin + serviceNameWidth + gap, y, accountPaint)
+                canvas.drawText(account, leftMargin + serviceNameWidth + gap + labelWidth + 2f, y, accountPaint)
             } else {
                 canvas.drawText(serviceName, leftMargin, y, serviceHeaderFont)
             }
             y += 22
-
             // Заголовки колонок
             drawColumnHeaders(canvas, y)
             y += 20

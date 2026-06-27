@@ -126,9 +126,10 @@
 
     <string name="payment_date">Дата платежа: %s</string>
 
-    <string name="personal_account_label">Лицевой счёт: -  </string>
+    <string name="personal_account_label">Лицевой счёт:</string>
     <string name="personal_account_in_text_history">Лицевой счёт: %s</string>
     <string name="personal_account">Л/С: %s</string>
+
     <string name="personal_account_taxes">ИНН: %s</string>
     <string name="number_phone">Тел: %s</string>
     <string name="contract_number">Договор №: %s</string>
@@ -185,7 +186,6 @@
     <string name="pdf_table_previous">Предыдущие</string>
     <string name="pdf_table_current">Текущие</string>
     <string name="pdf_table_consumption">Расход</string>
-    <string name="pdf_table_amount">Сумма</string>
     <string name="pdf_table_status">Статус</string>
     <string name="pdf_table_period">Период (мес)</string>
     <string name="pdf_table_payment_day">День платежа</string>
@@ -197,20 +197,45 @@
     <string name="export_txt">Поделиться TXT</string>
     <string name="export_pdf">Экспорт PDF</string>
     <string name="In_total">📋 Всего</string>
-    <string name="Annual_costs_for_all_services">Годовые расходы по всем услугам</string>
 
-    <string name="error">Ошибка</string>
     <string name="error_saving">Ошибка сохранения данных</string>
-    <string name="total_mount_year">Общая сумма за %1$d год</string>
+
     <string name="unknown_error">Не известная ошибка</string>
     <string name="download_error_with_message">❌ ОШИБКА ЗАГРУЗКИ: %s</string>
     <string name="error_load_default">Ошибка загрузки</string>
 
-    <string name="amount_format">%,.2f ₽</string>
-    <string name="amount_format_whole">%,.0f</string>
-    <string name="back_with_arrow">← Назад</string>
+
     <string name="tariff">Тариф</string>
     <string name="period">Период:</string>
-    <string name="no_data">Нет данных</string>
+    <string name="Expenses">Расходы</string>
+    <string name="income">Доходы</string>
+    <string name="Annual_report">Годовой отчёт</string>
+    <string name="error">Ошибка</string>
+    <string name="total_expenses_summary">Общая сумма расходов за %1$d год</string>
+    <string name="money_format">%,.2f ₽</string>
+    <string name="money_format_no_cents">%,.0f</string>
+    <string name="salary">Зарплата</string>
+    <string name="side_job">Подработка</string>
+    <string name="investments">Инвестиции</string>
+    <string name="gifts">Подарки</string>
+    <string name="other">Прочее</string>
+    <string name="no_income_data">Нет данных о доходах за этот год</string>
+    <string name="total_income">Общий доход за %1$d год</string>
+    <string name="add_income">+ Добавить доход</string>
+    <string name="remove_all_incomes">Удалить все доходы «%1$s»?</string>
+    <string name="this_action_is_irreversible">Это действие необратимо.</string>
+    <string name="delete">Удалить</string>
+    <string name="deposit_interests">Проценты с депозита</string>
+    <string name="amount">Сумма</string>
+    <string name="source">Источник</string>
+    <string name="add">Добавить</string>
+    <string name="income_dialog_title">Доходы: %1$s</string>
+    <string name="no_records">Нет записей</string>
+    <string name="close">Закрыть</string>
+    <string name="delete_record">Удалить запись?</string>
+    <string name="delete_confirm_amount">Сумма: %,.2f ₽</string>
+    <string name="day_of_payment_format">День платежа: %s</string>
+
+
 </resources>
 

@@ -28,12 +28,10 @@ class MTSRepositoryImpl(
             daysUntilPayment = data.daysUntilPayment,
             priceTariff = data.priceTariff,
             isHistory = data.isHistory,
-            customStatus = status
+            customStatus = status,
+            nextPaymentDate = data.nextPayment,   // ← передаём день платежа
+            periodMonths = data.periodMonths  // ← передаём период
         )
-        // Добавляем период, если он задан
-        if (data.periodMonths.isNotBlank()) {
-            content += context.getString(R.string.period_months_format)
-        }
         fileManager.appendRecord(serviceKey, content)
     }
 }

@@ -29,7 +29,7 @@
     <string name="unit_cubic_meter">"м³ "</string>
     <string name="unit_kilowatt_hour"> kW/h</string>
     <string name="consumption">Expenditure: - %1$.2f %2$s</string>
-    <string name="currency_rub">To be paid: - %.2f US$.</string>
+    <string name="currency_rub">To be paid: - %.2f ₽.</string>
 
     <string name="current_reading">Current readings: - %1$s %2$s</string>
     <string name="previous_reading">Previous readings: - %1$s %2$s</string>
@@ -111,7 +111,7 @@
     <string name="change_personal_account">Change your personal account</string>
 
     <string name="account_prefs">Account Settings</string>
-    <string name="total_mount_year">total_mount %1$d year</string>
+
     <string name="unknown_error">Unknown error</string>
     <string name="editing">Editing</string>
     <string name="service_name_label">Name of the service</string>
@@ -121,7 +121,7 @@
 
     <string name="personal_account_label">Personal account</string>
     <string name="personal_account_in_text_history">Personal account: %s</string>
-    <string name="personal_account">Account: %s</string>
+    <string name="personal_account">"Account: %s"</string>
     <string name="personal_account_taxes">SSN: %s</string>
     <string name="number_phone">Phone: %s</string>
     <string name="contract_number">Contract №: %s</string>
@@ -130,7 +130,7 @@
     <string name="error_invalid_input">Incorrect input</string>
     <string name="menu">Menu</string>
     <string name="exit">Exit</string>
-    <string name="error">error</string>
+
     <string name="error_saving">Data saving error</string>
 
     <string name="notifications_about_upcoming_service_payments">notifications_upcoming_payments</string>
@@ -171,7 +171,6 @@
     <string name="pdf_table_previous">pdf_table_previous</string>
     <string name="pdf_table_current">pdf_table_current</string>
     <string name="pdf_table_consumption">pdf_table_consumption</string>
-    <string name="pdf_table_amount">pdf_table_amount</string>
     <string name="pdf_table_status">pdf_table_status</string>
     <string name="pdf_table_period">pdf_table_period</string>
     <string name="pdf_table_payment_day">pdf_table_payment_day</string>
@@ -182,15 +181,40 @@
     <string name="export_txt">export_txt</string>
     <string name="export_pdf">export_pdf</string>
     <string name="In_total">In_total</string>
-    <string name="Annual_costs_for_all_services">Annual_costs_for_all_services</string>
+
     <string name="error_load_default">error_load_default</string>
-    <string name="amount_format">%,.2f ₽t</string>
-    <string name="amount_format_whole">>%,.0f</string>
-    <string name="back_with_arrow">back_with_arrow</string>
+
     <string name="tariff">tariff</string>
     <string name="period">period</string>
-    <string name="no_data">no_data</string>
+    <string name="Expenses">Expenses</string>
+    <string name="income">income</string>
+    <string name="Annual_report">Annual_report</string>
+    <string name="error">error</string>
+    <string name="total_expenses_summary">total_expenses_summary %1$d year</string>
+    <string name="money_format">%,.2f ₽</string>
+    <string name="money_format_no_cents">%,.0f</string>
+    <string name="salary">salary</string>
+    <string name="side_job">side_job</string>
+    <string name="investments">investments</string>
+    <string name="gifts">gifts</string>
+    <string name="other">other</string>
+    <string name="no_income_data">no_income_data</string>
+    <string name="total_income">total_income for %1$d year</string>
+    <string name="add_income">add_income</string>
+    <string name="remove_all_incomes">remove_all_incomes «%1$s»?</string>
 
+    <string name="delete">delete</string>
+    <string name="deposit_interests">Deposit interests</string>
+    <string name="amount">Amount</string>
+    <string name="source">Source</string>
+    <string name="add">Add</string>
+    <string name="this_action_is_irreversible">this_action_is_irreversible</string>
+    <string name="income_dialog_title">Income: %1$s</string>
+    <string name="no_records">no_records</string>
+    <string name="close">close</string>
+    <string name="delete_record">delete_record</string>
+    <string name="delete_confirm_amount">Amount: %,.2f ₽</string>
+    <string name="day_of_payment_format">Payment day: %s</string>
 
 </resources>
 
