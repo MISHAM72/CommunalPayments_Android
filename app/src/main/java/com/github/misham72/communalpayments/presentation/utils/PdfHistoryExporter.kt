@@ -64,6 +64,8 @@ object PdfHistoryExporter {
         text: String
     ): List<UniversalRecord> {   // преобразовать сырой текст истории (тот самый, что записан в файле для каждой услуги) в список объектов UniversalRecord, удобных для отображения в таблице PDF.
         val records = mutableListOf<UniversalRecord>()
+
+        @Suppress("HardcodedStringLiteral")
         val blocks = text.split(Regex("(?<=\\n|^)(?=🟩{14})"))   // Разбиение на блоки – исходный текст разделяется регулярным выражением, которое ищет строки, начинающиеся с последовательности 14 зелёных квадратов (🟩{14})
 
         for (block in blocks) {
@@ -84,7 +86,9 @@ object PdfHistoryExporter {
             for (line in lines) {
                 val trimmed = line.trim()
                 when {   // Построчный разбор – блок делится на строки. Для каждой строки с помощью when проверяется, с чего она начинается:
+                    @Suppress("HardcodedStringLiteral")
                     trimmed.matches(Regex("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}")) -> date = trimmed
+
                     trimmed.startsWith(context.getString(R.string.current_reading_pdf)) -> {
                         currentReading = trimmed.substringAfter(":").replace("-", "").trim()
                         isMeter = true
@@ -99,6 +103,7 @@ object PdfHistoryExporter {
                     trimmed.startsWith(context.getString(R.string.to_be_paid)) -> amount = trimmed.substringAfter(":").replace("-", "").replace(context.getString(R.string.ru), "").trim()
                     trimmed.startsWith(context.getString(R.string.tariff)) -> tariff = trimmed.substringAfter(":").replace(context.getString(R.string.ru), "").trim()
                     trimmed.startsWith(context.getString(R.string.day_of_payment_format).substringBefore("%")) -> paymentDay = trimmed.substringAfter(":").trim()
+                    @Suppress("HardcodedStringLiteral")
                     trimmed.startsWith("Период:") -> periodMonths = trimmed.substringAfter(":").replace("%d", "").replace("мес.", "").trim()
                     // Статусы с эмодзи (эмодзи остаются)
                     trimmed.startsWith("\uD83D\uDD34") -> status = trimmed   // 🔴

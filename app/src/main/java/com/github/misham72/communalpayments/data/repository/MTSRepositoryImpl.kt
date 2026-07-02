@@ -18,7 +18,7 @@ class MTSRepositoryImpl(
         val serviceKey = ServiceKeys.MTS
         val status = context.getString(R.string.status_calculated)
 
-        var content = formatWithAccountNumber(
+        val content = formatWithAccountNumber(
             accountNumber = data.accountNumber,
             dateTime = dateTime,
             serviceName = context.getString(R.string.service_display_name_mts),

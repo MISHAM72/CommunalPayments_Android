@@ -35,12 +35,24 @@ abstract class BaseMeterRepository(
             }
 
             appendLine(headerSeparator)
-            appendLine(context.getString(R.string.current_reading,
-                String.format("%.2f", current), "кВт"))
-            appendLine(context.getString(R.string.previous_reading,
-                String.format("%.2f", previous), "кВт"))
-            appendLine(context.getString(R.string.tariff_card,
-                String.format("%.2f", tariff)))
+            appendLine(
+                context.getString(
+                    R.string.current_reading,
+                    String.format("%.2f", current), "кВт"
+                )
+            )
+            appendLine(
+                context.getString(
+                    R.string.previous_reading,
+                    String.format("%.2f", previous), "кВт"
+                )
+            )
+            appendLine(
+                context.getString(
+                    R.string.tariff_card,
+                    String.format("%.2f", tariff)
+                )
+            )
             appendLine(context.getString(R.string.consumption, consumption, "кВт"))
             appendLine(context.getString(R.string.currency_rub, payment))
         }

@@ -15,7 +15,7 @@ class OsagoRepositoryImpl(
         val serviceKey = ServiceKeys.OSAGO
         val status = context.getString(R.string.status_calculated)
 
-        var content = formatWithAccountNumber(
+        val content = formatWithAccountNumber(
             accountNumber = data.accountNumber,
             dateTime = dateTime,
             serviceName = context.getString(R.string.service_display_name_osago),

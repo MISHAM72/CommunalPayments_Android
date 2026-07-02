@@ -1,11 +1,10 @@
 package com.github.misham72.communalpayments
 
-import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
-
+import androidx.test.platform.app.InstrumentationRegistry
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.assertj.core.api.Assertions.assertThat
 
 /**
  * Instrumented test, which will execute on an Android device.

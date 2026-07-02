@@ -11,7 +11,7 @@ import com.github.misham72.communalpayments.data.local.FileManager
 abstract class BaseMeterRepository(
     context: Context, fileManager: FileManager
 ) : BaseRepository(context, fileManager) {
-
+    @Suppress("SameParameterValue")
     protected fun formatMeterPayment(
         dateTime: String,
         serviceName: String,
@@ -23,9 +23,9 @@ abstract class BaseMeterRepository(
             appendLine(headerSeparator)
             appendLine(dateTime)
 
-            if (customStatus.isNotEmpty()) {
-                appendLine(customStatus)
-            }
+            // if (customStatus.isNotEmpty()) {
+            //   appendLine(customStatus)
+            //  }
 
             appendLine(headerSeparator)
             appendLine(

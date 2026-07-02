@@ -1,8 +1,14 @@
-package com.github.misham72.communalpayments.presentation.screen.screens.%service_name%
+package com.github.misham72.communalpayments.presentation.screen.screens.%
+
+service_name%
 
 import androidx.lifecycle.ViewModel
-import com.github.misham72.communalpayments.data.repository.%SERVICE_NAME%Repository
-import com.github.misham72.communalpayments.domain.userclasses.%SERVICE_NAME%
+import com.github.misham72.communalpayments.data.repository.%
+
+SERVICE_NAME%Repository
+import com.github.misham72.communalpayments.domain.userclasses.%
+
+SERVICE_NAME%
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -50,7 +56,7 @@ private val %service_name%Repository: %SERVICE_NAME%Repository
         }
 
         val data = %service_name%.collect%SERVICE_NAME%Data(current, previous, tariff)
-        %service_name%Repository.save%SERVICE_NAME%Payment(data)
+        %service_name % Repository.save % SERVICE_NAME % Payment(data)
         _uiState.update { it.copy(result = data, errorMessage = null) }
     }
 }

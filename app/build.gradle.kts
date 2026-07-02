@@ -29,7 +29,7 @@ android {
     defaultConfig {
         applicationId = "com.github.misham72.communalpayments"
         minSdk = 26
-        targetSdk = 36
+        targetSdk = 37
         versionCode = 16
         versionName = "2.5.4"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

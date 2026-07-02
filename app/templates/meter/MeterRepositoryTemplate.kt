@@ -3,7 +3,9 @@ package com.github.misham72.communalpayments.data.repository
 import android.content.Context
 import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.data.local.FileManager
-import com.github.misham72.communalpayments.domain.userclasses.%SERVICE_NAME%
+import com.github.misham72.communalpayments.domain.userclasses.%
+
+SERVICE_NAME%
 
 /**
  * ШАБЛОН для репозитория счетчика
@@ -24,7 +26,7 @@ fileManager: FileManager
 
         val content = formatMeterPayment(
             dateTime = dateTime,
-            serviceName = context.getString(R.string.%service_name%),
+            serviceName = context.getString(R.string.% service_name %),
             current = data.current,
             previous = data.previous,
             tariff = data.tariff,

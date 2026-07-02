@@ -31,13 +31,17 @@ abstract class BaseMeterRepositoryWithAccount(
             tariff = tariff,
             consumption = consumption,
             payment = payment,
-            isHistory = isHistory,
+            isHistory = false,
             customStatus = customStatus
         )
 
         // Если номер задан, добавляем его в начало
         return if (accountNumber.isNotBlank()) {
             buildString {
+                // Сначала добавляем квадратики, если это историческая запись
+                if (isHistory) {
+                    appendLine(historyHeader)   // ← вот тут должны быть квадратики!
+                }
                 appendLine(context.getString(R.string.personal_account_in_text_history, accountNumber))
                 append(baseContent)
             }

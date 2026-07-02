@@ -7,11 +7,13 @@ import com.github.misham72.communalpayments.domain.model.InternetData
 import com.github.misham72.communalpayments.domain.repository.InternetRepository
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 
+//, этот класс реализует сохранение интернет-платежа в файл,
+// преобразуя объект InternetData в строку и дописывая её в конец соответствующего файла.
 class InternetRepositoryImpl(
     context: Context,
     fileManager: FileManager
 ) : BasePeriodicRepositoryWithAccount(context, fileManager), InternetRepository {
-
+    //Формируете content — итоговую многострочную строку (через formatWithAccountNumber или подобный метод).
     override suspend fun saveInternetPayment(data: InternetData) {
         val dateTime = getCurrentDateTime()
         val serviceKey = ServiceKeys.INTERNET
@@ -31,6 +33,7 @@ class InternetRepositoryImpl(
             nextPaymentDate = data.nextPayment,   // ← передаём день платежа
             periodMonths = data.periodMonths  // ← передаём период
         )
+        //Вызываете fileManager.appendRecord
         fileManager.appendRecord(serviceKey, content)
     }
 }

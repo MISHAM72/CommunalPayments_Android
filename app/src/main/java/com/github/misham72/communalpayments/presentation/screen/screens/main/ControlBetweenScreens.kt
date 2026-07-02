@@ -46,27 +46,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.data.local.AccountPreferences
-import com.github.misham72.communalpayments.presentation.utils.LanguageManager
-import com.github.misham72.communalpayments.domain.utils.ServiceKeys
-import com.github.misham72.communalpayments.presentation.screen.components.ServiceTab
-import com.github.misham72.communalpayments.presentation.screen.navigation.getListInitialScreen
-import com.github.misham72.communalpayments.presentation.screen.screens.history.SimpleHistoryScreen
-import com.github.misham72.communalpayments.presentation.theme.ThemePrefs
-import com.github.misham72.communalpayments.presentation.utils.PdfHistoryExporter
-import com.github.misham72.communalpayments.presentation.utils.rememberBoilerSoundPlayer
-import com.github.misham72.communalpayments.presentation.utils.rememberCarSoundPlayer
-import com.github.misham72.communalpayments.presentation.utils.rememberGarbageSoundPlayer
-import com.github.misham72.communalpayments.presentation.utils.rememberGasSoundPlayer
-import com.github.misham72.communalpayments.presentation.utils.rememberHistorySoundPlayer
-import com.github.misham72.communalpayments.presentation.utils.rememberHostelSoundPlayer
-import com.github.misham72.communalpayments.presentation.utils.rememberInternetSoundPlayer
-import com.github.misham72.communalpayments.presentation.utils.rememberMTSSoundPlayer
-import com.github.misham72.communalpayments.presentation.utils.rememberOsagoSoundPlayer
-import com.github.misham72.communalpayments.presentation.utils.rememberTaxesSoundPlayer
-import com.github.misham72.communalpayments.presentation.utils.rememberTinkoffSoundPlayer
-import com.github.misham72.communalpayments.presentation.utils.rememberWaterSoundPlayer
-import com.github.misham72.communalpayments.presentation.utils.rememberlightSoundPlayer
-import kotlinx.coroutines.launch
 import com.github.misham72.communalpayments.data.local.FileManager
 import com.github.misham72.communalpayments.data.local.IncomeFileManager
 import com.github.misham72.communalpayments.data.repository.AnalyticsRepositoryImpl
@@ -75,13 +54,37 @@ import com.github.misham72.communalpayments.domain.userclasses.AddIncomeUseCase
 import com.github.misham72.communalpayments.domain.userclasses.GetAllServicesYearlySummaryUseCase
 import com.github.misham72.communalpayments.domain.userclasses.GetYearlyIncomeUseCase
 import com.github.misham72.communalpayments.domain.userclasses.UpdateIncomeUseCase
+import com.github.misham72.communalpayments.domain.utils.ServiceKeys
+import com.github.misham72.communalpayments.presentation.screen.components.ServiceTab
+import com.github.misham72.communalpayments.presentation.screen.navigation.getListInitialScreen
 import com.github.misham72.communalpayments.presentation.screen.screens.analytics.AllServicesSummaryScreen
 import com.github.misham72.communalpayments.presentation.screen.screens.analytics.AllServicesSummaryViewModelFactory
 import com.github.misham72.communalpayments.presentation.screen.screens.analytics.IncomeViewModelFactory
+import com.github.misham72.communalpayments.presentation.screen.screens.history.SimpleHistoryScreen
+import com.github.misham72.communalpayments.presentation.theme.ThemePrefs
+import com.github.misham72.communalpayments.presentation.utils.LanguageManager
+import com.github.misham72.communalpayments.presentation.utils.PdfHistoryExporter
+import com.github.misham72.communalpayments.presentation.utils.rememberBoilerSoundPlayer
+import com.github.misham72.communalpayments.presentation.utils.rememberCarSoundPlayer
+import com.github.misham72.communalpayments.presentation.utils.rememberGarbageSoundPlayer
+import com.github.misham72.communalpayments.presentation.utils.rememberGasSoundPlayer
+import com.github.misham72.communalpayments.presentation.utils.rememberHistorySoundPlayer
+import com.github.misham72.communalpayments.presentation.utils.rememberHostelSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberInTotalSoundPlayer
+import com.github.misham72.communalpayments.presentation.utils.rememberInternetSoundPlayer
+import com.github.misham72.communalpayments.presentation.utils.rememberMTSSoundPlayer
+import com.github.misham72.communalpayments.presentation.utils.rememberOsagoSoundPlayer
+import com.github.misham72.communalpayments.presentation.utils.rememberTaxesSoundPlayer
+import com.github.misham72.communalpayments.presentation.utils.rememberTinkoffSoundPlayer
+import com.github.misham72.communalpayments.presentation.utils.rememberWaterSoundPlayer
+import com.github.misham72.communalpayments.presentation.utils.rememberlightSoundPlayer
+import kotlinx.coroutines.launch
 
 @Composable
-fun ControlBetweenScreens() {
+fun ControlBetweenScreens(
+    onExportBackup: () -> Unit = {},
+    onImportBackup: () -> Unit = {}
+) {
     val context = LocalContext.current
     val accountPrefs = remember { AccountPreferences(context.applicationContext) }
     var selectedService by remember { mutableIntStateOf(0) }
@@ -106,6 +109,7 @@ fun ControlBetweenScreens() {
     val scope = rememberCoroutineScope()
     var showLanguageDialog by remember { mutableStateOf(false) }
     var showThemeDialog by remember { mutableStateOf(false) }
+    var showBackupDialog by remember { mutableStateOf(false) }
     val historySound = rememberHistorySoundPlayer()
     val mockingPipeSound = rememberInTotalSoundPlayer()
     // Перезагружаем даты при каждом возобновлении экрана
@@ -147,43 +151,98 @@ fun ControlBetweenScreens() {
                     .navigationBarsPadding()
             ) {
                 Row(
-                    modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        stringResource(R.string.app_name), fontSize = 24.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground
+                        stringResource(R.string.app_name),
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onBackground
                     )
-                    Row(
-                        modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text("...")
-                        IconButton(onClick = { showMenu = true }) {
-                            Icon(Icons.Default.MoreVert, contentDescription = stringResource(R.string.menu))
-                        }
+                    IconButton(onClick = { showMenu = true }) {
+                        Icon(Icons.Default.MoreVert, contentDescription = stringResource(R.string.menu))
                     }
-                    DropdownMenu(
-                        expanded = showMenu, onDismissRequest = { showMenu = false }) {
-                        DropdownMenuItem(text = { Text(stringResource(R.string.exit), fontSize = 20.sp) }, onClick = {
+                }
+
+                DropdownMenu(
+                    expanded = showMenu,
+                    onDismissRequest = { showMenu = false }
+                ) {
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.exit), fontSize = 20.sp) },
+                        onClick = {
                             (context as? Activity)?.finishAffinity()
                             showMenu = false
-                        })
-                        DropdownMenuItem(text = { Text(stringResource(R.string.export_all_pdf_title)) }, onClick = {
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.export_all_pdf_title)) },
+                        onClick = {
                             scope.launch {
                                 PdfHistoryExporter.exportAllHistoryPdf(context)
                             }
                             showMenu = false
-                        })
-                        DropdownMenuItem(text = { Text(stringResource(R.string.language)) }, onClick = {
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.language)) },
+                        onClick = {
                             showMenu = false
                             showLanguageDialog = true
-                        })
-                        DropdownMenuItem(
-                            text = { Text(stringResource(R.string.theme)) },
-                            onClick = {
-                                showMenu = false
-                                showThemeDialog = true
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.theme)) },
+                        onClick = {
+                            showMenu = false
+                            showThemeDialog = true
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.backup_title)) },
+                        onClick = {
+                            showMenu = false
+                            showBackupDialog = true
+                        }
+                    )
+                }
+
+// Диалог резервного копирования
+                if (showBackupDialog) {
+                    AlertDialog(
+                        onDismissRequest = { showBackupDialog = false },
+                        title = { Text(stringResource(R.string.backup_title)) },
+                        text = {
+                            Column {
+                                Text(stringResource(R.string.backup_choose_action))
+                                Spacer(modifier = Modifier.height(16.dp))
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceEvenly
+                                ) {
+                                    Button(onClick = {
+                                        showBackupDialog = false
+                                        onExportBackup()
+                                    }) {
+                                        Text(stringResource(R.string.backup_create))
+                                    }
+                                    Button(onClick = {
+                                        showBackupDialog = false
+                                        onImportBackup()
+                                    }) {
+                                        Text(stringResource(R.string.backup_restore))
+                                    }
+                                }
                             }
-                        )
-                    }
+                        },
+                        confirmButton = {
+                            TextButton(onClick = { showBackupDialog = false }) {
+                                Text(stringResource(R.string.close))
+                            }
+                        }
+                    )
                 }
                 if (showLanguageDialog) {
                     AlertDialog(
@@ -321,7 +380,7 @@ fun ControlBetweenScreens() {
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.buttonColors()
                     ) {
-                        Text(stringResource(R.string.In_total))
+                        Text(stringResource(R.string.annual_countdown))
                     }
                     Button(
                         onClick = {

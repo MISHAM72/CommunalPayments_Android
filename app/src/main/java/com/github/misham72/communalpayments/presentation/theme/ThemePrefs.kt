@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 
+@Suppress("HardcodedStringLiteral")
 object ThemePrefs {
     private const val PREFS_NAME = "theme_prefs"
     private const val KEY_THEME_MODE = "theme_mode"

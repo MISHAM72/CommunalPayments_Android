@@ -163,7 +163,6 @@
     <string name="dark">dark</string>
     <string name="current_reading_pdf">current_reading</string>
     <string name="ru">ru</string>
-    <string name="mo">mo</string>
     <string name="send_pdf">send_pdf</string>
     <string name="formed">formed</string>
     <string name="pdf_title_history">pdf_title_history: %s</string>
@@ -180,12 +179,10 @@
     <string name="period_months_format">period: %d mo.</string>
     <string name="export_txt">export_txt</string>
     <string name="export_pdf">export_pdf</string>
-    <string name="In_total">In_total</string>
 
     <string name="error_load_default">error_load_default</string>
 
     <string name="tariff">tariff</string>
-    <string name="period">period</string>
     <string name="Expenses">Expenses</string>
     <string name="income">income</string>
     <string name="Annual_report">Annual_report</string>
@@ -215,6 +212,16 @@
     <string name="delete_record">delete_record</string>
     <string name="delete_confirm_amount">Amount: %,.2f ₽</string>
     <string name="day_of_payment_format">Payment day: %s</string>
+    <string name="annual_countdown">Annual countdown</string>
+    <string name="backup_export_success">Backup export success</string>
+    <string name="backup_import_success">Backup import success</string>
+    <string name="backup_error_format">Backup error format: %1$s</string>
+    <string name="backup_open_write_error">Backup open write error</string>
+    <string name="backup_open_read_error">Backup open read error</string>
+    <string name="backup_title">Backup title</string>
+    <string name="backup_choose_action">Backup choose action</string>
+    <string name="backup_create">Backup create</string>
+    <string name="backup_restore">Backup restore</string>
 
 </resources>
 

@@ -177,7 +177,6 @@
     <string name="light">Светлая</string>
     <string name="dark">Тёмная</string>
     <string name="ru">руб.</string>
-    <string name="mo">мес.</string>
     <string name="send_pdf">Отправить PDF</string>
     <string name="formed">"Сформировано: - "</string>
     <string name="pdf_title_history">История: %s</string>
@@ -196,7 +195,6 @@
     <string name="period_months_format">Период: %d мес.</string>
     <string name="export_txt">Поделиться TXT</string>
     <string name="export_pdf">Экспорт PDF</string>
-    <string name="In_total">📋 Всего</string>
 
     <string name="error_saving">Ошибка сохранения данных</string>
 
@@ -206,7 +204,6 @@
 
 
     <string name="tariff">Тариф</string>
-    <string name="period">Период:</string>
     <string name="Expenses">Расходы</string>
     <string name="income">Доходы</string>
     <string name="Annual_report">Годовой отчёт</string>
@@ -235,6 +232,16 @@
     <string name="delete_record">Удалить запись?</string>
     <string name="delete_confirm_amount">Сумма: %,.2f ₽</string>
     <string name="day_of_payment_format">День платежа: %s</string>
+    <string name="annual_countdown">Годовой отсчет</string>
+    <string name="backup_export_success">✅ Копия создана успешно</string>
+    <string name="backup_import_success">✅ Данные восстановлены успешно</string>
+    <string name="backup_error_format">❌ Ошибка: %1$s</string>
+    <string name="backup_open_write_error">Не удалось открыть файл для записи</string>
+    <string name="backup_open_read_error">Не удалось открыть файл для чтения</string>
+    <string name="backup_title">📦 Резервное копирование</string>
+    <string name="backup_choose_action">Выберите действие:</string>
+    <string name="backup_create">📤 Создать копию</string>
+    <string name="backup_restore">📥 Восстановить</string>
 
 
 </resources>

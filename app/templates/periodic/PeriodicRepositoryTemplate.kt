@@ -3,7 +3,9 @@ package com.github.misham72.communalpayments.data.repository
 import android.content.Context
 import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.data.local.FileManager
-import com.github.misham72.communalpayments.domain.userclasses.%SERVICE_NAME%
+import com.github.misham72.communalpayments.domain.userclasses.%
+
+SERVICE_NAME%
 
 /**
  * ШАБЛОН для репозитория периодического платежа
@@ -19,7 +21,7 @@ fileManager: FileManager
 
         val content = formatPeriodicPayment(
             dateTime = dateTime,
-            serviceName = context.getString(R.string.%service_name%),
+            serviceName = context.getString(R.string.% service_name %),
             payment = data.payment,
             isHistory = data.isHistory,
             customStatus = context.getString(R.string.status_paid)

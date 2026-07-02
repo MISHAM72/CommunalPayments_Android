@@ -26,13 +26,17 @@ abstract class BasePeriodicRepositoryWithAccount(
             nextPayment = nextPayment,
             daysUntilPayment = daysUntilPayment,
             priceTariff = priceTariff,
-            isHistory = isHistory,
+            isHistory = false,
             customStatus = customStatus
         )
 
         // Формируем content с учётом номера счёта
         var content = if (accountNumber.isNotBlank()) {
             buildString {
+                // Сначала добавляем квадратики, если это историческая запись
+                if (isHistory) {
+                    appendLine(historyHeader)   // ← вот тут должны быть квадратики!
+                }
                 appendLine(context.getString(R.string.personal_account_in_text_history, accountNumber))
                 append(baseContent)
             }

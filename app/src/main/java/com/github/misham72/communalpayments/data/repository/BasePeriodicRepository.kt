@@ -9,6 +9,8 @@ abstract class BasePeriodicRepository(
 ) : BaseRepository(context, fileManager) {
 
     // ✅ ЕДИНЫЙ метод для ВСЕХ периодических платежей
+    //внутри метода происходит сборка итоговой строки
+    @Suppress("SameParameterValue")
     protected fun formatPeriodicPayment(
         dateTime: String, serviceName: String, previousPayment: String,     // дата прошлого
         daysFromPayment: Long,       // дней прошло

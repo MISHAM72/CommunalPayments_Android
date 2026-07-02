@@ -18,7 +18,7 @@ class HostelRepositoryImpl(
         val status = context.getString(R.string.status_calculated)
 
         // ✅ Используем НОВЫЙ метод formatInternetPayment со всеми полями
-        var content = formatWithAccountNumber(
+        val content = formatWithAccountNumber(
             accountNumber = data.accountNumber,
             dateTime = dateTime,
             serviceName = context.getString(R.string.service_display_name_hostel),
