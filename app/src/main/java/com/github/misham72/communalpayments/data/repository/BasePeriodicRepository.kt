@@ -36,6 +36,7 @@ abstract class BasePeriodicRepository(
             appendLine(context.getString(R.string.next_payment, nextPayment))
             appendLine(context.getString(R.string.payment_in, daysUntilPayment))
             appendLine(context.getString(R.string.tariff_card, priceTariff))
+            appendLine(context.getString(R.string.currency_rub, priceTariff))
             // ✅ Добавить пустую строку в конце для красоты
             appendLine()
         }

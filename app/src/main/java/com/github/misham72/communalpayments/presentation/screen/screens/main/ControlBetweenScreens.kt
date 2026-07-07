@@ -58,7 +58,6 @@ import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 import com.github.misham72.communalpayments.presentation.screen.components.ServiceTab
 import com.github.misham72.communalpayments.presentation.screen.navigation.getListInitialScreen
 import com.github.misham72.communalpayments.presentation.screen.screens.analytics.AllServicesSummaryScreen
-import com.github.misham72.communalpayments.presentation.screen.screens.analytics.AllServicesSummaryViewModelFactory
 import com.github.misham72.communalpayments.presentation.screen.screens.analytics.IncomeViewModelFactory
 import com.github.misham72.communalpayments.presentation.screen.screens.history.SimpleHistoryScreen
 import com.github.misham72.communalpayments.presentation.theme.ThemePrefs
@@ -96,7 +95,7 @@ fun ControlBetweenScreens(
     val analyticsRepo = remember { AnalyticsRepositoryImpl(fileManager) }
     val getAllServicesUseCase = remember { GetAllServicesYearlySummaryUseCase(analyticsRepo) }
     val defaultError = stringResource(R.string.error_load_default)
-    val allServicesFactory = remember { AllServicesSummaryViewModelFactory(getAllServicesUseCase, defaultError) }
+
     // Зависимости для доходов
     val incomeFileManager = remember { IncomeFileManager(context) }
     val incomeRepo = remember { IncomeRepositoryImpl(incomeFileManager) }
@@ -132,7 +131,8 @@ fun ControlBetweenScreens(
     if (showAllServicesSummary.value) {
         AllServicesSummaryScreen(
             onBack = { showAllServicesSummary.value = false },
-            expensesFactory = allServicesFactory,
+            getAllServicesYearlySummaryUseCase = getAllServicesUseCase,  // используем существующую переменную
+            defaultErrorMessage = defaultError,
             incomeFactory = incomeFactory
         )
     } else if (showHistory.value) {

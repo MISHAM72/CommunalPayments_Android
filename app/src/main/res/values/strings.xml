@@ -243,6 +243,9 @@
     <string name="backup_create">📤 Создать копию</string>
     <string name="backup_restore">📥 Восстановить</string>
 
+    <string name="no_expenses_data">Нет данных о расходах</string>
+
+
 
 </resources>
 

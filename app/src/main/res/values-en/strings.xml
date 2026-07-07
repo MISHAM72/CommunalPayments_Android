@@ -222,6 +222,7 @@
     <string name="backup_choose_action">Backup choose action</string>
     <string name="backup_create">Backup create</string>
     <string name="backup_restore">Backup restore</string>
+    <string name="no_expenses_data">No expenses data</string>
 
 </resources>
 

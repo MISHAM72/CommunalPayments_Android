@@ -201,13 +201,6 @@ fun SimpleHistoryScreen(
             }
         }
         if (isEditing) {
-            val editScrollState = rememberScrollState()
-            LaunchedEffect(isEditing) {
-                if (isEditing) {
-                    delay(100) // Ждем отрисовки
-                    editScrollState.animateScrollTo(editScrollState.maxValue)
-                }
-            }
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -291,33 +284,93 @@ fun SimpleHistoryScreen(
                 ) {
                     val statusLabel = stringResource(R.string.status_label)
                     val toBePaidLabel = stringResource(R.string.to_be_paid)
-
+                    val serviceDisplayName = when (selectedService) {
+                        ServiceKeys.ELECTRICITY -> stringResource(R.string.service_display_name_electricity)
+                        ServiceKeys.GAS -> stringResource(R.string.service_display_name_gas)
+                        ServiceKeys.WATER -> stringResource(R.string.service_display_name_water)
+                        ServiceKeys.GARBAGE -> stringResource(R.string.service_display_name_garbage)
+                        ServiceKeys.ZONT -> stringResource(R.string.service_display_name_zont)
+                        ServiceKeys.INTERNET -> stringResource(R.string.service_display_name_internet)
+                        ServiceKeys.MTS -> stringResource(R.string.service_display_name_mts)
+                        ServiceKeys.TINKOFF -> stringResource(R.string.service_display_name_tinkoff)
+                        ServiceKeys.TAXES -> stringResource(R.string.service_display_name_taxes)
+                        ServiceKeys.TROYKA -> stringResource(R.string.service_display_name_troyka)
+                        ServiceKeys.OSAGO -> stringResource(R.string.service_display_name_osago)
+                        ServiceKeys.HOSTEL -> stringResource(R.string.service_display_name_hostel)
+                        else -> ""
+                    }
                     val formattedHistoryText = buildAnnotatedString {
-                        // Разбиваем содержимое файла на строки
                         val lines = fileContent.replace("<br>", "\n").lines()
+                        val dateRegex = Regex("""(\d{4}-\d{2}-\d{2}) \d{2}:\d{2}:\d{2}""")
+                        val outputFormatter = java.time.format.DateTimeFormatter.ofPattern("d MMMM yyyy", java.util.Locale("ru"))
 
                         lines.forEachIndexed { index, line ->
-                            // Проверяем, содержит ли строка ключевые метки
-                            val isLabelLine = line.startsWith(stringResource(R.string.service_prefix)) ||
-                                (line.startsWith("( ") && line.endsWith(" )")) ||
-                                line.contains(statusLabel) || line.contains(toBePaidLabel)
-                            if (isLabelLine) {
-                                // Строки с метками делаем ЖИРНЫМИ
-                                withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                            val trimmed = line.trim()
+                            val isToBePaid = line.contains(toBePaidLabel)
+                            val isServiceName = trimmed == serviceDisplayName
+                            val dateMatch = dateRegex.find(line)
+                            val isDate = dateMatch != null
+                            val isOtherLabel = (line.startsWith("( ") && line.endsWith(" )")) ||
+                                line.contains(statusLabel)
+
+                            when {
+                                isToBePaid -> {
+                                    // ✅ Вся строка "К оплате: - 123.45 руб." – красная, крупная, жирная
+                                    withStyle(
+                                        style = SpanStyle(
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color.Red,
+                                            fontSize = 20.sp
+                                        )
+                                    ) {
+                                        append(line)
+                                    }
+                                }
+
+                                isDate -> {
+                                    val dateStr = dateMatch?.groupValues?.get(1) ?: trimmed
+                                    val formattedDate = try {
+                                        java.time.LocalDate.parse(dateStr).format(outputFormatter)
+                                    } catch (_: Exception) {
+                                        dateStr
+                                    }
+                                    withStyle(
+                                        style = SpanStyle(
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color.Black,
+                                            fontSize = 20.sp
+                                        )
+                                    ) {
+                                        append(formattedDate)
+                                    }
+                                }
+
+                                isServiceName -> {
+                                    withStyle(
+                                        style = SpanStyle(
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color.Black,
+                                            fontSize = 20.sp
+                                        )
+                                    ) {
+                                        append(line)
+                                    }
+                                }
+
+                                isOtherLabel -> {
+                                    withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                                        append(line)
+                                    }
+                                }
+
+                                else -> {
                                     append(line)
                                 }
-                            } else {
-                                // Остальные строки - обычным шрифтом
-                                append(line)
                             }
 
-                            // Добавляем перенос строки (кроме последней)
-                            if (index < lines.size - 1) {
-                                append("\n")
-                            }
+                            if (index < lines.size - 1) append("\n")
                         }
                     }
-
                     Text(
                         text = formattedHistoryText, fontSize = 16.sp
                     )

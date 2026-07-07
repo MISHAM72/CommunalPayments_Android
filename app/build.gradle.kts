@@ -40,8 +40,6 @@ android {
         if (localFile.exists()) {
             localProperties.load(localFile.inputStream())
         }
-        val deepSeekApiKey: String = localProperties.getProperty("DEEPSEEK_API_KEY", "")
-        buildConfigField("String", "DEEPSEEK_API_KEY", "\"$deepSeekApiKey\"")
     }
 
     buildTypes {
