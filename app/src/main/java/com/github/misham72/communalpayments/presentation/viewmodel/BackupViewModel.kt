@@ -2,6 +2,7 @@ package com.github.misham72.communalpayments.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.domain.userclasses.ExportBackupUseCase
 import com.github.misham72.communalpayments.domain.userclasses.ImportBackupUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,7 +26,7 @@ class BackupViewModel(
             _state.value = _state.value.copy(
                 isLoading = false,
                 isExportDone = success,
-                error = if (!success) "Ошибка при создании копии" else null
+                error = if (!success) R.string.error_copy_failed else null
             )
         }
     }
@@ -37,7 +38,7 @@ class BackupViewModel(
             _state.value = _state.value.copy(
                 isLoading = false,
                 isImportDone = success,
-                error = if (!success) "Ошибка при восстановлении" else null
+                error = if (!success) R.string.error_restore_failed else null
             )
         }
     }
@@ -50,6 +51,6 @@ class BackupViewModel(
         val isLoading: Boolean = false,
         val isExportDone: Boolean = false,
         val isImportDone: Boolean = false,
-        val error: String? = null
+        val error: Int? = null
     )
 }

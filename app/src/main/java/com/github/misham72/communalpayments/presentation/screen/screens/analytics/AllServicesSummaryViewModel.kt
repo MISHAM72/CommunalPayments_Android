@@ -1,11 +1,9 @@
 package com.github.misham72.communalpayments.presentation.screen.screens.analytics
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.misham72.communalpayments.domain.model.ExpenseSummary
 import com.github.misham72.communalpayments.domain.userclasses.GetAllServicesYearlySummaryUseCase
-import com.github.misham72.communalpayments.presentation.mapper.StatusDisplayMapper.map
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -27,15 +25,15 @@ class AllServicesSummaryViewModel(
     val uiState: StateFlow<AllServicesUiState> = _uiState.asStateFlow()
     fun loadSummary(serviceKeys: List<String>, year: Int = Year.now().value) {
         viewModelScope.launch {
-            _uiState.value = AllServicesUiState(isLoading = true)
+            _uiState.value = AllServicesUiState()
             try {
-                Log.d("Expenses", "serviceKeys: $serviceKeys")
                 val map = getAllServicesYearlySummaryUseCase(serviceKeys, year)
-                Log.d("Expenses", "Map from useCase: $map")
+                //serviceKeys – это список, пришедший из UI: allServices.map { it.fileKey },
+                // и он сохраняет порядок getListInitialScreen().
+                //Значит, byService – это карта, в которой ключи идут точно в том же порядке, что и в serviceKeys.
                 val byService = serviceKeys.associateWith { key ->
                     map[key]?.total ?: 0.0
                 }
-                Log.d("Expenses", "byService after associateWith: $byService") // ← итоговая карта
                 val total = byService.values.sum()
                 val summary = ExpenseSummary(total, byService)
                 _uiState.value = AllServicesUiState(isLoading = false, data = summary)

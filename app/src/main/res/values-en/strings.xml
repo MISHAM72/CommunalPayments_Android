@@ -56,7 +56,7 @@
     <string name="status_text_active">ACTIVELY</string>
     <string name="status_text_under_review">UNDER REVIEW</string>
     <string name="status_text_cancelled">CANCELLED</string>
-    <string name="service_prefix">Service</string>
+
 
     // В файле res/values/strings.xml замените эмодзи
     <string name="emoji_paid">🔴</string>
@@ -114,7 +114,6 @@
 
     <string name="unknown_error">Unknown error</string>
     <string name="editing">Editing</string>
-    <string name="service_name_label">Name of the service</string>
     <string name="select_start_date">Select start date: %s</string>
 
     <string name="payment_date">Payment date: %s</string>
@@ -155,7 +154,6 @@
     <string name="service_display_name_hostel">Hostel</string>
     <string name="address">address: %s</string>
     <string name="result_hostel">result_hostel</string>
-    <string name="number_of_the_apartment_or_room">number_of_the_apartment_or_room</string>
     <string name="theme">theme</string>
     <string name="select_theme">select_theme</string>
     <string name="system_default">system_default</string>
@@ -215,7 +213,6 @@
     <string name="annual_countdown">Annual countdown</string>
     <string name="backup_export_success">Backup export success</string>
     <string name="backup_import_success">Backup import success</string>
-    <string name="backup_error_format">Backup error format: %1$s</string>
     <string name="backup_open_write_error">Backup open write error</string>
     <string name="backup_open_read_error">Backup open read error</string>
     <string name="backup_title">Backup title</string>
@@ -223,6 +220,37 @@
     <string name="backup_create">Backup create</string>
     <string name="backup_restore">Backup restore</string>
     <string name="no_expenses_data">No expenses data</string>
+    <string name="error_copy_failed">Error copy failed</string>
+    <string name="error_restore_failed">Error  restore failed</string>
+    <string name="edit_bank_details">edit_bank_details</string>
+    <string name="service_name">service_name</string>
+    <string name="name_company">Name company</string>
+    <string name="inn_label">INN</string>
+    <string name="bank_account">Bank account</string>
+    <string name="payment_details">📋 Payment details</string>
+    <string name="select_details_to_copy">Select the details to copy</string>
+    <string name="your_personal_account_has_been_copied">Your personal account has been copied!</string>
+    <string name="personal_account_has_not_been_added">The personal account has not been added.</string>
+    <string name="service_label">service: %1$s</string>
+    <string name="not_specified">not_specified</string>
+    <string name="personal_account_not_specified">Personal account not specified</string>
+    <string name="tariff_copied">The pricing plan has been copied!</string>
+    <string name="tariff_not_specified">Тариф не указан.</string>
 
+    <string name="name_company_copied">Name company has been copied!</string>
+    <string name="name_company_not_specified">Name company not specified.</string>
+    <string name="name">Name: %s</string>
+    <string name="name_not_specified">Name not specified</string>
+    <string name="inn_copied">INN has been copied!</string>
+    <string name="inn_not_added">INN has not been added.</string>
+
+    <string name="inn_not_specified">INN not specified</string>
+    <string name="bank_account_copied">Bank account copied!</string>
+    <string name="bank_account_not_specified">Bank account not specified.</string>
+    <string name="bank_account_label">B/A: %1$s</string>
+    <string name="bank_account_label_not_specified">B/A not specified</string>
+    <string name="tariff_details">Tariff: %s</string>
+    <string name="enter_personal_account">Enter personal account</string>
+    <string name="mon">мес.</string>
 </resources>
 

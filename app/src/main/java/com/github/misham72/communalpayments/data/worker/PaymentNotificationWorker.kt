@@ -7,7 +7,7 @@ import androidx.core.app.NotificationCompat
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.github.misham72.communalpayments.R
-import com.github.misham72.communalpayments.data.local.AccountPreferences
+import com.github.misham72.communalpayments.data.local.preferences.AccountPreferences
 import com.github.misham72.communalpayments.domain.utils.DateUtils
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 import kotlinx.coroutines.Dispatchers

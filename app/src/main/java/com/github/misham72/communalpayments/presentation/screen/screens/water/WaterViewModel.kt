@@ -3,13 +3,16 @@ package com.github.misham72.communalpayments.presentation.screen.screens.water
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.misham72.communalpayments.data.local.AccountPreferences
+import com.github.misham72.communalpayments.data.local.preferences.AccountPreferences
+import com.github.misham72.communalpayments.domain.model.ProviderDetails
 import com.github.misham72.communalpayments.domain.model.ValidationError
 import com.github.misham72.communalpayments.domain.model.WaterData
+import com.github.misham72.communalpayments.domain.repository.IProviderRepository
 import com.github.misham72.communalpayments.domain.repository.WaterRepository
 import com.github.misham72.communalpayments.domain.userclasses.Water
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 import com.github.misham72.communalpayments.presentation.utils.PdfHistoryExporter
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -20,20 +23,19 @@ import kotlinx.coroutines.launch
 class WaterViewModel(
     private val water: Water,
     private val waterRepository: WaterRepository,
-    private val accountPrefs: AccountPreferences
+    private val accountPrefs: AccountPreferences,
+    private val repository: IProviderRepository
 ) : ViewModel() {
     companion object {
-        private const val SERVICE_KEY = ServiceKeys.WATER
+        const val SERVICE_KEY = ServiceKeys.WATER
     }
 
     data class UiState( //✅ UiState как единый источник правды для экрана
         val currentReading: String = "",
         val previousReading: String = "",
-        val tariff: String = "",
-        val accountNumber: String = "",
+        val providerDetails: ProviderDetails = ProviderDetails(),
+        val showAccountDialog: Boolean = false,
         val customDate: String = "",
-        val customServiceName: String = "",
-        val showAccountDialog: Boolean = false,   // флаг для диалога
         val result: WaterData? = null,
         val error: ValidationError? = null
     )
@@ -42,15 +44,37 @@ class WaterViewModel(
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()  //✅ StateFlow для неизменяемого публичного доступа
 
     init {
-        val savedNumber = accountPrefs.getAccount(SERVICE_KEY)
-        val savedName = accountPrefs.getCustomName(SERVICE_KEY)
-        val saveDate = accountPrefs.getCustomDate(SERVICE_KEY)
-        val lastReading = accountPrefs.getLastReading(SERVICE_KEY)
-        val savedTariff = accountPrefs.getTariff(SERVICE_KEY)
-        if (lastReading.isNotBlank()) {
-            _uiState.update { it.copy(previousReading = lastReading) }
+        viewModelScope.launch {
+            val detailsDeferred = async { repository.loadProviderDetails(ServiceKeys.WATER) }
+            val savedLastReading = accountPrefs.getLastReading(SERVICE_KEY)
+            val savedTariff = accountPrefs.getTariff(SERVICE_KEY)
+            val savedDate = accountPrefs.getCustomDate(SERVICE_KEY)
+
+            val details = detailsDeferred.await()
+
+            _uiState.update { currentState ->
+                currentState.copy(
+                    providerDetails = details.copy(
+                        tariff = savedTariff.ifBlank { details.tariff }
+                    ),
+                    previousReading = savedLastReading,
+                    customDate = savedDate
+                )
+            }
         }
-        _uiState.update { it.copy(accountNumber = savedNumber, customServiceName = savedName, customDate = saveDate, tariff = savedTariff) }
+    }
+
+    fun saveProviderDetails(details: ProviderDetails) {
+        viewModelScope.launch {
+            repository.saveProviderDetails(ServiceKeys.WATER, details)
+            _uiState.update { it.copy(providerDetails = details) }
+            // Если нужно обновить другие поля (тариф и т.д.) – можно сделать здесь
+        }
+    }
+
+    fun updateCustomDate(date: String) {
+        _uiState.update { it.copy(customDate = date) }
+        accountPrefs.saveCustomDate(SERVICE_KEY, date)
     }
 
     fun onPdfExport(context: Context) {
@@ -67,16 +91,6 @@ class WaterViewModel(
         _uiState.update { it.copy(showAccountDialog = false) }
     }
 
-
-    // 🔸 ЗАМЕНИТЬ updateAccountNumber на updateAccountData (сохраняет и номер, и название)
-    fun updateAccountData(newNumber: String, newName: String, newDate: String) {
-        _uiState.update { it.copy(accountNumber = newNumber, customServiceName = newName, customDate = newDate) }
-        accountPrefs.saveAccount(SERVICE_KEY, newNumber)
-        accountPrefs.saveCustomName(SERVICE_KEY, newName)
-        accountPrefs.saveCustomDate(SERVICE_KEY, newDate)
-
-    }
-
     fun onCurrentReadingChange(value: String) {
         _uiState.update { it.copy(currentReading = value) }
     }
@@ -86,16 +100,18 @@ class WaterViewModel(
     }
 
     fun onTariffChange(value: String) {
-        _uiState.update { it.copy(tariff = value) }
+        _uiState.update { currentState ->
+            currentState.copy(
+                providerDetails = currentState.providerDetails.copy(tariff = value)
+            )
+        }
     }
-
-    fun getServiceKey(): String = SERVICE_KEY
 
     fun onCalculateClick() {
         val current = _uiState.value.currentReading.toDoubleOrNull()
         val previous = _uiState.value.previousReading.toDoubleOrNull()
-        val tariff = _uiState.value.tariff.toDoubleOrNull()
-        val account = _uiState.value.accountNumber
+        val tariff = _uiState.value.providerDetails.tariff.toDoubleOrNull()
+        val account = _uiState.value.providerDetails.accountNumber
 
         if (current == null || previous == null || tariff == null) {
             _uiState.update { it.copy(error = ValidationError.InvalidInput) }

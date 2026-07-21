@@ -45,15 +45,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import com.github.misham72.communalpayments.R
-import com.github.misham72.communalpayments.data.local.AccountPreferences
-import com.github.misham72.communalpayments.data.local.FileManager
-import com.github.misham72.communalpayments.data.local.IncomeFileManager
-import com.github.misham72.communalpayments.data.repository.AnalyticsRepositoryImpl
-import com.github.misham72.communalpayments.data.repository.IncomeRepositoryImpl
+import com.github.misham72.communalpayments.data.local.preferences.AccountPreferences
+import com.github.misham72.communalpayments.data.local.file.FileManager
+import com.github.misham72.communalpayments.data.local.income.filemanager.IncomeFileManager
+import com.github.misham72.communalpayments.data.repository.analytics.AnalyticsRepositoryImpl
+import com.github.misham72.communalpayments.data.repository.income.IncomeRepositoryImpl
 import com.github.misham72.communalpayments.domain.userclasses.AddIncomeUseCase
 import com.github.misham72.communalpayments.domain.userclasses.GetAllServicesYearlySummaryUseCase
 import com.github.misham72.communalpayments.domain.userclasses.GetYearlyIncomeUseCase
-import com.github.misham72.communalpayments.domain.userclasses.UpdateIncomeUseCase
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 import com.github.misham72.communalpayments.presentation.screen.components.ServiceTab
 import com.github.misham72.communalpayments.presentation.screen.navigation.getListInitialScreen
@@ -101,8 +100,7 @@ fun ControlBetweenScreens(
     val incomeRepo = remember { IncomeRepositoryImpl(incomeFileManager) }
     val getIncomeUseCase = remember { GetYearlyIncomeUseCase(incomeRepo) }
     val addIncomeUseCase = remember { AddIncomeUseCase(incomeRepo) }
-    val updateIncomeUseCase = remember { UpdateIncomeUseCase(incomeRepo) }
-    val incomeFactory = remember { IncomeViewModelFactory(getIncomeUseCase, addIncomeUseCase, updateIncomeUseCase) }
+    val incomeFactory = remember { IncomeViewModelFactory(getIncomeUseCase, addIncomeUseCase) }
     var dueDates by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
     var showMenu by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()

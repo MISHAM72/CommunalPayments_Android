@@ -19,7 +19,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.misham72.communalpayments.R
-import com.github.misham72.communalpayments.data.repository.BackupRepositoryImpl
+import com.github.misham72.communalpayments.data.repository.backup.BackupRepositoryImpl
 import com.github.misham72.communalpayments.domain.userclasses.ExportBackupUseCase
 import com.github.misham72.communalpayments.domain.userclasses.ImportBackupUseCase
 import com.github.misham72.communalpayments.presentation.screen.screens.main.ControlBetweenScreens
@@ -103,7 +103,10 @@ class MainActivity : AppCompatActivity() {
                         }
 
                         backupState.error != null -> {
-                            Toast.makeText(context, getString(R.string.backup_error_format, backupState.error), Toast.LENGTH_LONG).show()
+                            // используем ?.let для безопасного извлечения errorId
+                            backupState.error?.let { errorId ->
+                                Toast.makeText(context, getString(errorId), Toast.LENGTH_LONG).show()
+                            }
                             backupViewModel.resetState()
                         }
                     }

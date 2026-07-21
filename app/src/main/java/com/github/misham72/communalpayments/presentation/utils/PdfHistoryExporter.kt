@@ -10,8 +10,8 @@ import android.graphics.pdf.PdfDocument
 import android.net.Uri
 import androidx.core.content.FileProvider
 import com.github.misham72.communalpayments.R
-import com.github.misham72.communalpayments.data.local.AccountPreferences
-import com.github.misham72.communalpayments.data.local.FileManager
+import com.github.misham72.communalpayments.data.local.preferences.AccountPreferences
+import com.github.misham72.communalpayments.data.local.file.FileManager
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -104,7 +104,7 @@ object PdfHistoryExporter {
                     trimmed.startsWith(context.getString(R.string.tariff)) -> tariff = trimmed.substringAfter(":").replace(context.getString(R.string.ru), "").trim()
                     trimmed.startsWith(context.getString(R.string.day_of_payment_format).substringBefore("%")) -> paymentDay = trimmed.substringAfter(":").trim()
                     @Suppress("HardcodedStringLiteral")
-                    trimmed.startsWith("Период:") -> periodMonths = trimmed.substringAfter(":").replace("%d", "").replace("мес.", "").trim()
+                    trimmed.startsWith("Период:") -> periodMonths = trimmed.substringAfter(":").replace("%d", "").replace(context.getString(R.string.mon), "").trim()
                     // Статусы с эмодзи (эмодзи остаются)
                     trimmed.startsWith("\uD83D\uDD34") -> status = trimmed   // 🔴
                     trimmed.startsWith("\u23F3") -> status = trimmed          // ⏳

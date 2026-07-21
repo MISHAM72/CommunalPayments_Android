@@ -1,6 +1,5 @@
 package com.github.misham72.communalpayments.presentation.screen.screens.analytics
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -63,8 +62,8 @@ import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.misham72.communalpayments.R
-import com.github.misham72.communalpayments.data.local.IncomeFileManager
-import com.github.misham72.communalpayments.data.local.IncomeParser
+import com.github.misham72.communalpayments.data.local.income.filemanager.IncomeFileManager
+import com.github.misham72.communalpayments.data.local.income.parser.IncomeParser
 import com.github.misham72.communalpayments.domain.model.ExpenseSummary
 import com.github.misham72.communalpayments.domain.model.IncomeCategory
 import com.github.misham72.communalpayments.domain.model.IncomeRecord
@@ -130,17 +129,13 @@ fun AllServicesSummaryScreen(
 }
 
 // ---------- Вкладка расходов ----------
-
-// ---------- Вкладка расходов ----------
 @Composable
 private fun ExpensesTab(factory: AllServicesSummaryViewModelFactory) {
-    Log.d("Expenses", "🔵🔵🔵 ExpensesTab: entered")   // <-- новый лог
     val viewModel: AllServicesSummaryViewModel = viewModel(factory = factory)
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val allServices = getListInitialScreen()
 
     LaunchedEffect(Unit) {
-        Log.d("Expenses", "🔵🔵🔵 LaunchedEffect: running")   // <-- новый лог
         viewModel.loadSummary(allServices.map { it.fileKey })
     }
 
@@ -178,7 +173,7 @@ private fun ExpensesTab(factory: AllServicesSummaryViewModelFactory) {
                     ExpensesChart(summary, allServices)
                     Spacer(modifier = Modifier.height(8.dp))
                 }
-                val services = summary.byService.toList().sortedBy { (key, _) -> key }
+                val services = summary.byService.toList().sortedBy { (key, _) -> allServices.indexOfFirst { it.fileKey == key } }
                 if (services.isNotEmpty()) {
                     items(services) { (key, total) ->
                         val screen = allServices.find { it.fileKey == key }
@@ -206,7 +201,7 @@ private fun ExpensesTab(factory: AllServicesSummaryViewModelFactory) {
 private fun ExpensesChart(
     summary: ExpenseSummary, allServices: List<InitialScreen>
 ) {
-    val services = summary.byService.toList().sortedBy { (key, _) -> key }
+    val services = summary.byService.toList().sortedBy { (key, _) -> allServices.indexOfFirst { it.fileKey == key } }
 
     val hasData = services.any { it.second > 0 }
     if (services.isEmpty() || !hasData) {

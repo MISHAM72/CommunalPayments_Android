@@ -3,13 +3,16 @@ package com.github.misham72.communalpayments.presentation.screen.screens.interne
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.misham72.communalpayments.data.local.AccountPreferences
+import com.github.misham72.communalpayments.data.local.preferences.AccountPreferences
 import com.github.misham72.communalpayments.domain.model.InternetData
+import com.github.misham72.communalpayments.domain.model.ProviderDetails
 import com.github.misham72.communalpayments.domain.model.ValidationError
+import com.github.misham72.communalpayments.domain.repository.IProviderRepository
 import com.github.misham72.communalpayments.domain.repository.InternetRepository
 import com.github.misham72.communalpayments.domain.userclasses.Internet
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 import com.github.misham72.communalpayments.presentation.utils.PdfHistoryExporter
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -20,22 +23,23 @@ import java.util.Date
 import java.util.Locale
 
 class InternetViewModel(
-    private val internet: Internet, private val internetRepository: InternetRepository, private val accountPrefs: AccountPreferences
+    private val internet: Internet,
+    private val internetRepository: InternetRepository,
+    private val accountPrefs: AccountPreferences,
+    private val repository: IProviderRepository
 ) : ViewModel() {
 
     companion object {
-        private const val SERVICE_KEY = ServiceKeys.INTERNET
+        const val SERVICE_KEY = ServiceKeys.INTERNET
     }
 
     // 1️⃣ СОСТОЯНИЕ ЭКРАНА (что храним)
     data class UiState(
         val paymentDay: String = "",
         val periodMonths: String = "",
-        val priceTariff: String = "",
-        val accountNumber: String = "",
-        val customDate: String = "",
-        val customServiceName: String = "",
+        val providerDetails: ProviderDetails = ProviderDetails(),
         val showAccountDialog: Boolean = false,
+        val customDate: String = "",
         val result: InternetData? = null,
         val error: ValidationError? = null,
     )
@@ -44,13 +48,40 @@ class InternetViewModel(
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
     init {
-        val savedNumber = accountPrefs.getAccount(SERVICE_KEY)
-        val saveDate = accountPrefs.getCustomDate(SERVICE_KEY)
-        val savedName = accountPrefs.getCustomName(SERVICE_KEY)
-        val savedDay = accountPrefs.getPaymentDay(SERVICE_KEY)
-        val savedPeriod = accountPrefs.getPeriodMonths(SERVICE_KEY)
-        val savedTariff = accountPrefs.getTariff(SERVICE_KEY)
-        _uiState.update { it.copy(accountNumber = savedNumber, customServiceName = savedName, customDate = saveDate, paymentDay = savedDay, periodMonths = savedPeriod, priceTariff = savedTariff) }
+        viewModelScope.launch {
+            // Загружаем всё параллельно, если возможно
+            val detailsDeferred = async { repository.loadProviderDetails(ServiceKeys.INTERNET) }
+            val saveDay = accountPrefs.getPaymentDay(SERVICE_KEY)
+            val savePeriod = accountPrefs.getPeriodMonths(SERVICE_KEY)
+            val savedTariff = accountPrefs.getTariff(SERVICE_KEY)
+            val savedDate = accountPrefs.getCustomDate(SERVICE_KEY)
+
+            val details = detailsDeferred.await() // ждём результат
+
+            _uiState.update { currentState ->
+                currentState.copy(
+                    providerDetails = details.copy(
+                        tariff = savedTariff.ifBlank { details.tariff }
+                    ),
+                    paymentDay = saveDay,
+                    periodMonths = savePeriod,
+                    customDate = savedDate
+                )
+            }
+        }
+    }
+
+    fun saveProviderDetails(details: ProviderDetails) {
+        viewModelScope.launch {
+            repository.saveProviderDetails(ServiceKeys.INTERNET, details)// 1) Сохраняем в SharedPreferences
+            _uiState.update { it.copy(providerDetails = details) }// 2) Обновляем состояние экрана
+            // Если нужно обновить другие поля (тариф и т.д.) – можно сделать здесь
+        }
+    }
+
+    fun updateCustomDate(date: String) {
+        _uiState.update { it.copy(customDate = date) }
+        accountPrefs.saveCustomDate(SERVICE_KEY, date)
     }
 
     fun onPdfExport(context: Context) {
@@ -67,15 +98,6 @@ class InternetViewModel(
         _uiState.update { it.copy(showAccountDialog = false) }
     }
 
-
-    // 🔸 ЗАМЕНИТЬ updateAccountNumber на updateAccountData (сохраняет и номер, и название)
-    fun updateAccountData(newNumber: String, newName: String, newDate: String) {
-        _uiState.update { it.copy(accountNumber = newNumber, customServiceName = newName, customDate = newDate) }
-        accountPrefs.saveAccount(SERVICE_KEY, newNumber)
-        accountPrefs.saveCustomDate(SERVICE_KEY, newDate)
-        accountPrefs.saveCustomName(SERVICE_KEY, newName)
-    }
-
     // 2️⃣ ПОЛУЧАЕМ ВВОД ОТ ПОЛЬЗОВАТЕЛЯ
     fun onPaymentDayChange(value: String) {
         _uiState.update { it.copy(paymentDay = value) }
@@ -86,7 +108,11 @@ class InternetViewModel(
     }
 
     fun onPriceTariffChange(value: String) {
-        _uiState.update { it.copy(priceTariff = value) }
+        _uiState.update { currentState ->
+            currentState.copy(
+                providerDetails = currentState.providerDetails.copy(tariff = value)
+            )
+        }
     }
 
     private fun parseStartDate(dateString: String): Date {
@@ -97,14 +123,12 @@ class InternetViewModel(
         }
     }
 
-    fun getServiceKey(): String = SERVICE_KEY
-
     fun onCalculateClick() {
         // Валидация
         val paymentDay = _uiState.value.paymentDay.toIntOrNull()
         val periodMonths = _uiState.value.periodMonths.toIntOrNull()
-        val priceTariff = _uiState.value.priceTariff.toDoubleOrNull()
-        val account = _uiState.value.accountNumber
+        val priceTariff = _uiState.value.providerDetails.tariff.toDoubleOrNull()
+        val account = _uiState.value.providerDetails.accountNumber
         if (paymentDay == null || periodMonths == null || priceTariff == null) {
             _uiState.update { it.copy(error = ValidationError.InvalidInput) }
             return
@@ -113,12 +137,16 @@ class InternetViewModel(
 
         // 1️⃣ Домен - ЧТО рассчитать
         val data = internet.collectInternetData(
-            paymentDay = paymentDay, periodMonths = periodMonths, startDate = startDate, priceTariff = priceTariff, accountNumber = account
+            paymentDay = paymentDay,
+            periodMonths = periodMonths,
+            startDate = startDate,
+            priceTariff = priceTariff,
+            accountNumber = account
         )
         viewModelScope.launch {
             internetRepository.saveInternetPayment(data)
             _uiState.update {
-                accountPrefs.savedPaymentDay(SERVICE_KEY, paymentDay.toString())
+                accountPrefs.savePaymentDay(SERVICE_KEY, paymentDay.toString())
                 accountPrefs.savePeriodMonths(SERVICE_KEY, periodMonths.toString())
                 accountPrefs.saveTariff(SERVICE_KEY, priceTariff.toString())
                 it.copy(result = data, error = null)

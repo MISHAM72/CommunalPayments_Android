@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.core.content.FileProvider
 import com.github.misham72.communalpayments.R
-import com.github.misham72.communalpayments.data.local.FileManager
+import com.github.misham72.communalpayments.data.local.file.FileManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File

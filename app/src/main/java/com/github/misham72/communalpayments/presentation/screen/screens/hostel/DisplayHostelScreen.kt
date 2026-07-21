@@ -1,10 +1,10 @@
 package com.github.misham72.communalpayments.presentation.screen.screens.hostel
 
 import android.annotation.SuppressLint
-import android.app.DatePickerDialog
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,7 +28,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -41,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.domain.model.ValidationError
+import com.github.misham72.communalpayments.presentation.screen.components.EditProviderDetailsDialog
 import com.github.misham72.communalpayments.presentation.screen.components.ServiceTopBar
 import com.github.misham72.communalpayments.presentation.utils.BankPaymentHelper
 import com.github.misham72.communalpayments.presentation.utils.HistoryExporter
@@ -48,15 +48,12 @@ import com.github.misham72.communalpayments.presentation.utils.rememberBankButto
 import com.github.misham72.communalpayments.presentation.utils.rememberCoinSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberCopyButtonSoundPlayer
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.GregorianCalendar
-import java.util.Locale
 
 @SuppressLint("LocalContextGetResourceValueCall")
 @Composable
 fun DisplayHostelScreen(viewModel: HostelViewModel) {
     val showBankDialog = remember { mutableStateOf(false) }
+    val showProviderDialog = remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val clipboardManager = LocalClipboardManager.current
@@ -64,9 +61,6 @@ fun DisplayHostelScreen(viewModel: HostelViewModel) {
     val copySound = rememberCopyButtonSoundPlayer()
     val bankSound = rememberBankButtonSoundPlayer()
     val uiState by viewModel.uiState.collectAsState()
-    var tempNumber by remember { mutableStateOf(uiState.accountNumber) }
-    var tempName by remember { mutableStateOf(uiState.customServiceName) }
-    var tempDate by remember { mutableStateOf(uiState.customDate) }
 
     Column(
         modifier = Modifier
@@ -75,15 +69,11 @@ fun DisplayHostelScreen(viewModel: HostelViewModel) {
             .verticalScroll(rememberScrollState()), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(1.dp)
     ) {
         ServiceTopBar(
-            onPdfExport = { viewModel.onPdfExport(context) },
-            title = uiState.customServiceName.ifBlank { stringResource(R.string.service_display_name_hostel) },
-            onEditClick = { viewModel.openAccountDialog() },
-            onShareClick = {
+            onPdfExport = { viewModel.onPdfExport(context) }, title = uiState.providerDetails.customServiceName.ifBlank { stringResource(R.string.service_display_name_hostel) }, onEditClick = { viewModel.openAccountDialog() }, onShareClick = {
                 scope.launch {
-                    HistoryExporter.shareSingleHistory(context, viewModel.getServiceKey())
+                    HistoryExporter.shareSingleHistory(context, HostelViewModel.SERVICE_KEY)
                 }
-            },
-            modifier = Modifier.height(28.dp)
+            }, modifier = Modifier.height(28.dp)
         )
         if (uiState.customDate.isNotBlank()) {
             Text(
@@ -91,53 +81,36 @@ fun DisplayHostelScreen(viewModel: HostelViewModel) {
             )
         }
 // Номер под названием (отдельная строка)
-        if (uiState.accountNumber.isNotBlank()) {
+        if (uiState.providerDetails.accountNumber.isNotBlank()) {
             Text(
-                text = stringResource(R.string.address, uiState.accountNumber), fontSize = 14.sp, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(top = 1.dp)
+                text = stringResource(R.string.address, uiState.providerDetails.accountNumber), fontSize = 14.sp, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(top = 1.dp)
             )
         }
         // Поле ввода - день платежа
         OutlinedTextField(
-            value = uiState.paymentDay,
-            onValueChange = viewModel::onPaymentDayChange,
-            label = { Text(stringResource(R.string.day_of_payment_label)) },  // явный текст
+            value = uiState.paymentDay, onValueChange = viewModel::onPaymentDayChange, label = { Text(stringResource(R.string.day_of_payment_label)) },  // явный текст
             modifier = Modifier
                 .fillMaxWidth()
-                .heightIn(min = 48.dp, max = 56.dp),
-            singleLine = true,
-            textStyle = LocalTextStyle.current.copy(
-                fontSize = 14.sp,
-                lineHeight = 20.sp
+                .heightIn(min = 48.dp, max = 56.dp), singleLine = true, textStyle = LocalTextStyle.current.copy(
+                fontSize = 14.sp, lineHeight = 20.sp
             )
         )
 
         // Поле ввода - период в месяцах
         OutlinedTextField(
-            value = uiState.periodMonths,
-            onValueChange = viewModel::onPeriodMonthsChange,
-            label = { Text(stringResource(R.string.period_months_label)) },
-            modifier = Modifier
+            value = uiState.periodMonths, onValueChange = viewModel::onPeriodMonthsChange, label = { Text(stringResource(R.string.period_months_label)) }, modifier = Modifier
                 .fillMaxWidth()
-                .heightIn(min = 48.dp, max = 56.dp),
-            singleLine = true,
-            textStyle = LocalTextStyle.current.copy(
-                fontSize = 14.sp,
-                lineHeight = 20.sp
+                .heightIn(min = 48.dp, max = 56.dp), singleLine = true, textStyle = LocalTextStyle.current.copy(
+                fontSize = 14.sp, lineHeight = 20.sp
             )
         )
 
         // Поле ввода - тариф
         OutlinedTextField(
-            value = uiState.priceTariff,
-            onValueChange = viewModel::onPriceTariffChange,
-            label = { Text(stringResource(R.string.tariff_label)) },
-            modifier = Modifier
+            value = uiState.providerDetails.tariff, onValueChange = viewModel::onPriceTariffChange, label = { Text(stringResource(R.string.tariff_label)) }, modifier = Modifier
                 .fillMaxWidth()
-                .heightIn(min = 48.dp, max = 56.dp),
-            singleLine = true,
-            textStyle = LocalTextStyle.current.copy(
-                fontSize = 14.sp,
-                lineHeight = 20.sp
+                .heightIn(min = 48.dp, max = 56.dp), singleLine = true, textStyle = LocalTextStyle.current.copy(
+                fontSize = 14.sp, lineHeight = 20.sp
             )
         )
         Spacer(modifier = Modifier.height(3.dp))
@@ -209,12 +182,9 @@ fun DisplayHostelScreen(viewModel: HostelViewModel) {
                     copySound?.start()
                     clipboardManager.setText(AnnotatedString(result.priceTariff.toString()))
                     Toast.makeText(
-                        context,
-                        context.getString(R.string.amount_copied, result.priceTariff),
-                        Toast.LENGTH_SHORT
+                        context, context.getString(R.string.amount_copied, result.priceTariff), Toast.LENGTH_SHORT
                     ).show()
-                },
-                modifier = Modifier.fillMaxWidth()
+                }, modifier = Modifier.fillMaxWidth()
             ) {
                 Text(stringResource(R.string.copy_amount))
             }
@@ -225,6 +195,14 @@ fun DisplayHostelScreen(viewModel: HostelViewModel) {
                 }, modifier = Modifier.fillMaxWidth()
             ) {
                 Text(stringResource(R.string.select_bank_to_pay))
+            }
+            Button(
+                onClick = {
+                    copySound?.start()
+                    showProviderDialog.value = true
+                }, modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(stringResource(R.string.payment_details))
             }
         }
         Spacer(modifier = Modifier.height(10.dp)) // небольшой отступ для красоты
@@ -265,42 +243,119 @@ fun DisplayHostelScreen(viewModel: HostelViewModel) {
             }
         })
     }
-    if (uiState.showAccountDialog) {
-        AlertDialog(onDismissRequest = viewModel::closeAccountDialog, title = { Text(stringResource(R.string.editing)) }, text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedTextField(
-                    value = tempName, onValueChange = { tempName = it }, label = { Text(stringResource(R.string.service_name_label)) }, singleLine = true, modifier = Modifier.fillMaxWidth()
+    // Диалог выбора: ИНН или Л/С
+    if (showProviderDialog.value) {
+        AlertDialog(onDismissRequest = { showProviderDialog.value = false }, title = { Text(stringResource(R.string.select_details_to_copy)) }, text = {
+            Column {
+                // 1. Название услуги (только текст)
+                Text(
+                    text = stringResource(R.string.service_label, uiState.providerDetails.customServiceName.ifBlank { stringResource(R.string.not_specified) }),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(bottom = 4.dp)
                 )
-                Button(
+                // 5. Лицевой счёт
+                TextButton(
                     onClick = {
-                        val now = Calendar.getInstance()
-                        DatePickerDialog(
-                            context, { _, year, month, day ->
-                                val date = GregorianCalendar(year, month, day).time
-                                val newDate = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(date)
-                                tempDate = newDate
-                            }, now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH)
-                        ).show()
+                        if (uiState.providerDetails.accountNumber.isNotBlank()) {
+                            clipboardManager.setText(AnnotatedString(uiState.providerDetails.accountNumber))
+                            Toast.makeText(context, R.string.your_personal_account_has_been_copied, Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(context, R.string.personal_account_has_not_been_added, Toast.LENGTH_LONG).show()
+                        }
+                        showProviderDialog.value = false
                     }, modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(stringResource(R.string.select_start_date, tempDate))
+                    Text(
+                        text = if (uiState.providerDetails.accountNumber.isNotBlank()) stringResource(R.string.personal_account, uiState.providerDetails.accountNumber)
+                        else stringResource(R.string.personal_account_not_specified)
+                    )
                 }
-                OutlinedTextField(
-                    value = tempNumber, onValueChange = { tempNumber = it }, label = { Text(stringResource(R.string.number_of_the_apartment_or_room)) }, singleLine = true, modifier = Modifier.fillMaxWidth()
-                )
+
+                // 2. Тариф (копируется)
+                TextButton(
+                    onClick = {
+                        if (uiState.providerDetails.tariff.isNotBlank()) {
+                            clipboardManager.setText(AnnotatedString(uiState.providerDetails.tariff))
+                            Toast.makeText(context, R.string.tariff_copied, Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(context, R.string.tariff_not_specified, Toast.LENGTH_LONG).show()
+                        }
+                        showProviderDialog.value = false
+                    }, modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = if (uiState.providerDetails.tariff.isNotBlank()) stringResource(R.string.tariff_details, uiState.providerDetails.tariff)
+                        else stringResource(R.string.tariff_not_specified)
+                    )
+                }
+
+                // 3. Название компании
+                TextButton(
+                    onClick = {
+                        if (uiState.providerDetails.nameCompany.isNotBlank()) {
+                            clipboardManager.setText(AnnotatedString(uiState.providerDetails.nameCompany))
+                            Toast.makeText(context, R.string.name_company_copied, Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(context, R.string.name_company_not_specified, Toast.LENGTH_LONG).show()
+                        }
+                        showProviderDialog.value = false
+                    }, modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = if (uiState.providerDetails.nameCompany.isNotBlank()) stringResource(R.string.name, uiState.providerDetails.nameCompany)
+                        else stringResource(R.string.name_company_not_specified)
+                    )
+                }
+
+                // 4. ИНН
+                TextButton(
+                    onClick = {
+                        if (uiState.providerDetails.inn.isNotBlank()) {
+                            clipboardManager.setText(AnnotatedString(uiState.providerDetails.inn))
+                            Toast.makeText(context, R.string.inn_copied, Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(context, R.string.inn_not_added, Toast.LENGTH_LONG).show()
+                        }
+                        showProviderDialog.value = false
+                    }, modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = if (uiState.providerDetails.inn.isNotBlank()) stringResource(R.string.personal_account_taxes, uiState.providerDetails.inn)
+                        else stringResource(R.string.inn_not_specified)
+                    )
+                }
+
+                // 6. Расчётный счёт
+                TextButton(
+                    onClick = {
+                        if (uiState.providerDetails.bankAccount.isNotBlank()) {
+                            clipboardManager.setText(AnnotatedString(uiState.providerDetails.bankAccount))
+                            Toast.makeText(context, R.string.bank_account_copied, Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(context, R.string.bank_account_label_not_specified, Toast.LENGTH_LONG).show()
+                        }
+                        showProviderDialog.value = false
+                    }, modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = if (uiState.providerDetails.bankAccount.isNotBlank()) stringResource(R.string.bank_account_label, uiState.providerDetails.bankAccount)
+                        else stringResource(R.string.bank_account_not_specified)
+                    )
+                }
             }
         }, confirmButton = {
-            TextButton(
-                onClick = {
-                    viewModel.updateAccountData(tempNumber, tempName, tempDate)
-                    viewModel.closeAccountDialog()
-                }) {
-                Text(stringResource(R.string.save))
-            }
-        }, dismissButton = {
-            TextButton(onClick = viewModel::closeAccountDialog) {
+            TextButton(onClick = { showProviderDialog.value = false }) {
                 Text(stringResource(R.string.cancel))
             }
         })
+    }
+    if (uiState.showAccountDialog) {
+        EditProviderDetailsDialog(details = uiState.providerDetails, customDate = uiState.customDate, onSave = { updatedDetails, updatedDate ->
+            viewModel.saveProviderDetails(updatedDetails)
+            viewModel.updateCustomDate(updatedDate)
+            viewModel.closeAccountDialog()
+        }, onDismiss = { viewModel.closeAccountDialog() })
     }
 }
