@@ -102,4 +102,13 @@ class AccountPreferences(context: Context) {
     fun getBankAccount(serviceKey: String): String {
         return prefs.getString("${serviceKey}_bankAccount", "") ?: ""
     }
+
+    fun saveWebsiteUrl(serviceKey: String, websiteUrl: String) {
+        prefs.edit { putString("${serviceKey}_websiteUrl", websiteUrl) }
+    }
+
+    fun getWebsiteUrl(serviceKey: String): String {
+        return prefs.getString("${serviceKey}_websiteUrl", "") ?: ""
+    }
+
 }

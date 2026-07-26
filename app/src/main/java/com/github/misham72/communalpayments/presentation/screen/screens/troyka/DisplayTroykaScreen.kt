@@ -1,6 +1,7 @@
 package com.github.misham72.communalpayments.presentation.screen.screens.troyka
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -37,12 +38,15 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.domain.model.ValidationError
 import com.github.misham72.communalpayments.presentation.screen.components.EditProviderDetailsDialog
+import com.github.misham72.communalpayments.presentation.screen.components.ProviderDetailsDialog
 import com.github.misham72.communalpayments.presentation.screen.components.ServiceTopBar
 import com.github.misham72.communalpayments.presentation.utils.BankPaymentHelper
 import com.github.misham72.communalpayments.presentation.utils.HistoryExporter
+import com.github.misham72.communalpayments.presentation.utils.normalizeUrl
 import com.github.misham72.communalpayments.presentation.utils.rememberBankButtonSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberCoinSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberCopyButtonSoundPlayer
@@ -171,21 +175,8 @@ fun DisplayTroykaScreen(viewModel: TroykaViewModel) {
                         text = stringResource(R.string.result_troyka), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold
                     )
 
-                    // ✅ ТВОИ оригинальные ресурсы!
-                    Text(
-                        text = stringResource(R.string.the_payment_was, result.previousPayment), fontWeight = FontWeight.Bold, color = Color(red = 0.02f, green = 0.4f, blue = 0.0f)
-                    )
-
-                    Text(
-                        text = stringResource(R.string.passed, result.daysFromPayment), fontWeight = FontWeight.Bold, color = Color(red = 0.02f, green = 0.4f, blue = 0.0f)
-                    )
-
                     Text(
                         text = stringResource(R.string.next_payment, result.nextPayment), fontWeight = FontWeight.Bold, color = Color.Red
-                    )
-
-                    Text(
-                        text = stringResource(R.string.payment_in, result.daysUntilPayment), fontWeight = FontWeight.Bold, color = Color.Red
                     )
 
                     Text(
@@ -262,109 +253,17 @@ fun DisplayTroykaScreen(viewModel: TroykaViewModel) {
     }
     // Диалог выбора: ИНН или Л/С
     if (showProviderDialog.value) {
-        AlertDialog(onDismissRequest = { showProviderDialog.value = false }, title = { Text(stringResource(R.string.select_details_to_copy)) }, text = {
-            Column {
-                // 1. Название услуги (только текст)
-                Text(
-                    text = stringResource(R.string.service_label, uiState.providerDetails.customServiceName.ifBlank { stringResource(R.string.not_specified) }),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.padding(bottom = 4.dp)
-                )
-                // 5. Лицевой счёт
-                TextButton(
-                    onClick = {
-                        if (uiState.providerDetails.accountNumber.isNotBlank()) {
-                            clipboardManager.setText(AnnotatedString(uiState.providerDetails.accountNumber))
-                            Toast.makeText(context, R.string.your_personal_account_has_been_copied, Toast.LENGTH_SHORT).show()
-                        } else {
-                            Toast.makeText(context, R.string.personal_account_has_not_been_added, Toast.LENGTH_LONG).show()
-                        }
-                        showProviderDialog.value = false
-                    }, modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        text = if (uiState.providerDetails.accountNumber.isNotBlank()) stringResource(R.string.personal_account, uiState.providerDetails.accountNumber)
-                        else stringResource(R.string.personal_account_not_specified)
-                    )
-                }
-
-                // 2. Тариф (копируется)
-                TextButton(
-                    onClick = {
-                        if (uiState.providerDetails.tariff.isNotBlank()) {
-                            clipboardManager.setText(AnnotatedString(uiState.providerDetails.tariff))
-                            Toast.makeText(context, R.string.tariff_copied, Toast.LENGTH_SHORT).show()
-                        } else {
-                            Toast.makeText(context, R.string.tariff_not_specified, Toast.LENGTH_LONG).show()
-                        }
-                        showProviderDialog.value = false
-                    }, modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        text = if (uiState.providerDetails.tariff.isNotBlank()) stringResource(R.string.tariff_details, uiState.providerDetails.tariff)
-                        else stringResource(R.string.tariff_not_specified)
-                    )
-                }
-
-                // 3. Название компании
-                TextButton(
-                    onClick = {
-                        if (uiState.providerDetails.nameCompany.isNotBlank()) {
-                            clipboardManager.setText(AnnotatedString(uiState.providerDetails.nameCompany))
-                            Toast.makeText(context, R.string.name_company_copied, Toast.LENGTH_SHORT).show()
-                        } else {
-                            Toast.makeText(context, R.string.name_company_not_specified, Toast.LENGTH_LONG).show()
-                        }
-                        showProviderDialog.value = false
-                    }, modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        text = if (uiState.providerDetails.nameCompany.isNotBlank()) stringResource(R.string.name, uiState.providerDetails.nameCompany)
-                        else stringResource(R.string.name_not_specified)
-                    )
-                }
-
-                // 4. ИНН
-                TextButton(
-                    onClick = {
-                        if (uiState.providerDetails.inn.isNotBlank()) {
-                            clipboardManager.setText(AnnotatedString(uiState.providerDetails.inn))
-                            Toast.makeText(context, R.string.inn_copied, Toast.LENGTH_SHORT).show()
-                        } else {
-                            Toast.makeText(context, R.string.inn_not_added, Toast.LENGTH_LONG).show()
-                        }
-                        showProviderDialog.value = false
-                    }, modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        text = if (uiState.providerDetails.inn.isNotBlank()) stringResource(R.string.personal_account_taxes, uiState.providerDetails.inn)
-                        else stringResource(R.string.inn_not_specified)
-                    )
-                }
-
-                // 6. Расчётный счёт
-                TextButton(
-                    onClick = {
-                        if (uiState.providerDetails.bankAccount.isNotBlank()) {
-                            clipboardManager.setText(AnnotatedString(uiState.providerDetails.bankAccount))
-                            Toast.makeText(context, R.string.bank_account_copied, Toast.LENGTH_SHORT).show()
-                        } else {
-                            Toast.makeText(context, R.string.bank_account_not_specified, Toast.LENGTH_LONG).show()
-                        }
-                        showProviderDialog.value = false
-                    }, modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        text = if (uiState.providerDetails.bankAccount.isNotBlank()) stringResource(R.string.bank_account_label, uiState.providerDetails.bankAccount)
-                        else stringResource(R.string.bank_account_label_not_specified)
-                    )
-                }
-            }
-        }, confirmButton = {
-            TextButton(onClick = { showProviderDialog.value = false }) {
-                Text(stringResource(R.string.cancel))
+        ProviderDetailsDialog(providerDetails = uiState.providerDetails, onDismiss = { showProviderDialog.value = false }, onCopyText = { text ->
+            clipboardManager.setText(AnnotatedString(text))
+            Toast.makeText(context, R.string.copied, Toast.LENGTH_SHORT).show()
+        }, onOpenUrl = { url ->
+            val finalUrl = url.normalizeUrl()
+            val intent = Intent(Intent.ACTION_VIEW, finalUrl.toUri())
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            try {
+                context.startActivity(intent)
+            } catch (_: Exception) {
+                Toast.makeText(context, R.string.no_browser, Toast.LENGTH_SHORT).show()
             }
         })
     }

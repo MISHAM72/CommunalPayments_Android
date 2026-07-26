@@ -15,7 +15,8 @@ class ProviderRepositoryImpl(
             tariff = prefs.getTariff(serviceKey),
             nameCompany = prefs.getNameCompany(serviceKey),
             inn = prefs.getInn(serviceKey),
-            bankAccount = prefs.getBankAccount(serviceKey)   // убедитесь, что этот метод есть
+            bankAccount = prefs.getBankAccount(serviceKey),
+            websiteUrl = prefs.getWebsiteUrl(serviceKey)
         )
     }
 
@@ -27,5 +28,6 @@ class ProviderRepositoryImpl(
         prefs.saveNameCompany(serviceKey, details.nameCompany)
         prefs.saveInn(serviceKey, details.inn)
         prefs.saveBankAccount(serviceKey, details.bankAccount)
+        prefs.saveWebsiteUrl(serviceKey, details.websiteUrl)
     }
 }

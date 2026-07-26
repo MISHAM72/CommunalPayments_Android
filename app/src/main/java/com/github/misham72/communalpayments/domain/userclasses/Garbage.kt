@@ -17,24 +17,17 @@ class Garbage(private val calculator: PaymentDateCalculator) {
         accountNumber: String
     ): GarbageData {
         // Используем переданный калькулятор
-        val previousDate = calculator.getPreviousPaymentDate(periodMonths, paymentDay, startDate)
-        val daysFrom = calculator.getDaysFromPreviousPayment(periodMonths, paymentDay, startDate)
-        val daysUntil = calculator.getDaysToNextPayment(periodMonths, paymentDay, startDate)
         val nextDate = calculator.getNextPaymentDate(periodMonths, paymentDay, startDate)
 
         val formatter = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
-        val previousPayment = formatter.format(previousDate)
         val nextPayment = formatter.format(nextDate)
 
         // 3. СОЗДАНИЕ ОБЪЕКТА С ДАННЫМИ
         return GarbageData(
             isHistory = true,
-            previousPayment = previousPayment,
-            daysFromPayment = daysFrom,
             nextPayment = nextPayment,
-            daysUntilPayment = daysUntil,
             priceTariff = priceTariff,
-            periodMonths = periodMonths.toString(),
+            periodMonths = periodMonths,
             accountNumber = accountNumber,
             startDate = startDate
         )

@@ -5,6 +5,9 @@ import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
@@ -43,7 +46,13 @@ fun EditProviderDetailsDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.edit_bank_details)) },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = 500.dp)
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
 
                 // 1. Название услуги
                 OutlinedTextField(
@@ -97,6 +106,16 @@ fun EditProviderDetailsDialog(
                     label = { Text(stringResource(R.string.bank_account)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
+                )
+
+
+                OutlinedTextField(
+                    value = tempDetails.websiteUrl,  // ← берем из tempDetails
+                    onValueChange = { tempDetails = tempDetails.copy(websiteUrl = it) }, // ← сохраняем в tempDetails
+                    label = { Text(stringResource(R.string.website_label)) },
+                    placeholder = { Text(stringResource(R.string.website_hint)) },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
                 )
 
                 // --- Выбор даты ---

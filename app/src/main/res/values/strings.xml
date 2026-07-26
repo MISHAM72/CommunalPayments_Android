@@ -80,13 +80,10 @@
 
 
     <string name="loading">Загрузка</string>
-    <string name="the_payment_was">Оплата была: - %1$s</string>
-    <string name="passed">Прошло: - %1$d дня.</string>
     <string name="next_payment">Дата оплаты: - %1$s</string>
     <string name="day_of_payment_label">День платежа - </string>
     <string name="period_months_label">Период, (в мес.) - </string>
     <string name="days_payment_for">Через %d дня(ей) платеж по %s</string>
-    <string name="payment_in">Оплата через: - %1$d дней.</string>
     <string name="tariff_card">Тариф: %.2f руб.</string>
     <string name="to_be_paid">К оплате:</string>
     <string name="consumption">Расход: - %1$.2f %2$s</string>
@@ -220,24 +217,20 @@
 
     <string name="payment_details">📋 Реквизиты для оплаты</string>
     <string name="select_details_to_copy">Выберите реквизит для копирования</string>
-    <string name="your_personal_account_has_been_copied">Лицевой счёт скопирован!</string>
     <string name="personal_account_has_not_been_added">Лицевой счёт не добавлен.</string>
     <string name="service_label">Услуга: %1$s</string>
     <string name="not_specified">не указана</string>
 
 
-    <string name="tariff_copied">Тариф скопирован!</string>
     <string name="tariff_not_specified">Тариф не указан.</string>
     <string name="tariff">Тариф</string>
     <string name="tariff_details">Тариф: %s</string>
     <string name="tariff_label">Тариф: руб.</string>
 
-    <string name="name_company_copied">Название компании скопировано!</string>
     <string name="name_company_not_specified">Название компании не указано.</string>
     <string name="name">Название: %s</string>
     <string name="name_not_specified">Название не указано</string>
 
-    <string name="inn_copied">ИНН скопирован!</string>
     <string name="inn_not_added">ИНН не добавлен.</string>
     <string name="inn_not_specified">ИНН не указан</string>
     <string name="inn_label">ИНН</string>
@@ -247,7 +240,6 @@
     <string name="select_bank">Выберите банк</string>
     <string name="select_bank_to_pay">🏦 Выбрать банк для оплаты</string>
     <string name="bank_account">Расчётный счёт</string>
-    <string name="bank_account_copied">Расчётный счёт скопирован!</string>
     <string name="bank_account_not_specified">Расчётный счёт не указан.</string>
     <string name="bank_account_label">Р/С: %1$s</string>
     <string name="bank_account_label_not_specified">Р/С не указан</string>
@@ -259,7 +251,13 @@
     <string name="personal_account">Л/С: %s</string>
     <string name="personal_account_not_specified">Л/С не указан</string>
     <string name="enter_personal_account">Введите лицевой счёт</string>
-    <string name="mon">мес.</string>
+
+    <string name="website_label">Сайт услуги</string>
+    <string name="website_hint">https://example.com</string>
+    <string name="no_browser">Не найден браузер</string>
+    <string name="website_not_specified">Адресс сайта не указан</string>
+    <string name="website_label_with_url">Адресс сайта: %s</string>
+    <string name="copied">Скопировано</string>
 
 </resources>
 

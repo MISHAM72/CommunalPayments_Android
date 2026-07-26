@@ -105,19 +105,9 @@ fun SimpleHistoryScreen(
     val osagoSound = rememberOsagoSoundPlayer()
     val hostelSound = rememberHostelSoundPlayer()
 
-    // ↑↑↑ КОНЕЦ ДОБАВЛЕНИЯ ↑↑↑
-    //🔴//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //suspend — асинхронная функция, читает историю из файла и обновляет fileContent.
     suspend fun refreshHistory() {
         fileContent = fileManager.readHistory(selectedService)
     }
-    /*
-    🔴//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    5. LaunchedEffect для загрузки истории при смене услуги.
-    Запускается каждый раз, когда меняется selectedService.
-    Сначала устанавливает текст загрузки, потом пытается прочитать файл.
-    В случае ошибки записывает сообщение об ошибке (из ресурсов) в fileContent.
-    */
     LaunchedEffect(selectedService) {
         fileContent = loadingText
         fileContent = try {
@@ -400,10 +390,8 @@ private val DEFAULT_SEPARATOR = "🟩".repeat(14)
 fun addStatusToLastRecord(content: String, newStatus: String): String {
     val separator = DEFAULT_SEPARATOR
     val sepIndex = content.indexOf(separator)
-
     val before = content.take(sepIndex + separator.length)
     val after = content.drop(sepIndex + separator.length)
-
     val lines = after.split("\n").toMutableList()
 
     // Вставляем новый статус

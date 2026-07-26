@@ -103,8 +103,11 @@ object PdfHistoryExporter {
                     trimmed.startsWith(context.getString(R.string.to_be_paid)) -> amount = trimmed.substringAfter(":").replace("-", "").replace(context.getString(R.string.ru), "").trim()
                     trimmed.startsWith(context.getString(R.string.tariff)) -> tariff = trimmed.substringAfter(":").replace(context.getString(R.string.ru), "").trim()
                     trimmed.startsWith(context.getString(R.string.day_of_payment_format).substringBefore("%")) -> paymentDay = trimmed.substringAfter(":").trim()
-                    @Suppress("HardcodedStringLiteral")
-                    trimmed.startsWith("Период:") -> periodMonths = trimmed.substringAfter(":").replace("%d", "").replace(context.getString(R.string.mon), "").trim()
+                    trimmed.startsWith(context.getString(R.string.pdf_table_period)) -> {
+                        @Suppress("HardcodedStringLiteral")
+                        val match = Regex("\\d+").find(trimmed.substringAfter(":"))
+                        periodMonths = match?.value ?: ""
+                    }
                     // Статусы с эмодзи (эмодзи остаются)
                     trimmed.startsWith("\uD83D\uDD34") -> status = trimmed   // 🔴
                     trimmed.startsWith("\u23F3") -> status = trimmed          // ⏳

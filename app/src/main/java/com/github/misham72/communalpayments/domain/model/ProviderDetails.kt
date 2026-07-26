@@ -7,5 +7,6 @@ data class ProviderDetails(
     val tariff: String = "",
     val nameCompany: String = "",
     val inn: String = "",
-    val bankAccount: String = ""
+    val bankAccount: String = "",
+    val websiteUrl: String = ""
 )

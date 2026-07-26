@@ -100,10 +100,7 @@
 
     // КАРТОЧКА ОПЛАТЫ ЗА ПЕРИОД
 
-    <string name="the_payment_was">The payment was: - %1$s</string>
-    <string name="passed">Passed: - %1$d дня.</string>
     <string name="next_payment">Payment date: - %1$s</string>
-    <string name="payment_in">Payment via: - %1$d day(s).</string>
     <string name="tariff_card">Rate:  %.2f us$.</string>
 
 
@@ -229,28 +226,29 @@
     <string name="bank_account">Bank account</string>
     <string name="payment_details">📋 Payment details</string>
     <string name="select_details_to_copy">Select the details to copy</string>
-    <string name="your_personal_account_has_been_copied">Your personal account has been copied!</string>
     <string name="personal_account_has_not_been_added">The personal account has not been added.</string>
     <string name="service_label">service: %1$s</string>
     <string name="not_specified">not_specified</string>
     <string name="personal_account_not_specified">Personal account not specified</string>
-    <string name="tariff_copied">The pricing plan has been copied!</string>
     <string name="tariff_not_specified">Тариф не указан.</string>
 
-    <string name="name_company_copied">Name company has been copied!</string>
     <string name="name_company_not_specified">Name company not specified.</string>
     <string name="name">Name: %s</string>
     <string name="name_not_specified">Name not specified</string>
-    <string name="inn_copied">INN has been copied!</string>
     <string name="inn_not_added">INN has not been added.</string>
 
     <string name="inn_not_specified">INN not specified</string>
-    <string name="bank_account_copied">Bank account copied!</string>
     <string name="bank_account_not_specified">Bank account not specified.</string>
     <string name="bank_account_label">B/A: %1$s</string>
     <string name="bank_account_label_not_specified">B/A not specified</string>
     <string name="tariff_details">Tariff: %s</string>
     <string name="enter_personal_account">Enter personal account</string>
-    <string name="mon">мес.</string>
+
+    <string name="website_label">Service website</string>
+    <string name="website_hint">https://example.com</string>
+    <string name="no_browser">No browser found</string>
+    <string name="website_not_specified">Website not specified</string>
+    <string name="website_label_with_url">Website label with url: %s</string>
+    <string name="copied">Copied</string>
 </resources>
 
