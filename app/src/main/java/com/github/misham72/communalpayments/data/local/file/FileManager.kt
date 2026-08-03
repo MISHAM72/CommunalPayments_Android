@@ -9,15 +9,16 @@ import java.io.FileWriter
 import java.io.IOException
 
 class FileManager(private val context: Context) {
+    //Проверяет, существует ли папка history.
     suspend fun readHistory(serviceKey: String): String = withContext(Dispatchers.IO) {
         val directory = File(context.filesDir, context.getString(R.string.history))
         if (!directory.exists()) {
             return@withContext context.getString(R.string.empty_history_calculation)
-        }
+        }//Проверяет, существует ли файл <serviceKey>.txt.
         val file = File(directory, "$serviceKey.txt")
         if (!file.exists()) {
             return@withContext context.getString(R.string.empty_history_calculation)
-        }
+        }//Если файл есть — читает его содержимое как текст и возвращает.
         return@withContext file.readText()
     }
 

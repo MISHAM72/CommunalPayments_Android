@@ -31,8 +31,9 @@
     <string name="consumption">Expenditure: - %1$.2f %2$s</string>
     <string name="currency_rub">To be paid: - %.2f ₽.</string>
 
-    <string name="current_reading">Current readings: - %1$s %2$s</string>
-    <string name="previous_reading">Previous readings: - %1$s %2$s</string>
+    <string name="unit_month">mon.</string>
+    <string name="current_reading">Current readings: - %1$.2f %2$s</string>
+    <string name="previous_reading">Previous readings: - %1$.2f %2$s</string>
 
     <string name="previous_reading_pdf">previous_reading</string>
     <string name="current_reading_label_electricity">Current readings (kW/h)- </string>
@@ -80,7 +81,6 @@
 
 
     // ТЕКСТ НА ПОЛЯХ ПЛАТЕЖЕЙ ЗА ПЕРИОД (label)
-    <string name="day_of_payment_label">Payment day</string>
     <string name="period_months_label">Period, (in months) - </string>
     <string name="tariff_label">Tariff: US$.</string>
 
@@ -100,7 +100,10 @@
 
     // КАРТОЧКА ОПЛАТЫ ЗА ПЕРИОД
 
+
+    <string name="previous_reading_txt_water_and_gas">previous reading</string>
     <string name="next_payment">Payment date: - %1$s</string>
+    <string name="period">Period</string>
     <string name="tariff_card">Rate:  %.2f us$.</string>
 
 
@@ -164,10 +167,8 @@
     <string name="pdf_table_date">pdf_table_date</string>
     <string name="pdf_table_previous">pdf_table_previous</string>
     <string name="pdf_table_current">pdf_table_current</string>
-    <string name="pdf_table_consumption">pdf_table_consumption</string>
     <string name="pdf_table_status">pdf_table_status</string>
     <string name="pdf_table_period">pdf_table_period</string>
-    <string name="pdf_table_payment_day">pdf_table_payment_day</string>
     <string name="pdf_all_history_title">pdf_all_history_title</string>
     <string name="pdf_generated">pdf_generated: %s</string>
     <string name="export_all_pdf_title">export_all_pdf_title</string>
@@ -206,7 +207,6 @@
     <string name="close">close</string>
     <string name="delete_record">delete_record</string>
     <string name="delete_confirm_amount">Amount: %,.2f ₽</string>
-    <string name="day_of_payment_format">Payment day: %s</string>
     <string name="annual_countdown">Annual countdown</string>
     <string name="backup_export_success">Backup export success</string>
     <string name="backup_import_success">Backup import success</string>
@@ -250,5 +250,12 @@
     <string name="website_not_specified">Website not specified</string>
     <string name="website_label_with_url">Website label with url: %s</string>
     <string name="copied">Copied</string>
+    <string name="consumption_pdf">consumption_pdf</string>
+    <string name="to_be_paid_pdf">to_be_paid_pdf</string>
+    <string name="tariff_pdf">tariff_pdf</string>
+    <string name="period_pdf">period_pdf</string>
+    <string name="next_payment_pdf">Payment day</string>
+    <string name="current_reading_txt_water_and_gas">current reading</string>
+
 </resources>
 

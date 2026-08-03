@@ -27,7 +27,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -45,19 +44,16 @@ import com.github.misham72.communalpayments.presentation.screen.components.EditP
 import com.github.misham72.communalpayments.presentation.screen.components.ProviderDetailsDialog
 import com.github.misham72.communalpayments.presentation.screen.components.ServiceTopBar
 import com.github.misham72.communalpayments.presentation.utils.BankPaymentHelper
-import com.github.misham72.communalpayments.presentation.utils.HistoryExporter
 import com.github.misham72.communalpayments.presentation.utils.normalizeUrl
 import com.github.misham72.communalpayments.presentation.utils.rememberBankButtonSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberCoinSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberCopyButtonSoundPlayer
-import kotlinx.coroutines.launch
 
 @SuppressLint("LocalContextGetResourceValueCall")
 @Composable
 fun DisplayTroykaScreen(viewModel: TroykaViewModel) {
     val showBankDialog = remember { mutableStateOf(false) }
     val showProviderDialog = remember { mutableStateOf(false) }
-    val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val clipboardManager = LocalClipboardManager.current
     val coinSound = rememberCoinSoundPlayer()
@@ -73,11 +69,9 @@ fun DisplayTroykaScreen(viewModel: TroykaViewModel) {
     ) {
         ServiceTopBar(
             onPdfExport = { viewModel.onPdfExport(context) },
-            title = uiState.providerDetails.customServiceName.ifBlank { stringResource(R.string.service_display_name_troyka) }, onEditClick = { viewModel.openAccountDialog() }, onShareClick = {
-                scope.launch {
-                    HistoryExporter.shareSingleHistory(context, TroykaViewModel.SERVICE_KEY)
-                }
-            },
+            title = uiState.providerDetails.customServiceName.ifBlank { stringResource(R.string.service_display_name_troyka) },
+            onEditClick = { viewModel.openAccountDialog() },
+            onShareClick = { viewModel.onShareClick(context) },
             modifier = Modifier.height(28.dp)
         )
         if (uiState.customDate.isNotBlank()) {
@@ -95,7 +89,7 @@ fun DisplayTroykaScreen(viewModel: TroykaViewModel) {
         OutlinedTextField(
             value = uiState.paymentDay,
             onValueChange = viewModel::onPaymentDayChange,
-            label = { Text(stringResource(R.string.day_of_payment_label)) },  // явный текст
+            label = { Text(stringResource(R.string.next_payment_pdf)) },  // явный текст
             modifier = Modifier
                 .fillMaxWidth()
                 .heightIn(min = 48.dp, max = 56.dp),

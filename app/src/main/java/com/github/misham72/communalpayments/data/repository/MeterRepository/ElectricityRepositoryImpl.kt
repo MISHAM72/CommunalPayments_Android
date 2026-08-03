@@ -26,6 +26,7 @@ class ElectricityRepositoryImpl(
             consumption = data.consumption,
             payment = data.payment,
             isHistory = data.isHistory,
+            unit = context.getString(R.string.unit_kilowatt_hour)
         )
 
         fileManager.appendRecord(serviceKey, content)

@@ -26,7 +26,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -44,19 +43,16 @@ import com.github.misham72.communalpayments.presentation.screen.components.EditP
 import com.github.misham72.communalpayments.presentation.screen.components.ProviderDetailsDialog
 import com.github.misham72.communalpayments.presentation.screen.components.ServiceTopBar
 import com.github.misham72.communalpayments.presentation.utils.BankPaymentHelper
-import com.github.misham72.communalpayments.presentation.utils.HistoryExporter
 import com.github.misham72.communalpayments.presentation.utils.normalizeUrl
 import com.github.misham72.communalpayments.presentation.utils.rememberBankButtonSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberCoinSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberCopyButtonSoundPlayer
-import kotlinx.coroutines.launch
 
 @SuppressLint("LocalContextGetResourceValueCall")
 @Composable
 fun DisplayGasScreen(viewModel: GasViewModel) {
     val showBankDialog = remember { mutableStateOf(false) }
     val showProviderDialog = remember { mutableStateOf(false) }
-    val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val clipboardManager = LocalClipboardManager.current
     val coinSound = rememberCoinSoundPlayer()
@@ -78,11 +74,7 @@ fun DisplayGasScreen(viewModel: GasViewModel) {
             },
             title = uiState.providerDetails.customServiceName.ifBlank { stringResource(R.string.service_display_name_gas) },
             onEditClick = { viewModel.openAccountDialog() },
-            onShareClick = {
-                scope.launch {
-                    HistoryExporter.shareSingleHistory(context, GasViewModel.SERVICE_KEY)
-                }
-            },
+            onShareClick = { viewModel.onShareClick(context) },
             modifier = Modifier.height(28.dp)
         )
         if (uiState.customDate.isNotBlank()) {
@@ -101,7 +93,7 @@ fun DisplayGasScreen(viewModel: GasViewModel) {
         OutlinedTextField(
             value = uiState.currentReading,
             onValueChange = viewModel::onCurrentReadingChange,
-            label = { Text(stringResource(R.string.current_reading_label_electricity)) },
+            label = { Text(stringResource(R.string.current_reading_txt_water_and_gas)) },
             modifier = Modifier
                 .fillMaxWidth()
                 .heightIn(min = 48.dp, max = 56.dp), // сужаем
@@ -114,7 +106,7 @@ fun DisplayGasScreen(viewModel: GasViewModel) {
         OutlinedTextField(
             value = uiState.previousReading,
             onValueChange = viewModel::onPreviousReadingChange,
-            label = { Text(stringResource(R.string.previous_reading_label_electricity)) },
+            label = { Text(stringResource(R.string.previous_reading_txt_water_and_gas)) },
             modifier = Modifier
                 .fillMaxWidth()
                 .heightIn(min = 48.dp, max = 56.dp), // сужаем

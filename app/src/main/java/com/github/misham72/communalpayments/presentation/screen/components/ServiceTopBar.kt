@@ -67,35 +67,35 @@ fun ServiceTopBar(
                 )
             }
 
-            // Кнопка, открывающая меню
+
             Box {
-                IconButton(
+                IconButton(// 1. Кнопка с иконкой "Поделиться"
                     onClick = {
-                        clockCuCuSound?.start()
-                        showMenu = true
+                        clockCuCuSound?.start()// звук
+                        showMenu = true// открываем меню
                     }
                 ) {
-                    Icon(
+                    Icon(// иконка шеринга
                         Icons.Default.Share,
                         contentDescription = stringResource(R.string.export_history)
                     )
                 }
-                DropdownMenu(
+                DropdownMenu(// 2. Выпадающее меню (показывается, если showMenu == true)
                     expanded = showMenu,
                     onDismissRequest = { showMenu = false }
                 ) {
-                    DropdownMenuItem(
+                    DropdownMenuItem(// Пункт меню "Экспорт TXT"
                         text = { Text(stringResource(R.string.export_txt)) },
                         onClick = {
                             showMenu = false
-                            onShareClick()
+                            onShareClick()// ← вызывает переданный колбэк для TXT
                         }
                     )
-                    DropdownMenuItem(
+                    DropdownMenuItem(// Пункт меню "Экспорт PDF"
                         text = { Text(stringResource(R.string.export_pdf)) },
                         onClick = {
                             showMenu = false
-                            onPdfExport()
+                            onPdfExport()// ← ВОТ ЗДЕСЬ ВЫЗЫВАЕТСЯ PDF-ЭКСПОРТ
                         }
                     )
                 }

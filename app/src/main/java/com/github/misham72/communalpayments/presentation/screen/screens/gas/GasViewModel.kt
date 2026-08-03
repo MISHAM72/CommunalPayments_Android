@@ -11,6 +11,7 @@ import com.github.misham72.communalpayments.domain.repository.GasRepository
 import com.github.misham72.communalpayments.domain.repository.IProviderRepository
 import com.github.misham72.communalpayments.domain.userclasses.Gas
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
+import com.github.misham72.communalpayments.presentation.utils.HistoryExporter
 import com.github.misham72.communalpayments.presentation.utils.PdfHistoryExporter
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -75,6 +76,12 @@ class GasViewModel(
     fun updateCustomDate(date: String) {
         _uiState.update { it.copy(customDate = date) }
         accountPrefs.saveCustomDate(SERVICE_KEY, date)
+    }
+
+    fun onShareClick(context: Context) {
+        viewModelScope.launch {
+            HistoryExporter.shareSingleHistory(context, SERVICE_KEY)
+        }
     }
 
     fun onPdfExport(context: Context) {

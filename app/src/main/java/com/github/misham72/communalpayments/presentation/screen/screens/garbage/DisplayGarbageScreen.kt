@@ -27,7 +27,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -45,19 +44,16 @@ import com.github.misham72.communalpayments.presentation.screen.components.EditP
 import com.github.misham72.communalpayments.presentation.screen.components.ProviderDetailsDialog
 import com.github.misham72.communalpayments.presentation.screen.components.ServiceTopBar
 import com.github.misham72.communalpayments.presentation.utils.BankPaymentHelper
-import com.github.misham72.communalpayments.presentation.utils.HistoryExporter
 import com.github.misham72.communalpayments.presentation.utils.normalizeUrl
 import com.github.misham72.communalpayments.presentation.utils.rememberBankButtonSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberCoinSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberCopyButtonSoundPlayer
-import kotlinx.coroutines.launch
 
 @SuppressLint("LocalContextGetResourceValueCall")
 @Composable
 fun DisplayGarbageScreen(viewModel: GarbageViewModel) {//Почему только viewModel? Потому что экран полностью управляется ViewModel. Всё состояние (показания, тариф, реквизиты, результат, ошибки) хранится в UiState внутри ViewModel. UI-слой (Compose) только отображает это состояние и передаёт действия (клики, ввод текста) обратно в ViewModel.
     val showBankDialog = remember { mutableStateOf(false) }//Зачем remember: сохраняет состояние между перекомпозициями. Без remember при каждой перерисовке экрана переменная сбрасывалась бы в false, и диалог не открывался бы.
     val showProviderDialog = remember { mutableStateOf(false) }//mutableStateOf(false) — реактивное состояние, изменение которого автоматически перерисовывает UI (диалог появляется/исчезает).
-    val scope = rememberCoroutineScope()//Назначение: даёт доступ к корутине, привязанной к жизненному циклу композиции. Это нужно для вызова suspend-функций из UI (например, экспорт PDF, обновление данных).
     val context = LocalContext.current//Назначение: получает текущий Context (активность/приложение) внутри Compose. Нужен для:Показа Toast-уведомлений (Toast.makeText). Получения PackageManager для проверки установленных банковских приложений.
     val clipboardManager = LocalClipboardManager.current//Назначение: доступ к системному буферу обмена. Используется для копирования:суммы результата (clipboardManager.setText(AnnotatedString(result.payment.toString()))).реквизитов (ИНН, лицевой счёт, тариф и т.д.) при нажатии на кнопки в диалоге провайдера.
     val coinSound = rememberCoinSoundPlayer()//Назначение: звуковые эффекты при нажатии на разные кнопки.
@@ -72,18 +68,17 @@ fun DisplayGarbageScreen(viewModel: GarbageViewModel) {//Почему тольк
             .verticalScroll(rememberScrollState()), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(1.dp)
     ) {
         ServiceTopBar(
-            onPdfExport = { viewModel.onPdfExport(context) },
             title = uiState.providerDetails.customServiceName.ifBlank { stringResource(R.string.service_display_name_garbage) },
             onEditClick = { viewModel.openAccountDialog() },
-            onShareClick = {
-                scope.launch {
-                    HistoryExporter.shareSingleHistory(context, GarbageViewModel.SERVICE_KEY)
-                }
-            }, modifier = Modifier.height(28.dp)
+            onPdfExport = { viewModel.onPdfExport(context) },
+            onShareClick = { viewModel.onShareClick(context) },
+            modifier = Modifier.height(28.dp)
         )
         if (uiState.customDate.isNotBlank()) {
             Text(
-                text = stringResource(R.string.payment_date, uiState.customDate), fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurface, modifier = Modifier.padding(top = 1.dp)
+                text = stringResource(R.string.payment_date, uiState.customDate),
+                fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.padding(top = 1.dp)
             )
         }
 // Номер под названием (отдельная строка)
@@ -94,7 +89,13 @@ fun DisplayGarbageScreen(viewModel: GarbageViewModel) {//Почему тольк
         }
         // Поле ввода - день платежа
         OutlinedTextField(
-            value = uiState.paymentDay, onValueChange = viewModel::onPaymentDayChange, label = { Text(stringResource(R.string.day_of_payment_label)) },  // явный текст
+            value = uiState.paymentDay, onValueChange = viewModel::onPaymentDayChange, label = {
+                Text(
+                    stringResource(
+                        R.string.next_payment_pdf
+                    )
+                )
+            },  // явный текст
             modifier = Modifier
                 .fillMaxWidth()
                 .heightIn(min = 48.dp, max = 56.dp), singleLine = true, textStyle = LocalTextStyle.current.copy(
@@ -261,10 +262,15 @@ fun DisplayGarbageScreen(viewModel: GarbageViewModel) {//Почему тольк
         })
     }
     if (uiState.showAccountDialog) {
-        EditProviderDetailsDialog(details = uiState.providerDetails, customDate = uiState.customDate, onSave = { updatedDetails, updatedDate ->
-            viewModel.saveProviderDetails(updatedDetails)
-            viewModel.updateCustomDate(updatedDate)
-            viewModel.closeAccountDialog()
-        }, onDismiss = { viewModel.closeAccountDialog() })
+        EditProviderDetailsDialog(
+            details = uiState.providerDetails,
+            customDate = uiState.customDate,
+            onSave = { updatedDetails, updatedDate ->
+                viewModel.saveProviderDetails(updatedDetails)
+                viewModel.updateCustomDate(updatedDate)
+                viewModel.closeAccountDialog()
+            },
+            onDismiss = { viewModel.closeAccountDialog() }
+        )
     }
 }

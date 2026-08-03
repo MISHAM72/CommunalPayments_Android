@@ -43,6 +43,7 @@ import com.github.misham72.communalpayments.data.local.file.FileManager
 import com.github.misham72.communalpayments.domain.model.PaymentStatus
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 import com.github.misham72.communalpayments.presentation.mapper.StatusDisplayMapper
+import com.github.misham72.communalpayments.presentation.utils.HISTORY_SEPARATOR
 import com.github.misham72.communalpayments.presentation.utils.rememberBoilerSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberButtonBuckSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberCancelButtonSoundPlayer
@@ -121,7 +122,7 @@ fun SimpleHistoryScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(10.dp)
     ) {
         //🔴////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         //При нажатии вызывает onBack, переданный извне.
@@ -133,14 +134,9 @@ fun SimpleHistoryScreen(
         ) {
             Text(stringResource(R.string.back))
         }
-        //🔴////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        //Заголовок «История расчётов». - Небольшой отступ сверху и текст заголовка.
         Spacer(modifier = Modifier.height(8.dp))
         Text(stringResource(R.string.calculation_history), fontSize = 24.sp, fontWeight = FontWeight.Bold)
         //🔴////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // Горизонтальный ряд чипсов для выбора услуги.
-        // Создаёт список всех услуг (ключ → отображаемое имя).
-        //Каждый чипс при нажатии меняет selectedService, что вызывает перезагрузку истории
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -193,25 +189,25 @@ fun SimpleHistoryScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(16.dp)
+                    .padding(1.dp)
+
             ) {
                 OutlinedTextField(
-                    value = fileContent, onValueChange = { fileContent = it }, modifier = Modifier
+                    value = fileContent,
+                    onValueChange = { fileContent = it },
+                    modifier = Modifier
+                        .padding(20.dp)
+                        .background(Color.Green.copy(alpha = 0.2f))
                         .fillMaxWidth()
-                        .weight(1f), label = {
-                        Text(stringResource(R.string.Edit_the_entire_text_To_replace_the_status_in_the_last_entry_click_on_the_button_above))
-                    })
-
-                Text(
-                    text = stringResource(R.string.Replace_the_status_in_the_LAST_entry), fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp)
-                )
+                        .weight(1f),
+                    label = { Text(stringResource(R.string.Edit_the_entire_text_To_replace_the_status_in_the_last_entry_click_on_the_button_above)) })
+                // КНОПКИ СТАТУСОВ
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 18.dp)
+                        .padding(bottom = 10.dp)
                         .horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    // Заменяем presetStatuses.forEach на это:
                     PaymentStatus.entries.forEach { paymentStatus ->
                         val displayInfo = StatusDisplayMapper.map(paymentStatus)
                         val statusString = stringResource(displayInfo.emojiResId) + " " + stringResource(displayInfo.textResId)
@@ -223,7 +219,9 @@ fun SimpleHistoryScreen(
                                 )
                             }) {
                             Text(
-                                text = statusString, color = colorResource(displayInfo.colorResId), fontWeight = FontWeight.Bold  // ← ВОТ ЗДЕСЬ ЖИРНЫЙ ШРИФТ
+                                text = statusString,
+                                color = colorResource(displayInfo.colorResId),
+                                fontWeight = FontWeight.Bold  // ← ВОТ ЗДЕСЬ ЖИРНЫЙ ШРИФТ
                             )
                         }
                     }
@@ -260,16 +258,15 @@ fun SimpleHistoryScreen(
             Card(
                 Modifier
                     .fillMaxWidth()
-                    .weight(1f)  // ← занимает всё свободное место
+                    .weight(10f)  // ← занимает всё свободное место
 
             ) {
                 Box(
                     Modifier
                         .fillMaxSize()
                         .background(Color.Blue.copy(alpha = 0.2f)) // Полупрозрачный
-                        .padding(10.dp)
+                        .padding(40.dp)
                         .verticalScroll(state = viewScrollState)
-                    // .border(6.dp, Color.Red)  // ← красная рамка вокруг Card
                 ) {
                     val statusLabel = stringResource(R.string.status_label)
                     val toBePaidLabel = stringResource(R.string.to_be_paid)
@@ -386,9 +383,8 @@ fun SimpleHistoryScreen(
 // Использует разделитель 🟩🟩🟩... для нахождения последней записи.
 //Вставляет новую строку статуса в начало части после разделителя.
 //Возвращает изменённый текст.
-private val DEFAULT_SEPARATOR = "🟩".repeat(14)
 fun addStatusToLastRecord(content: String, newStatus: String): String {
-    val separator = DEFAULT_SEPARATOR
+    val separator = HISTORY_SEPARATOR
     val sepIndex = content.indexOf(separator)
     val before = content.take(sepIndex + separator.length)
     val after = content.drop(sepIndex + separator.length)

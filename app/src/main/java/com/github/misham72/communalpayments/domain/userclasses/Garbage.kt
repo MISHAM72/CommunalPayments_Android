@@ -18,7 +18,6 @@ class Garbage(private val calculator: PaymentDateCalculator) {
     ): GarbageData {
         // Используем переданный калькулятор
         val nextDate = calculator.getNextPaymentDate(periodMonths, paymentDay, startDate)
-
         val formatter = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
         val nextPayment = formatter.format(nextDate)
 

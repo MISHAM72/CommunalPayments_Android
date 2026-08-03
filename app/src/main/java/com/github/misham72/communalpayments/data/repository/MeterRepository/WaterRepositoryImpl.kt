@@ -25,6 +25,7 @@ class WaterRepositoryImpl(
             consumption = data.consumption,
             payment = data.payment,
             isHistory = data.isHistory,
+            unit = context.getString(R.string.unit_cubic_meter)
         )
 
         fileManager.appendRecord(serviceKey, content)

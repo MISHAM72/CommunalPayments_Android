@@ -25,19 +25,15 @@ object PdfHistoryExporter {
     suspend fun exportAndShare(context: Context, serviceKey: String) {   // exportAndShare — основная публичная suspend-функция для экспорта и отправки PDF.
         withContext(Dispatchers.IO) {   //  переключает выполнение на фоновый поток ввода-вывода, чтобы не замораживать интерфейс.
             val fileManager = FileManager(context.applicationContext)  //Чтение истории – создает FileManager и AccountPreferences (им нужен applicationContext, чтобы избежать утечек).
-            val accountPrefs = AccountPreferences(context.applicationContext)
-
-            val historyText = fileManager.readHistory(serviceKey)
-            if (historyText.isBlank()) return@withContext
-
+            val accountPrefs = AccountPreferences(context.applicationContext)//читаются пользовательские настройки (название услуги, номер счёта).
+            val historyText = fileManager.readHistory(serviceKey)//читает историю, нужно.
+            if (historyText.isBlank()) return@withContext//проверяет, что история не пустая
             val records = parseHistoryUniversal(context, historyText)   // Парсинг текста – вызывает parseHistoryUniversal(historyText), получает список структурированных записей UniversalRecord.
-            val isMeter = records.firstOrNull()?.isMeter ?: false   // Определение типа услуги – проверяет первую запись: если у неё isMeter == true, значит услуга счётчиковая (электричество, вода и т.п.), иначе – периодическая
-
+            val isMeter = isMeterService(serviceKey) // Определение типа услуги – проверяет первую запись: если у неё isMeter == true, значит услуга счётчиковая (электричество, вода и т.п.), иначе – периодическая
             val customServiceName = accountPrefs.getCustomName(serviceKey).ifBlank {   // Получение названия услуги и номера счёта
                 getServiceName(context, serviceKey)
             }
             val accountNumber = accountPrefs.getAccount(serviceKey)
-
             val pdfFile = generatePdf(context, records, customServiceName, accountNumber, isMeter)   // Возвращается готовый файл PDF во временной папке.
 
             withContext(Dispatchers.Main) {   // Возврат на главный поток – withContext(Dispatchers.Main) и вызов sharePdf(context, pdfFile), который отправляет файл через системное меню «Поделиться».
@@ -47,6 +43,7 @@ object PdfHistoryExporter {
     }
 
     private data class UniversalRecord(
+//Формируется список объектов UniversalRecord, это проект (шаблон) объекта, а не сам объект. Он существует в коде, но не содержит данных.
         val date: String,
         val status: String,
         val amount: String,
@@ -54,23 +51,27 @@ object PdfHistoryExporter {
         val currentReading: String = "",
         val previousReading: String = "",
         val consumption: String = "",
-        val paymentDay: String = "",
+        val nextPayment: String = "",
         val periodMonths: String = "",
-        val isMeter: Boolean
     )
 
-    private fun parseHistoryUniversal(
+    private fun isMeterService(serviceKey: String): Boolean {
+        return serviceKey == ServiceKeys.ELECTRICITY ||
+            serviceKey == ServiceKeys.WATER ||
+            serviceKey == ServiceKeys.GAS
+    }
+
+    private fun parseHistoryUniversal(//Парсер берёт этот шаблон и заполняет его реальными данными из истории.
         context: Context,
         text: String
     ): List<UniversalRecord> {   // преобразовать сырой текст истории (тот самый, что записан в файле для каждой услуги) в список объектов UniversalRecord, удобных для отображения в таблице PDF.
         val records = mutableListOf<UniversalRecord>()
 
         @Suppress("HardcodedStringLiteral")
-        val blocks = text.split(Regex("(?<=\\n|^)(?=🟩{14})"))   // Разбиение на блоки – исходный текст разделяется регулярным выражением, которое ищет строки, начинающиеся с последовательности 14 зелёных квадратов (🟩{14})
+        val blocks = text.split(HISTORY_SEPARATOR)
 
         for (block in blocks) {
             if (block.isBlank()) continue
-
             var date = ""
             var status = context.getString(R.string.status_calculated)
             var amount = ""
@@ -78,9 +79,8 @@ object PdfHistoryExporter {
             var currentReading = ""
             var previousReading = ""
             var consumption = ""
-            var paymentDay = ""
+            var nextPayment = ""
             var periodMonths = ""
-            var isMeter = false
 
             val lines = block.lines()
             for (line in lines) {
@@ -89,25 +89,13 @@ object PdfHistoryExporter {
                     @Suppress("HardcodedStringLiteral")
                     trimmed.matches(Regex("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}")) -> date = trimmed
 
-                    trimmed.startsWith(context.getString(R.string.current_reading_pdf)) -> {
-                        currentReading = trimmed.substringAfter(":").replace("-", "").trim()
-                        isMeter = true
-                    }
-
-                    trimmed.startsWith(context.getString(R.string.previous_reading_pdf)) -> {
-                        previousReading = trimmed.substringAfter(":").replace("-", "").trim()
-                        isMeter = true
-                    }
-
-                    trimmed.startsWith(context.getString(R.string.consumption)) -> consumption = trimmed.substringAfter(":").replace("-", "").trim()
-                    trimmed.startsWith(context.getString(R.string.to_be_paid)) -> amount = trimmed.substringAfter(":").replace("-", "").replace(context.getString(R.string.ru), "").trim()
-                    trimmed.startsWith(context.getString(R.string.tariff)) -> tariff = trimmed.substringAfter(":").replace(context.getString(R.string.ru), "").trim()
-                    trimmed.startsWith(context.getString(R.string.day_of_payment_format).substringBefore("%")) -> paymentDay = trimmed.substringAfter(":").trim()
-                    trimmed.startsWith(context.getString(R.string.pdf_table_period)) -> {
-                        @Suppress("HardcodedStringLiteral")
-                        val match = Regex("\\d+").find(trimmed.substringAfter(":"))
-                        periodMonths = match?.value ?: ""
-                    }
+                    trimmed.startsWith(context.getString(R.string.current_reading_pdf)) -> currentReading = trimmed.substringAfter(":").trim()
+                    trimmed.startsWith(context.getString(R.string.previous_reading_pdf)) -> previousReading = trimmed.substringAfter(":").trim()
+                    trimmed.startsWith(context.getString(R.string.consumption_pdf)) -> consumption = trimmed.substringAfter(":").trim()
+                    trimmed.startsWith(context.getString(R.string.to_be_paid_pdf)) -> amount = trimmed.substringAfter(":").trim()
+                    trimmed.startsWith(context.getString(R.string.tariff_pdf)) -> tariff = trimmed.substringAfter(":").trim()
+                    trimmed.startsWith(context.getString(R.string.period_pdf)) -> periodMonths = trimmed.substringAfter(":").trim()
+                    trimmed.startsWith(context.getString(R.string.next_payment_pdf)) -> nextPayment = trimmed.substringAfter(":").trim()
                     // Статусы с эмодзи (эмодзи остаются)
                     trimmed.startsWith("\uD83D\uDD34") -> status = trimmed   // 🔴
                     trimmed.startsWith("\u23F3") -> status = trimmed          // ⏳
@@ -120,7 +108,8 @@ object PdfHistoryExporter {
 
             if (date.isNotBlank()) {
                 records.add(
-                    UniversalRecord(  // Сохранение записи – если в блоке была найдена дата (обязательное поле), создаётся объект UniversalRecord со всеми собранными полями и добавляется в итоговый список.
+                    UniversalRecord(
+                        // Сохранение записи – если в блоке была найдена дата (обязательное поле), создаётся объект UniversalRecord со всеми собранными полями и добавляется в итоговый список.
                         date = date,
                         status = status,
                         amount = amount,
@@ -128,9 +117,8 @@ object PdfHistoryExporter {
                         currentReading = currentReading,
                         previousReading = previousReading,
                         consumption = consumption,
-                        paymentDay = paymentDay,
+                        nextPayment = nextPayment,
                         periodMonths = periodMonths,
-                        isMeter = isMeter
                     )
                 )
             }
@@ -217,7 +205,7 @@ object PdfHistoryExporter {
             canvas.drawText(context.getString(R.string.pdf_table_date), xDate, y, headerFont)
             canvas.drawText(context.getString(R.string.pdf_table_previous), xPrev, y, headerFont)
             canvas.drawText(context.getString(R.string.pdf_table_current), xCurr, y, headerFont)
-            canvas.drawText(context.getString(R.string.pdf_table_consumption), xCons, y, headerFont)
+            canvas.drawText(context.getString(R.string.consumption_pdf), xCons, y, headerFont)
             canvas.drawText(context.getString(R.string.tariff), xTariff, y, headerFont)
             canvas.drawText(context.getString(R.string.amount), xAmnt, y, headerFont)
             canvas.drawText(context.getString(R.string.pdf_table_status), xStat, y, headerFont)
@@ -242,7 +230,7 @@ object PdfHistoryExporter {
             // Заголовки для периодических
             canvas.drawText(context.getString(R.string.pdf_table_date), xDate, y, headerFont)
             canvas.drawText(context.getString(R.string.pdf_table_period), xPer, y, headerFont)
-            canvas.drawText(context.getString(R.string.pdf_table_payment_day), xDay, y, headerFont)
+            canvas.drawText(context.getString(R.string.next_payment_pdf), xDay, y, headerFont)
             canvas.drawText(context.getString(R.string.tariff), xTariff, y, headerFont)
             canvas.drawText(context.getString(R.string.pdf_table_status), xStat, y, headerFont)
             y += 25
@@ -250,7 +238,7 @@ object PdfHistoryExporter {
             for (r in records) {
                 canvas.drawText(r.date, xDate, y, tableFont)
                 canvas.drawText(r.periodMonths, xPer, y, tableFont)
-                canvas.drawText(r.paymentDay, xDay, y, tableFont)
+                canvas.drawText(r.nextPayment, xDay, y, tableFont)
                 canvas.drawText(r.tariff, xTariff, y, tableFont)
                 canvas.drawText(r.status, xStat, y, tableFont)
                 y += 22

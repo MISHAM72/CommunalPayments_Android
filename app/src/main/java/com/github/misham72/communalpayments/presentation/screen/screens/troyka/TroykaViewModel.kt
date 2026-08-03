@@ -11,6 +11,7 @@ import com.github.misham72.communalpayments.domain.repository.IProviderRepositor
 import com.github.misham72.communalpayments.domain.repository.TroykaRepository
 import com.github.misham72.communalpayments.domain.userclasses.Troyka
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
+import com.github.misham72.communalpayments.presentation.utils.HistoryExporter
 import com.github.misham72.communalpayments.presentation.utils.PdfHistoryExporter
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -77,6 +78,12 @@ class TroykaViewModel(
         accountPrefs.saveCustomDate(SERVICE_KEY, date)
     }
 
+    fun onShareClick(context: Context) {
+        viewModelScope.launch {
+            HistoryExporter.shareSingleHistory(context, SERVICE_KEY)
+        }
+    }
+
     fun onPdfExport(context: Context) {
         viewModelScope.launch {
             PdfHistoryExporter.exportAndShare(context, SERVICE_KEY)
@@ -132,7 +139,11 @@ class TroykaViewModel(
 
         // 1️⃣ Домен - ЧТО рассчитать
         val data = troyka.collectTroykaData(
-            paymentDay = paymentDay, periodMonths = periodMonths, startDate = startDate, priceTariff = priceTariff, accountNumber = account
+            paymentDay = paymentDay,
+            periodMonths = periodMonths,
+            startDate = startDate,
+            priceTariff = priceTariff,
+            accountNumber = account
         )
         viewModelScope.launch {
             troykaRepository.saveTroykaPayment(data)

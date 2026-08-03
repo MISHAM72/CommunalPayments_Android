@@ -72,11 +72,16 @@ fun DisplayElectricityScreen(viewModel: ElectricityViewModel) {
             .verticalScroll(rememberScrollState()), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(1.dp)
     ) {
         ServiceTopBar(
-            onPdfExport = { viewModel.onPdfExport(context) }, title = uiState.providerDetails.customServiceName.ifBlank { stringResource(R.string.service_display_name_electricity) }, onEditClick = { viewModel.openAccountDialog() }, onShareClick = {
+            title = uiState.providerDetails.customServiceName.ifBlank { stringResource(R.string.service_display_name_electricity) },
+            onEditClick = { viewModel.openAccountDialog() },
+            onShareClick = {
                 scope.launch {
                     HistoryExporter.shareSingleHistory(context, ElectricityViewModel.SERVICE_KEY)
                 }
-            }, modifier = Modifier.height(28.dp)
+            },
+            modifier = Modifier.height(28.dp),
+            onPdfExport = { viewModel.onPdfExport(context) }
+
         )
         if (uiState.customDate.isNotBlank()) {
             Text(
@@ -89,7 +94,10 @@ fun DisplayElectricityScreen(viewModel: ElectricityViewModel) {
             )
         }
         OutlinedTextField(
-            value = uiState.currentReading, onValueChange = viewModel::onCurrentReadingChange, label = { Text(stringResource(R.string.current_reading_label_electricity)) }, modifier = Modifier
+            value = uiState.currentReading,
+            onValueChange = viewModel::onCurrentReadingChange,
+            label = { Text(stringResource(R.string.current_reading_label_electricity)) },
+            modifier = Modifier
                 .fillMaxWidth()
                 .heightIn(min = 48.dp, max = 56.dp), // сужаем
             textStyle = LocalTextStyle.current.copy(
@@ -156,7 +164,9 @@ fun DisplayElectricityScreen(viewModel: ElectricityViewModel) {
                         )
                     )
                     Text(
-                        text = stringResource(R.string.currency_rub, result.payment), style = MaterialTheme.typography.headlineSmall, color = Color.Red
+                        text = stringResource(R.string.currency_rub, result.payment),
+                        style = MaterialTheme.typography.headlineSmall,
+                        color = Color.Red
                     )
                 }
             }

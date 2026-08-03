@@ -3,7 +3,6 @@ package com.github.misham72.communalpayments.data.repository.base
 import android.content.Context
 import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.data.local.file.FileManager
-import com.github.misham72.communalpayments.data.repository.base.BaseRepository
 
 /**
  * Базовый репозиторий для счетчиков (Electricity, Water, Gas)
@@ -22,6 +21,7 @@ abstract class BaseMeterRepository(
         consumption: Double,
         payment: Double,
         isHistory: Boolean,
+        unit: String
     ): String {
         return buildString {
             if (isHistory) appendLine(historyHeader)
@@ -30,10 +30,11 @@ abstract class BaseMeterRepository(
             appendLine(headerSeparator)
             appendLine(dateTime)
             appendLine(headerSeparator)
-            appendLine(context.getString(R.string.current_reading, String.format(context.getString(R.string.format_two_decimals), current), context.getString(R.string.unit_kilowatt_hour)))
-            appendLine(context.getString(R.string.previous_reading, String.format(context.getString(R.string.format_two_decimals), previous), context.getString(R.string.unit_kilowatt_hour)))
+            appendLine(context.getString(R.string.current_reading, current, unit))
+            appendLine(context.getString(R.string.previous_reading, previous, unit))
             appendLine(context.getString(R.string.tariff_card, tariff))
-            appendLine(context.getString(R.string.consumption, consumption, context.getString(R.string.unit_kilowatt_hour)))
+            appendLine(context.getString(R.string.consumption, consumption, unit))
+            appendLine()
             appendLine(context.getString(R.string.currency_rub, payment))
         }
     }
