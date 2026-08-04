@@ -1,6 +1,6 @@
 package com.github.misham72.communalpayments.domain.userclasses
 
-import com.github.misham72.communalpayments.domain.calculators.PaymentDateCalculator
+import com.github.misham72.communalpayments.domain.calculators.PeriodCalculator
 import com.github.misham72.communalpayments.domain.model.InternetData
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -11,7 +11,7 @@ import java.util.Locale
  * НЕТ Context, НЕТ FileManager, НЕТ сохранения!
  * Только бизнес-логика и данные
  */
-class Internet(private val calculator: PaymentDateCalculator) {
+class Internet(private val calculator: PeriodCalculator) {
     fun collectInternetData(
         paymentDay: Int,
         periodMonths: Int,

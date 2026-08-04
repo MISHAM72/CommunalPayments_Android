@@ -3,7 +3,7 @@ package com.github.misham72.communalpayments.presentation.screen.screens.garbage
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.github.misham72.communalpayments.data.calculators.PaymentDateCalculatorImpl
+import com.github.misham72.communalpayments.data.calculators.PeriodCalculatorImpl
 import com.github.misham72.communalpayments.data.local.preferences.AccountPreferences
 import com.github.misham72.communalpayments.data.local.file.FileManager
 import com.github.misham72.communalpayments.data.repository.PeriodicRepository.GarbageRepositoryImpl
@@ -13,7 +13,7 @@ import com.github.misham72.communalpayments.domain.userclasses.Garbage
 
 class GarbageViewModelFactory(context: Context) : ViewModelProvider.Factory {
 
-    val calculator: PaymentDateCalculatorImpl = PaymentDateCalculatorImpl()
+    val calculator: PeriodCalculatorImpl = PeriodCalculatorImpl()
     private val garbage = Garbage(calculator)
     private val fileManager = FileManager(context)
     private val garbageRepository = GarbageRepositoryImpl(context, fileManager)

@@ -3,7 +3,7 @@ package com.github.misham72.communalpayments.presentation.screen.screens.osago
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.github.misham72.communalpayments.data.calculators.PaymentDateCalculatorImpl
+import com.github.misham72.communalpayments.data.calculators.PeriodCalculatorImpl
 import com.github.misham72.communalpayments.data.local.preferences.AccountPreferences
 import com.github.misham72.communalpayments.data.local.file.FileManager
 import com.github.misham72.communalpayments.data.repository.PeriodicRepository.OsagoRepositoryImpl
@@ -12,7 +12,7 @@ import com.github.misham72.communalpayments.domain.repository.IProviderRepositor
 import com.github.misham72.communalpayments.domain.userclasses.Osago
 
 class OsagoViewModelFactory(context: Context) : ViewModelProvider.Factory {
-    val calculator: PaymentDateCalculatorImpl = PaymentDateCalculatorImpl()
+    val calculator: PeriodCalculatorImpl = PeriodCalculatorImpl()
     private val osago = Osago(calculator)
     private val fileManager = FileManager(context)
     private val osagoRepository = OsagoRepositoryImpl(context, fileManager)

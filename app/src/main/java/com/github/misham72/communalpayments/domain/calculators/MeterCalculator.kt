@@ -1,14 +1,7 @@
 package com.github.misham72.communalpayments.domain.calculators
 
-data class MeterCalculator(
+import com.github.misham72.communalpayments.domain.model.MeterResult
 
-    val consumption: Double, val payment: Double
-) {
-    companion object {
-        fun calculate(current: Double, previous: Double, tariff: Double): MeterCalculator {
-            val consumption = current - previous
-            val payment = consumption * tariff
-            return MeterCalculator(consumption, payment)
-        }
-    }
+interface MeterCalculator {
+    fun calculate(current: Double, previous: Double, tariff: Double): MeterResult
 }

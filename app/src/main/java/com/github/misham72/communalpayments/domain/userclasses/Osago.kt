@@ -1,13 +1,13 @@
 package com.github.misham72.communalpayments.domain.userclasses
 
 
-import com.github.misham72.communalpayments.domain.calculators.PaymentDateCalculator
+import com.github.misham72.communalpayments.domain.calculators.PeriodCalculator
 import com.github.misham72.communalpayments.domain.model.OsagoData
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class Osago(private val calculator: PaymentDateCalculator) {
+class Osago(private val calculator: PeriodCalculator) {
     fun collectOsagoData(
         paymentDay: Int,
         periodMonths: Int,

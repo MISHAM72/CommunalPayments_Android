@@ -1,11 +1,11 @@
 package com.github.misham72.communalpayments.data.calculators
 
 
-import com.github.misham72.communalpayments.domain.calculators.PaymentDateCalculator
+import com.github.misham72.communalpayments.domain.calculators.PeriodCalculator
 import java.util.Calendar
 import java.util.Date
 
-class PaymentDateCalculatorImpl : PaymentDateCalculator {
+class PeriodCalculatorImpl : PeriodCalculator {
 
     override fun getPreviousPaymentDate(monthsPeriod: Int, paymentDay: Int, startDate: Date): Date {
         val start = Calendar.getInstance().apply { time = startDate }

@@ -1,12 +1,12 @@
 package com.github.misham72.communalpayments.domain.userclasses
 
-import com.github.misham72.communalpayments.domain.calculators.PaymentDateCalculator
+import com.github.misham72.communalpayments.domain.calculators.PeriodCalculator
 import com.github.misham72.communalpayments.domain.model.ZONTData
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class ZONT(private val calculator: PaymentDateCalculator) {
+class ZONT(private val calculator: PeriodCalculator) {
 
     fun collectZONTData(
         paymentDay: Int,

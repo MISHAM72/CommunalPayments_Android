@@ -1,13 +1,13 @@
 package com.github.misham72.communalpayments.domain.userclasses
 
-import com.github.misham72.communalpayments.domain.calculators.PaymentDateCalculator
+import com.github.misham72.communalpayments.domain.calculators.PeriodCalculator
 import com.github.misham72.communalpayments.domain.model.GarbageData
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
 
-class Garbage(private val calculator: PaymentDateCalculator) {
+class Garbage(private val calculator: PeriodCalculator) {
 
     fun collectGarbageData(
         paymentDay: Int,
