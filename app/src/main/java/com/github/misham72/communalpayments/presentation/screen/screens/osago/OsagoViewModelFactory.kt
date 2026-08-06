@@ -9,7 +9,7 @@ import com.github.misham72.communalpayments.data.local.file.FileManager
 import com.github.misham72.communalpayments.data.repository.PeriodicRepository.OsagoRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.provider.ProviderRepositoryImpl
 import com.github.misham72.communalpayments.domain.repository.IProviderRepository
-import com.github.misham72.communalpayments.domain.userclasses.Osago
+import com.github.misham72.communalpayments.domain.usecases.Osago
 
 class OsagoViewModelFactory(context: Context) : ViewModelProvider.Factory {
     val calculator: PeriodCalculatorImpl = PeriodCalculatorImpl()

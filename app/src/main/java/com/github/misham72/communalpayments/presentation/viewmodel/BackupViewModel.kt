@@ -3,8 +3,8 @@ package com.github.misham72.communalpayments.presentation.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.misham72.communalpayments.R
-import com.github.misham72.communalpayments.domain.userclasses.ExportBackupUseCase
-import com.github.misham72.communalpayments.domain.userclasses.ImportBackupUseCase
+import com.github.misham72.communalpayments.domain.usecases.ExportBackupUseCase
+import com.github.misham72.communalpayments.domain.usecases.ImportBackupUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch

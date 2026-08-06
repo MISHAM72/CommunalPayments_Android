@@ -9,7 +9,7 @@ import com.github.misham72.communalpayments.domain.model.ValidationError
 import com.github.misham72.communalpayments.domain.model.ZONTData
 import com.github.misham72.communalpayments.domain.repository.IProviderRepository
 import com.github.misham72.communalpayments.domain.repository.ZONTRepository
-import com.github.misham72.communalpayments.domain.userclasses.ZONT
+import com.github.misham72.communalpayments.domain.usecases.ZONT
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 import com.github.misham72.communalpayments.presentation.utils.HistoryExporter
 import com.github.misham72.communalpayments.presentation.utils.PdfHistoryExporter

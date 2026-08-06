@@ -379,10 +379,6 @@ fun SimpleHistoryScreen(
 }
 
 //🔴/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Вспомогательная функция addStatusToLastRecord.
-// Использует разделитель 🟩🟩🟩... для нахождения последней записи.
-//Вставляет новую строку статуса в начало части после разделителя.
-//Возвращает изменённый текст.
 fun addStatusToLastRecord(content: String, newStatus: String): String {
     val separator = HISTORY_SEPARATOR
     val sepIndex = content.indexOf(separator)

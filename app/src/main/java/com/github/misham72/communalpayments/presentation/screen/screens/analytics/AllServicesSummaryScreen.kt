@@ -68,7 +68,7 @@ import com.github.misham72.communalpayments.domain.model.ExpenseSummary
 import com.github.misham72.communalpayments.domain.model.IncomeCategory
 import com.github.misham72.communalpayments.domain.model.IncomeRecord
 import com.github.misham72.communalpayments.domain.model.IncomeSummary
-import com.github.misham72.communalpayments.domain.userclasses.GetAllServicesYearlySummaryUseCase
+import com.github.misham72.communalpayments.domain.usecases.GetAllServicesYearlySummaryUseCase
 import com.github.misham72.communalpayments.presentation.screen.navigation.InitialScreen
 import com.github.misham72.communalpayments.presentation.screen.navigation.getListInitialScreen
 import com.github.misham72.communalpayments.presentation.utils.nameRes

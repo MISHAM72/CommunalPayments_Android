@@ -9,7 +9,7 @@ import com.github.misham72.communalpayments.data.local.file.FileManager
 import com.github.misham72.communalpayments.data.repository.provider.ProviderRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.PeriodicRepository.ZONTRepositoryImpl
 import com.github.misham72.communalpayments.domain.repository.IProviderRepository
-import com.github.misham72.communalpayments.domain.userclasses.ZONT
+import com.github.misham72.communalpayments.domain.usecases.ZONT
 
 
 class ZONTViewModelFactory(context: Context) : ViewModelProvider.Factory {

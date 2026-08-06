@@ -9,7 +9,7 @@ import com.github.misham72.communalpayments.data.local.file.FileManager
 import com.github.misham72.communalpayments.data.repository.provider.ProviderRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.PeriodicRepository.TaxesRepositoryImpl
 import com.github.misham72.communalpayments.domain.repository.IProviderRepository
-import com.github.misham72.communalpayments.domain.userclasses.Taxes
+import com.github.misham72.communalpayments.domain.usecases.Taxes
 
 class TaxesViewModelFactory(context: Context) : ViewModelProvider.Factory {
     val calculator: PeriodCalculatorImpl = PeriodCalculatorImpl()

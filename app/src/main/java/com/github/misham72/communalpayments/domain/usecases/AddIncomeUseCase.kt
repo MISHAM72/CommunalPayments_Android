@@ -1,4 +1,4 @@
-package com.github.misham72.communalpayments.domain.userclasses
+package com.github.misham72.communalpayments.domain.usecases
 
 import com.github.misham72.communalpayments.domain.repository.IncomeRepository
 import java.time.LocalDate

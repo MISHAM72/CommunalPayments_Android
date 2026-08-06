@@ -24,10 +24,11 @@ abstract class BasePeriodicRepository(
         return buildString {
             if (isHistory)
                 appendLine(historyHeader)
+            appendLine(dateTime)
+            appendLine(headerSeparator)
             appendLine(context.getString(R.string.personal_account_in_text_history, accountNumber))
             appendLine(serviceName)
-            appendLine(headerSeparator)
-            appendLine(dateTime)
+            appendLine()
             appendLine(context.getString(R.string.next_payment, nextPayment))
             appendLine(context.getString(R.string.period_months_format, periodMonths))
             appendLine(context.getString(R.string.tariff_card, priceTariff))

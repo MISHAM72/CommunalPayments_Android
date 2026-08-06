@@ -2,8 +2,8 @@ package com.github.misham72.communalpayments.presentation.screen.screens.analyti
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.github.misham72.communalpayments.domain.userclasses.AddIncomeUseCase
-import com.github.misham72.communalpayments.domain.userclasses.GetYearlyIncomeUseCase
+import com.github.misham72.communalpayments.domain.usecases.AddIncomeUseCase
+import com.github.misham72.communalpayments.domain.usecases.GetYearlyIncomeUseCase
 
 class IncomeViewModelFactory(
     private val getIncomeUseCase: GetYearlyIncomeUseCase,

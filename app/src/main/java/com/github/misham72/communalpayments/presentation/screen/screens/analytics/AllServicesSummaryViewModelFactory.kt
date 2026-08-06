@@ -2,7 +2,7 @@ package com.github.misham72.communalpayments.presentation.screen.screens.analyti
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.github.misham72.communalpayments.domain.userclasses.GetAllServicesYearlySummaryUseCase
+import com.github.misham72.communalpayments.domain.usecases.GetAllServicesYearlySummaryUseCase
 
 class AllServicesSummaryViewModelFactory(
     private val useCase: GetAllServicesYearlySummaryUseCase,

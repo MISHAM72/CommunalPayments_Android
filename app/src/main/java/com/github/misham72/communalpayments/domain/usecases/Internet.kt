@@ -1,25 +1,31 @@
-package com.github.misham72.communalpayments.domain.userclasses
+package com.github.misham72.communalpayments.domain.usecases
 
 import com.github.misham72.communalpayments.domain.calculators.PeriodCalculator
-import com.github.misham72.communalpayments.domain.model.TinkoffData
+import com.github.misham72.communalpayments.domain.model.InternetData
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class Tinkoff(private val calculator: PeriodCalculator) {
-    fun collectTinkoffData(   // — отвечает только за расчет данных
+/**
+ * Чистый domain класс для интернет-платежей
+ * НЕТ Context, НЕТ FileManager, НЕТ сохранения!
+ * Только бизнес-логика и данные
+ */
+class Internet(private val calculator: PeriodCalculator) {
+    fun collectInternetData(
         paymentDay: Int,
         periodMonths: Int,
         startDate: Date,
         priceTariff: Double,
         accountNumber: String
-    ): TinkoffData {
-
+    ): InternetData {
+        // Используем переданный калькулятор
         val nextDate = calculator.getNextPaymentDate(periodMonths, paymentDay, startDate)
+
         val formatter = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
         val nextPayment = formatter.format(nextDate)
 
-        return TinkoffData(
+        return InternetData(
             isHistory = true,
             nextPayment = nextPayment,
             priceTariff = priceTariff,

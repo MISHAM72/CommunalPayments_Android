@@ -9,7 +9,7 @@ import com.github.misham72.communalpayments.domain.model.ValidationError
 import com.github.misham72.communalpayments.domain.model.WaterData
 import com.github.misham72.communalpayments.domain.repository.IProviderRepository
 import com.github.misham72.communalpayments.domain.repository.WaterRepository
-import com.github.misham72.communalpayments.domain.userclasses.Water
+import com.github.misham72.communalpayments.domain.usecases.Water
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 import com.github.misham72.communalpayments.presentation.utils.HistoryExporter
 import com.github.misham72.communalpayments.presentation.utils.PdfHistoryExporter

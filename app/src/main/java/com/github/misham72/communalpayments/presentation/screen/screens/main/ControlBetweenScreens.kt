@@ -50,9 +50,9 @@ import com.github.misham72.communalpayments.data.local.file.FileManager
 import com.github.misham72.communalpayments.data.local.income.filemanager.IncomeFileManager
 import com.github.misham72.communalpayments.data.repository.analytics.AnalyticsRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.income.IncomeRepositoryImpl
-import com.github.misham72.communalpayments.domain.userclasses.AddIncomeUseCase
-import com.github.misham72.communalpayments.domain.userclasses.GetAllServicesYearlySummaryUseCase
-import com.github.misham72.communalpayments.domain.userclasses.GetYearlyIncomeUseCase
+import com.github.misham72.communalpayments.domain.usecases.AddIncomeUseCase
+import com.github.misham72.communalpayments.domain.usecases.GetAllServicesYearlySummaryUseCase
+import com.github.misham72.communalpayments.domain.usecases.GetYearlyIncomeUseCase
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 import com.github.misham72.communalpayments.presentation.screen.components.ServiceTab
 import com.github.misham72.communalpayments.presentation.screen.navigation.getListInitialScreen

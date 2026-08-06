@@ -3,7 +3,7 @@ package com.github.misham72.communalpayments.presentation.screen.screens.analyti
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.misham72.communalpayments.domain.model.ExpenseSummary
-import com.github.misham72.communalpayments.domain.userclasses.GetAllServicesYearlySummaryUseCase
+import com.github.misham72.communalpayments.domain.usecases.GetAllServicesYearlySummaryUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

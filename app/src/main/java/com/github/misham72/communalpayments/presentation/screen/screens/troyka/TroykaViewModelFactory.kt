@@ -9,7 +9,7 @@ import com.github.misham72.communalpayments.data.local.file.FileManager
 import com.github.misham72.communalpayments.data.repository.provider.ProviderRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.PeriodicRepository.TroykaRepositoryImpl
 import com.github.misham72.communalpayments.domain.repository.IProviderRepository
-import com.github.misham72.communalpayments.domain.userclasses.Troyka
+import com.github.misham72.communalpayments.domain.usecases.Troyka
 
 class TroykaViewModelFactory(context: Context) : ViewModelProvider.Factory {
     val calculator: PeriodCalculatorImpl = PeriodCalculatorImpl()

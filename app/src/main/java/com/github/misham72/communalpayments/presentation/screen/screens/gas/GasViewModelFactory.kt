@@ -9,7 +9,7 @@ import com.github.misham72.communalpayments.data.local.file.FileManager
 import com.github.misham72.communalpayments.data.repository.MeterRepository.GasRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.provider.ProviderRepositoryImpl
 import com.github.misham72.communalpayments.domain.repository.IProviderRepository
-import com.github.misham72.communalpayments.domain.userclasses.Gas
+import com.github.misham72.communalpayments.domain.usecases.Gas
 
 class GasViewModelFactory(context: Context) : ViewModelProvider.Factory {
     private val meterCalculator = MeterCalculatorImpl()

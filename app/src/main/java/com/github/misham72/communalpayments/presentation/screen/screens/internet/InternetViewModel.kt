@@ -9,7 +9,7 @@ import com.github.misham72.communalpayments.domain.model.ProviderDetails
 import com.github.misham72.communalpayments.domain.model.ValidationError
 import com.github.misham72.communalpayments.domain.repository.IProviderRepository
 import com.github.misham72.communalpayments.domain.repository.InternetRepository
-import com.github.misham72.communalpayments.domain.userclasses.Internet
+import com.github.misham72.communalpayments.domain.usecases.Internet
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 import com.github.misham72.communalpayments.presentation.utils.HistoryExporter
 import com.github.misham72.communalpayments.presentation.utils.PdfHistoryExporter

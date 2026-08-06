@@ -1,26 +1,26 @@
-package com.github.misham72.communalpayments.domain.userclasses
+package com.github.misham72.communalpayments.domain.usecases
 
 import com.github.misham72.communalpayments.domain.calculators.PeriodCalculator
-import com.github.misham72.communalpayments.domain.model.ZONTData
+import com.github.misham72.communalpayments.domain.model.TaxesData
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class ZONT(private val calculator: PeriodCalculator) {
-
-    fun collectZONTData(
+class Taxes(private val calculator: PeriodCalculator) {
+    fun collectTaxesData(
         paymentDay: Int,
         periodMonths: Int,
         startDate: Date,
         priceTariff: Double,
         accountNumber: String
-    ): ZONTData {
+    ): TaxesData {
         // Используем переданный калькулятор
         val nextDate = calculator.getNextPaymentDate(periodMonths, paymentDay, startDate)
+
         val formatter = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
         val nextPayment = formatter.format(nextDate)
 
-        return ZONTData(
+        return TaxesData(
             isHistory = true,
             nextPayment = nextPayment,
             priceTariff = priceTariff,

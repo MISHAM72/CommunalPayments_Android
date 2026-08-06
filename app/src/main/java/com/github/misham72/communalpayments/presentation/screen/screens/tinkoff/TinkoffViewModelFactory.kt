@@ -9,7 +9,7 @@ import com.github.misham72.communalpayments.data.local.file.FileManager
 import com.github.misham72.communalpayments.data.repository.provider.ProviderRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.PeriodicRepository.TinkoffRepositoryImpl
 import com.github.misham72.communalpayments.domain.repository.IProviderRepository
-import com.github.misham72.communalpayments.domain.userclasses.Tinkoff
+import com.github.misham72.communalpayments.domain.usecases.Tinkoff
 
 class TinkoffViewModelFactory(context: Context) : ViewModelProvider.Factory {
     val calculator: PeriodCalculatorImpl = PeriodCalculatorImpl()

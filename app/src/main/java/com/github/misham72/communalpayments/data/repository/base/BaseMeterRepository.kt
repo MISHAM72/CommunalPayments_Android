@@ -25,11 +25,11 @@ abstract class BaseMeterRepository(
     ): String {
         return buildString {
             if (isHistory) appendLine(historyHeader)
-            appendLine(context.getString(R.string.personal_account_in_text_history, accountNumber))
-            appendLine(serviceName)
-            appendLine(headerSeparator)
             appendLine(dateTime)
             appendLine(headerSeparator)
+            appendLine(context.getString(R.string.personal_account_in_text_history, accountNumber))
+            appendLine(serviceName)
+            appendLine()
             appendLine(context.getString(R.string.current_reading, current, unit))
             appendLine(context.getString(R.string.previous_reading, previous, unit))
             appendLine(context.getString(R.string.tariff_card, tariff))

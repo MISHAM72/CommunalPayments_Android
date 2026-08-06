@@ -1,4 +1,4 @@
-package com.github.misham72.communalpayments.domain.userclasses
+package com.github.misham72.communalpayments.domain.usecases
 
 import com.github.misham72.communalpayments.domain.calculators.PeriodCalculator
 import com.github.misham72.communalpayments.domain.model.HostelData

@@ -20,8 +20,8 @@ import androidx.core.view.WindowCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.data.repository.backup.BackupRepositoryImpl
-import com.github.misham72.communalpayments.domain.userclasses.ExportBackupUseCase
-import com.github.misham72.communalpayments.domain.userclasses.ImportBackupUseCase
+import com.github.misham72.communalpayments.domain.usecases.ExportBackupUseCase
+import com.github.misham72.communalpayments.domain.usecases.ImportBackupUseCase
 import com.github.misham72.communalpayments.presentation.screen.screens.main.ControlBetweenScreens
 import com.github.misham72.communalpayments.presentation.theme.AppTheme
 import com.github.misham72.communalpayments.presentation.theme.ThemePrefs

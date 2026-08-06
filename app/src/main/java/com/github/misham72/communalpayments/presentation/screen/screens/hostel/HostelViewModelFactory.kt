@@ -9,7 +9,7 @@ import com.github.misham72.communalpayments.data.local.file.FileManager
 import com.github.misham72.communalpayments.data.repository.PeriodicRepository.HostelRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.provider.ProviderRepositoryImpl
 import com.github.misham72.communalpayments.domain.repository.IProviderRepository
-import com.github.misham72.communalpayments.domain.userclasses.Hostel
+import com.github.misham72.communalpayments.domain.usecases.Hostel
 
 class HostelViewModelFactory(context: Context) : ViewModelProvider.Factory {
 

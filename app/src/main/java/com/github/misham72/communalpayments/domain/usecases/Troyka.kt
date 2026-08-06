@@ -1,28 +1,27 @@
-package com.github.misham72.communalpayments.domain.userclasses
+package com.github.misham72.communalpayments.domain.usecases
+
 
 import com.github.misham72.communalpayments.domain.calculators.PeriodCalculator
-import com.github.misham72.communalpayments.domain.model.GarbageData
+import com.github.misham72.communalpayments.domain.model.TroykaData
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+class Troyka(private val calculator: PeriodCalculator) {
 
-class Garbage(private val calculator: PeriodCalculator) {
-
-    fun collectGarbageData(
+    fun collectTroykaData(
         paymentDay: Int,
         periodMonths: Int,
         startDate: Date,
         priceTariff: Double,
         accountNumber: String
-    ): GarbageData {
+    ): TroykaData {
         // Используем переданный калькулятор
         val nextDate = calculator.getNextPaymentDate(periodMonths, paymentDay, startDate)
         val formatter = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
         val nextPayment = formatter.format(nextDate)
 
-        // 3. СОЗДАНИЕ ОБЪЕКТА С ДАННЫМИ
-        return GarbageData(
+        return TroykaData(
             isHistory = true,
             nextPayment = nextPayment,
             priceTariff = priceTariff,

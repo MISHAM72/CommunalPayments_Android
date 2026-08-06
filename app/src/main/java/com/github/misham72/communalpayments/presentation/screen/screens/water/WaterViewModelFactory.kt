@@ -9,7 +9,7 @@ import com.github.misham72.communalpayments.data.local.file.FileManager
 import com.github.misham72.communalpayments.data.repository.provider.ProviderRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.MeterRepository.WaterRepositoryImpl
 import com.github.misham72.communalpayments.domain.repository.IProviderRepository
-import com.github.misham72.communalpayments.domain.userclasses.Water
+import com.github.misham72.communalpayments.domain.usecases.Water
 
 class WaterViewModelFactory(context: Context) : ViewModelProvider.Factory {
     private val meterCalculator = MeterCalculatorImpl()

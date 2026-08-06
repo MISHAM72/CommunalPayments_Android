@@ -9,7 +9,7 @@ import com.github.misham72.communalpayments.domain.model.TroykaData
 import com.github.misham72.communalpayments.domain.model.ValidationError
 import com.github.misham72.communalpayments.domain.repository.IProviderRepository
 import com.github.misham72.communalpayments.domain.repository.TroykaRepository
-import com.github.misham72.communalpayments.domain.userclasses.Troyka
+import com.github.misham72.communalpayments.domain.usecases.Troyka
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 import com.github.misham72.communalpayments.presentation.utils.HistoryExporter
 import com.github.misham72.communalpayments.presentation.utils.PdfHistoryExporter

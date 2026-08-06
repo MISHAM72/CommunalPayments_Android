@@ -9,7 +9,7 @@ import com.github.misham72.communalpayments.domain.model.ProviderDetails
 import com.github.misham72.communalpayments.domain.model.ValidationError
 import com.github.misham72.communalpayments.domain.repository.ElectricityRepository
 import com.github.misham72.communalpayments.domain.repository.IProviderRepository
-import com.github.misham72.communalpayments.domain.userclasses.Electricity
+import com.github.misham72.communalpayments.domain.usecases.Electricity
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 import com.github.misham72.communalpayments.presentation.utils.PdfHistoryExporter
 import kotlinx.coroutines.async
@@ -112,9 +112,9 @@ class ElectricityViewModel(
         /** По команде (onCalculateClick) запускает цепочку действий:
         валидирует данные, вызывает доменную логику (electricity.collectElectricityData),
         форматирует результат и сохраняет его через meterPaymentStorage.*/
-        val current = _uiState.value.currentReading.toDoubleOrNull() //Преобразует строки из полей ввода в числа (или null, если введена ерунда).
-        val previous = _uiState.value.previousReading.toDoubleOrNull() //Преобразует строки из полей ввода в числа (или null, если введена ерунда).
-        val tariff = _uiState.value.providerDetails.tariff.toDoubleOrNull() //Преобразует строки из полей ввода в числа (или null, если введена ерунда).
+        val current = _uiState.value.currentReading.toDoubleOrNull() //Преобразует строки из полей ввода в числа (или null)
+        val previous = _uiState.value.previousReading.toDoubleOrNull()
+        val tariff = _uiState.value.providerDetails.tariff.toDoubleOrNull()
         val account = _uiState.value.providerDetails.accountNumber
         //Если хоть одно поле пустое или содержит не число — показывает ошибку и останавливается.
         if (current == null || previous == null || tariff == null) {
@@ -122,11 +122,11 @@ class ElectricityViewModel(
             return
         }
 
-        val data = electricity.collectElectricityData(
+        val data = electricity.collectElectricityData(//Через команду- return ElectricityData, fun collectElectricityData  возврпщает а ViewModel получает объект и сохраняет в переменную data:
             current, previous, tariff, accountNumber = account
         )
 
-        viewModelScope.launch {   // Кирпич (тариф) уже на витрине, но нам ещё нужно: Занести запись в складскую книгу (сохранить платёж в файл истории).
+        viewModelScope.launch {
             electricityRepository.saveElectricityPayment(data)
             accountPrefs.saveLastReading(SERVICE_KEY, current.toString())
             accountPrefs.saveTariff(SERVICE_KEY, tariff.toString())
