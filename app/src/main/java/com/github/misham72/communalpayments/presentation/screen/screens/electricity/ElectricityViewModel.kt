@@ -4,12 +4,14 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.misham72.communalpayments.data.local.preferences.AccountPreferences
+import com.github.misham72.communalpayments.domain.exceptions.InvalidReadingException
+import com.github.misham72.communalpayments.domain.model.DomainMessages
 import com.github.misham72.communalpayments.domain.model.ElectricityData
+import com.github.misham72.communalpayments.domain.model.MeterData
 import com.github.misham72.communalpayments.domain.model.ProviderDetails
 import com.github.misham72.communalpayments.domain.model.ValidationError
-import com.github.misham72.communalpayments.domain.repository.ElectricityRepository
 import com.github.misham72.communalpayments.domain.repository.IProviderRepository
-import com.github.misham72.communalpayments.domain.usecases.Electricity
+import com.github.misham72.communalpayments.domain.usecases.MeterDataCollector
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 import com.github.misham72.communalpayments.presentation.utils.PdfHistoryExporter
 import kotlinx.coroutines.async
@@ -19,11 +21,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+
 class ElectricityViewModel(
-    private val electricity: Electricity,
-    private val electricityRepository: ElectricityRepository,
+    private val meterDataCollector: MeterDataCollector,
     private val accountPrefs: AccountPreferences,
     private val repository: IProviderRepository
+
 ) : ViewModel() {  //✅ Класс наследуется от ViewModel() — будет жить при поворотах
 
     companion object {
@@ -37,7 +40,7 @@ class ElectricityViewModel(
         val providerDetails: ProviderDetails = ProviderDetails(),  //Все реквизиты (название, ЛС, тариф, компания, ИНН, р/с) хранятся внутри этого объекта.
         val showAccountDialog: Boolean = false,   // флаг для диалога
         val customDate: String = "",
-        val result: ElectricityData? = null,
+        val result: MeterData? = null,
         val error: ValidationError? = null,
     )
 
@@ -108,39 +111,46 @@ class ElectricityViewModel(
         }
     }
 
-    fun onCalculateClick() {// 🎯 Получает команды от Screen
-        /** По команде (onCalculateClick) запускает цепочку действий:
-        валидирует данные, вызывает доменную логику (electricity.collectElectricityData),
-        форматирует результат и сохраняет его через meterPaymentStorage.*/
-        val current = _uiState.value.currentReading.toDoubleOrNull() //Преобразует строки из полей ввода в числа (или null)
+    fun onCalculateClick() {
+        val current = _uiState.value.currentReading.toDoubleOrNull()
         val previous = _uiState.value.previousReading.toDoubleOrNull()
         val tariff = _uiState.value.providerDetails.tariff.toDoubleOrNull()
         val account = _uiState.value.providerDetails.accountNumber
-        //Если хоть одно поле пустое или содержит не число — показывает ошибку и останавливается.
+
         if (current == null || previous == null || tariff == null) {
             _uiState.update { it.copy(error = ValidationError.InvalidInput) }
             return
         }
 
-        val data = electricity.collectElectricityData(//Через команду- return ElectricityData, fun collectElectricityData  возврпщает а ViewModel получает объект и сохраняет в переменную data:
-            current, previous, tariff, accountNumber = account
-        )
-
         viewModelScope.launch {
-            electricityRepository.saveElectricityPayment(data)
-            accountPrefs.saveLastReading(SERVICE_KEY, current.toString())
-            accountPrefs.saveTariff(SERVICE_KEY, tariff.toString())
-
-            // ✅ Переносим текущее показание в предыдущее прямо сейчас
-            _uiState.update { currentState ->
-                currentState.copy(
-                    previousReading = currentState.currentReading, // перенос
-                    currentReading = "",                           // очистка для следующего ввода
-                    result = data,
-                    error = null
+            try {
+                // Вызываем новый UseCase – он создаст объект, сохранит, обновит Preferences
+                val data = meterDataCollector.collectMeterData(
+                    current = current,
+                    previous = previous,
+                    tariff = tariff,
+                    accountNumber = account,
+                    serviceKey = SERVICE_KEY,
+                    factory = ::ElectricityData   // фабрика – конструктор ElectricityData
                 )
+
+                // После успешного сохранения обновляем UI
+                _uiState.update { state ->
+                    state.copy(
+                        previousReading = state.currentReading,
+                        currentReading = "",
+                        result = data,
+                        error = null
+                    )
+                }
+            } catch (e: InvalidReadingException) {
+                _uiState.update {
+                    it.copy(
+                        error = ValidationError.DomainError(e.message ?: DomainMessages.DEFAULT_VALIDATION_ERROR),
+                        result = null
+                    )
+                }
             }
         }
     }
 }
-

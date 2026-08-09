@@ -130,13 +130,20 @@ fun DisplayElectricityScreen(viewModel: ElectricityViewModel) {
         ) {
             Text(stringResource(R.string.calculate_and_save))
         }
-        when (uiState.error) {
+        @Suppress("VariableDeclarationInWhen")
+        val error = uiState.error
+        when (error) {
             ValidationError.InvalidInput -> Text(
                 stringResource(R.string.error_invalid_input), color = Color.Red
             )
 
             ValidationError.SavingError -> Text(
                 stringResource(R.string.error_saving), color = Color.Red
+            )
+
+            is ValidationError.DomainError -> Text(
+                text = error.message,
+                color = Color.Red
             )
 
             null -> { /* ничего */
@@ -156,15 +163,22 @@ fun DisplayElectricityScreen(viewModel: ElectricityViewModel) {
                         .padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Text(
-                        text = stringResource(R.string.result_electricity), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold
+                        text = stringResource(R.string.result_electricity),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
                     )
                     Text(
                         text = stringResource(
-                            R.string.consumption, result.consumption, stringResource(R.string.unit_kilowatt_hour)
+                            R.string.consumption,
+                            result.consumption.value,
+                            stringResource(R.string.unit_kilowatt_hour)
                         )
                     )
                     Text(
-                        text = stringResource(R.string.currency_rub, result.payment),
+                        text = stringResource(
+                            R.string.currency_rub,
+                            result.payment.amount
+                        ),
                         style = MaterialTheme.typography.headlineSmall,
                         color = Color.Red
                     )
@@ -177,8 +191,14 @@ fun DisplayElectricityScreen(viewModel: ElectricityViewModel) {
             Button(
                 onClick = {
                     copySound?.start()
-                    clipboardManager.setText(AnnotatedString(result.payment.toString()))
-                    Toast.makeText(context, context.getString(R.string.amount_copied, result.payment), Toast.LENGTH_SHORT).show()
+                    clipboardManager.setText(AnnotatedString(result.payment.amount.toString()))
+                    Toast.makeText(
+                        context, context.getString(
+                            R.string.amount_copied,
+                            result.payment.amount
+                        ),
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }, modifier = Modifier.fillMaxWidth()
             ) {
                 Text(stringResource(R.string.copy_amount))

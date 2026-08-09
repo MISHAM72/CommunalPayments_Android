@@ -7,23 +7,23 @@ import com.github.misham72.communalpayments.data.calculators.MeterCalculatorImpl
 import com.github.misham72.communalpayments.data.local.preferences.AccountPreferences
 import com.github.misham72.communalpayments.data.local.file.FileManager
 import com.github.misham72.communalpayments.data.repository.provider.ProviderRepositoryImpl
-import com.github.misham72.communalpayments.data.repository.MeterRepository.WaterRepositoryImpl
+import com.github.misham72.communalpayments.data.repository.meterRepository.WaterRepositoryImpl
 import com.github.misham72.communalpayments.domain.repository.IProviderRepository
-import com.github.misham72.communalpayments.domain.usecases.Water
+import com.github.misham72.communalpayments.domain.usecases.MeterDataCollector
 
 class WaterViewModelFactory(context: Context) : ViewModelProvider.Factory {
-    private val meterCalculator = MeterCalculatorImpl()
-    private val water = Water(meterCalculator)
+
     private val fileManager = FileManager(context)
     private val waterRepository = WaterRepositoryImpl(context, fileManager)
     private val accountPrefs = AccountPreferences(context.applicationContext)
     private val providerRepository: IProviderRepository = ProviderRepositoryImpl(accountPrefs)
+    private val meterDataCollector = MeterDataCollector(waterRepository, accountPrefs)
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(WaterViewModel::class.java)) {
             @Suppress("HardcodedStringLiteral") return WaterViewModel(
-                water = water,
-                waterRepository = waterRepository,
+
+                meterDataCollector = meterDataCollector,
                 accountPrefs = accountPrefs,
                 repository = providerRepository
             ) as T

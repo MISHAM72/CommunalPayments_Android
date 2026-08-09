@@ -1,4 +1,4 @@
-package com.github.misham72.communalpayments.data.repository.PeriodicRepository
+package com.github.misham72.communalpayments.data.repository.periodicRepository
 
 import android.content.Context
 import com.github.misham72.communalpayments.R

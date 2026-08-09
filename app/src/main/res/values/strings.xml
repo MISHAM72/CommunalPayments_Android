@@ -51,7 +51,6 @@
     <string name="status_text_active">АКТИВНО</string>
     <string name="status_text_under_review">НА ПРОВЕРКЕ</string>
     <string name="status_text_cancelled">ОТМЕНЕНО</string>
-    <string name="Replace_the_status_in_the_LAST_entry">Заменить статус в ПОСЛЕДНЕЙ записи:</string>
     <string name="Edit_the_entire_text_To_replace_the_status_in_the_last_entry_click_on_the_button_above">Редактируйте весь текст. Для замены статуса в последней записи нажмите на кнопку внизу</string>
     <string name="status_label">Статус:</string>
 
@@ -76,7 +75,6 @@
     <string name="days_payment_for">Через %d дня(ей) платеж по %s</string>
 
 
-    <string name="format_two_decimals"> %.2f</string>
     <string name="back">Назад</string>
     <string name="save">Сохранить</string>
     <string name="cancel">Отмена</string>
@@ -125,7 +123,6 @@
     <string name="system_default">Как в системе</string>
     <string name="light">Светлая</string>
     <string name="dark">Тёмная</string>
-    <string name="ru">руб.</string>
 
     <string name="formed">"Сформировано: - "</string>
 
@@ -254,7 +251,6 @@
 
 
     <string name="tariff">Тариф:</string>
-    <string name="period">Период: </string>
 
     <!-- общая дата  -->
     <string name="payment_date">Дата платежа: %s</string>
@@ -268,7 +264,6 @@
 
     <string name="unit_cubic_meter"> м./куб.</string>
     <string name="unit_kilowatt_hour"> кВт/ч</string>
-    <string name="unit_month"> мес.</string>
 
 
     <!-- запись в Историю по периоду-->
@@ -286,8 +281,7 @@
     <string name="current_reading_pdf">Текущие показания:</string>
     <string name="previous_reading_pdf">Предыдущие показания:</string>
     <string name="consumption_pdf">Расход:</string>
-    <string name="tariff_pdf">Тариф:</string>
-    <string name="to_be_paid_pdf">К оплате:</string>
+
     <!-- запись в PDF файл по периоду-->
     <string name="period_pdf">Период:</string>
     <string name="next_payment_pdf">Дата оплаты:</string>

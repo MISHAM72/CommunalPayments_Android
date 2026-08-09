@@ -4,12 +4,14 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.misham72.communalpayments.data.local.preferences.AccountPreferences
+import com.github.misham72.communalpayments.domain.exceptions.InvalidReadingException
+import com.github.misham72.communalpayments.domain.model.DomainMessages
 import com.github.misham72.communalpayments.domain.model.GasData
+import com.github.misham72.communalpayments.domain.model.MeterData
 import com.github.misham72.communalpayments.domain.model.ProviderDetails
 import com.github.misham72.communalpayments.domain.model.ValidationError
-import com.github.misham72.communalpayments.domain.repository.GasRepository
 import com.github.misham72.communalpayments.domain.repository.IProviderRepository
-import com.github.misham72.communalpayments.domain.usecases.Gas
+import com.github.misham72.communalpayments.domain.usecases.MeterDataCollector
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 import com.github.misham72.communalpayments.presentation.utils.HistoryExporter
 import com.github.misham72.communalpayments.presentation.utils.PdfHistoryExporter
@@ -21,8 +23,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class GasViewModel(
-    private val gas: Gas,
-    private val gasRepository: GasRepository,
+    private val meterDataCollector: MeterDataCollector,
     private val accountPrefs: AccountPreferences,
     private val repository: IProviderRepository
 ) : ViewModel() {
@@ -37,7 +38,7 @@ class GasViewModel(
         val providerDetails: ProviderDetails = ProviderDetails(),
         val showAccountDialog: Boolean = false,   // флаг для диалога
         val customDate: String = "",
-        val result: GasData? = null,
+        val result: MeterData? = null,
         val error: ValidationError? = null,
     )
 
@@ -115,9 +116,6 @@ class GasViewModel(
     }
 
     fun onCalculateClick() {
-        /** По команде (onCalculateClick) запускает цепочку действий:
-        валидирует данные, вызывает доменную логику (electricity.collectElectricityData),
-        форматирует результат и сохраняет его через meterPaymentStorage.*/
         val current = _uiState.value.currentReading.toDoubleOrNull() //Преобразует строки из полей ввода в числа (или null, если введена ерунда).
         val previous = _uiState.value.previousReading.toDoubleOrNull() //Преобразует строки из полей ввода в числа (или null, если введена ерунда).
         val tariff = _uiState.value.providerDetails.tariff.toDoubleOrNull() //Преобразует строки из полей ввода в числа (или null, если введена ерунда).
@@ -128,23 +126,33 @@ class GasViewModel(
             return
         }
 
-        val data = gas.collectGasData(
-            current, previous, tariff, accountNumber = account
-        )
-
         viewModelScope.launch {
-            gasRepository.saveGasPayment(data)
-            accountPrefs.saveLastReading(SERVICE_KEY, current.toString())
-            accountPrefs.saveTariff(SERVICE_KEY, tariff.toString())
-
-            // ✅ Переносим текущее показание в предыдущее прямо сейчас
-            _uiState.update { currentState ->
-                currentState.copy(
-                    previousReading = currentState.currentReading, // перенос
-                    currentReading = "",                           // очистка для следующего ввода
-                    result = data,
-                    error = null
+            try {
+                val data = meterDataCollector.collectMeterData(
+                    current = current,
+                    previous = previous,
+                    tariff = tariff,
+                    accountNumber = account,
+                    serviceKey = SERVICE_KEY,
+                    factory = ::GasData
                 )
+                // ✅ Переносим текущее показание в предыдущее прямо сейчас
+                _uiState.update { state ->
+                    state.copy(
+                        previousReading = state.currentReading, // перенос
+                        currentReading = "",                           // очистка для следующего ввода
+                        result = data,
+                        error = null
+                    )
+                }
+            } catch (e: InvalidReadingException) {
+                // 🛑 Ловим доменное исключение и показываем пользователю
+                _uiState.update {
+                    it.copy(
+                        error = ValidationError.DomainError(e.message ?: DomainMessages.DEFAULT_VALIDATION_ERROR),
+                        result = null
+                    )
+                }
             }
         }
     }

@@ -21,7 +21,6 @@ class PaymentNotificationWorker(
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
-        Log.d("PaymentNotificationWorker", "doWork запущен")
         val appContext = applicationContext
         val accountPrefs = AccountPreferences(appContext)
 
@@ -50,7 +49,6 @@ class PaymentNotificationWorker(
                 }
             }
         }
-        Log.d("PaymentNotificationWorker", "Работа завершена")
         Result.success()
     }
 

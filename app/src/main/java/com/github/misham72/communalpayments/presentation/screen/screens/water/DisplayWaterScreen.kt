@@ -135,7 +135,9 @@ fun DisplayWaterScreen(viewModel: WaterViewModel) {
         ) {
             Text(stringResource(R.string.calculate_and_save))
         }
-        when (uiState.error) {
+        @Suppress("VariableDeclarationInWhen")
+        val error = uiState.error
+        when (error) {
             ValidationError.InvalidInput -> Text(
                 stringResource(R.string.error_invalid_input), color = Color.Red
             )
@@ -144,10 +146,14 @@ fun DisplayWaterScreen(viewModel: WaterViewModel) {
                 stringResource(R.string.error_saving), color = Color.Red
             )
 
+            is ValidationError.DomainError -> Text(
+                text = error.message,
+                color = Color.Red
+            )
+
             null -> { /* ничего */
             }
         }
-
         // Результат (как у тебя - с датой)
         uiState.result?.let { result ->
             Card(
@@ -163,9 +169,9 @@ fun DisplayWaterScreen(viewModel: WaterViewModel) {
                     Text(
                         text = stringResource(R.string.result_water), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold
                     )
-                    Text(text = stringResource(R.string.consumption, result.consumption, R.string.unit_cubic_meter))
+                    Text(text = stringResource(R.string.consumption, result.consumption.value, R.string.unit_cubic_meter))
                     Text(
-                        text = stringResource(R.string.currency_rub, result.payment), style = MaterialTheme.typography.headlineSmall, color = Color.Red
+                        text = stringResource(R.string.currency_rub, result.payment.amount), style = MaterialTheme.typography.headlineSmall, color = Color.Red
                     )
                 }
             }
@@ -176,8 +182,8 @@ fun DisplayWaterScreen(viewModel: WaterViewModel) {
             Button(
                 onClick = {
                     copySound?.start()
-                    clipboardManager.setText(AnnotatedString(result.payment.toString()))
-                    Toast.makeText(context, context.getString(R.string.amount_copied, result.payment), Toast.LENGTH_SHORT).show()
+                    clipboardManager.setText(AnnotatedString(result.payment.amount.toString()))
+                    Toast.makeText(context, context.getString(R.string.amount_copied, result.payment.amount), Toast.LENGTH_SHORT).show()
                 }, modifier = Modifier.fillMaxWidth()
             ) {
                 Text(stringResource(R.string.copy_amount))

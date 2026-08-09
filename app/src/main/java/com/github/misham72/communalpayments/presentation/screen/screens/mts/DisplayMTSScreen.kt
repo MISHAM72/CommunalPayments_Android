@@ -138,14 +138,20 @@ fun DisplayMTSScreen(viewModel: MTSViewModel) {
         ) {
             Text(stringResource(R.string.calculate_and_save))
         }
-
-        when (uiState.error) {
+        @Suppress("VariableDeclarationInWhen")
+        val error = uiState.error
+        when (error) {
             ValidationError.InvalidInput -> Text(
                 stringResource(R.string.error_invalid_input), color = Color.Red
             )
 
             ValidationError.SavingError -> Text(
                 stringResource(R.string.error_saving), color = Color.Red
+            )
+
+            is ValidationError.DomainError -> Text(
+                text = error.message,
+                color = Color.Red
             )
 
             null -> { /* ничего */

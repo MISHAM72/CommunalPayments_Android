@@ -4,13 +4,16 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.misham72.communalpayments.data.local.preferences.AccountPreferences
+import com.github.misham72.communalpayments.domain.exceptions.InvalidReadingException
+import com.github.misham72.communalpayments.domain.model.DomainMessages
+import com.github.misham72.communalpayments.domain.model.MeterData
 import com.github.misham72.communalpayments.domain.model.ProviderDetails
 import com.github.misham72.communalpayments.domain.model.ValidationError
 import com.github.misham72.communalpayments.domain.model.WaterData
 import com.github.misham72.communalpayments.domain.repository.IProviderRepository
-import com.github.misham72.communalpayments.domain.repository.WaterRepository
-import com.github.misham72.communalpayments.domain.usecases.Water
+import com.github.misham72.communalpayments.domain.usecases.MeterDataCollector
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
+import com.github.misham72.communalpayments.presentation.screen.screens.electricity.ElectricityViewModel
 import com.github.misham72.communalpayments.presentation.utils.HistoryExporter
 import com.github.misham72.communalpayments.presentation.utils.PdfHistoryExporter
 import kotlinx.coroutines.async
@@ -22,8 +25,7 @@ import kotlinx.coroutines.launch
 
 
 class WaterViewModel(
-    private val water: Water,
-    private val waterRepository: WaterRepository,
+    private val meterDataCollector: MeterDataCollector,
     private val accountPrefs: AccountPreferences,
     private val repository: IProviderRepository
 ) : ViewModel() {
@@ -37,7 +39,7 @@ class WaterViewModel(
         val providerDetails: ProviderDetails = ProviderDetails(),
         val showAccountDialog: Boolean = false,
         val customDate: String = "",
-        val result: WaterData? = null,
+        val result: MeterData? = null,
         val error: ValidationError? = null
     )
 
@@ -124,23 +126,34 @@ class WaterViewModel(
             _uiState.update { it.copy(error = ValidationError.InvalidInput) }
             return
         }
-        val data = water.collectWaterData(
-            current, previous, tariff, accountNumber = account
-        )
 
         viewModelScope.launch {
-            waterRepository.saveWaterPayment(data)
-            accountPrefs.saveLastReading(SERVICE_KEY, current.toString())
-            accountPrefs.saveTariff(SERVICE_KEY, tariff.toString())
-
-            // ✅ Переносим текущее показание в предыдущее прямо сейчас
-            _uiState.update { currentState ->
-                currentState.copy(
-                    previousReading = currentState.currentReading, // перенос
-                    currentReading = "",                           // очистка для следующего ввода
-                    result = data,
-                    error = null
+            try {
+                val data = meterDataCollector.collectMeterData(
+                    current = current,
+                    previous = previous,
+                    tariff = tariff,
+                    accountNumber = account,
+                    serviceKey = ElectricityViewModel.Companion.SERVICE_KEY,
+                    factory = ::WaterData
                 )
+
+                _uiState.update { state ->
+                    state.copy(
+                        previousReading = state.currentReading, // перенос
+                        currentReading = "",                           // очистка для следующего ввода
+                        result = data,
+                        error = null
+                    )
+                }
+            } catch (e: InvalidReadingException) {
+                // 🛑 Ловим доменное исключение и показываем пользователю
+                _uiState.update {
+                    it.copy(
+                        error = ValidationError.DomainError(e.message ?: DomainMessages.DEFAULT_VALIDATION_ERROR),
+                        result = null
+                    )
+                }
             }
         }
     }

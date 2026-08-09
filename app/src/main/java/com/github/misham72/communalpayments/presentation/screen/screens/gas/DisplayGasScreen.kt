@@ -137,13 +137,20 @@ fun DisplayGasScreen(viewModel: GasViewModel) {
         ) {
             Text(stringResource(R.string.calculate_and_save))
         }
-        when (uiState.error) {
+        @Suppress("VariableDeclarationInWhen")
+        val error = uiState.error
+        when (error) {
             ValidationError.InvalidInput -> Text(
                 stringResource(R.string.error_invalid_input), color = Color.Red
             )
 
             ValidationError.SavingError -> Text(
                 stringResource(R.string.error_saving), color = Color.Red
+            )
+
+            is ValidationError.DomainError -> Text(
+                text = error.message,
+                color = Color.Red
             )
 
             null -> { /* ничего */
@@ -166,11 +173,11 @@ fun DisplayGasScreen(viewModel: GasViewModel) {
                     )
                     Text(
                         text = stringResource(
-                            R.string.consumption, result.consumption, R.string.unit_cubic_meter
+                            R.string.consumption, result.consumption.value, R.string.unit_cubic_meter
                         )
                     )
                     Text(
-                        text = stringResource(R.string.currency_rub, result.payment), style = MaterialTheme.typography.headlineSmall, color = Color.Red
+                        text = stringResource(R.string.currency_rub, result.payment.amount), style = MaterialTheme.typography.headlineSmall, color = Color.Red
                     )
                 }
             }
@@ -181,8 +188,8 @@ fun DisplayGasScreen(viewModel: GasViewModel) {
             Button(
                 onClick = {
                     copySound?.start()
-                    clipboardManager.setText(AnnotatedString(result.payment.toString()))
-                    Toast.makeText(context, context.getString(R.string.amount_copied, result.payment), Toast.LENGTH_SHORT).show()
+                    clipboardManager.setText(AnnotatedString(result.payment.amount.toString()))
+                    Toast.makeText(context, context.getString(R.string.amount_copied, result.payment.amount), Toast.LENGTH_SHORT).show()
                 }, modifier = Modifier.fillMaxWidth()
             ) {
                 Text(stringResource(R.string.copy_amount))
