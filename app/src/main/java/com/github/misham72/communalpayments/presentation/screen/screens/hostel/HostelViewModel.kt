@@ -6,12 +6,12 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.misham72.communalpayments.data.local.preferences.AccountPreferences
-import com.github.misham72.communalpayments.domain.model.HostelData
 import com.github.misham72.communalpayments.domain.model.ProviderDetails
 import com.github.misham72.communalpayments.domain.model.ValidationError
-import com.github.misham72.communalpayments.domain.repository.HostelRepository
+import com.github.misham72.communalpayments.domain.model.periodic.PeriodicData
 import com.github.misham72.communalpayments.domain.repository.IProviderRepository
-import com.github.misham72.communalpayments.domain.usecases.Hostel
+import com.github.misham72.communalpayments.domain.repository.PeriodicRepository
+import com.github.misham72.communalpayments.domain.usecases.PeriodicDataCollector
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 import com.github.misham72.communalpayments.presentation.utils.HistoryExporter
 import com.github.misham72.communalpayments.presentation.utils.PdfHistoryExporter
@@ -25,11 +25,8 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-//Добавлен IProviderRepository в конструктор
-// – теперь ViewModel может загружать и сохранять данные провайдера.
 class HostelViewModel(
-    private val hostel: Hostel,
-    private val hostelRepository: HostelRepository,
+    private val periodicDataCollector: PeriodicDataCollector,
     private val accountPrefs: AccountPreferences,
     private val repository: IProviderRepository
 ) : ViewModel() {
@@ -45,7 +42,7 @@ class HostelViewModel(
         val providerDetails: ProviderDetails = ProviderDetails(),
         val showAccountDialog: Boolean = false,
         val customDate: String = "",
-        val result: HostelData? = null,
+        val result: PeriodicData? = null,
         val error: ValidationError? = null,
     )
 
@@ -149,23 +146,32 @@ class HostelViewModel(
         }
         val startDate = parseStartDate(_uiState.value.customDate)
 
-        val data = hostel.collectHostelData(
-            paymentDay = paymentDay,
-            periodMonths = periodMonths,
-            startDate = startDate,
-            priceTariff = priceTariff,
-            accountNumber = account
-        )
-
         viewModelScope.launch {
-            hostelRepository.saveHostelPayment(data)
-            _uiState.update {
-                accountPrefs.savePaymentDay(SERVICE_KEY, paymentDay.toString())
-                accountPrefs.savePeriodMonths(SERVICE_KEY, periodMonths.toString())
-                accountPrefs.saveTariff(SERVICE_KEY, priceTariff.toString())
-                it.copy(result = data, error = null)
+            try {
+                val data = periodicDataCollector.collectPeriodicData(
+                    serviceKey = ServiceKeys.HOSTEL,
+                    isHistory = true,
+                    paymentDay = paymentDay,
+                    periodMonths = periodMonths,
+                    startDate = startDate,
+                    priceTariff = priceTariff,
+                    accountNumber = account
+                )
 
-
+                // Обновляем UI – UseCase уже сохранил данные
+                _uiState.update { state ->
+                    state.copy(
+                        result = data,
+                        error = null,
+                    )
+                }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        error = ValidationError.DomainError(e.message ?: "Ошибка сохранения"),
+                        result = null
+                    )
+                }
             }
         }
     }

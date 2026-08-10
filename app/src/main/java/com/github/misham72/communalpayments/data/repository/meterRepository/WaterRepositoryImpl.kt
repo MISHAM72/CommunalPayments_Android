@@ -4,8 +4,9 @@ import android.content.Context
 import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.data.local.file.FileManager
 import com.github.misham72.communalpayments.data.repository.base.BaseMeterRepository
-import com.github.misham72.communalpayments.domain.model.WaterData
-import com.github.misham72.communalpayments.domain.model.MeterData
+import com.github.misham72.communalpayments.domain.common.DomainMessages
+import com.github.misham72.communalpayments.domain.model.metric.WaterData
+import com.github.misham72.communalpayments.domain.model.metric.MeterData
 import com.github.misham72.communalpayments.domain.repository.MeterRepository
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 
@@ -14,7 +15,7 @@ class WaterRepositoryImpl(
     fileManager: FileManager
 ) : BaseMeterRepository(context, fileManager), MeterRepository {
     override suspend fun save(data: MeterData) {
-        require(data is WaterData) { "Ожидается WaterData" }
+        require(data is WaterData) { DomainMessages.EXPECTED_WATER_DATA }
         val dateTime = getCurrentDateTime()
         val serviceKey = ServiceKeys.WATER
         val content = formatMeterPayment(

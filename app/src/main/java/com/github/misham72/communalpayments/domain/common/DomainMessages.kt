@@ -1,4 +1,4 @@
-package com.github.misham72.communalpayments.domain.model
+package com.github.misham72.communalpayments.domain.common
 
 @Suppress("HardcodedStringLiteral")
 object DomainMessages {
@@ -8,4 +8,7 @@ object DomainMessages {
     const val TARIFF_MUST_BE_POSITIVE = "Тариф должен быть положительным"
     const val AMOUNT_CANNOT_BE_NEGATIVE = "Сумма не может быть отрицательной"
     const val ACCOUNT_NUMBER_CANNOT_BE_EMPTY = "Номер счёта не может быть пустым"
+    const val EXPECTED_ELECTRICITY_DATA = "Ожидается ElectricityData"
+    const val EXPECTED_WATER_DATA = "Ожидается WaterData"
+    const val EXPECTED_GAS_DATA = "Ожидается GasData"
 }

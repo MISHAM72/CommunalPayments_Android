@@ -1,6 +1,6 @@
 package com.github.misham72.communalpayments.domain.repository
 
-import com.github.misham72.communalpayments.domain.model.IncomeSummary
+import com.github.misham72.communalpayments.domain.model.incomes.IncomeSummary
 import java.time.LocalDate
 
 interface IncomeRepository {

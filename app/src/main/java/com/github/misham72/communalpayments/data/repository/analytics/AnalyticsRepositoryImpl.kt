@@ -1,7 +1,7 @@
 package com.github.misham72.communalpayments.data.repository.analytics
 
 import com.github.misham72.communalpayments.data.local.file.FileManager
-import com.github.misham72.communalpayments.domain.model.YearSummary
+import com.github.misham72.communalpayments.domain.model.incomes.YearSummary
 import com.github.misham72.communalpayments.domain.repository.AnalyticsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

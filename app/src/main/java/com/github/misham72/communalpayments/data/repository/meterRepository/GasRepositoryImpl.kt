@@ -4,8 +4,9 @@ import android.content.Context
 import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.data.local.file.FileManager
 import com.github.misham72.communalpayments.data.repository.base.BaseMeterRepository
-import com.github.misham72.communalpayments.domain.model.GasData
-import com.github.misham72.communalpayments.domain.model.MeterData
+import com.github.misham72.communalpayments.domain.common.DomainMessages
+import com.github.misham72.communalpayments.domain.model.metric.GasData
+import com.github.misham72.communalpayments.domain.model.metric.MeterData
 import com.github.misham72.communalpayments.domain.repository.MeterRepository
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 
@@ -14,7 +15,7 @@ class GasRepositoryImpl(
     fileManager: FileManager
 ) : BaseMeterRepository(context, fileManager), MeterRepository {
     override suspend fun save(data: MeterData) {
-        require(data is GasData) { "Ожидается ElectricityData" }
+        require(data is GasData) { DomainMessages.EXPECTED_GAS_DATA }
         val dateTime = getCurrentDateTime()
         val serviceKey = ServiceKeys.GAS
         val content = formatMeterPayment(

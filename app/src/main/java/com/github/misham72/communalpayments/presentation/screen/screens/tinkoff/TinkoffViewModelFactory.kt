@@ -6,26 +6,27 @@ import androidx.lifecycle.ViewModelProvider
 import com.github.misham72.communalpayments.data.calculators.PeriodCalculatorImpl
 import com.github.misham72.communalpayments.data.local.preferences.AccountPreferences
 import com.github.misham72.communalpayments.data.local.file.FileManager
+import com.github.misham72.communalpayments.data.repository.periodicRepository.PeriodicRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.provider.ProviderRepositoryImpl
-import com.github.misham72.communalpayments.data.repository.periodicRepository.TinkoffRepositoryImpl
 import com.github.misham72.communalpayments.domain.repository.IProviderRepository
-import com.github.misham72.communalpayments.domain.usecases.Tinkoff
+import com.github.misham72.communalpayments.domain.usecases.PeriodicDataCollector
 
 class TinkoffViewModelFactory(context: Context) : ViewModelProvider.Factory {
-    val calculator: PeriodCalculatorImpl = PeriodCalculatorImpl()
 
-    private val tinkoff = Tinkoff(calculator)
+
     private val fileManager = FileManager(context)
-    private val tinkoffRepository = TinkoffRepositoryImpl(context, fileManager)
+
     private val accountPrefs = AccountPreferences(context.applicationContext)
     private val providerRepository: IProviderRepository = ProviderRepositoryImpl(accountPrefs)
+    private val calculator: PeriodCalculatorImpl = PeriodCalculatorImpl()
+    private val periodicRepository = PeriodicRepositoryImpl(context, fileManager)
+    private val periodicDataCollector = PeriodicDataCollector(periodicRepository, accountPrefs, calculator)
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(TinkoffViewModel::class.java)) {
             @Suppress("HardcodedStringLiteral")
             return TinkoffViewModel(
-                tinkoff = tinkoff,
-                tinkoffRepository = tinkoffRepository,
+                periodicDataCollector = periodicDataCollector,
                 accountPrefs = accountPrefs,
                 repository = providerRepository
             ) as T

@@ -110,5 +110,12 @@ class AccountPreferences(context: Context) {
     fun getWebsiteUrl(serviceKey: String): String {
         return prefs.getString("${serviceKey}_websiteUrl", "") ?: ""
     }
+    fun saveLastPeriodicDate(serviceKey: String, date: String) {
+        prefs.edit().putString("last_periodic_date_$serviceKey", date).apply()
+    }
+
+    fun getLastPeriodicDate(serviceKey: String): String? {
+        return prefs.getString("last_periodic_date_$serviceKey", null)
+    }
 
 }

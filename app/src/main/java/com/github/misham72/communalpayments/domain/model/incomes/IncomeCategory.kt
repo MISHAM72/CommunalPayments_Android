@@ -1,4 +1,4 @@
-package com.github.misham72.communalpayments.domain.model
+package com.github.misham72.communalpayments.domain.model.incomes
 
 enum class IncomeCategory(val order: Int) {
     SALARY(0),

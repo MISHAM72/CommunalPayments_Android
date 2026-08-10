@@ -5,11 +5,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.misham72.communalpayments.data.local.preferences.AccountPreferences
 import com.github.misham72.communalpayments.domain.model.ProviderDetails
-import com.github.misham72.communalpayments.domain.model.TaxesData
 import com.github.misham72.communalpayments.domain.model.ValidationError
+import com.github.misham72.communalpayments.domain.model.periodic.PeriodicData
 import com.github.misham72.communalpayments.domain.repository.IProviderRepository
-import com.github.misham72.communalpayments.domain.repository.TaxesRepository
-import com.github.misham72.communalpayments.domain.usecases.Taxes
+import com.github.misham72.communalpayments.domain.usecases.PeriodicDataCollector
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 import com.github.misham72.communalpayments.presentation.utils.HistoryExporter
 import com.github.misham72.communalpayments.presentation.utils.PdfHistoryExporter
@@ -24,8 +23,7 @@ import java.util.Date
 import java.util.Locale
 
 class TaxesViewModel(
-    private val taxes: Taxes,                    // Домен
-    private val taxesRepository: TaxesRepository,
+    private val periodicDataCollector: PeriodicDataCollector,
     private val accountPrefs: AccountPreferences,
     private val repository: IProviderRepository
 ) : ViewModel() {
@@ -40,7 +38,7 @@ class TaxesViewModel(
         val providerDetails: ProviderDetails = ProviderDetails(),
         val showAccountDialog: Boolean = false,
         val customDate: String = "",
-        val result: TaxesData? = null,
+        val result: PeriodicData? = null,
         val error: ValidationError? = null,
     )
 
@@ -140,22 +138,32 @@ class TaxesViewModel(
             return
         }
         val startDate = parseStartDate(_uiState.value.customDate)
-
-        // 1️⃣ Домен - ЧТО рассчитать
-        val data = taxes.collectTaxesData(
-            paymentDay = paymentDay,
-            periodMonths = periodMonths,
-            startDate = startDate,
-            priceTariff = priceTariff,
-            accountNumber = account
-        )
         viewModelScope.launch {
-            taxesRepository.saveTaxesPayment(data)
-            _uiState.update {
-                accountPrefs.savePaymentDay(SERVICE_KEY, paymentDay.toString())
-                accountPrefs.savePeriodMonths(SERVICE_KEY, periodMonths.toString())
-                accountPrefs.saveTariff(SERVICE_KEY, priceTariff.toString())
-                it.copy(result = data, error = null)
+            try {
+                val data = periodicDataCollector.collectPeriodicData(
+                    serviceKey = ServiceKeys.TAXES,
+                    isHistory = true,
+                    paymentDay = paymentDay,
+                    periodMonths = periodMonths,
+                    startDate = startDate,
+                    priceTariff = priceTariff,
+                    accountNumber = account
+                )
+
+                // Обновляем UI – UseCase уже сохранил данные
+                _uiState.update { state ->
+                    state.copy(
+                        result = data,
+                        error = null,
+                    )
+                }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        error = ValidationError.DomainError(e.message ?: "Ошибка сохранения"),
+                        result = null
+                    )
+                }
             }
         }
     }

@@ -1,6 +1,6 @@
 package com.github.misham72.communalpayments.data.local.income.parser
 
-import com.github.misham72.communalpayments.domain.model.IncomeRecord
+import com.github.misham72.communalpayments.domain.model.incomes.IncomeRecord
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 

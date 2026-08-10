@@ -4,12 +4,11 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.misham72.communalpayments.data.local.preferences.AccountPreferences
-import com.github.misham72.communalpayments.domain.model.InternetData
 import com.github.misham72.communalpayments.domain.model.ProviderDetails
 import com.github.misham72.communalpayments.domain.model.ValidationError
+import com.github.misham72.communalpayments.domain.model.periodic.PeriodicData
 import com.github.misham72.communalpayments.domain.repository.IProviderRepository
-import com.github.misham72.communalpayments.domain.repository.InternetRepository
-import com.github.misham72.communalpayments.domain.usecases.Internet
+import com.github.misham72.communalpayments.domain.usecases.PeriodicDataCollector
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 import com.github.misham72.communalpayments.presentation.utils.HistoryExporter
 import com.github.misham72.communalpayments.presentation.utils.PdfHistoryExporter
@@ -24,8 +23,7 @@ import java.util.Date
 import java.util.Locale
 
 class InternetViewModel(
-    private val internet: Internet,
-    private val internetRepository: InternetRepository,
+    private val periodicDataCollector: PeriodicDataCollector,
     private val accountPrefs: AccountPreferences,
     private val repository: IProviderRepository
 ) : ViewModel() {
@@ -41,7 +39,7 @@ class InternetViewModel(
         val providerDetails: ProviderDetails = ProviderDetails(),
         val showAccountDialog: Boolean = false,
         val customDate: String = "",
-        val result: InternetData? = null,
+        val result: PeriodicData? = null,
         val error: ValidationError? = null,
     )
 
@@ -142,21 +140,32 @@ class InternetViewModel(
         }
         val startDate = parseStartDate(_uiState.value.customDate)
 
-        // 1️⃣ Домен - ЧТО рассчитать
-        val data = internet.collectInternetData(
-            paymentDay = paymentDay,
-            periodMonths = periodMonths,
-            startDate = startDate,
-            priceTariff = priceTariff,
-            accountNumber = account
-        )
         viewModelScope.launch {
-            internetRepository.saveInternetPayment(data)
-            _uiState.update {
-                accountPrefs.savePaymentDay(SERVICE_KEY, paymentDay.toString())
-                accountPrefs.savePeriodMonths(SERVICE_KEY, periodMonths.toString())
-                accountPrefs.saveTariff(SERVICE_KEY, priceTariff.toString())
-                it.copy(result = data, error = null)
+            try {
+                val data = periodicDataCollector.collectPeriodicData(
+                    serviceKey = ServiceKeys.INTERNET,
+                    isHistory = true,
+                    paymentDay = paymentDay,
+                    periodMonths = periodMonths,
+                    startDate = startDate,
+                    priceTariff = priceTariff,
+                    accountNumber = account
+                )
+
+                // Обновляем UI – UseCase уже сохранил данные
+                _uiState.update { state ->
+                    state.copy(
+                        result = data,
+                        error = null,
+                    )
+                }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        error = ValidationError.DomainError(e.message ?: "Ошибка сохранения"),
+                        result = null
+                    )
+                }
             }
         }
     }

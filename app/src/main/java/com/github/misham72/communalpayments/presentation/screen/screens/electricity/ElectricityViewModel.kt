@@ -5,9 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.misham72.communalpayments.data.local.preferences.AccountPreferences
 import com.github.misham72.communalpayments.domain.exceptions.InvalidReadingException
-import com.github.misham72.communalpayments.domain.model.DomainMessages
-import com.github.misham72.communalpayments.domain.model.ElectricityData
-import com.github.misham72.communalpayments.domain.model.MeterData
+import com.github.misham72.communalpayments.domain.common.DomainMessages
+import com.github.misham72.communalpayments.domain.model.metric.ElectricityData
+import com.github.misham72.communalpayments.domain.model.metric.MeterData
 import com.github.misham72.communalpayments.domain.model.ProviderDetails
 import com.github.misham72.communalpayments.domain.model.ValidationError
 import com.github.misham72.communalpayments.domain.repository.IProviderRepository

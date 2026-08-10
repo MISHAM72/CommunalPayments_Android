@@ -2,8 +2,8 @@ package com.github.misham72.communalpayments.data.repository.income
 
 import com.github.misham72.communalpayments.data.local.income.filemanager.IncomeFileManager
 import com.github.misham72.communalpayments.data.local.income.parser.IncomeParser
-import com.github.misham72.communalpayments.domain.model.IncomeCategory
-import com.github.misham72.communalpayments.domain.model.IncomeSummary
+import com.github.misham72.communalpayments.domain.model.incomes.IncomeCategory
+import com.github.misham72.communalpayments.domain.model.incomes.IncomeSummary
 import com.github.misham72.communalpayments.domain.repository.IncomeRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

@@ -2,7 +2,7 @@ package com.github.misham72.communalpayments.presentation.utils
 
 import androidx.annotation.StringRes
 import com.github.misham72.communalpayments.R
-import com.github.misham72.communalpayments.domain.model.IncomeCategory
+import com.github.misham72.communalpayments.domain.model.incomes.IncomeCategory
 
 @StringRes
 fun IncomeCategory.nameRes(): Int = when (this) {

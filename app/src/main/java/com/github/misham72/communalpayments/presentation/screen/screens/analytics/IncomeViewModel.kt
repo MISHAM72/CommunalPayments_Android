@@ -2,7 +2,7 @@ package com.github.misham72.communalpayments.presentation.screen.screens.analyti
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.misham72.communalpayments.domain.model.IncomeSummary
+import com.github.misham72.communalpayments.domain.model.incomes.IncomeSummary
 import com.github.misham72.communalpayments.domain.usecases.AddIncomeUseCase
 import com.github.misham72.communalpayments.domain.usecases.GetYearlyIncomeUseCase
 import kotlinx.coroutines.flow.MutableStateFlow

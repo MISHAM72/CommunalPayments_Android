@@ -1,4 +1,4 @@
-package com.github.misham72.communalpayments.domain.model
+package com.github.misham72.communalpayments.domain.model.metric
 
 import com.github.misham72.communalpayments.domain.model.valueobjects.AccountNumber
 import com.github.misham72.communalpayments.domain.model.valueobjects.KilowattHour

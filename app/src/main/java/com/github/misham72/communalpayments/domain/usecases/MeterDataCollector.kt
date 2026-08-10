@@ -3,9 +3,9 @@ package com.github.misham72.communalpayments.domain.usecases
 import com.github.misham72.communalpayments.data.local.preferences.AccountPreferences
 import com.github.misham72.communalpayments.domain.exceptions.InvalidReadingException
 import com.github.misham72.communalpayments.domain.model.valueobjects.AccountNumber
-import com.github.misham72.communalpayments.domain.model.DomainMessages
+import com.github.misham72.communalpayments.domain.common.DomainMessages
 import com.github.misham72.communalpayments.domain.model.valueobjects.KilowattHour
-import com.github.misham72.communalpayments.domain.model.MeterData
+import com.github.misham72.communalpayments.domain.model.metric.MeterData
 import com.github.misham72.communalpayments.domain.model.valueobjects.Tariff
 import com.github.misham72.communalpayments.domain.repository.MeterRepository
 

@@ -1,8 +1,6 @@
 package com.github.misham72.communalpayments.domain.model.valueobjects
 
-import com.github.misham72.communalpayments.domain.model.DomainMessages
-import com.github.misham72.communalpayments.domain.model.valueobjects.Money
-import com.github.misham72.communalpayments.domain.model.valueobjects.Tariff
+import com.github.misham72.communalpayments.domain.common.DomainMessages
 
 @JvmInline
 value class KilowattHour(val value: Double) {
