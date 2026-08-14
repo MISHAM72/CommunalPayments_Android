@@ -1,6 +1,7 @@
 package com.github.misham72.communalpayments.data.local.income.filemanager
 
 import android.content.Context
+import com.github.misham72.communalpayments.data.common.DataConstants
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -8,8 +9,7 @@ import java.io.File
 class IncomeFileManager(private val context: Context) {
 
     private val directory: File
-        @Suppress("HardcodedStringLiteral")
-        get() = File(context.filesDir, "income_history").also { it.mkdirs() }
+        get() = File(context.filesDir, DataConstants.INCOME_HISTORY_DIR).also { it.mkdirs() }
 
     private fun fileForYear(year: Int): File = File(directory, "income_$year.txt")
 

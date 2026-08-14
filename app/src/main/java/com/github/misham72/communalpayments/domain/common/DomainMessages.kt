@@ -11,4 +11,6 @@ object DomainMessages {
     const val EXPECTED_ELECTRICITY_DATA = "Ожидается ElectricityData"
     const val EXPECTED_WATER_DATA = "Ожидается WaterData"
     const val EXPECTED_GAS_DATA = "Ожидается GasData"
+    const val PERIOD_MUST_BE_POSITIVE = "Период должен быть больше нуля"
+    const val DAY_OF_PAYMENTS_MUST_BE_FROM_1_TO_31 = "День платежа должен быть от 1 до 31"
 }

@@ -42,6 +42,7 @@ import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.data.local.file.FileManager
 import com.github.misham72.communalpayments.domain.model.PaymentStatus
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
+import com.github.misham72.communalpayments.presentation.common.UiConstants
 import com.github.misham72.communalpayments.presentation.mapper.StatusDisplayMapper
 import com.github.misham72.communalpayments.presentation.utils.HISTORY_SEPARATOR
 import com.github.misham72.communalpayments.presentation.utils.rememberBoilerSoundPlayer
@@ -61,6 +62,7 @@ import com.github.misham72.communalpayments.presentation.utils.rememberTinkoffSo
 import com.github.misham72.communalpayments.presentation.utils.rememberWaterSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberlightSoundPlayer
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 
 //🔴//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //@Composable — аннотация, обозначающая, что функция является частью UI (Composable).
@@ -287,8 +289,8 @@ fun SimpleHistoryScreen(
                     }
                     val formattedHistoryText = buildAnnotatedString {
                         val lines = fileContent.replace("<br>", "\n").lines()
-                        val dateRegex = Regex("""(\d{4}-\d{2}-\d{2}) \d{2}:\d{2}:\d{2}""")
-                        val outputFormatter = java.time.format.DateTimeFormatter.ofPattern("d MMMM yyyy", java.util.Locale("ru"))
+                        val dateRegex = Regex(UiConstants.DATE_TIME_REGEX_PATTERN)
+                        val outputFormatter = java.time.format.DateTimeFormatter.ofPattern(UiConstants.DATE_OUTPUT_PATTERN, UiConstants.DEFAULT_LOCALE)
 
                         lines.forEachIndexed { index, line ->
                             val trimmed = line.trim()
@@ -314,9 +316,9 @@ fun SimpleHistoryScreen(
                                 }
 
                                 isDate -> {
-                                    val dateStr = dateMatch?.groupValues?.get(1) ?: trimmed
+                                    val dateStr = dateMatch.groupValues[1]
                                     val formattedDate = try {
-                                        java.time.LocalDate.parse(dateStr).format(outputFormatter)
+                                        LocalDate.parse(dateStr).format(outputFormatter)
                                     } catch (_: Exception) {
                                         dateStr
                                     }

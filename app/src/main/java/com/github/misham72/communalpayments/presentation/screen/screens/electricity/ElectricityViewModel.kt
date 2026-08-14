@@ -3,7 +3,6 @@ package com.github.misham72.communalpayments.presentation.screen.screens.electri
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.misham72.communalpayments.data.local.preferences.AccountPreferences
 import com.github.misham72.communalpayments.domain.exceptions.InvalidReadingException
 import com.github.misham72.communalpayments.domain.common.DomainMessages
 import com.github.misham72.communalpayments.domain.model.metric.ElectricityData
@@ -11,6 +10,7 @@ import com.github.misham72.communalpayments.domain.model.metric.MeterData
 import com.github.misham72.communalpayments.domain.model.ProviderDetails
 import com.github.misham72.communalpayments.domain.model.ValidationError
 import com.github.misham72.communalpayments.domain.repository.IProviderRepository
+import com.github.misham72.communalpayments.domain.repository.UserSettingsRepository
 import com.github.misham72.communalpayments.domain.usecases.MeterDataCollector
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 import com.github.misham72.communalpayments.presentation.utils.PdfHistoryExporter
@@ -24,7 +24,7 @@ import kotlinx.coroutines.launch
 
 class ElectricityViewModel(
     private val meterDataCollector: MeterDataCollector,
-    private val accountPrefs: AccountPreferences,
+    private val settingsRepository: UserSettingsRepository,
     private val repository: IProviderRepository
 
 ) : ViewModel() {  //✅ Класс наследуется от ViewModel() — будет жить при поворотах
@@ -50,10 +50,9 @@ class ElectricityViewModel(
     init {
         viewModelScope.launch {
             val detailsDeferred = async { repository.loadProviderDetails(ServiceKeys.ELECTRICITY) }
-            val savedLastReading = accountPrefs.getLastReading(SERVICE_KEY)
-            val savedTariff = accountPrefs.getTariff(SERVICE_KEY)
-            val savedDate = accountPrefs.getCustomDate(SERVICE_KEY)
-
+            val savedLastReading = settingsRepository.getLastReading(SERVICE_KEY) ?: ""
+            val savedTariff = settingsRepository.getTariff(SERVICE_KEY) ?: ""
+            val savedDate = settingsRepository.getCustomDate(SERVICE_KEY)
             val details = detailsDeferred.await()
 
             _uiState.update { currentState ->
@@ -78,7 +77,9 @@ class ElectricityViewModel(
 
     fun updateCustomDate(date: String) {
         _uiState.update { it.copy(customDate = date) }
-        accountPrefs.saveCustomDate(SERVICE_KEY, date)
+        viewModelScope.launch {
+            settingsRepository.saveCustomDate(SERVICE_KEY, date)
+        }
     }
 
     fun onPdfExport(context: Context) {

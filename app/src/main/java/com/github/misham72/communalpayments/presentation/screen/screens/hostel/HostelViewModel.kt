@@ -5,14 +5,14 @@ package com.github.misham72.communalpayments.presentation.screen.screens.hostel
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.misham72.communalpayments.data.local.preferences.AccountPreferences
 import com.github.misham72.communalpayments.domain.model.ProviderDetails
 import com.github.misham72.communalpayments.domain.model.ValidationError
 import com.github.misham72.communalpayments.domain.model.periodic.PeriodicData
 import com.github.misham72.communalpayments.domain.repository.IProviderRepository
-import com.github.misham72.communalpayments.domain.repository.PeriodicRepository
+import com.github.misham72.communalpayments.domain.repository.UserSettingsRepository
 import com.github.misham72.communalpayments.domain.usecases.PeriodicDataCollector
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
+import com.github.misham72.communalpayments.presentation.common.UiMessages
 import com.github.misham72.communalpayments.presentation.utils.HistoryExporter
 import com.github.misham72.communalpayments.presentation.utils.PdfHistoryExporter
 import kotlinx.coroutines.async
@@ -27,12 +27,12 @@ import java.util.Locale
 
 class HostelViewModel(
     private val periodicDataCollector: PeriodicDataCollector,
-    private val accountPrefs: AccountPreferences,
+    private val settingsRepository: UserSettingsRepository,
     private val repository: IProviderRepository
 ) : ViewModel() {
 
     companion object {
-        const val SERVICE_KEY = ServiceKeys.GARBAGE
+        const val SERVICE_KEY = ServiceKeys.HOSTEL
     }
 
     // 1️⃣ СОСТОЯНИЕ ЭКРАНА (что храним)
@@ -54,10 +54,10 @@ class HostelViewModel(
         viewModelScope.launch {
             // Загружаем всё параллельно, если возможно
             val detailsDeferred = async { repository.loadProviderDetails(ServiceKeys.HOSTEL) }
-            val saveDay = accountPrefs.getPaymentDay(SERVICE_KEY)
-            val savePeriod = accountPrefs.getPeriodMonths(SERVICE_KEY)
-            val savedTariff = accountPrefs.getTariff(SERVICE_KEY)
-            val savedDate = accountPrefs.getCustomDate(SERVICE_KEY)
+            val saveDay = settingsRepository.getPaymentDay(SERVICE_KEY) ?: ""
+            val savePeriod = settingsRepository.getPeriodMonths(SERVICE_KEY) ?: ""
+            val savedTariff = settingsRepository.getTariff(SERVICE_KEY) ?: ""
+            val savedDate = settingsRepository.getCustomDate(SERVICE_KEY)
 
             val details = detailsDeferred.await() // ждём результат
 
@@ -85,7 +85,9 @@ class HostelViewModel(
 
     fun updateCustomDate(date: String) {
         _uiState.update { it.copy(customDate = date) }
-        accountPrefs.saveCustomDate(SERVICE_KEY, date)
+        viewModelScope.launch {
+            settingsRepository.saveCustomDate(SERVICE_KEY, date)
+        }
     }
 
     fun onShareClick(context: Context) {
@@ -168,7 +170,7 @@ class HostelViewModel(
             } catch (e: Exception) {
                 _uiState.update {
                     it.copy(
-                        error = ValidationError.DomainError(e.message ?: "Ошибка сохранения"),
+                        error = ValidationError.DomainError(e.message ?: UiMessages.ERROR_SAVING),
                         result = null
                     )
                 }

@@ -1,6 +1,5 @@
 package com.github.misham72.communalpayments.domain.usecases
 
-import com.github.misham72.communalpayments.data.local.preferences.AccountPreferences
 import com.github.misham72.communalpayments.domain.exceptions.InvalidReadingException
 import com.github.misham72.communalpayments.domain.model.valueobjects.AccountNumber
 import com.github.misham72.communalpayments.domain.common.DomainMessages
@@ -8,10 +7,12 @@ import com.github.misham72.communalpayments.domain.model.valueobjects.KilowattHo
 import com.github.misham72.communalpayments.domain.model.metric.MeterData
 import com.github.misham72.communalpayments.domain.model.valueobjects.Tariff
 import com.github.misham72.communalpayments.domain.repository.MeterRepository
+import com.github.misham72.communalpayments.domain.repository.UserSettingsRepository
 
 class MeterDataCollector(
     private val repository: MeterRepository,
-    private val accountPrefs: AccountPreferences
+    private val settingsRepository: UserSettingsRepository   // ← замена
+
 ) {
     suspend fun collectMeterData(
         current: Double,
@@ -34,8 +35,8 @@ class MeterDataCollector(
         }
 
         repository.save(data)
-        accountPrefs.saveLastReading(serviceKey, current.toString())
-        accountPrefs.saveTariff(serviceKey, tariff.toString())
+        settingsRepository.saveLastReading(serviceKey, current.toString())
+        settingsRepository.saveTariff(serviceKey, tariff.toString())
 
         return data
     }

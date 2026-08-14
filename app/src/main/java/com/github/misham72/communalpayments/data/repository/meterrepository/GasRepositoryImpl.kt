@@ -1,27 +1,27 @@
-package com.github.misham72.communalpayments.data.repository.meterRepository
+package com.github.misham72.communalpayments.data.repository.meterrepository
 
 import android.content.Context
 import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.data.local.file.FileManager
 import com.github.misham72.communalpayments.data.repository.base.BaseMeterRepository
 import com.github.misham72.communalpayments.domain.common.DomainMessages
-import com.github.misham72.communalpayments.domain.model.metric.WaterData
+import com.github.misham72.communalpayments.domain.model.metric.GasData
 import com.github.misham72.communalpayments.domain.model.metric.MeterData
 import com.github.misham72.communalpayments.domain.repository.MeterRepository
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 
-class WaterRepositoryImpl(
+class GasRepositoryImpl(
     context: Context,
     fileManager: FileManager
 ) : BaseMeterRepository(context, fileManager), MeterRepository {
     override suspend fun save(data: MeterData) {
-        require(data is WaterData) { DomainMessages.EXPECTED_WATER_DATA }
+        require(data is GasData) { DomainMessages.EXPECTED_GAS_DATA }
         val dateTime = getCurrentDateTime()
-        val serviceKey = ServiceKeys.WATER
+        val serviceKey = ServiceKeys.GAS
         val content = formatMeterPayment(
             accountNumber = data.accountNumber.value,
             dateTime = dateTime,
-            serviceName = context.getString(R.string.service_display_name_water),
+            serviceName = context.getString(R.string.service_display_name_gas),
             current = data.current.value,
             previous = data.previous.value,
             tariff = data.tariff.value,

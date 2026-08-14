@@ -1,34 +1,34 @@
-package com.github.misham72.communalpayments.data.repository.meterRepository
+package com.github.misham72.communalpayments.data.repository.meterrepository
 
 import android.content.Context
 import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.data.local.file.FileManager
 import com.github.misham72.communalpayments.data.repository.base.BaseMeterRepository
 import com.github.misham72.communalpayments.domain.common.DomainMessages
-import com.github.misham72.communalpayments.domain.model.metric.GasData
+import com.github.misham72.communalpayments.domain.model.metric.ElectricityData
 import com.github.misham72.communalpayments.domain.model.metric.MeterData
 import com.github.misham72.communalpayments.domain.repository.MeterRepository
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 
-class GasRepositoryImpl(
+class ElectricityRepositoryImpl(
     context: Context,
     fileManager: FileManager
 ) : BaseMeterRepository(context, fileManager), MeterRepository {
     override suspend fun save(data: MeterData) {
-        require(data is GasData) { DomainMessages.EXPECTED_GAS_DATA }
+        require(data is ElectricityData) { DomainMessages.EXPECTED_ELECTRICITY_DATA }
         val dateTime = getCurrentDateTime()
-        val serviceKey = ServiceKeys.GAS
+        val serviceKey = ServiceKeys.ELECTRICITY
         val content = formatMeterPayment(
             accountNumber = data.accountNumber.value,
             dateTime = dateTime,
-            serviceName = context.getString(R.string.service_display_name_gas),
+            serviceName = context.getString(R.string.service_display_name_electricity),
             current = data.current.value,
             previous = data.previous.value,
             tariff = data.tariff.value,
             consumption = data.consumption.value,
             payment = data.payment.amount,
             isHistory = data.isHistory,
-            unit = context.getString(R.string.unit_cubic_meter)
+            unit = context.getString(R.string.unit_kilowatt_hour)
         )
 
         fileManager.appendRecord(serviceKey, content)
