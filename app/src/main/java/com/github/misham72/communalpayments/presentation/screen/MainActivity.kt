@@ -19,9 +19,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.github.misham72.communalpayments.R
-import com.github.misham72.communalpayments.data.repository.backup.BackupRepositoryImpl
-import com.github.misham72.communalpayments.domain.usecases.ExportBackupUseCase
-import com.github.misham72.communalpayments.domain.usecases.ImportBackupUseCase
+import com.github.misham72.communalpayments.app.CommunalPaymentsApp
 import com.github.misham72.communalpayments.presentation.screen.screens.main.ControlBetweenScreens
 import com.github.misham72.communalpayments.presentation.theme.AppTheme
 import com.github.misham72.communalpayments.presentation.theme.ThemePrefs
@@ -31,12 +29,9 @@ import com.github.misham72.communalpayments.presentation.viewmodel.BackupViewMod
 class MainActivity : AppCompatActivity() {
 
     private val backupViewModel by lazy {
-        val backupRepo = BackupRepositoryImpl(applicationContext)
-        val exportUseCase = ExportBackupUseCase(backupRepo)
-        val importUseCase = ImportBackupUseCase(backupRepo)
-        BackupViewModel(exportUseCase, importUseCase)
+        val app = application as CommunalPaymentsApp
+        BackupViewModel(app.appContainer.exportBackupUseCase, app.appContainer.importBackupUseCase)
     }
-
     private val createBackupLauncher = registerForActivityResult(
         ActivityResultContracts.CreateDocument("application/zip")
     ) { uri ->
@@ -117,11 +112,17 @@ class MainActivity : AppCompatActivity() {
                         .fillMaxSize()
                         .systemBarsPadding()
                 ) {
-                    ControlBetweenScreens(onExportBackup = {
-                        createBackupLauncher.launch("backup_${System.currentTimeMillis()}.zip")
-                    }, onImportBackup = {
-                        openBackupLauncher.launch(arrayOf("application/zip"))
-                    })
+                    ControlBetweenScreens(
+                        exportHistoryUseCase = (application as CommunalPaymentsApp).appContainer.exportHistoryUseCase,
+                        getHistoryUseCase = (application as CommunalPaymentsApp).appContainer.getHistoryUseCase,
+                        saveHistoryUseCase = (application as CommunalPaymentsApp).appContainer.saveHistoryUseCase,
+                        getAllServicesYearlySummaryUseCase = (application as CommunalPaymentsApp).appContainer.getAllServicesYearlySummaryUseCase,
+                        incomeViewModelFactory = (application as CommunalPaymentsApp).appContainer.incomeViewModelFactory,
+                        settingsRepository = (application as CommunalPaymentsApp).appContainer.settingsRepository,
+                        onExportBackup = { createBackupLauncher.launch("backup_${System.currentTimeMillis()}.zip") },
+                        onImportBackup = {
+                            openBackupLauncher.launch(arrayOf("application/zip"))
+                        })
                 }
             }
         }

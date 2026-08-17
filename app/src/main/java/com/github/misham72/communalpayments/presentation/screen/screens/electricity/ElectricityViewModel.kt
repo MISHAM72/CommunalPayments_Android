@@ -3,17 +3,18 @@ package com.github.misham72.communalpayments.presentation.screen.screens.electri
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.misham72.communalpayments.domain.exceptions.InvalidReadingException
 import com.github.misham72.communalpayments.domain.common.DomainMessages
-import com.github.misham72.communalpayments.domain.model.metric.ElectricityData
-import com.github.misham72.communalpayments.domain.model.metric.MeterData
+import com.github.misham72.communalpayments.domain.exceptions.InvalidReadingException
 import com.github.misham72.communalpayments.domain.model.ProviderDetails
 import com.github.misham72.communalpayments.domain.model.ValidationError
+import com.github.misham72.communalpayments.domain.model.metric.ElectricityData
+import com.github.misham72.communalpayments.domain.model.metric.MeterData
 import com.github.misham72.communalpayments.domain.repository.IProviderRepository
 import com.github.misham72.communalpayments.domain.repository.UserSettingsRepository
+import com.github.misham72.communalpayments.domain.usecases.ExportHistoryUseCase
 import com.github.misham72.communalpayments.domain.usecases.MeterDataCollector
+import com.github.misham72.communalpayments.domain.usecases.TextHistoryUseCase
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
-import com.github.misham72.communalpayments.presentation.utils.PdfHistoryExporter
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -25,12 +26,14 @@ import kotlinx.coroutines.launch
 class ElectricityViewModel(
     private val meterDataCollector: MeterDataCollector,
     private val settingsRepository: UserSettingsRepository,
-    private val repository: IProviderRepository
+    private val repository: IProviderRepository,
+    private val textHistoryUseCase: TextHistoryUseCase,
+    private val exportHistoryUseCase: ExportHistoryUseCase
 
-) : ViewModel() {  //✅ Класс наследуется от ViewModel() — будет жить при поворотах
+) : ViewModel() {  //✅ Объявление класса ViewModel – чертёж будущих объектов.
 
     companion object {
-        const val SERVICE_KEY = ServiceKeys.ELECTRICITY
+        const val SERVICE_KEY = ServiceKeys.ELECTRICITY//– чертежи переменных.
     }
 
     /**Принимает пользовательский ввод (текущие показания, прошлые показания, тариф) и временно хранит их в UiState.*/
@@ -44,10 +47,10 @@ class ElectricityViewModel(
         val error: ValidationError? = null,
     )
 
-    private val _uiState = MutableStateFlow(UiState())  //✅ MutableStateFlow для изменяемого состояния
-    val uiState: StateFlow<UiState> = _uiState.asStateFlow()  //✅ это StateFlow<UiState>, который хранит текущее состояние экрана.
+    private val _uiState = MutableStateFlow(UiState())  //✅ – чертежи переменных.
+    val uiState: StateFlow<UiState> = _uiState.asStateFlow()  //✅– чертежи переменных. Это StateFlow<UiState>, который хранит текущее состояние экрана.
 
-    init {
+    init {//– чертежи действий (инструкции).
         viewModelScope.launch {
             val detailsDeferred = async { repository.loadProviderDetails(ServiceKeys.ELECTRICITY) }
             val savedLastReading = settingsRepository.getLastReading(SERVICE_KEY) ?: ""
@@ -67,7 +70,7 @@ class ElectricityViewModel(
         }
     }
 
-    fun saveProviderDetails(details: ProviderDetails) {
+    fun saveProviderDetails(details: ProviderDetails) {//– чертежи действий (инструкции).
         viewModelScope.launch {
             repository.saveProviderDetails(ServiceKeys.ELECTRICITY, details)
             _uiState.update { it.copy(providerDetails = details) }
@@ -82,9 +85,15 @@ class ElectricityViewModel(
         }
     }
 
+    fun onShareClick(context: Context) {
+        viewModelScope.launch {
+            textHistoryUseCase.shareSingleHistory(context, SERVICE_KEY)
+        }
+    }
+
     fun onPdfExport(context: Context) {
         viewModelScope.launch {
-            PdfHistoryExporter.exportAndShare(context, SERVICE_KEY)
+            exportHistoryUseCase.exportAndShare(context, SERVICE_KEY)
         }
     }
 
@@ -112,7 +121,7 @@ class ElectricityViewModel(
         }
     }
 
-    fun onCalculateClick() {
+    fun onCalculateClick() {//– чертежи действий (инструкции).
         val current = _uiState.value.currentReading.toDoubleOrNull()
         val previous = _uiState.value.previousReading.toDoubleOrNull()
         val tariff = _uiState.value.providerDetails.tariff.toDoubleOrNull()

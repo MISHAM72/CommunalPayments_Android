@@ -1,4 +1,5 @@
-package com.github.misham72.communalpayments.presentation.utils
+package com.github.misham72.communalpayments.data.repository.export
+
 
 import android.content.Context
 import android.content.Intent
@@ -10,8 +11,9 @@ import android.graphics.pdf.PdfDocument
 import android.net.Uri
 import androidx.core.content.FileProvider
 import com.github.misham72.communalpayments.R
-import com.github.misham72.communalpayments.data.local.preferences.AccountPreferences
 import com.github.misham72.communalpayments.data.local.file.FileManager
+import com.github.misham72.communalpayments.data.local.preferences.AccountPreferences
+import com.github.misham72.communalpayments.domain.repository.PdfHistoryRepository
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -20,12 +22,16 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-object PdfHistoryExporter {
+class PdfHistoryRepositoryImpl(
+    private val fileManager: FileManager,
+    private val accountPrefs: AccountPreferences
+) : PdfHistoryRepository {
+    companion object {
+        private const val HISTORY_SEPARATOR = "\n***\n"
+    }
 
-    suspend fun exportAndShare(context: Context, serviceKey: String) {   // exportAndShare — основная публичная suspend-функция для экспорта и отправки PDF.
+    override suspend fun exportAndShare(context: Context, serviceKey: String) {   // exportAndShare — основная публичная suspend-функция для экспорта и отправки PDF.
         withContext(Dispatchers.IO) {   //  переключает выполнение на фоновый поток ввода-вывода, чтобы не замораживать интерфейс.
-            val fileManager = FileManager(context.applicationContext)  //Чтение истории – создает FileManager и AccountPreferences (им нужен applicationContext, чтобы избежать утечек).
-            val accountPrefs = AccountPreferences(context.applicationContext)//читаются пользовательские настройки (название услуги, номер счёта).
             val historyText = fileManager.readHistory(serviceKey)//читает историю, нужно.
             if (historyText.isBlank()) return@withContext//проверяет, что история не пустая
             val records = parseHistoryUniversal(context, historyText)   // Парсинг текста – вызывает parseHistoryUniversal(historyText), получает список структурированных записей UniversalRecord.
@@ -285,10 +291,8 @@ object PdfHistoryExporter {
     }
     // Внутри объекта PdfHistoryExporter
 
-    suspend fun exportAllHistoryPdf(context: Context) {
+    override suspend fun exportAllHistoryPdf(context: Context) {
         withContext(Dispatchers.IO) {
-            val fileManager = FileManager(context.applicationContext)
-            val accountPrefs = AccountPreferences(context.applicationContext)
 
             val allKeys = listOf(
                 ServiceKeys.ELECTRICITY, ServiceKeys.GAS, ServiceKeys.WATER,

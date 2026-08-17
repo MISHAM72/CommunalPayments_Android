@@ -1,6 +1,5 @@
 package com.github.misham72.communalpayments.presentation.screen.screens.history
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//–Подключают необходимые классы и функции из Android Jetpack Compose, Material Design, ресурсов, корутин и вашего проекта.
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -29,7 +28,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -39,8 +37,9 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.misham72.communalpayments.R
-import com.github.misham72.communalpayments.data.local.file.FileManager
 import com.github.misham72.communalpayments.domain.model.PaymentStatus
+import com.github.misham72.communalpayments.domain.usecases.GetHistoryUseCase
+import com.github.misham72.communalpayments.domain.usecases.SaveHistoryUseCase
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 import com.github.misham72.communalpayments.presentation.common.UiConstants
 import com.github.misham72.communalpayments.presentation.mapper.StatusDisplayMapper
@@ -64,29 +63,19 @@ import com.github.misham72.communalpayments.presentation.utils.rememberlightSoun
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
-//🔴//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//@Composable — аннотация, обозначающая, что функция является частью UI (Composable).
 @Composable
 //🔴//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//Принимает два параметра:
-//onBack: () -> Unit — функция, которая будет вызвана при нажатии кнопки «Назад».
-//initialService: String — ключ услуги, выбранной на предыдущем экране.
-//Context — текущий контекст Android.
-//loadingText — текст «Загрузка...» из ресурсов.
-//fileContent — строка, содержащая содержимое файла истории (или ошибку/загрузку). Изменение вызывает перерисовку.
-//isEditing — флаг, показываем ли мы режим редактирования.
-//selectedService — ключ текущей выбранной услуги.
-//fileManager — экземпляр класса FileManager для работы с файлами.
 fun SimpleHistoryScreen(
-    onBack: () -> Unit, initialService: String
-    //🔴/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-) {//3. Объявление переменных состояния и вспомогательных объектов
-    val context = LocalContext.current
+    onBack: () -> Unit,
+    initialService: String,
+    getHistoryUseCase: GetHistoryUseCase,
+    saveHistoryUseCase: SaveHistoryUseCase
+
+) {
     val loadingText = stringResource(R.string.loading)
     var fileContent by remember { mutableStateOf(loadingText) }
     var isEditing by remember { mutableStateOf(false) }
     var selectedService by remember { mutableStateOf(initialService) }
-    val fileManager = remember { FileManager(context) }
     val errorMessageTemplate = stringResource(R.string.download_error_with_message) // шаблон с %s
     val unknownErrorText = stringResource(R.string.unknown_error) // ← получаем текст ошибки через stringResource
     val buttonBuckSound = rememberButtonBuckSoundPlayer()
@@ -109,12 +98,12 @@ fun SimpleHistoryScreen(
     val hostelSound = rememberHostelSoundPlayer()
 
     suspend fun refreshHistory() {
-        fileContent = fileManager.readHistory(selectedService)
+        fileContent = getHistoryUseCase.getHistory(selectedService)
     }
     LaunchedEffect(selectedService) {
         fileContent = loadingText
         fileContent = try {
-            fileManager.readHistory(selectedService)
+            getHistoryUseCase.getHistory(selectedService)
         } catch (e: Exception) {
             errorMessageTemplate.format(e.localizedMessage ?: unknownErrorText) // ← используем полученную переменную
         }
@@ -244,7 +233,7 @@ fun SimpleHistoryScreen(
                     Button(onClick = {
                         saveSound?.start()
                         scope.launch {
-                            fileManager.saveToFile(fileContent, "$selectedService.txt")
+                            saveHistoryUseCase.saveHistory(selectedService, fileContent)
                             isEditing = false
                             refreshHistory()
                         }

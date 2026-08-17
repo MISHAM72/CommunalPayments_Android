@@ -8,11 +8,11 @@ import com.github.misham72.communalpayments.domain.model.ValidationError
 import com.github.misham72.communalpayments.domain.model.periodic.PeriodicData
 import com.github.misham72.communalpayments.domain.repository.IProviderRepository
 import com.github.misham72.communalpayments.domain.repository.UserSettingsRepository
+import com.github.misham72.communalpayments.domain.usecases.ExportHistoryUseCase
 import com.github.misham72.communalpayments.domain.usecases.PeriodicDataCollector
+import com.github.misham72.communalpayments.domain.usecases.TextHistoryUseCase
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 import com.github.misham72.communalpayments.presentation.common.UiMessages
-import com.github.misham72.communalpayments.presentation.utils.HistoryExporter
-import com.github.misham72.communalpayments.presentation.utils.PdfHistoryExporter
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -27,7 +27,10 @@ import java.util.Locale
 class ZONTViewModel(
     private val periodicDataCollector: PeriodicDataCollector,
     private val settingsRepository: UserSettingsRepository,
-    private val repository: IProviderRepository
+    private val repository: IProviderRepository,
+    private val textHistoryUseCase: TextHistoryUseCase,
+    private val exportHistoryUseCase: ExportHistoryUseCase
+
 ) : ViewModel() {
 
     companion object {
@@ -88,13 +91,13 @@ class ZONTViewModel(
 
     fun onShareClick(context: Context) {
         viewModelScope.launch {
-            HistoryExporter.shareSingleHistory(context, SERVICE_KEY)
+            textHistoryUseCase.shareSingleHistory(context, SERVICE_KEY)
         }
     }
 
     fun onPdfExport(context: Context) {
         viewModelScope.launch {
-            PdfHistoryExporter.exportAndShare(context, SERVICE_KEY)
+            exportHistoryUseCase.exportAndShare(context, SERVICE_KEY)
         }
     }
 

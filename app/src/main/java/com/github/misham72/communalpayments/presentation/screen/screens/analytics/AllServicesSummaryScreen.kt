@@ -39,12 +39,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -52,7 +51,6 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -62,8 +60,6 @@ import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.misham72.communalpayments.R
-import com.github.misham72.communalpayments.data.local.income.filemanager.IncomeFileManager
-import com.github.misham72.communalpayments.data.local.income.parser.IncomeParser
 import com.github.misham72.communalpayments.domain.model.ExpenseSummary
 import com.github.misham72.communalpayments.domain.model.incomes.IncomeCategory
 import com.github.misham72.communalpayments.domain.model.incomes.IncomeRecord
@@ -73,7 +69,6 @@ import com.github.misham72.communalpayments.presentation.screen.navigation.Initi
 import com.github.misham72.communalpayments.presentation.screen.navigation.getListInitialScreen
 import com.github.misham72.communalpayments.presentation.utils.nameRes
 import com.github.misham72.communalpayments.presentation.utils.rememberButtonBuckSoundPlayer
-import kotlinx.coroutines.launch
 import java.time.Year
 
 private val chartColors = listOf(
@@ -388,14 +383,11 @@ private fun IncomesChart(summary: IncomeSummary) {
 // ---------- Вкладка доходов ----------
 @Composable
 private fun IncomesTab(factory: IncomeViewModelFactory) {
-    val context = LocalContext.current
-    val incomeFileManager = remember { IncomeFileManager(context) }
     val viewModel: IncomeViewModel = viewModel(factory = factory)
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showAddDialog by remember { mutableStateOf(false) }
     var selectedSourceForEdit by remember { mutableStateOf<String?>(null) }
     var showDeleteSourceConfirm by remember { mutableStateOf<String?>(null) }
-    val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
         viewModel.loadIncome()
@@ -416,9 +408,7 @@ private fun IncomesTab(factory: IncomeViewModelFactory) {
 
         uiState.summary != null -> {
             val summary = uiState.summary ?: return
-            // Используем LazyColumn как корневой, без внешнего Column с verticalScroll
             LazyColumn(modifier = Modifier.fillMaxSize()) {
-                // Карточка общей суммы
                 item {
                     Card(
                         modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
@@ -433,12 +423,9 @@ private fun IncomesTab(factory: IncomeViewModelFactory) {
                         }
                     }
                 }
-
-                // График доходов (теперь тоже будет скроллиться)
                 item {
                     IncomesChart(summary)
                 }
-
                 val sources = summary.bySource.toList().sortedBy { (category, _) -> category.order }
                 if (sources.isNotEmpty()) {
                     items(sources.size) { index ->
@@ -471,7 +458,6 @@ private fun IncomesTab(factory: IncomeViewModelFactory) {
                         }
                     }
                 }
-                // Кнопка добавления дохода
                 item {
                     Spacer(modifier = Modifier.height(12.dp))
                     Button(onClick = { showAddDialog = true }) {
@@ -482,7 +468,7 @@ private fun IncomesTab(factory: IncomeViewModelFactory) {
         }
     }
 
-    // Диалоги остаются без изменений
+    // Диалог добавления дохода
     if (showAddDialog) {
         AddIncomeDialog(onDismiss = { showAddDialog = false }, onAdd = { source, amount ->
             viewModel.addIncome(source, amount)
@@ -490,30 +476,30 @@ private fun IncomesTab(factory: IncomeViewModelFactory) {
         })
     }
 
+    // Диалог записей по источнику
     if (selectedSourceForEdit != null) {
         val source = selectedSourceForEdit ?: return
         SourceRecordsDialog(
-            source = source,
-            fileManager = incomeFileManager,
-            onDismiss = {
+            source = source, viewModel = viewModel, onDismiss = {
                 selectedSourceForEdit = null
                 viewModel.loadIncome()
-            },
-        )
+            })
     }
 
+    // Диалог подтверждения удаления всех записей источника
     if (showDeleteSourceConfirm != null) {
         val source = showDeleteSourceConfirm ?: return
         AlertDialog(onDismissRequest = { showDeleteSourceConfirm = null }, title = { Text(stringResource(R.string.remove_all_incomes, source)) }, text = { Text(stringResource(R.string.this_action_is_irreversible)) }, confirmButton = {
             TextButton(onClick = {
-                scope.launch {
-                    deleteAllSourceRecords(source, incomeFileManager, Year.now().value)
-                    viewModel.loadIncome()
-                    showDeleteSourceConfirm = null
-                }
-            }) { Text(stringResource(R.string.delete)) }
+                viewModel.deleteAllRecordsBySource(source)
+                showDeleteSourceConfirm = null
+            }) {
+                Text(stringResource(R.string.delete))
+            }
         }, dismissButton = {
-            TextButton(onClick = { showDeleteSourceConfirm = null }) { Text(stringResource(R.string.cancel)) }
+            TextButton(onClick = { showDeleteSourceConfirm = null }) {
+                Text(stringResource(R.string.cancel))
+            }
         })
     }
 }
@@ -565,32 +551,20 @@ private fun AddIncomeDialog(
 
 @Composable
 private fun SourceRecordsDialog(
-    source: String, fileManager: IncomeFileManager, onDismiss: () -> Unit
+    source: String, viewModel: IncomeViewModel, onDismiss: () -> Unit
 ) {
-    val scope = rememberCoroutineScope()
-    val records = remember { mutableStateListOf<IncomeRecord>() }
+    val records by viewModel.recordsBySource.collectAsState()
+    val sourceRecords = records[source] ?: emptyList()
     var editIndex by remember { mutableStateOf<Int?>(null) }
     var showDeleteConfirm by remember { mutableStateOf<IncomeRecord?>(null) }
 
-    fun reloadRecords() {
-        scope.launch {
-            val raw = fileManager.readIncome(Year.now().value)
-            records.clear()
-            records.addAll(IncomeParser.parse(raw).filter { it.source == source })
-        }
-    }
-
-    LaunchedEffect(source) {
-        reloadRecords()
-    }
-
     AlertDialog(onDismissRequest = onDismiss, title = { Text(stringResource(R.string.income_dialog_title, source)) }, text = {
-        if (records.isEmpty()) {
+        if (sourceRecords.isEmpty()) {
             Text(stringResource(R.string.no_records))
         } else {
             LazyColumn {
-                items(records.size) { index ->
-                    val record = records[index]
+                items(sourceRecords.size) { index ->
+                    val record = sourceRecords[index]
                     val isEditing = editIndex == index
 
                     if (isEditing) {
@@ -609,14 +583,16 @@ private fun SourceRecordsDialog(
                                 TextButton(onClick = {
                                     val newAmount = editAmount.toDoubleOrNull()
                                     if (newAmount != null && newAmount > 0 && editSource.isNotBlank()) {
-                                        scope.launch {
-                                            updateIncomeRecord(record, editSource, newAmount, fileManager, Year.now().value)
-                                            reloadRecords()
-                                            editIndex = null
-                                        }
+                                        val newRecord = IncomeRecord(record.date, newAmount, editSource)
+                                        viewModel.updateRecord(record, newRecord)
+                                        editIndex = null
                                     }
-                                }) { Text(stringResource(R.string.save)) }
-                                TextButton(onClick = { editIndex = null }) { Text(stringResource(R.string.cancel)) }
+                                }) {
+                                    Text(stringResource(R.string.save))
+                                }
+                                TextButton(onClick = { editIndex = null }) {
+                                    Text(stringResource(R.string.cancel))
+                                }
                             }
                         }
                     } else {
@@ -650,55 +626,18 @@ private fun SourceRecordsDialog(
         TextButton(onClick = onDismiss) { Text(stringResource(R.string.close)) }
     })
 
+    // Диалог подтверждения удаления одной записи
     val deleteRecord = showDeleteConfirm ?: return
     AlertDialog(onDismissRequest = { showDeleteConfirm = null }, title = { Text(stringResource(R.string.delete_record)) }, text = { Text(stringResource(R.string.delete_confirm_amount).format(deleteRecord.amount)) }, confirmButton = {
         TextButton(onClick = {
-            scope.launch {
-                deleteIncomeRecord(deleteRecord, fileManager, Year.now().value)
-                reloadRecords()
-                showDeleteConfirm = null
-            }
-        }) { Text(stringResource(R.string.delete)) }
+            viewModel.deleteRecord(deleteRecord)
+            showDeleteConfirm = null
+        }) {
+            Text(stringResource(R.string.delete))
+        }
     }, dismissButton = {
-        TextButton(onClick = { showDeleteConfirm = null }) { Text(stringResource(R.string.cancel)) }
+        TextButton(onClick = { showDeleteConfirm = null }) {
+            Text(stringResource(R.string.cancel))
+        }
     })
-}
-
-private suspend fun updateIncomeRecord(
-    oldRecord: IncomeRecord, newSource: String, newAmount: Double, fileManager: IncomeFileManager, year: Int
-) {
-    val raw = fileManager.readIncome(year)
-    val dateString = oldRecord.date.toString()
-
-    @Suppress("HardcodedStringLiteral") val oldBlock = "$dateString\nИсточник: ${oldRecord.source}\nСумма: ${"%.2f".format(oldRecord.amount).replace(',', '.')}"
-
-    @Suppress("HardcodedStringLiteral") val newBlock = "$dateString\nИсточник: $newSource\nСумма: ${"%.2f".format(newAmount).replace(',', '.')}"
-    val updated = raw.replace(oldBlock, newBlock)
-    fileManager.saveIncome(year, updated)
-}
-
-private suspend fun deleteIncomeRecord(
-    record: IncomeRecord, fileManager: IncomeFileManager, year: Int
-) {
-    val raw = fileManager.readIncome(year)
-    val dateString = record.date.toString()
-
-    @Suppress("HardcodedStringLiteral") val block = "$dateString\nИсточник: ${record.source}\nСумма: ${"%.2f".format(record.amount).replace(',', '.')}"
-    val updated = raw.replace("$block\n***", "").replace(block, "")
-    fileManager.saveIncome(year, updated)
-}
-
-@Suppress("HardcodedStringLiteral")
-private suspend fun deleteAllSourceRecords(
-    source: String, fileManager: IncomeFileManager, year: Int
-) {
-    val raw = fileManager.readIncome(year)
-    val blocks = raw.split("***").filter { it.isNotBlank() }
-    val filtered = blocks.filter { block ->
-        val lines = block.lines()
-        val blockSource = lines.firstOrNull { it.startsWith("Источник:") }?.substringAfter("Источник:")?.trim()
-        blockSource != source
-    }
-    val updated = filtered.joinToString("\n***\n")
-    fileManager.saveIncome(year, updated)
 }

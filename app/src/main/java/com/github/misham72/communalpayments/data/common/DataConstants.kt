@@ -30,5 +30,7 @@ object DataConstants {
     const val NAME_COMPANY_SUFFIX = "_nameCompany"
     const val BANK_ACCOUNT_SUFFIX = "_bankAccount"
     const val WEBSITE_URL_SUFFIX = "_websiteUrl"
+    // Форматы и имена файлов
+    const val DATE_FORMAT_FILENAME = "yyyyMMdd_HHmmss"
 
 }

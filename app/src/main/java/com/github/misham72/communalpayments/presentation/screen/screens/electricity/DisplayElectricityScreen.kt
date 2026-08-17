@@ -44,12 +44,10 @@ import com.github.misham72.communalpayments.presentation.screen.components.EditP
 import com.github.misham72.communalpayments.presentation.screen.components.ProviderDetailsDialog
 import com.github.misham72.communalpayments.presentation.screen.components.ServiceTopBar
 import com.github.misham72.communalpayments.presentation.utils.BankPaymentHelper
-import com.github.misham72.communalpayments.presentation.utils.HistoryExporter
 import com.github.misham72.communalpayments.presentation.utils.normalizeUrl
 import com.github.misham72.communalpayments.presentation.utils.rememberBankButtonSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberCoinSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberCopyButtonSoundPlayer
-import kotlinx.coroutines.launch
 
 @SuppressLint("LocalContextGetResourceValueCall")
 @Composable
@@ -74,11 +72,7 @@ fun DisplayElectricityScreen(viewModel: ElectricityViewModel) {
         ServiceTopBar(
             title = uiState.providerDetails.customServiceName.ifBlank { stringResource(R.string.service_display_name_electricity) },
             onEditClick = { viewModel.openAccountDialog() },
-            onShareClick = {
-                scope.launch {
-                    HistoryExporter.shareSingleHistory(context, ElectricityViewModel.SERVICE_KEY)
-                }
-            },
+            onShareClick = { viewModel.onShareClick(context) },
             modifier = Modifier.height(28.dp),
             onPdfExport = { viewModel.onPdfExport(context) }
 

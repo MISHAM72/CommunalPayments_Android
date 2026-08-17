@@ -3,6 +3,7 @@ package com.github.misham72.communalpayments.data.repository.income
 import com.github.misham72.communalpayments.data.local.income.filemanager.IncomeFileManager
 import com.github.misham72.communalpayments.data.local.income.parser.IncomeParser
 import com.github.misham72.communalpayments.domain.model.incomes.IncomeCategory
+import com.github.misham72.communalpayments.domain.model.incomes.IncomeRecord
 import com.github.misham72.communalpayments.domain.model.incomes.IncomeSummary
 import com.github.misham72.communalpayments.domain.repository.IncomeRepository
 import kotlinx.coroutines.Dispatchers
@@ -57,5 +58,44 @@ class IncomeRepositoryImpl(
 
     override suspend fun updateIncome(year: Int, content: String) {
         fileManager.saveIncome(year, content)
+    }
+
+    override suspend fun updateRecord(year: Int, oldRecord: IncomeRecord, newRecord: IncomeRecord) {
+        val raw = fileManager.readIncome(year)
+        val oldBlock = buildBlock(oldRecord)
+        val newBlock = buildBlock(newRecord)
+        val updated = raw.replace(oldBlock, newBlock)
+        fileManager.saveIncome(year, updated)
+    }
+
+    override suspend fun deleteRecord(year: Int, record: IncomeRecord) {
+        val raw = fileManager.readIncome(year)
+        val block = buildBlock(record)
+        val updated = raw.replace("$block\n***", "").replace(block, "")
+        fileManager.saveIncome(year, updated)
+    }
+
+    override suspend fun deleteAllRecordsBySource(year: Int, source: String) {
+        val raw = fileManager.readIncome(year)
+        val blocks = raw.split("\n***\n").filter { it.isNotBlank() }
+        val filtered = blocks.filter { block ->
+            val lines = block.lines()
+            val blockSource = lines.firstOrNull { it.startsWith("Источник:") }?.substringAfter("Источник:")?.trim()
+            blockSource != source
+        }
+        val updated = filtered.joinToString("\n***\n")
+        fileManager.saveIncome(year, updated)
+    }
+
+    // Вспомогательная функция для форматирования записи в текстовый блок
+    private fun buildBlock(record: IncomeRecord): String {
+        val dateString = record.date.toString()
+        val formattedAmount = "%.2f".format(record.amount).replace(',', '.')
+        return "$dateString\nИсточник: ${record.source}\nСумма: $formattedAmount"
+    }
+
+    override suspend fun getRecordsByYear(year: Int): List<IncomeRecord> {
+        val raw = fileManager.readIncome(year)
+        return IncomeParser.parse(raw)
     }
 }

@@ -45,14 +45,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import com.github.misham72.communalpayments.R
-import com.github.misham72.communalpayments.data.local.preferences.AccountPreferences
-import com.github.misham72.communalpayments.data.local.file.FileManager
-import com.github.misham72.communalpayments.data.local.income.filemanager.IncomeFileManager
-import com.github.misham72.communalpayments.data.repository.analytics.AnalyticsRepositoryImpl
-import com.github.misham72.communalpayments.data.repository.income.IncomeRepositoryImpl
-import com.github.misham72.communalpayments.domain.usecases.AddIncomeUseCase
+import com.github.misham72.communalpayments.domain.repository.UserSettingsRepository
+import com.github.misham72.communalpayments.domain.usecases.ExportHistoryUseCase
 import com.github.misham72.communalpayments.domain.usecases.GetAllServicesYearlySummaryUseCase
-import com.github.misham72.communalpayments.domain.usecases.GetYearlyIncomeUseCase
+import com.github.misham72.communalpayments.domain.usecases.GetHistoryUseCase
+import com.github.misham72.communalpayments.domain.usecases.SaveHistoryUseCase
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 import com.github.misham72.communalpayments.presentation.screen.components.ServiceTab
 import com.github.misham72.communalpayments.presentation.screen.navigation.getListInitialScreen
@@ -61,7 +58,6 @@ import com.github.misham72.communalpayments.presentation.screen.screens.analytic
 import com.github.misham72.communalpayments.presentation.screen.screens.history.SimpleHistoryScreen
 import com.github.misham72.communalpayments.presentation.theme.ThemePrefs
 import com.github.misham72.communalpayments.presentation.utils.LanguageManager
-import com.github.misham72.communalpayments.presentation.utils.PdfHistoryExporter
 import com.github.misham72.communalpayments.presentation.utils.rememberBoilerSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberCarSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberGarbageSoundPlayer
@@ -80,27 +76,28 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun ControlBetweenScreens(
+    exportHistoryUseCase: ExportHistoryUseCase,
+    getHistoryUseCase: GetHistoryUseCase,
+    saveHistoryUseCase: SaveHistoryUseCase,
+    getAllServicesYearlySummaryUseCase: GetAllServicesYearlySummaryUseCase,
+    incomeViewModelFactory: IncomeViewModelFactory,
+    settingsRepository: UserSettingsRepository,
     onExportBackup: () -> Unit = {},
     onImportBackup: () -> Unit = {}
+
 ) {
     val context = LocalContext.current
-    val accountPrefs = remember { AccountPreferences(context.applicationContext) }
     var selectedService by remember { mutableIntStateOf(0) }
     val showHistory = remember { mutableStateOf(false) }
     val showAllServicesSummary = remember { mutableStateOf(false) }   // новый флаг
     val services = getListInitialScreen()
-    // Зависимости для сводной аналитики по всем услугам
-    val fileManager = remember { FileManager(context) }
-    val analyticsRepo = remember { AnalyticsRepositoryImpl(fileManager) }
-    val getAllServicesUseCase = remember { GetAllServicesYearlySummaryUseCase(analyticsRepo) }
+
+
     val defaultError = stringResource(R.string.error_load_default)
 
     // Зависимости для доходов
-    val incomeFileManager = remember { IncomeFileManager(context) }
-    val incomeRepo = remember { IncomeRepositoryImpl(incomeFileManager) }
-    val getIncomeUseCase = remember { GetYearlyIncomeUseCase(incomeRepo) }
-    val addIncomeUseCase = remember { AddIncomeUseCase(incomeRepo) }
-    val incomeFactory = remember { IncomeViewModelFactory(getIncomeUseCase, addIncomeUseCase) }
+
+
     var dueDates by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
     var showMenu by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
@@ -111,14 +108,16 @@ fun ControlBetweenScreens(
     val mockingPipeSound = rememberInTotalSoundPlayer()
     // Перезагружаем даты при каждом возобновлении экрана
     LifecycleResumeEffect(Unit) {
-        val dates = mutableMapOf<String, String>()
-        services.forEach { service ->
-            val date = accountPrefs.getCustomDate(service.fileKey)
-            if (date.isNotBlank()) {
-                dates[service.fileKey] = date
+        scope.launch {
+            val dates = mutableMapOf<String, String>()
+            services.forEach { service ->
+                val date = settingsRepository.getCustomDate(service.fileKey)
+                if (date.isNotBlank()) {
+                    dates[service.fileKey] = date
+                }
             }
+            dueDates = dates
         }
-        dueDates = dates
         onPauseOrDispose { }
     }
 
@@ -129,14 +128,16 @@ fun ControlBetweenScreens(
     if (showAllServicesSummary.value) {
         AllServicesSummaryScreen(
             onBack = { showAllServicesSummary.value = false },
-            getAllServicesYearlySummaryUseCase = getAllServicesUseCase,  // используем существующую переменную
+            getAllServicesYearlySummaryUseCase = getAllServicesYearlySummaryUseCase,  // используем существующую переменную
             defaultErrorMessage = defaultError,
-            incomeFactory = incomeFactory
+            incomeFactory = incomeViewModelFactory
         )
     } else if (showHistory.value) {
         SimpleHistoryScreen(
             onBack = { onNavigateBack() },
-            initialService = services[selectedService].fileKey
+            initialService = services[selectedService].fileKey,
+            getHistoryUseCase = getHistoryUseCase,
+            saveHistoryUseCase = saveHistoryUseCase
         )
     } else {
         Surface(
@@ -179,7 +180,7 @@ fun ControlBetweenScreens(
                         text = { Text(stringResource(R.string.export_all_pdf_title)) },
                         onClick = {
                             scope.launch {
-                                PdfHistoryExporter.exportAllHistoryPdf(context)
+                                exportHistoryUseCase.exportAllHistoryPdf(context)
                             }
                             showMenu = false
                         }
