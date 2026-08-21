@@ -26,7 +26,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -54,7 +53,6 @@ import com.github.misham72.communalpayments.presentation.utils.rememberCopyButto
 fun DisplayElectricityScreen(viewModel: ElectricityViewModel) {
     val showBankDialog = remember { mutableStateOf(false) }
     val showProviderDialog = remember { mutableStateOf(false) }
-    val scope = rememberCoroutineScope()
     val context = LocalContext.current   // <-- добавить
     val clipboardManager = LocalClipboardManager.current
     val coinSound = rememberCoinSoundPlayer()
@@ -93,9 +91,10 @@ fun DisplayElectricityScreen(viewModel: ElectricityViewModel) {
             label = { Text(stringResource(R.string.current_reading_label_electricity)) },
             modifier = Modifier
                 .fillMaxWidth()
-                .heightIn(min = 48.dp, max = 56.dp), // сужаем
+                .heightIn(min = 48.dp, max = 56.dp),
             textStyle = LocalTextStyle.current.copy(
-                fontSize = 14.sp, lineHeight = 20.sp
+                fontSize = 14.sp,
+                lineHeight = 20.sp
             )
         )
         OutlinedTextField(
@@ -231,27 +230,30 @@ fun DisplayElectricityScreen(viewModel: ElectricityViewModel) {
                 }
             }
         }
-        AlertDialog(onDismissRequest = { showBankDialog.value = false }, title = { Text(stringResource(R.string.select_bank)) }, text = {
-            Column {
-                if (installedBanks.isEmpty()) {
-                    Text(stringResource(R.string.there_are_no_installed_banking_applications))
-                } else {
-                    installedBanks.forEach { bank ->
-                        TextButton(
-                            onClick = {
-                                showBankDialog.value = false
-                                BankPaymentHelper.openBankApp(context, bank)
-                            }) {
-                            Text(bank.name)
+        AlertDialog(
+            onDismissRequest = { showBankDialog.value = false },
+            title = { Text(stringResource(R.string.select_bank)) },
+            text = {
+                Column {
+                    if (installedBanks.isEmpty()) {
+                        Text(stringResource(R.string.there_are_no_installed_banking_applications))
+                    } else {
+                        installedBanks.forEach { bank ->
+                            TextButton(
+                                onClick = {
+                                    showBankDialog.value = false
+                                    BankPaymentHelper.openBankApp(context, bank)
+                                }) {
+                                Text(bank.name)
+                            }
                         }
                     }
                 }
-            }
-        }, confirmButton = {
-            TextButton(onClick = { showBankDialog.value = false }) {
-                Text(stringResource(R.string.cancel))
-            }
-        })
+            }, confirmButton = {
+                TextButton(onClick = { showBankDialog.value = false }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            })
     }
     // Диалог выбора: ИНН или Л/С
     if (showProviderDialog.value) {

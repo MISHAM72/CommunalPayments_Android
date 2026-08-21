@@ -41,6 +41,8 @@ class IncomeViewModel(
             _uiState.value = IncomeUiState()
             try {
                 val summary = getYearlyIncomeUseCase(year)
+                val records = getIncomeRecordsUseCase(year)
+                _recordsBySource.value = records.groupBy { it.source }
                 _uiState.value = IncomeUiState(isLoading = false, summary = summary)
             } catch (e: Exception) {
                 @Suppress("HardcodedStringLiteral")
@@ -56,6 +58,7 @@ class IncomeViewModel(
             loadIncome(Year.now().value)
         }
     }
+
     fun updateRecord(oldRecord: IncomeRecord, newRecord: IncomeRecord) {
         viewModelScope.launch {
             updateIncomeRecordUseCase(Year.now().value, oldRecord, newRecord)

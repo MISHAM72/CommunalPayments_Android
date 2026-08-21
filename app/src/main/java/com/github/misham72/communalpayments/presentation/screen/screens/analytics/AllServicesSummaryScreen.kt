@@ -39,7 +39,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -479,8 +478,12 @@ private fun IncomesTab(factory: IncomeViewModelFactory) {
     // Диалог записей по источнику
     if (selectedSourceForEdit != null) {
         val source = selectedSourceForEdit ?: return
+        val records = viewModel.recordsBySource.value[source] ?: emptyList()
         SourceRecordsDialog(
-            source = source, viewModel = viewModel, onDismiss = {
+            source = source,
+            records = records,
+            viewModel = viewModel,
+            onDismiss = {
                 selectedSourceForEdit = null
                 viewModel.loadIncome()
             })
@@ -551,93 +554,122 @@ private fun AddIncomeDialog(
 
 @Composable
 private fun SourceRecordsDialog(
-    source: String, viewModel: IncomeViewModel, onDismiss: () -> Unit
+    source: String,
+    records: List<IncomeRecord>,   // ← используем этот список
+    viewModel: IncomeViewModel,
+    onDismiss: () -> Unit
 ) {
-    val records by viewModel.recordsBySource.collectAsState()
-    val sourceRecords = records[source] ?: emptyList()
     var editIndex by remember { mutableStateOf<Int?>(null) }
     var showDeleteConfirm by remember { mutableStateOf<IncomeRecord?>(null) }
 
-    AlertDialog(onDismissRequest = onDismiss, title = { Text(stringResource(R.string.income_dialog_title, source)) }, text = {
-        if (sourceRecords.isEmpty()) {
-            Text(stringResource(R.string.no_records))
-        } else {
-            LazyColumn {
-                items(sourceRecords.size) { index ->
-                    val record = sourceRecords[index]
-                    val isEditing = editIndex == index
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.income_dialog_title, source)) },
+        text = {
+            if (records.isEmpty()) {
+                Text(stringResource(R.string.no_records))
+            } else {
+                LazyColumn {
+                    items(records.size) { index ->
+                        val record = records[index]
+                        val isEditing = editIndex == index
 
-                    if (isEditing) {
-                        var editSource by remember { mutableStateOf(record.source) }
-                        var editAmount by remember { mutableStateOf(record.amount.toString()) }
+                        if (isEditing) {
+                            var editSource by remember { mutableStateOf(record.source) }
+                            var editAmount by remember { mutableStateOf(record.amount.toString()) }
 
-                        Column(modifier = Modifier.padding(vertical = 4.dp)) {
-                            OutlinedTextField(
-                                value = editSource, onValueChange = { editSource = it }, label = { Text(stringResource(R.string.source)) }, modifier = Modifier.fillMaxWidth()
-                            )
-                            Spacer(modifier = Modifier.height(4.dp))
-                            OutlinedTextField(
-                                value = editAmount, onValueChange = { editAmount = it }, label = { Text(stringResource(R.string.amount)) }, modifier = Modifier.fillMaxWidth(), singleLine = true
-                            )
-                            Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
-                                TextButton(onClick = {
-                                    val newAmount = editAmount.toDoubleOrNull()
-                                    if (newAmount != null && newAmount > 0 && editSource.isNotBlank()) {
-                                        val newRecord = IncomeRecord(record.date, newAmount, editSource)
-                                        viewModel.updateRecord(record, newRecord)
-                                        editIndex = null
+                            Column(modifier = Modifier.padding(vertical = 4.dp)) {
+                                OutlinedTextField(
+                                    value = editSource,
+                                    onValueChange = { editSource = it },
+                                    label = { Text(stringResource(R.string.source)) },
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                                Spacer(modifier = Modifier.height(4.dp))
+                                OutlinedTextField(
+                                    value = editAmount,
+                                    onValueChange = { editAmount = it },
+                                    label = { Text(stringResource(R.string.amount)) },
+                                    modifier = Modifier.fillMaxWidth(),
+                                    singleLine = true
+                                )
+                                Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
+                                    TextButton(onClick = {
+                                        val newAmount = editAmount.toDoubleOrNull()
+                                        if (newAmount != null && newAmount > 0 && editSource.isNotBlank()) {
+                                            val newRecord = IncomeRecord(record.date, newAmount, editSource)
+                                            viewModel.updateRecord(record, newRecord)
+                                            editIndex = null
+                                            // После сохранения закрываем диалог, чтобы обновить данные
+                                            onDismiss()
+                                        }
+                                    }) {
+                                        Text(stringResource(R.string.save))
                                     }
-                                }) {
-                                    Text(stringResource(R.string.save))
-                                }
-                                TextButton(onClick = { editIndex = null }) {
-                                    Text(stringResource(R.string.cancel))
+                                    TextButton(onClick = { editIndex = null }) {
+                                        Text(stringResource(R.string.cancel))
+                                    }
                                 }
                             }
-                        }
-                    } else {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 4.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(
-                                    text = stringResource(R.string.money_format).format(record.amount), fontSize = 14.sp
-                                )
-                                Text(
-                                    text = record.date.toString(), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                                )
-                            }
-                            Row {
-                                IconButton(onClick = { editIndex = index }) {
-                                    Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.editing))
+                        } else {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 4.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = stringResource(R.string.money_format).format(record.amount),
+                                        fontSize = 14.sp
+                                    )
+                                    Text(
+                                        text = record.date.toString(),
+                                        fontSize = 12.sp,
+                                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                                    )
                                 }
-                                IconButton(onClick = { showDeleteConfirm = record }) {
-                                    Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.delete))
+                                Row {
+                                    IconButton(onClick = { editIndex = index }) {
+                                        Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.editing))
+                                    }
+                                    IconButton(onClick = { showDeleteConfirm = record }) {
+                                        Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.delete))
+                                    }
                                 }
                             }
                         }
                     }
                 }
             }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.close))
+            }
         }
-    }, confirmButton = {
-        TextButton(onClick = onDismiss) { Text(stringResource(R.string.close)) }
-    })
+    )
 
     // Диалог подтверждения удаления одной записи
     val deleteRecord = showDeleteConfirm ?: return
-    AlertDialog(onDismissRequest = { showDeleteConfirm = null }, title = { Text(stringResource(R.string.delete_record)) }, text = { Text(stringResource(R.string.delete_confirm_amount).format(deleteRecord.amount)) }, confirmButton = {
-        TextButton(onClick = {
-            viewModel.deleteRecord(deleteRecord)
-            showDeleteConfirm = null
-        }) {
-            Text(stringResource(R.string.delete))
+    AlertDialog(
+        onDismissRequest = { showDeleteConfirm = null },
+        title = { Text(stringResource(R.string.delete_record)) },
+        text = { Text(stringResource(R.string.delete_confirm_amount).format(deleteRecord.amount)) },
+        confirmButton = {
+            TextButton(onClick = {
+                viewModel.deleteRecord(deleteRecord)
+                showDeleteConfirm = null
+                onDismiss()
+            }) {
+                Text(stringResource(R.string.delete))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = { showDeleteConfirm = null }) {
+                Text(stringResource(R.string.cancel))
+            }
         }
-    }, dismissButton = {
-        TextButton(onClick = { showDeleteConfirm = null }) {
-            Text(stringResource(R.string.cancel))
-        }
-    })
+    )
 }

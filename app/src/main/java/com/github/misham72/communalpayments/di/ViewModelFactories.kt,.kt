@@ -45,7 +45,7 @@ class GasViewModelFactory(
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(GasViewModel::class.java)) {
             return GasViewModel(
-                meterDataCollector = container.meterDataCollector,
+                meterDataCollector = container.gasDataCollector,
                 settingsRepository = container.settingsRepository,
                 repository = container.providerRepository,
                 textHistoryUseCase = textHistoryUseCase,
@@ -64,7 +64,7 @@ class WaterViewModelFactory(
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(WaterViewModel::class.java)) {
             return WaterViewModel(
-                meterDataCollector = container.meterDataCollector,
+                meterDataCollector = container.waterDataCollector,
                 settingsRepository = container.settingsRepository,
                 repository = container.providerRepository,
                 textHistoryUseCase = textHistoryUseCase,
