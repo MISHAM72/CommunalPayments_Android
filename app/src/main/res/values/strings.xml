@@ -287,4 +287,7 @@
     <string name="next_payment_pdf">Дата оплаты:</string>
     <!-- <string name="tariff_pdf">Тариф:</string>-->
 
+    <string name="receipts_title">Квитанции (%s)</string>
+    <string name="no_receipts">Нет сохранённых квитанций</string>
+
 </resources>

@@ -2,7 +2,10 @@ package com.github.misham72.communalpayments.di
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.github.misham72.communalpayments.domain.usecases.DeleteReceiptUseCase
 import com.github.misham72.communalpayments.domain.usecases.ExportHistoryUseCase
+import com.github.misham72.communalpayments.domain.usecases.GetReceiptsUseCase
+import com.github.misham72.communalpayments.domain.usecases.SaveReceiptUseCase
 import com.github.misham72.communalpayments.domain.usecases.TextHistoryUseCase
 import com.github.misham72.communalpayments.presentation.screen.screens.analytics.IncomeViewModelFactory
 import com.github.misham72.communalpayments.presentation.screen.screens.electricity.ElectricityViewModel
@@ -13,10 +16,12 @@ import com.github.misham72.communalpayments.presentation.screen.screens.hostel.H
 import com.github.misham72.communalpayments.presentation.screen.screens.internet.InternetViewModel
 import com.github.misham72.communalpayments.presentation.screen.screens.mts.MTSViewModel
 import com.github.misham72.communalpayments.presentation.screen.screens.osago.OsagoViewModel
+import com.github.misham72.communalpayments.presentation.screen.screens.receipts.ReceiptsViewModel
 import com.github.misham72.communalpayments.presentation.screen.screens.taxes.TaxesViewModel
 import com.github.misham72.communalpayments.presentation.screen.screens.tinkoff.TinkoffViewModel
 import com.github.misham72.communalpayments.presentation.screen.screens.troyka.TroykaViewModel
 import com.github.misham72.communalpayments.presentation.screen.screens.water.WaterViewModel
+import kotlin.jvm.java
 
 class ElectricityViewModelFactory(
     private val container: AppContainer,
@@ -246,3 +251,15 @@ class TroykaViewModelFactory(
     }
 }
 
+class ReceiptsViewModelFactory(
+    private val getReceiptsUseCase: GetReceiptsUseCase,
+    private val deleteReceiptUseCase: DeleteReceiptUseCase,
+    private val saveReceiptUseCase: SaveReceiptUseCase
+) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(ReceiptsViewModel::class.java)) {
+            return ReceiptsViewModel(getReceiptsUseCase, deleteReceiptUseCase, saveReceiptUseCase) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
+    }
+}

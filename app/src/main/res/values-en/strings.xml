@@ -247,6 +247,8 @@
     <string name="period_pdf">period_pdf</string>
     <string name="next_payment_pdf">Payment day</string>
     <string name="current_reading_txt_water_and_gas">current reading</string>
+    <string name="receipts_title">receipts</string>
+    <string name="no_receipts">no receipts</string>
 
 </resources>
 

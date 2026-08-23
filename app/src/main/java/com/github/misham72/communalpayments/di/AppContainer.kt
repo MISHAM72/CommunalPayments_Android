@@ -16,6 +16,7 @@ import com.github.misham72.communalpayments.data.repository.meterrepository.GasR
 import com.github.misham72.communalpayments.data.repository.meterrepository.WaterRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.periodrepository.PeriodicRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.provider.ProviderRepositoryImpl
+import com.github.misham72.communalpayments.data.repository.receipt.ReceiptRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.settings.UserSettingsRepositoryImpl
 import com.github.misham72.communalpayments.domain.repository.BackupRepository
 import com.github.misham72.communalpayments.domain.repository.HistoryRepository
@@ -23,24 +24,29 @@ import com.github.misham72.communalpayments.domain.repository.IncomeRepository
 import com.github.misham72.communalpayments.domain.repository.MeterRepository
 import com.github.misham72.communalpayments.domain.repository.PdfHistoryRepository
 import com.github.misham72.communalpayments.domain.repository.PeriodicRepository
+import com.github.misham72.communalpayments.domain.repository.ReceiptRepository
 import com.github.misham72.communalpayments.domain.repository.TextHistoryRepository
 import com.github.misham72.communalpayments.domain.repository.UserSettingsRepository
 import com.github.misham72.communalpayments.domain.usecases.AddIncomeUseCase
 import com.github.misham72.communalpayments.domain.usecases.DeleteAllIncomeRecordsBySourceUseCase
 import com.github.misham72.communalpayments.domain.usecases.DeleteIncomeRecordUseCase
+import com.github.misham72.communalpayments.domain.usecases.DeleteReceiptUseCase
 import com.github.misham72.communalpayments.domain.usecases.ExportBackupUseCase
 import com.github.misham72.communalpayments.domain.usecases.ExportHistoryUseCase
 import com.github.misham72.communalpayments.domain.usecases.GetAllServicesYearlySummaryUseCase
 import com.github.misham72.communalpayments.domain.usecases.GetHistoryUseCase
 import com.github.misham72.communalpayments.domain.usecases.GetIncomeRecordsUseCase
+import com.github.misham72.communalpayments.domain.usecases.GetReceiptsUseCase
 import com.github.misham72.communalpayments.domain.usecases.GetYearlyIncomeUseCase
 import com.github.misham72.communalpayments.domain.usecases.ImportBackupUseCase
 import com.github.misham72.communalpayments.domain.usecases.MeterDataCollector
 import com.github.misham72.communalpayments.domain.usecases.PeriodicDataCollector
 import com.github.misham72.communalpayments.domain.usecases.SaveHistoryUseCase
+import com.github.misham72.communalpayments.domain.usecases.SaveReceiptUseCase
 import com.github.misham72.communalpayments.domain.usecases.TextHistoryUseCase
 import com.github.misham72.communalpayments.domain.usecases.UpdateIncomeRecordUseCase
 import com.github.misham72.communalpayments.presentation.screen.screens.analytics.IncomeViewModelFactory
+import com.google.gson.Gson
 
 
 class AppContainer(private val context: Context) {
@@ -109,6 +115,10 @@ class AppContainer(private val context: Context) {
     val backupRepository: BackupRepository = BackupRepositoryImpl(context)
     val exportBackupUseCase = ExportBackupUseCase(backupRepository)
     val importBackupUseCase = ImportBackupUseCase(backupRepository)
-
-
+    // Репозиторий для квитанций
+    val receiptRepository: ReceiptRepository = ReceiptRepositoryImpl(fileManager, Gson())
+    val saveReceiptUseCase = SaveReceiptUseCase(receiptRepository)
+    val getReceiptsUseCase = GetReceiptsUseCase(receiptRepository)
+    val deleteReceiptUseCase = DeleteReceiptUseCase(receiptRepository)
+    val receiptsViewModelFactory = ReceiptsViewModelFactory(getReceiptsUseCase, deleteReceiptUseCase, saveReceiptUseCase)
 }

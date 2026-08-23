@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -33,8 +34,9 @@ fun ServiceTopBar(
     title: String,
     onEditClick: () -> Unit,
     onShareClick: () -> Unit,
+    onReceiptsClick: () -> Unit,
     modifier: Modifier = Modifier,
-    onPdfExport: () -> Unit = {}   // новый параметр с пустой реализацией по умолчанию
+    onPdfExport: () -> Unit = {}
 
 ) {
     val clockCuCuSound = rememberClockCuCuSoundPlayer()
@@ -64,6 +66,18 @@ fun ServiceTopBar(
                 Icon(
                     Icons.Default.Edit,
                     contentDescription = stringResource(R.string.change_personal_account)
+                )
+            }
+            // 🆕 Кнопка квитанций (папка)
+            IconButton(
+                onClick = {
+                    // звук не обязателен, можно добавить позже
+                    onReceiptsClick()
+                }
+            ) {
+                Icon(
+                    Icons.Outlined.Folder,
+                    contentDescription = "Квитанции" // или stringResource, если добавишь в strings.xml
                 )
             }
 

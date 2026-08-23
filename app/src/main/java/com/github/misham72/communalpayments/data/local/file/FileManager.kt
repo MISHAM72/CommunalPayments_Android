@@ -1,12 +1,14 @@
 package com.github.misham72.communalpayments.data.local.file
 
 import android.content.Context
+import android.util.Log
 import com.github.misham72.communalpayments.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileWriter
 import java.io.IOException
+import java.io.InputStream
 
 class FileManager(private val context: Context) {
     //Проверяет, существует ли папка history.
@@ -25,16 +27,24 @@ class FileManager(private val context: Context) {
 
     suspend fun appendRecord(serviceKey: String, recordText: String) {
         withContext(Dispatchers.IO) {
+            Log.d("FileManager", "=== appendRecord START ===")
+            Log.d("FileManager", "serviceKey: $serviceKey")
+            Log.d("FileManager", "recordText length: ${recordText.length}")
             val directory = File(context.filesDir, context.getString(R.string.history))
+            Log.d("FileManager", "directory: ${directory.absolutePath}")
             directory.mkdirs()
             val file = File(directory, "$serviceKey.txt")
+            Log.d("FileManager", "file path: ${file.absolutePath}")
             val existingText = if (file.exists()) file.readText() else ""
+            Log.d("FileManager", "existingText length: ${existingText.length}")
             val newText = if (existingText.isNotEmpty()) {
                 "$recordText\n\n$existingText"
             } else {
                 recordText
             }
             file.writeText(newText)
+            Log.d("FileManager", "File written successfully")
+            Log.d("FileManager", "File exists after write: ${file.exists()}, size: ${file.length()}")
         }
     }
 
@@ -54,5 +64,39 @@ class FileManager(private val context: Context) {
             e.printStackTrace()
             false
         }
+    }
+
+    // ---------- Методы для квитанций ----------
+    fun getReceiptsDir(): File {
+        val dir = File(context.filesDir, "receipts")
+        if (!dir.exists()) dir.mkdirs()
+        return dir
+    }
+
+    private fun getServiceReceiptsDir(serviceKey: String): File {
+        val dir = File(getReceiptsDir(), serviceKey)
+        if (!dir.exists()) dir.mkdirs()
+        return dir
+    }
+
+    suspend fun saveReceiptFile(inputStream: InputStream, serviceKey: String, fileName: String): String {
+        return withContext(Dispatchers.IO) {
+            val dir = getServiceReceiptsDir(serviceKey)
+            val uniqueFileName = "${System.currentTimeMillis()}_$fileName"
+            val file = File(dir, uniqueFileName)
+            file.outputStream().use { output ->
+                inputStream.copyTo(output)
+            }
+            file.absolutePath
+        }
+    }
+
+    fun deleteReceiptFile(path: String): Boolean {
+        return File(path).delete()
+    }
+
+    fun getReceiptFile(path: String): File? {
+        val file = File(path)
+        return if (file.exists()) file else null
     }
 }

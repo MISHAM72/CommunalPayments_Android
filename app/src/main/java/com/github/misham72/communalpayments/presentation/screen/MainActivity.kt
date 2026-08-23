@@ -1,9 +1,12 @@
 package com.github.misham72.communalpayments.presentation.screen
 
 import android.Manifest
+import android.content.Intent
 import android.content.res.Configuration
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.OpenableColumns
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -18,20 +21,28 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.ActivityCompat
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.app.CommunalPaymentsApp
+import com.github.misham72.communalpayments.di.AppContainer
+import com.github.misham72.communalpayments.domain.usecases.SaveReceiptUseCase
 import com.github.misham72.communalpayments.presentation.screen.screens.main.ControlBetweenScreens
 import com.github.misham72.communalpayments.presentation.theme.AppTheme
 import com.github.misham72.communalpayments.presentation.theme.ThemePrefs
 import com.github.misham72.communalpayments.presentation.utils.LanguageManager
 import com.github.misham72.communalpayments.presentation.viewmodel.BackupViewModel
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
+
+    private lateinit var appContainer: AppContainer
+    private lateinit var saveReceiptUseCase: SaveReceiptUseCase
 
     private val backupViewModel by lazy {
         val app = application as CommunalPaymentsApp
         BackupViewModel(app.appContainer.exportBackupUseCase, app.appContainer.importBackupUseCase)
     }
+
     private val createBackupLauncher = registerForActivityResult(
         ActivityResultContracts.CreateDocument("application/zip")
     ) { uri ->
@@ -61,6 +72,9 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        appContainer = (application as CommunalPaymentsApp).appContainer
+        saveReceiptUseCase = appContainer.saveReceiptUseCase
+
         LanguageManager.applySavedLanguage(this)
 
         val isSystemDarkTheme = (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
@@ -84,7 +98,6 @@ class MainActivity : AppCompatActivity() {
                 val backupState by backupViewModel.state.collectAsStateWithLifecycle()
                 val context = LocalContext.current
 
-                // Показываем Toast при изменении состояния
                 LaunchedEffect(backupState) {
                     when {
                         backupState.isExportDone -> {
@@ -98,7 +111,6 @@ class MainActivity : AppCompatActivity() {
                         }
 
                         backupState.error != null -> {
-                            // используем ?.let для безопасного извлечения errorId
                             backupState.error?.let { errorId ->
                                 Toast.makeText(context, getString(errorId), Toast.LENGTH_LONG).show()
                             }
@@ -120,11 +132,58 @@ class MainActivity : AppCompatActivity() {
                         incomeViewModelFactory = (application as CommunalPaymentsApp).appContainer.incomeViewModelFactory,
                         settingsRepository = (application as CommunalPaymentsApp).appContainer.settingsRepository,
                         onExportBackup = { createBackupLauncher.launch("backup_${System.currentTimeMillis()}.zip") },
-                        onImportBackup = {
-                            openBackupLauncher.launch(arrayOf("application/zip"))
-                        })
+                        onImportBackup = { openBackupLauncher.launch(arrayOf("application/zip")) }
+                    )
                 }
             }
+        }
+
+        handleReceivedFile(intent)
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        handleReceivedFile(intent)
+    }
+
+    private fun handleReceivedFile(intent: Intent?) {
+        if (intent?.action == Intent.ACTION_SEND && intent.type == "application/pdf") {
+            val uri = intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM)
+            uri?.let { saveReceiptFromUri(it) }
+        }
+    }
+
+    private fun saveReceiptFromUri(uri: Uri) {
+        val inputStream = contentResolver.openInputStream(uri)
+        if (inputStream == null) {
+            Toast.makeText(this, "Не удалось прочитать файл", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val fileName = getFileNameFromUri(uri) ?: "квитанция_${System.currentTimeMillis()}.pdf"
+
+        lifecycleScope.launch {
+            try {
+                Toast.makeText(this@MainActivity, "Сохранение квитанции...", Toast.LENGTH_SHORT).show()
+                val receipt = saveReceiptUseCase("unknown", inputStream, fileName)
+                Toast.makeText(
+                    this@MainActivity,
+                    "Квитанция сохранена: ${receipt.fileName}",
+                    Toast.LENGTH_LONG
+                ).show()
+            } catch (e: Exception) {
+                Toast.makeText(this@MainActivity, "Ошибка: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun getFileNameFromUri(uri: Uri): String? {
+        val cursor = contentResolver.query(uri, null, null, null, null)
+        return cursor?.use {
+            val nameIndex = it.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+            if (nameIndex != -1 && it.moveToFirst()) {
+                it.getString(nameIndex)
+            } else null
         }
     }
 }
