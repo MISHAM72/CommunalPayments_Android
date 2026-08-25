@@ -1,12 +1,12 @@
 package com.github.misham72.communalpayments.presentation.screen.screens.receipts
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.misham72.communalpayments.domain.model.Receipt
 import com.github.misham72.communalpayments.domain.usecases.GetReceiptsUseCase
 import com.github.misham72.communalpayments.domain.usecases.DeleteReceiptUseCase
 import com.github.misham72.communalpayments.domain.usecases.SaveReceiptUseCase
+import com.github.misham72.communalpayments.presentation.common.UiMessages
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -28,14 +28,13 @@ class ReceiptsViewModel(
                 val receipts = getReceiptsUseCase(serviceKey)
                 _uiState.value = ReceiptsUiState.Success(receipts)
             } catch (e: Exception) {
-                _uiState.value = ReceiptsUiState.Error(e.message ?: "Ошибка загрузки")
+                _uiState.value = ReceiptsUiState.Error(e.message ?: UiMessages.DOWNLOAD_ERROR)
             }
         }
     }
 
     fun deleteReceipt(id: String, serviceKey: String) {
         viewModelScope.launch {
-            Log.d("ReceiptsVM", "deleteReceipt: id=$id, serviceKey=$serviceKey")
             deleteReceiptUseCase(id)
             loadReceipts(serviceKey)
         }
@@ -44,7 +43,6 @@ class ReceiptsViewModel(
 
     fun addReceipt(inputStream: InputStream, fileName: String, serviceKey: String) {
         viewModelScope.launch {
-            Log.d("ReceiptsVM", "addReceipt: fileName=$fileName, serviceKey=$serviceKey")
             saveReceiptUseCase(serviceKey, inputStream, fileName)
             loadReceipts(serviceKey)
         }

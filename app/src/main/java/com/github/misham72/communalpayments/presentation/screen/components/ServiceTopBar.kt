@@ -77,7 +77,7 @@ fun ServiceTopBar(
             ) {
                 Icon(
                     Icons.Outlined.Folder,
-                    contentDescription = "Квитанции" // или stringResource, если добавишь в strings.xml
+                    contentDescription = stringResource(R.string.receipts) // или stringResource, если добавишь в strings.xml
                 )
             }
 

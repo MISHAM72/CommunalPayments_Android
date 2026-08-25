@@ -6,18 +6,18 @@
 
     <!-- НАЗВАНИЯ ВКЛАДОК В ИСТОРИИ-->
     <!-- Services -->
-    <string name="service_display_name_electricity">Свет</string>
-    <string name="service_display_name_water">Вода</string>
-    <string name="service_display_name_gas">Газ</string>
-    <string name="service_display_name_internet">Интернет</string>
-    <string name="service_display_name_garbage">Мусор</string>
-    <string name="service_display_name_mts">Телефона 1</string>
-    <string name="service_display_name_osago">Автострахование</string>
-    <string name="service_display_name_taxes">Налог на бизнес</string>
-    <string name="service_display_name_tinkoff"> Телефона 2</string>
-    <string name="service_display_name_troyka">Проездной билет</string>
-    <string name="service_display_name_zont">Отопление</string>
-    <string name="service_display_name_hostel">Общежитие</string>
+    <string name="service_display_name_electricity"> 💡Свет</string>
+    <string name="service_display_name_water">💧 Вода</string>
+    <string name="service_display_name_gas">🔥 Газ</string>
+    <string name="service_display_name_internet">🌐 Интернет</string>
+    <string name="service_display_name_garbage">🗑️ Мусор</string>
+    <string name="service_display_name_mts">📱 Телефона 1</string>
+    <string name="service_display_name_osago">🚗 ААвтострахование</string>
+    <string name="service_display_name_taxes">📄 Налог на бизнес</string>
+    <string name="service_display_name_tinkoff">💳  Телефона 2</string>
+    <string name="service_display_name_troyka">🚇 Проездной билет</string>
+    <string name="service_display_name_zont">🏠 Отопление</string>
+    <string name="service_display_name_hostel">🏢 Общежитие</string>
 
 
     <!-- СТАРЫЕ строки (оставьте для результатов): -->
@@ -289,5 +289,18 @@
 
     <string name="receipts_title">Квитанции (%s)</string>
     <string name="no_receipts">Нет сохранённых квитанций</string>
+    <string name="add_receipt">Добавить квитанцию</string>
+    <string name="error_prefix">Ошибка: %1$s</string>
+    <string name="open_pdf">Открыть PDF</string>
+    <string name="date_time_format">dd.MM.yyyy HH:mm</string>
+    <string name="open">Открыть</string>
+    <string name="receipts">Квитанции</string>
+    <string name="error_intent_no_file">Не удалось получить файл из Intent</string>
+    <string name="list_services_empty">Список услуг пуст</string>
+    <string name="select_service_receipt">Выберите услугу для квитанции</string>
+    <string name="error_read_file">Не удалось прочитать файл</string>
+    <string name="saving_receipt">Сохранение квитанции…</string>
+    <string name="receipt_saved">Квитанция сохранена: %1$s\nПуть: %2$s</string>
+    <string name="error_saving_receipt">Ошибка сохранения: %1$s</string>
 
 </resources>

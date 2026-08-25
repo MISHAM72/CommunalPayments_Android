@@ -1,6 +1,7 @@
 package com.github.misham72.communalpayments.presentation.screen
 
 import android.Manifest
+import android.app.AlertDialog
 import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
@@ -19,13 +20,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.ActivityCompat
+import androidx.core.net.toUri
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.github.misham72.communalpayments.R
-import com.github.misham72.communalpayments.app.CommunalPaymentsApp
 import com.github.misham72.communalpayments.di.AppContainer
-import com.github.misham72.communalpayments.domain.usecases.SaveReceiptUseCase
+import com.github.misham72.communalpayments.domain.utils.ServiceKeys
+import com.github.misham72.communalpayments.presentation.common.UiConstants
 import com.github.misham72.communalpayments.presentation.screen.screens.main.ControlBetweenScreens
 import com.github.misham72.communalpayments.presentation.theme.AppTheme
 import com.github.misham72.communalpayments.presentation.theme.ThemePrefs
@@ -35,12 +37,8 @@ import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var appContainer: AppContainer
-    private lateinit var saveReceiptUseCase: SaveReceiptUseCase
-
     private val backupViewModel by lazy {
-        val app = application as CommunalPaymentsApp
-        BackupViewModel(app.appContainer.exportBackupUseCase, app.appContainer.importBackupUseCase)
+        BackupViewModel(AppContainer.exportBackupUseCase, AppContainer.importBackupUseCase)
     }
 
     private val createBackupLauncher = registerForActivityResult(
@@ -69,11 +67,29 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // Список услуг для диалога (без Compose, просто данные)
+    private val serviceItems by lazy {
+        listOf(
+            getString(R.string.service_display_name_electricity) to ServiceKeys.ELECTRICITY,
+            getString(R.string.service_display_name_gas) to ServiceKeys.GAS,
+            getString(R.string.service_display_name_water) to ServiceKeys.WATER,
+            getString(R.string.service_display_name_garbage) to ServiceKeys.GARBAGE,
+            getString(R.string.service_display_name_zont) to ServiceKeys.ZONT,
+            getString(R.string.service_display_name_internet) to ServiceKeys.INTERNET,
+            getString(R.string.service_display_name_mts) to ServiceKeys.MTS,
+            getString(R.string.service_display_name_tinkoff) to ServiceKeys.TINKOFF,
+            getString(R.string.service_display_name_taxes) to ServiceKeys.TAXES,
+            getString(R.string.service_display_name_troyka) to ServiceKeys.TROYKA,
+            getString(R.string.service_display_name_osago) to ServiceKeys.OSAGO,
+            getString(R.string.service_display_name_hostel) to ServiceKeys.HOSTEL,
+        )
+    }
+
+    private var pendingFileUri: Uri? = null
+    private var pendingFileName: String? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        appContainer = (application as CommunalPaymentsApp).appContainer
-        saveReceiptUseCase = appContainer.saveReceiptUseCase
 
         LanguageManager.applySavedLanguage(this)
 
@@ -125,14 +141,16 @@ class MainActivity : AppCompatActivity() {
                         .systemBarsPadding()
                 ) {
                     ControlBetweenScreens(
-                        exportHistoryUseCase = (application as CommunalPaymentsApp).appContainer.exportHistoryUseCase,
-                        getHistoryUseCase = (application as CommunalPaymentsApp).appContainer.getHistoryUseCase,
-                        saveHistoryUseCase = (application as CommunalPaymentsApp).appContainer.saveHistoryUseCase,
-                        getAllServicesYearlySummaryUseCase = (application as CommunalPaymentsApp).appContainer.getAllServicesYearlySummaryUseCase,
-                        incomeViewModelFactory = (application as CommunalPaymentsApp).appContainer.incomeViewModelFactory,
-                        settingsRepository = (application as CommunalPaymentsApp).appContainer.settingsRepository,
+                        exportHistoryUseCase = AppContainer.exportHistoryUseCase,
+                        getHistoryUseCase = AppContainer.getHistoryUseCase,
+                        saveHistoryUseCase = AppContainer.saveHistoryUseCase,
+                        getAllServicesYearlySummaryUseCase = AppContainer.getAllServicesYearlySummaryUseCase,
+                        incomeViewModelFactory = AppContainer.incomeViewModelFactory,
+                        settingsRepository = AppContainer.settingsRepository,
                         onExportBackup = { createBackupLauncher.launch("backup_${System.currentTimeMillis()}.zip") },
-                        onImportBackup = { openBackupLauncher.launch(arrayOf("application/zip")) }
+                        onImportBackup = {
+                            openBackupLauncher.launch(arrayOf("application/zip"))
+                        }
                     )
                 }
             }
@@ -143,36 +161,94 @@ class MainActivity : AppCompatActivity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
+        setIntent(intent)
         handleReceivedFile(intent)
     }
 
     private fun handleReceivedFile(intent: Intent?) {
-        if (intent?.action == Intent.ACTION_SEND && intent.type == "application/pdf") {
-            val uri = intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM)
-            uri?.let { saveReceiptFromUri(it) }
+        if (intent == null) return
+        var uri: Uri? = null
+
+        when (intent.action) {
+            Intent.ACTION_VIEW -> uri = intent.data
+            Intent.ACTION_SEND -> uri = intent.getParcelableExtra(Intent.EXTRA_STREAM)
+            Intent.ACTION_SEND_MULTIPLE -> {
+                val uris = intent.getParcelableArrayListExtra<Uri>(Intent.EXTRA_STREAM)
+                if (!uris.isNullOrEmpty()) uri = uris[0]
+            }
+
+            else -> { /* fallback */
+            }
+        }
+        val clipData = intent.clipData
+        if (uri == null && clipData != null && clipData.itemCount > 0) {
+            val item = clipData.getItemAt(0)
+            uri = item.uri
+            if (uri == null) {
+                val text = item.coerceToText(this).toString()
+                if (text.startsWith(UiConstants.URI_SCHEME_CONTENT) || text.startsWith(UiConstants.URI_SCHEME_FILE)) {
+                    uri = text.toUri()
+                }
+            }
+        }
+
+        if (uri != null) {
+            pendingFileUri = uri
+            pendingFileName = getFileNameFromUri(uri) ?: UiConstants.DEFAULT_RECEIPT_FILENAME_TEMPLATE.format(System.currentTimeMillis())
+            showServicePickerDialog()
+        } else {
+            Toast.makeText(this, getString(R.string.error_intent_no_file), Toast.LENGTH_SHORT).show()
         }
     }
 
-    private fun saveReceiptFromUri(uri: Uri) {
-        val inputStream = contentResolver.openInputStream(uri)
-        if (inputStream == null) {
-            Toast.makeText(this, "Не удалось прочитать файл", Toast.LENGTH_SHORT).show()
+    // Диалог выбора услуги
+    private fun showServicePickerDialog() {
+        if (serviceItems.isEmpty()) {
+            Toast.makeText(this, getString(R.string.list_services_empty), Toast.LENGTH_SHORT).show()
             return
         }
 
-        val fileName = getFileNameFromUri(uri) ?: "квитанция_${System.currentTimeMillis()}.pdf"
+        val serviceNames = serviceItems.map { it.first }.toTypedArray()
+
+        AlertDialog.Builder(this)
+            .setTitle(getString(R.string.select_service_receipt))
+            .setItems(serviceNames) { _, which ->
+                val serviceKey = serviceItems[which].second
+                pendingFileUri?.let { uri ->
+                    pendingFileName?.let { fileName ->
+                        saveReceiptWithService(uri, fileName, serviceKey)
+                    }
+                }
+                pendingFileUri = null
+                pendingFileName = null
+            }
+            .setNegativeButton(getString(R.string.cancel)) { _, _ ->
+                pendingFileUri = null
+                pendingFileName = null
+            }
+            .show()
+    }
+
+    // Сохранение с выбранной услугой
+    private fun saveReceiptWithService(uri: Uri, fileName: String, serviceKey: String) {
+        val inputStream = contentResolver.openInputStream(uri)
+        if (inputStream == null) {
+            Toast.makeText(this, getString(R.string.error_read_file), Toast.LENGTH_SHORT).show()
+            return
+        }
 
         lifecycleScope.launch {
             try {
-                Toast.makeText(this@MainActivity, "Сохранение квитанции...", Toast.LENGTH_SHORT).show()
-                val receipt = saveReceiptUseCase("unknown", inputStream, fileName)
+                Toast.makeText(this@MainActivity, getString(R.string.saving_receipt), Toast.LENGTH_SHORT).show()
+                val receipt = AppContainer.saveReceiptUseCase(serviceKey, inputStream, fileName)
                 Toast.makeText(
                     this@MainActivity,
-                    "Квитанция сохранена: ${receipt.fileName}",
+                    getString(R.string.receipt_saved, receipt.fileName, receipt.filePath),
                     Toast.LENGTH_LONG
                 ).show()
             } catch (e: Exception) {
-                Toast.makeText(this@MainActivity, "Ошибка: ${e.message}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@MainActivity, getString(R.string.error_saving_receipt, e.message), Toast.LENGTH_SHORT).show()
+                e.printStackTrace()
             }
         }
     }

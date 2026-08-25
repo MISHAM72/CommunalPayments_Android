@@ -3,11 +3,8 @@ package com.github.misham72.communalpayments.di
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.github.misham72.communalpayments.domain.usecases.DeleteReceiptUseCase
-import com.github.misham72.communalpayments.domain.usecases.ExportHistoryUseCase
 import com.github.misham72.communalpayments.domain.usecases.GetReceiptsUseCase
 import com.github.misham72.communalpayments.domain.usecases.SaveReceiptUseCase
-import com.github.misham72.communalpayments.domain.usecases.TextHistoryUseCase
-import com.github.misham72.communalpayments.presentation.screen.screens.analytics.IncomeViewModelFactory
 import com.github.misham72.communalpayments.presentation.screen.screens.electricity.ElectricityViewModel
 import com.github.misham72.communalpayments.presentation.screen.screens.garbage.GarbageViewModel
 import com.github.misham72.communalpayments.presentation.screen.screens.gas.GasViewModel
@@ -21,12 +18,9 @@ import com.github.misham72.communalpayments.presentation.screen.screens.taxes.Ta
 import com.github.misham72.communalpayments.presentation.screen.screens.tinkoff.TinkoffViewModel
 import com.github.misham72.communalpayments.presentation.screen.screens.troyka.TroykaViewModel
 import com.github.misham72.communalpayments.presentation.screen.screens.water.WaterViewModel
-import kotlin.jvm.java
 
 class ElectricityViewModelFactory(
-    private val container: AppContainer,
-    private val textHistoryUseCase: TextHistoryUseCase,
-    private val exportHistoryUseCase: ExportHistoryUseCase
+    private val container: AppContainer
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(ElectricityViewModel::class.java)) {
@@ -34,8 +28,8 @@ class ElectricityViewModelFactory(
                 meterDataCollector = container.meterDataCollector,
                 settingsRepository = container.settingsRepository,
                 repository = container.providerRepository,
-                textHistoryUseCase = textHistoryUseCase,
-                exportHistoryUseCase = exportHistoryUseCase
+                textHistoryUseCase = container.textHistoryUseCase,
+                exportHistoryUseCase = container.exportHistoryUseCase
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
@@ -43,18 +37,16 @@ class ElectricityViewModelFactory(
 }
 
 class GasViewModelFactory(
-    private val container: AppContainer,
-    private val textHistoryUseCase: TextHistoryUseCase,
-    private val exportHistoryUseCase: ExportHistoryUseCase
+    private val container: AppContainer
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(GasViewModel::class.java)) {
             return GasViewModel(
-                meterDataCollector = container.gasDataCollector,
+                meterDataCollector = container.meterDataCollector,
                 settingsRepository = container.settingsRepository,
                 repository = container.providerRepository,
-                textHistoryUseCase = textHistoryUseCase,
-                exportHistoryUseCase = exportHistoryUseCase
+                textHistoryUseCase = container.textHistoryUseCase,
+                exportHistoryUseCase = container.exportHistoryUseCase
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
@@ -62,18 +54,16 @@ class GasViewModelFactory(
 }
 
 class WaterViewModelFactory(
-    private val container: AppContainer,
-    private val textHistoryUseCase: TextHistoryUseCase,
-    private val exportHistoryUseCase: ExportHistoryUseCase
+    private val container: AppContainer
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(WaterViewModel::class.java)) {
             return WaterViewModel(
-                meterDataCollector = container.waterDataCollector,
+                meterDataCollector = container.meterDataCollector,
                 settingsRepository = container.settingsRepository,
                 repository = container.providerRepository,
-                textHistoryUseCase = textHistoryUseCase,
-                exportHistoryUseCase = exportHistoryUseCase
+                textHistoryUseCase = container.textHistoryUseCase,
+                exportHistoryUseCase = container.exportHistoryUseCase
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
@@ -81,9 +71,7 @@ class WaterViewModelFactory(
 }
 
 class GarbageViewModelFactory(
-    private val container: AppContainer,
-    private val textHistoryUseCase: TextHistoryUseCase,
-    private val exportHistoryUseCase: ExportHistoryUseCase
+    private val container: AppContainer
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(GarbageViewModel::class.java)) {
@@ -91,8 +79,8 @@ class GarbageViewModelFactory(
                 periodicDataCollector = container.periodicDataCollector,
                 settingsRepository = container.settingsRepository,
                 repository = container.providerRepository,
-                textHistoryUseCase = textHistoryUseCase,
-                exportHistoryUseCase = exportHistoryUseCase
+                textHistoryUseCase = container.textHistoryUseCase,
+                exportHistoryUseCase = container.exportHistoryUseCase
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
@@ -100,9 +88,7 @@ class GarbageViewModelFactory(
 }
 
 class ZONTViewModelFactory(
-    private val container: AppContainer,
-    private val textHistoryUseCase: TextHistoryUseCase,
-    private val exportHistoryUseCase: ExportHistoryUseCase
+    private val container: AppContainer
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(ZONTViewModel::class.java)) {
@@ -110,8 +96,8 @@ class ZONTViewModelFactory(
                 periodicDataCollector = container.periodicDataCollector,
                 settingsRepository = container.settingsRepository,
                 repository = container.providerRepository,
-                textHistoryUseCase = textHistoryUseCase,
-                exportHistoryUseCase = exportHistoryUseCase
+                textHistoryUseCase = container.textHistoryUseCase,
+                exportHistoryUseCase = container.exportHistoryUseCase
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
@@ -119,9 +105,7 @@ class ZONTViewModelFactory(
 }
 
 class HostelViewModelFactory(
-    private val container: AppContainer,
-    private val textHistoryUseCase: TextHistoryUseCase,
-    private val exportHistoryUseCase: ExportHistoryUseCase
+    private val container: AppContainer
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(HostelViewModel::class.java)) {
@@ -129,8 +113,8 @@ class HostelViewModelFactory(
                 periodicDataCollector = container.periodicDataCollector,
                 settingsRepository = container.settingsRepository,
                 repository = container.providerRepository,
-                textHistoryUseCase = textHistoryUseCase,
-                exportHistoryUseCase = exportHistoryUseCase
+                textHistoryUseCase = container.textHistoryUseCase,
+                exportHistoryUseCase = container.exportHistoryUseCase
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
@@ -138,9 +122,7 @@ class HostelViewModelFactory(
 }
 
 class InternetViewModelFactory(
-    private val container: AppContainer,
-    private val textHistoryUseCase: TextHistoryUseCase,
-    private val exportHistoryUseCase: ExportHistoryUseCase
+    private val container: AppContainer
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(InternetViewModel::class.java)) {
@@ -148,8 +130,8 @@ class InternetViewModelFactory(
                 periodicDataCollector = container.periodicDataCollector,
                 settingsRepository = container.settingsRepository,
                 repository = container.providerRepository,
-                textHistoryUseCase = textHistoryUseCase,
-                exportHistoryUseCase = exportHistoryUseCase
+                textHistoryUseCase = container.textHistoryUseCase,
+                exportHistoryUseCase = container.exportHistoryUseCase
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
@@ -157,9 +139,7 @@ class InternetViewModelFactory(
 }
 
 class MTSViewModelFactory(
-    private val container: AppContainer,
-    private val textHistoryUseCase: TextHistoryUseCase,
-    private val exportHistoryUseCase: ExportHistoryUseCase
+    private val container: AppContainer
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MTSViewModel::class.java)) {
@@ -167,8 +147,8 @@ class MTSViewModelFactory(
                 periodicDataCollector = container.periodicDataCollector,
                 settingsRepository = container.settingsRepository,
                 repository = container.providerRepository,
-                textHistoryUseCase = textHistoryUseCase,
-                exportHistoryUseCase = exportHistoryUseCase
+                textHistoryUseCase = container.textHistoryUseCase,
+                exportHistoryUseCase = container.exportHistoryUseCase
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
@@ -176,9 +156,7 @@ class MTSViewModelFactory(
 }
 
 class OSAGOViewModelFactory(
-    private val container: AppContainer,
-    private val textHistoryUseCase: TextHistoryUseCase,
-    private val exportHistoryUseCase: ExportHistoryUseCase
+    private val container: AppContainer
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(OsagoViewModel::class.java)) {
@@ -186,8 +164,8 @@ class OSAGOViewModelFactory(
                 periodicDataCollector = container.periodicDataCollector,
                 settingsRepository = container.settingsRepository,
                 repository = container.providerRepository,
-                textHistoryUseCase = textHistoryUseCase,
-                exportHistoryUseCase = exportHistoryUseCase
+                textHistoryUseCase = container.textHistoryUseCase,
+                exportHistoryUseCase = container.exportHistoryUseCase
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
@@ -195,9 +173,7 @@ class OSAGOViewModelFactory(
 }
 
 class TaxesViewModelFactory(
-    private val container: AppContainer,
-    private val textHistoryUseCase: TextHistoryUseCase,
-    private val exportHistoryUseCase: ExportHistoryUseCase
+    private val container: AppContainer
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(TaxesViewModel::class.java)) {
@@ -205,8 +181,9 @@ class TaxesViewModelFactory(
                 periodicDataCollector = container.periodicDataCollector,
                 settingsRepository = container.settingsRepository,
                 repository = container.providerRepository,
-                textHistoryUseCase = textHistoryUseCase,
-                exportHistoryUseCase = exportHistoryUseCase
+                textHistoryUseCase = container.textHistoryUseCase,
+                exportHistoryUseCase = container.exportHistoryUseCase
+
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
@@ -214,9 +191,7 @@ class TaxesViewModelFactory(
 }
 
 class TinkoffViewModelFactory(
-    private val container: AppContainer,
-    private val textHistoryUseCase: TextHistoryUseCase,
-    private val exportHistoryUseCase: ExportHistoryUseCase
+    private val container: AppContainer
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(TinkoffViewModel::class.java)) {
@@ -224,8 +199,8 @@ class TinkoffViewModelFactory(
                 periodicDataCollector = container.periodicDataCollector,
                 settingsRepository = container.settingsRepository,
                 repository = container.providerRepository,
-                textHistoryUseCase = textHistoryUseCase,
-                exportHistoryUseCase = exportHistoryUseCase
+                textHistoryUseCase = container.textHistoryUseCase,
+                exportHistoryUseCase = container.exportHistoryUseCase
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
@@ -233,9 +208,7 @@ class TinkoffViewModelFactory(
 }
 
 class TroykaViewModelFactory(
-    private val container: AppContainer,
-    private val textHistoryUseCase: TextHistoryUseCase,
-    private val exportHistoryUseCase: ExportHistoryUseCase
+    private val container: AppContainer
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(TroykaViewModel::class.java)) {
@@ -243,8 +216,8 @@ class TroykaViewModelFactory(
                 periodicDataCollector = container.periodicDataCollector,
                 settingsRepository = container.settingsRepository,
                 repository = container.providerRepository,
-                textHistoryUseCase = textHistoryUseCase,
-                exportHistoryUseCase = exportHistoryUseCase
+                textHistoryUseCase = container.textHistoryUseCase,
+                exportHistoryUseCase = container.exportHistoryUseCase
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")

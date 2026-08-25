@@ -1,6 +1,5 @@
 package com.github.misham72.communalpayments.data.repository.receipt
 
-import android.util.Log
 import com.github.misham72.communalpayments.data.local.file.FileManager
 import com.github.misham72.communalpayments.domain.model.Receipt
 import com.github.misham72.communalpayments.domain.repository.ReceiptRepository
@@ -39,7 +38,6 @@ class ReceiptRepositoryImpl(
 
     override suspend fun saveReceipt(serviceKey: String, inputStream: InputStream, fileName: String): Receipt {
         val path = fileManager.saveReceiptFile(inputStream, serviceKey, fileName)
-        Log.d("ReceiptRepo", "Saved to: $path")
         val receipt = Receipt(
             id = UUID.randomUUID().toString(),
             serviceKey = serviceKey,
@@ -61,7 +59,7 @@ class ReceiptRepositoryImpl(
     override suspend fun deleteReceipt(id: String) {
         val index = loadIndex()
         var found = false
-        for ((key, list) in index) {
+        for ((_, list) in index) {
             val iterator = list.iterator()
             while (iterator.hasNext()) {
                 val receipt = iterator.next()

@@ -3,10 +3,8 @@ package com.github.misham72.communalpayments.presentation.screen.screens.receipt
 import android.content.Intent
 import android.net.Uri
 import android.provider.OpenableColumns
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -40,7 +37,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -96,7 +92,7 @@ fun DisplayReceiptsScreen(
             FloatingActionButton(
                 onClick = { launcher.launch("application/pdf") }
             ) {
-                Icon(Icons.Filled.Add, contentDescription = "Добавить квитанцию")
+                Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.add_receipt))
             }
         }
     ) { padding ->
@@ -112,7 +108,7 @@ fun DisplayReceiptsScreen(
 
                 is ReceiptsUiState.Error -> {
                     Text(
-                        text = "Ошибка: ${(uiState as ReceiptsUiState.Error).message}",
+                        text = stringResource(R.string.error_prefix, (uiState as ReceiptsUiState.Error).message),
                         modifier = Modifier.align(Alignment.Center),
                         color = MaterialTheme.colorScheme.error
                     )
@@ -128,6 +124,7 @@ fun DisplayReceiptsScreen(
                     } else {
                         LazyColumn {
                             items(receipts) { receipt ->
+                                val openPdfTitle = stringResource(R.string.open_pdf)
                                 ReceiptItem(
                                     receipt = receipt,
                                     onOpen = {
@@ -142,7 +139,7 @@ fun DisplayReceiptsScreen(
                                                 setDataAndType(uri, "application/pdf")
                                                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                                             }
-                                            context.startActivity(Intent.createChooser(intent, "Открыть PDF"))
+                                            context.startActivity(Intent.createChooser(intent, openPdfTitle))
                                         }
                                     },
                                     onDelete = {
@@ -168,8 +165,9 @@ fun ReceiptItem(
     onDelete: () -> Unit
 ) {
     val locale = LocalConfiguration.current.locales[0]
-    val dateFormat = remember(locale) {
-        SimpleDateFormat("dd.MM.yyyy HH:mm", locale)
+    val dateFormatString = stringResource(R.string.date_time_format)
+    val dateFormat = remember(locale, dateFormatString) {
+        SimpleDateFormat(dateFormatString, locale)
     }
 
     Card(
@@ -184,7 +182,7 @@ fun ReceiptItem(
             horizontalArrangement = androidx.compose.foundation.layout.Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Column (modifier = Modifier.weight(1f) ){
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = receipt.fileName,
                     fontWeight = FontWeight.Bold,
@@ -198,10 +196,10 @@ fun ReceiptItem(
             }
             Row {
                 IconButton(onClick = onOpen) {
-                    Icon(Icons.Outlined.Visibility, contentDescription = "Открыть", tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
+                    Icon(Icons.Outlined.Visibility, contentDescription = stringResource(R.string.open), tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
                 }
-                IconButton(onClick = onDelete){
-                    Icon(Icons.Outlined.Delete, contentDescription = "Удалить", tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
+                IconButton(onClick = onDelete) {
+                    Icon(Icons.Outlined.Delete, contentDescription = stringResource(R.string.delete), tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
                 }
             }
         }

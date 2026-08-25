@@ -1,5 +1,6 @@
 package com.github.misham72.communalpayments.data.repository.income
 
+import com.github.misham72.communalpayments.data.common.DataConstants
 import com.github.misham72.communalpayments.data.local.income.filemanager.IncomeFileManager
 import com.github.misham72.communalpayments.data.local.income.parser.IncomeParser
 import com.github.misham72.communalpayments.domain.model.incomes.IncomeCategory
@@ -47,10 +48,12 @@ class IncomeRepositoryImpl(
         )
     }
 
-    @Suppress("HardcodedStringLiteral")
+
     override suspend fun addIncome(year: Int, date: LocalDate, source: String, amount: Double) {
-        val formattedAmount = "%.2f".format(amount).replace(',', '.')
-        val record = "${date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))}\nИсточник: $source\nСумма: $formattedAmount"
+        val formattedAmount = DataConstants.AMOUNT_FORMAT.format(amount).replace(',', '.')
+
+        @Suppress("HardcodedStringLiteral")
+        val record = "${date.format(DateTimeFormatter.ofPattern(DataConstants.INCOME_RECORD_DATE_PATTERN))}\nИсточник: $source\nСумма: $formattedAmount"
         withContext(Dispatchers.IO) {
             fileManager.appendIncome(year, record)
         }
@@ -80,6 +83,8 @@ class IncomeRepositoryImpl(
         val blocks = raw.split("\n***\n").filter { it.isNotBlank() }
         val filtered = blocks.filter { block ->
             val lines = block.lines()
+
+            @Suppress("HardcodedStringLiteral")
             val blockSource = lines.firstOrNull { it.startsWith("Источник:") }?.substringAfter("Источник:")?.trim()
             blockSource != source
         }
@@ -90,7 +95,8 @@ class IncomeRepositoryImpl(
     // Вспомогательная функция для форматирования записи в текстовый блок
     private fun buildBlock(record: IncomeRecord): String {
         val dateString = record.date.toString()
-        val formattedAmount = "%.2f".format(record.amount).replace(',', '.')
+        val formattedAmount = DataConstants.AMOUNT_FORMAT.format(record.amount).replace(',', '.')
+        @Suppress("HardcodedStringLiteral")
         return "$dateString\nИсточник: ${record.source}\nСумма: $formattedAmount"
     }
 

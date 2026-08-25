@@ -7,7 +7,7 @@ import androidx.core.app.NotificationCompat
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.github.misham72.communalpayments.R
-import com.github.misham72.communalpayments.data.local.preferences.AccountPreferences
+import com.github.misham72.communalpayments.di.AppContainer
 import com.github.misham72.communalpayments.domain.utils.DateUtils
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 import kotlinx.coroutines.Dispatchers
@@ -20,22 +20,22 @@ class PaymentNotificationWorker(
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
-        val appContext = applicationContext
-        val accountPrefs = AccountPreferences(appContext)
+
+        val accountPrefs = AppContainer.accountPrefs
 
         val serviceNames = mapOf(
-            ServiceKeys.ELECTRICITY to appContext.getString(R.string.service_display_name_electricity),
-            ServiceKeys.GAS to appContext.getString(R.string.service_display_name_gas),
-            ServiceKeys.WATER to appContext.getString(R.string.service_display_name_water),
-            ServiceKeys.GARBAGE to appContext.getString(R.string.service_display_name_garbage),
-            ServiceKeys.ZONT to appContext.getString(R.string.service_display_name_zont),
-            ServiceKeys.INTERNET to appContext.getString(R.string.service_display_name_internet),
-            ServiceKeys.MTS to appContext.getString(R.string.service_display_name_mts),
-            ServiceKeys.TINKOFF to appContext.getString(R.string.service_display_name_tinkoff),
-            ServiceKeys.TAXES to appContext.getString(R.string.service_display_name_taxes),
-            ServiceKeys.TROYKA to appContext.getString(R.string.service_display_name_troyka),
-            ServiceKeys.OSAGO to appContext.getString(R.string.service_display_name_osago),
-            ServiceKeys.HOSTEL to appContext.getString(R.string.service_display_name_hostel)
+            ServiceKeys.ELECTRICITY to applicationContext.getString(R.string.service_display_name_electricity),
+            ServiceKeys.GAS to applicationContext.getString(R.string.service_display_name_gas),
+            ServiceKeys.WATER to applicationContext.getString(R.string.service_display_name_water),
+            ServiceKeys.GARBAGE to applicationContext.getString(R.string.service_display_name_garbage),
+            ServiceKeys.ZONT to applicationContext.getString(R.string.service_display_name_zont),
+            ServiceKeys.INTERNET to applicationContext.getString(R.string.service_display_name_internet),
+            ServiceKeys.MTS to applicationContext.getString(R.string.service_display_name_mts),
+            ServiceKeys.TINKOFF to applicationContext.getString(R.string.service_display_name_tinkoff),
+            ServiceKeys.TAXES to applicationContext.getString(R.string.service_display_name_taxes),
+            ServiceKeys.TROYKA to applicationContext.getString(R.string.service_display_name_troyka),
+            ServiceKeys.OSAGO to applicationContext.getString(R.string.service_display_name_osago),
+            ServiceKeys.HOSTEL to applicationContext.getString(R.string.service_display_name_hostel)
         )
 
         for ((key, name) in serviceNames) {
@@ -43,7 +43,7 @@ class PaymentNotificationWorker(
             if (dateStr.isNotBlank()) {
                 val daysLeft = DateUtils.daysUntil(dateStr)
                 if (daysLeft in 1..3) {
-                    showNotification(appContext, key, name, daysLeft)
+                    showNotification(applicationContext, key, name, daysLeft)
                     delay(300) // задержка 300 миллисекунд
                 }
             }

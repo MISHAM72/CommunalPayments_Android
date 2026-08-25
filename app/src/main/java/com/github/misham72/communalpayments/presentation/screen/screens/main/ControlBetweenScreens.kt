@@ -92,12 +92,7 @@ fun ControlBetweenScreens(
     val showAllServicesSummary = remember { mutableStateOf(false) }   // новый флаг
     val services = getListInitialScreen()
 
-
     val defaultError = stringResource(R.string.error_load_default)
-
-    // Зависимости для доходов
-
-
     var dueDates by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
     var showMenu by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()

@@ -1,5 +1,6 @@
 package com.github.misham72.communalpayments.di
 
+import android.annotation.SuppressLint
 import android.content.Context
 import com.github.misham72.communalpayments.data.calculators.PeriodCalculatorImpl
 import com.github.misham72.communalpayments.data.local.file.FileManager
@@ -18,8 +19,10 @@ import com.github.misham72.communalpayments.data.repository.periodrepository.Per
 import com.github.misham72.communalpayments.data.repository.provider.ProviderRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.receipt.ReceiptRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.settings.UserSettingsRepositoryImpl
+import com.github.misham72.communalpayments.domain.repository.AnalyticsRepository
 import com.github.misham72.communalpayments.domain.repository.BackupRepository
 import com.github.misham72.communalpayments.domain.repository.HistoryRepository
+import com.github.misham72.communalpayments.domain.repository.IProviderRepository
 import com.github.misham72.communalpayments.domain.repository.IncomeRepository
 import com.github.misham72.communalpayments.domain.repository.MeterRepository
 import com.github.misham72.communalpayments.domain.repository.PdfHistoryRepository
@@ -48,77 +51,138 @@ import com.github.misham72.communalpayments.domain.usecases.UpdateIncomeRecordUs
 import com.github.misham72.communalpayments.presentation.screen.screens.analytics.IncomeViewModelFactory
 import com.google.gson.Gson
 
+object AppContainer {
+    @SuppressLint("StaticFieldLeak")
+    lateinit var fileManager: FileManager
+        private set
+    lateinit var accountPrefs: AccountPreferences
+        private set
+    lateinit var settingsRepository: UserSettingsRepository
+        private set
+    lateinit var providerRepository: IProviderRepository
+        private set
+    private lateinit var electricityRepository: MeterRepository
+    private lateinit var waterRepository: MeterRepository
+    private lateinit var gasRepository: MeterRepository
+    private lateinit var periodicRepository: PeriodicRepository
+    lateinit var periodicDataCollector: PeriodicDataCollector
+        private set
+    private lateinit var pdfHistoryRepository: PdfHistoryRepository
+    lateinit var exportHistoryUseCase: ExportHistoryUseCase
+        private set
+    private lateinit var textHistoryRepository: TextHistoryRepository
 
-class AppContainer(private val context: Context) {
+    lateinit var textHistoryUseCase: TextHistoryUseCase
+        private set
+    private lateinit var historyRepository: HistoryRepository
 
-    // Общие зависимости
-    val fileManager: FileManager = FileManager(context)
-    val accountPrefs: AccountPreferences = AccountPreferences(context.applicationContext)
+    lateinit var getHistoryUseCase: GetHistoryUseCase
+        private set
+    lateinit var saveHistoryUseCase: SaveHistoryUseCase
+        private set
 
-    // Репозитории
-    val settingsRepository: UserSettingsRepository = UserSettingsRepositoryImpl(accountPrefs)
-    val providerRepository = ProviderRepositoryImpl(accountPrefs)
+    @SuppressLint("StaticFieldLeak")
+    lateinit var incomeFileManager: IncomeFileManager
+        private set
+    private lateinit var incomeRepository: IncomeRepository
+    private lateinit var getYearlyIncomeUseCase: GetYearlyIncomeUseCase
+    private lateinit var addIncomeUseCase: AddIncomeUseCase
+    private lateinit var getIncomeRecordsUseCase: GetIncomeRecordsUseCase
+    private lateinit var updateIncomeRecordUseCase: UpdateIncomeRecordUseCase
+    private lateinit var deleteIncomeRecordUseCase: DeleteIncomeRecordUseCase
+    private lateinit var deleteAllIncomeRecordsBySourceUseCase: DeleteAllIncomeRecordsBySourceUseCase
+    lateinit var incomeViewModelFactory: IncomeViewModelFactory
+        private set
+    private lateinit var analyticsRepository: AnalyticsRepository
+    lateinit var getAllServicesYearlySummaryUseCase: GetAllServicesYearlySummaryUseCase
+        private set
+    private lateinit var backupRepository: BackupRepository
+    lateinit var exportBackupUseCase: ExportBackupUseCase
+        private set
+    lateinit var importBackupUseCase: ImportBackupUseCase
+        private set
+    private lateinit var receiptRepository: ReceiptRepository
+    lateinit var saveReceiptUseCase: SaveReceiptUseCase
+        private set
+    lateinit var getReceiptsUseCase: GetReceiptsUseCase
+        private set
+    lateinit var deleteReceiptUseCase: DeleteReceiptUseCase
+        private set
+    lateinit var receiptsViewModelFactory: ReceiptsViewModelFactory
+        private set
+    lateinit var meterDataCollector: MeterDataCollector
+        private set
 
-    // Репозитории для метрик
-    val electricityRepository: MeterRepository = ElectricityRepositoryImpl(context, fileManager)
-    val waterRepository: MeterRepository = WaterRepositoryImpl(context, fileManager)
-    val gasRepository: MeterRepository = GasRepositoryImpl(context, fileManager)
+    fun init(context: Context) {
 
-    // Репозиторий для периодических услуг
-    val periodicRepository: PeriodicRepository = PeriodicRepositoryImpl(context, fileManager)
+        // Общие зависимости
+        fileManager = FileManager(context.applicationContext)
+        accountPrefs = AccountPreferences(context.applicationContext)
 
-    // UseCase
-    val meterDataCollector = MeterDataCollector(electricityRepository, settingsRepository)
-    val waterDataCollector = MeterDataCollector(waterRepository, settingsRepository)
-    val gasDataCollector = MeterDataCollector(gasRepository, settingsRepository)
+        // Репозитории
+        settingsRepository = UserSettingsRepositoryImpl(accountPrefs)
+        providerRepository = ProviderRepositoryImpl(accountPrefs)
 
-    val periodicDataCollector = PeriodicDataCollector(
-        repository = periodicRepository,
-        settingsRepository = settingsRepository,
-        calculator = PeriodCalculatorImpl()
-    )
-    val pdfHistoryRepository: PdfHistoryRepository = PdfHistoryRepositoryImpl(fileManager, accountPrefs)
-    val exportHistoryUseCase = ExportHistoryUseCase(pdfHistoryRepository)
+        // Репозитории для метрик
+        electricityRepository = ElectricityRepositoryImpl(context, fileManager)
+        waterRepository = WaterRepositoryImpl(context, fileManager)
+        gasRepository = GasRepositoryImpl(context, fileManager)
 
-    val textHistoryRepository: TextHistoryRepository = TextHistoryRepositoryImpl(fileManager)
-    val textHistoryUseCase = TextHistoryUseCase(textHistoryRepository)
+        // Репозиторий для периодических услуг
+        periodicRepository = PeriodicRepositoryImpl(context, fileManager)
 
-    // di/AppContainer.kt
-    val historyRepository: HistoryRepository = HistoryRepositoryImpl(fileManager)
-    val getHistoryUseCase = GetHistoryUseCase(historyRepository)
-    val saveHistoryUseCase = SaveHistoryUseCase(historyRepository)
+        // UseCase
+        meterDataCollector = MeterDataCollector(electricityRepository, settingsRepository)
 
-    // Доходы
-    val incomeFileManager = IncomeFileManager(context)
-    val incomeRepository: IncomeRepository = IncomeRepositoryImpl(incomeFileManager)
-    val getYearlyIncomeUseCase = GetYearlyIncomeUseCase(incomeRepository)
-    val addIncomeUseCase = AddIncomeUseCase(incomeRepository)
-    val getIncomeRecordsUseCase = GetIncomeRecordsUseCase(incomeRepository)
-    val updateIncomeRecordUseCase = UpdateIncomeRecordUseCase(incomeRepository)
-    val deleteIncomeRecordUseCase = DeleteIncomeRecordUseCase(incomeRepository)
-    val deleteAllIncomeRecordsBySourceUseCase = DeleteAllIncomeRecordsBySourceUseCase(incomeRepository)
+        periodicDataCollector = PeriodicDataCollector(
+            repository = periodicRepository,
+            settingsRepository = settingsRepository,
+            calculator = PeriodCalculatorImpl()
+        )
+        pdfHistoryRepository = PdfHistoryRepositoryImpl(fileManager, accountPrefs)
+        exportHistoryUseCase = ExportHistoryUseCase(pdfHistoryRepository)
 
-    val incomeViewModelFactory = IncomeViewModelFactory(
-        getYearlyIncomeUseCase,
-        addIncomeUseCase,
-        getIncomeRecordsUseCase,
-        updateIncomeRecordUseCase,
-        deleteIncomeRecordUseCase,
-        deleteAllIncomeRecordsBySourceUseCase
-    )
+        textHistoryRepository = TextHistoryRepositoryImpl(fileManager)
+        textHistoryUseCase = TextHistoryUseCase(textHistoryRepository)
 
-    // Аналитика (расходы)
-    val analyticsRepository = AnalyticsRepositoryImpl(fileManager)
-    val getAllServicesYearlySummaryUseCase = GetAllServicesYearlySummaryUseCase(analyticsRepository)
+        // di/AppContainer.kt
+        historyRepository = HistoryRepositoryImpl(fileManager)
+        getHistoryUseCase = GetHistoryUseCase(historyRepository)
+        saveHistoryUseCase = SaveHistoryUseCase(historyRepository)
 
-    // Репозиторий для бекапа
-    val backupRepository: BackupRepository = BackupRepositoryImpl(context)
-    val exportBackupUseCase = ExportBackupUseCase(backupRepository)
-    val importBackupUseCase = ImportBackupUseCase(backupRepository)
-    // Репозиторий для квитанций
-    val receiptRepository: ReceiptRepository = ReceiptRepositoryImpl(fileManager, Gson())
-    val saveReceiptUseCase = SaveReceiptUseCase(receiptRepository)
-    val getReceiptsUseCase = GetReceiptsUseCase(receiptRepository)
-    val deleteReceiptUseCase = DeleteReceiptUseCase(receiptRepository)
-    val receiptsViewModelFactory = ReceiptsViewModelFactory(getReceiptsUseCase, deleteReceiptUseCase, saveReceiptUseCase)
+        // Доходы
+        incomeFileManager = IncomeFileManager(context.applicationContext)
+        incomeRepository = IncomeRepositoryImpl(incomeFileManager)
+        getYearlyIncomeUseCase = GetYearlyIncomeUseCase(incomeRepository)
+        addIncomeUseCase = AddIncomeUseCase(incomeRepository)
+        getIncomeRecordsUseCase = GetIncomeRecordsUseCase(incomeRepository)
+        updateIncomeRecordUseCase = UpdateIncomeRecordUseCase(incomeRepository)
+        deleteIncomeRecordUseCase = DeleteIncomeRecordUseCase(incomeRepository)
+        deleteAllIncomeRecordsBySourceUseCase = DeleteAllIncomeRecordsBySourceUseCase(incomeRepository)
+
+        incomeViewModelFactory = IncomeViewModelFactory(
+            getYearlyIncomeUseCase,
+            addIncomeUseCase,
+            getIncomeRecordsUseCase,
+            updateIncomeRecordUseCase,
+            deleteIncomeRecordUseCase,
+            deleteAllIncomeRecordsBySourceUseCase
+        )
+
+        // Аналитика (расходы)
+        analyticsRepository = AnalyticsRepositoryImpl(fileManager)
+        getAllServicesYearlySummaryUseCase = GetAllServicesYearlySummaryUseCase(analyticsRepository)
+
+        // Репозиторий для бекапа
+        backupRepository = BackupRepositoryImpl(context)
+        exportBackupUseCase = ExportBackupUseCase(backupRepository)
+        importBackupUseCase = ImportBackupUseCase(backupRepository)
+
+        // Репозиторий для квитанций
+        receiptRepository = ReceiptRepositoryImpl(fileManager, Gson())
+        saveReceiptUseCase = SaveReceiptUseCase(receiptRepository)
+        getReceiptsUseCase = GetReceiptsUseCase(receiptRepository)
+        deleteReceiptUseCase = DeleteReceiptUseCase(receiptRepository)
+        receiptsViewModelFactory = ReceiptsViewModelFactory(getReceiptsUseCase, deleteReceiptUseCase, saveReceiptUseCase)
+    }
 }

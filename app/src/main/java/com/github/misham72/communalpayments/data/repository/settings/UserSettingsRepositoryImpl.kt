@@ -10,7 +10,7 @@ class UserSettingsRepositoryImpl(
         accountPrefs.saveLastReading(serviceKey, value)
     }
 
-    override suspend fun getLastReading(serviceKey: String): String? {
+    override suspend fun getLastReading(serviceKey: String): String {
         return accountPrefs.getLastReading(serviceKey)
     }
 
@@ -18,7 +18,7 @@ class UserSettingsRepositoryImpl(
         accountPrefs.saveTariff(serviceKey, tariff)
     }
 
-    override suspend fun getTariff(serviceKey: String): String? {
+    override suspend fun getTariff(serviceKey: String): String {
         return accountPrefs.getTariff(serviceKey)
     }
 
@@ -26,7 +26,7 @@ class UserSettingsRepositoryImpl(
         accountPrefs.savePaymentDay(serviceKey, value)
     }
 
-    override suspend fun getPaymentDay(serviceKey: String): String? {
+    override suspend fun getPaymentDay(serviceKey: String): String {
         return accountPrefs.getPaymentDay(serviceKey)
     }
 
@@ -34,7 +34,7 @@ class UserSettingsRepositoryImpl(
         accountPrefs.savePeriodMonths(serviceKey, value)
     }
 
-    override suspend fun getPeriodMonths(serviceKey: String): String? {
+    override suspend fun getPeriodMonths(serviceKey: String): String {
         return accountPrefs.getPeriodMonths(serviceKey)
     }
 
@@ -42,7 +42,7 @@ class UserSettingsRepositoryImpl(
         accountPrefs.saveLastPeriodicDate(serviceKey, date)
     }
 
-    override suspend fun getLastPeriodicDate(serviceKey: String): String? {
+    override suspend fun getLastPeriodicDate(serviceKey: String): String {
         return accountPrefs.getLastPeriodicDate(serviceKey)
     }
 

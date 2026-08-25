@@ -247,8 +247,22 @@
     <string name="period_pdf">period_pdf</string>
     <string name="next_payment_pdf">Payment day</string>
     <string name="current_reading_txt_water_and_gas">current reading</string>
-    <string name="receipts_title">receipts</string>
+    <string name="receipts_title">receipts (%s)</string>
     <string name="no_receipts">no receipts</string>
+
+    <string name="add_receipt">Add receipt</string>
+    <string name="error_prefix">Error %1$s</string>
+    <string name="open_pdf">Open PDF</string>
+    <string name="date_time_format">Date time format</string>
+    <string name="open">Open</string>
+    <string name="receipts">Receipts</string>
+    <string name="error_intent_no_file">Error intent no file</string>
+    <string name="list_services_empty">The  list of services is empty</string>
+    <string name="select_service_receipt">Select the service for the receipt</string>
+    <string name="error_read_file">Couldn\t read the file</string>
+    <string name="saving_receipt">Saving receipt</string>
+    <string name="receipt_saved">Receipt saved %1$s\\nПуть: %2$s</string>
+    <string name="error_saving_receipt">Error saving receipt: %1$s</string>
 
 </resources>
 
