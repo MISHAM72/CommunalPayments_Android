@@ -294,7 +294,6 @@
     <string name="open_pdf">Открыть PDF</string>
     <string name="date_time_format">dd.MM.yyyy HH:mm</string>
     <string name="open">Открыть</string>
-    <string name="receipts">Квитанции</string>
     <string name="error_intent_no_file">Не удалось получить файл из Intent</string>
     <string name="list_services_empty">Список услуг пуст</string>
     <string name="select_service_receipt">Выберите услугу для квитанции</string>

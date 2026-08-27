@@ -1,5 +1,6 @@
 package com.github.misham72.communalpayments.data.repository.receipt
 
+import android.util.Log
 import com.github.misham72.communalpayments.data.local.file.FileManager
 import com.github.misham72.communalpayments.domain.model.Receipt
 import com.github.misham72.communalpayments.domain.repository.ReceiptRepository
@@ -19,7 +20,7 @@ class ReceiptRepositoryImpl(
     private val indexFile: File
         get() = File(fileManager.getReceiptsDir(), "receipts_index.json")
 
-    private fun loadIndex(): MutableMap<String, MutableList<Receipt>> {
+    private fun loadIndex(): MutableMap<String, MutableList<Receipt>> {//Загрузка индекса (loadIndex()) – читает файл receipts_index.json, в котором хранится список всех квитанций для каждой услуги.
         return if (indexFile.exists()) {
             val json = indexFile.readText()
             val type = object : TypeToken<MutableMap<String, MutableList<Receipt>>>() {}.type

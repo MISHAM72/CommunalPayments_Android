@@ -37,5 +37,5 @@ object DataConstants {
     // Форматы данных
     const val AMOUNT_FORMAT = "%.2f"
     const val INCOME_RECORD_DATE_PATTERN = "yyyy-MM-dd"
-
+    const val RECEIPTS_DIR = "receipts"
 }

@@ -118,11 +118,12 @@ fun ControlBetweenScreens(
 
     fun onNavigateBack() {
         showHistory.value = false
+        showAllServicesSummary.value = false
     }
 
     if (showAllServicesSummary.value) {
         AllServicesSummaryScreen(
-            onBack = { showAllServicesSummary.value = false },
+            onBack = { onNavigateBack() },
             getAllServicesYearlySummaryUseCase = getAllServicesYearlySummaryUseCase,  // используем существующую переменную
             defaultErrorMessage = defaultError,
             incomeFactory = incomeViewModelFactory

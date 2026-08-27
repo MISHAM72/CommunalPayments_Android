@@ -2,6 +2,7 @@ package com.github.misham72.communalpayments.data.local.file
 
 import android.content.Context
 import com.github.misham72.communalpayments.R
+import com.github.misham72.communalpayments.data.common.DataConstants
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -59,7 +60,7 @@ class FileManager(private val context: Context) {
 
     // ---------- Методы для квитанций ----------
     fun getReceiptsDir(): File {
-        val dir = File(context.filesDir, context.getString(R.string.receipts))
+        val dir = File(context.filesDir, DataConstants.RECEIPTS_DIR)
         if (!dir.exists()) dir.mkdirs()
         return dir
     }

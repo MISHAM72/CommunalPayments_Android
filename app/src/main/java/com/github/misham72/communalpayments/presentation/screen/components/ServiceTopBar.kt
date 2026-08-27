@@ -26,6 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.github.misham72.communalpayments.R
+import com.github.misham72.communalpayments.data.common.DataConstants
 import com.github.misham72.communalpayments.presentation.utils.rememberChangeListSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberClockCuCuSoundPlayer
 
@@ -77,7 +78,7 @@ fun ServiceTopBar(
             ) {
                 Icon(
                     Icons.Outlined.Folder,
-                    contentDescription = stringResource(R.string.receipts) // или stringResource, если добавишь в strings.xml
+                    contentDescription = DataConstants.RECEIPTS_DIR
                 )
             }
 
