@@ -30,8 +30,8 @@ android {
         applicationId = "com.github.misham72.communalpayments"
         minSdk = 26
         targetSdk = 37
-        versionCode = 19
-        versionName = "2.5.7"
+        versionCode = 20
+        versionName = "2.5.8"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         // Чтение API-ключа из local.properties
