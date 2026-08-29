@@ -375,7 +375,7 @@ fun ControlBetweenScreens(
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.buttonColors()
                     ) {
-                        Text(stringResource(R.string.annual_countdown))
+                        Text(stringResource(R.string.annual_countdown), fontSize = 12.sp)
                     }
                     Button(
                         onClick = {
@@ -385,7 +385,7 @@ fun ControlBetweenScreens(
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.buttonColors()
                     ) {
-                        Text(stringResource(R.string.history))
+                        Text(stringResource(R.string.history), fontSize = 12.sp)
                     }
 
                 }

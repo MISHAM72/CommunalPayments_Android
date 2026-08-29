@@ -13,6 +13,7 @@ import com.github.misham72.communalpayments.domain.usecases.PeriodicDataCollecto
 import com.github.misham72.communalpayments.domain.usecases.TextHistoryUseCase
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 import com.github.misham72.communalpayments.presentation.common.UiMessages
+import com.google.gson.Gson
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -28,7 +29,8 @@ class InternetViewModel(
     private val settingsRepository: UserSettingsRepository,
     private val repository: IProviderRepository,
     private val textHistoryUseCase: TextHistoryUseCase,
-    private val exportHistoryUseCase: ExportHistoryUseCase
+    private val exportHistoryUseCase: ExportHistoryUseCase,
+    private val gson: Gson
 
 ) : ViewModel() {
 
@@ -44,6 +46,7 @@ class InternetViewModel(
         val showAccountDialog: Boolean = false,
         val customDate: String = "",
         val result: PeriodicData? = null,
+        val lastResult: PeriodicData? = null,
         val error: ValidationError? = null,
     )
 
@@ -58,8 +61,10 @@ class InternetViewModel(
             val savePeriod = settingsRepository.getPeriodMonths(SERVICE_KEY) ?: ""
             val savedTariff = settingsRepository.getTariff(SERVICE_KEY) ?: ""
             val savedDate = settingsRepository.getCustomDate(SERVICE_KEY)
-
             val details = detailsDeferred.await() // ждём результат
+            val savedJson = settingsRepository.getLastResult(SERVICE_KEY)
+            val lastResult = savedJson?.let { gson.fromJson(it, PeriodicData::class.java) }
+            _uiState.update { it.copy(lastResult = lastResult) }
 
             _uiState.update { currentState ->
                 currentState.copy(
@@ -159,9 +164,11 @@ class InternetViewModel(
                 )
 
                 // Обновляем UI – UseCase уже сохранил данные
+                settingsRepository.saveLastResult(SERVICE_KEY, gson.toJson(data))
                 _uiState.update { state ->
                     state.copy(
                         result = data,
+                        lastResult = data,
                         error = null,
                     )
                 }

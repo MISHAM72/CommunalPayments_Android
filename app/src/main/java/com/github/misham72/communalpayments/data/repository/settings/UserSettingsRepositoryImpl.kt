@@ -1,7 +1,10 @@
 package com.github.misham72.communalpayments.data.repository.settings
 
+import com.github.misham72.communalpayments.data.common.DataConstants
 import com.github.misham72.communalpayments.data.local.preferences.AccountPreferences
 import com.github.misham72.communalpayments.domain.repository.UserSettingsRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class UserSettingsRepositoryImpl(
     private val accountPrefs: AccountPreferences
@@ -52,5 +55,17 @@ class UserSettingsRepositoryImpl(
 
     override suspend fun getCustomDate(serviceKey: String): String {
         return accountPrefs.getCustomDate(serviceKey)
+    }
+
+    override suspend fun saveLastResult(serviceKey: String, result: String) {
+        withContext(Dispatchers.IO) {
+            accountPrefs.saveString(DataConstants.LAST_RESULT_PREFIX + serviceKey, result)
+        }
+    }
+
+    override suspend fun getLastResult(serviceKey: String): String? {
+        return withContext(Dispatchers.IO) {
+            accountPrefs.getString(DataConstants.LAST_RESULT_PREFIX + serviceKey)
+        }
     }
 }

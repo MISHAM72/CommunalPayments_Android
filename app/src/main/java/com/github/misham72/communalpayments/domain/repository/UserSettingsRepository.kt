@@ -7,6 +7,7 @@ interface UserSettingsRepository {
     suspend fun savePeriodMonths(serviceKey: String, value: String)
     suspend fun saveLastPeriodicDate(serviceKey: String, date: String)
     suspend fun saveCustomDate(serviceKey: String, date: String)
+    suspend fun saveLastResult(serviceKey: String, result: String)
 
     // Чтение (добавить)
     suspend fun getLastReading(serviceKey: String): String?
@@ -15,5 +16,6 @@ interface UserSettingsRepository {
     suspend fun getPeriodMonths(serviceKey: String): String?
     suspend fun getLastPeriodicDate(serviceKey: String): String?
     suspend fun getCustomDate(serviceKey: String): String
+    suspend fun getLastResult(serviceKey: String): String?
 
 }

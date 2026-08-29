@@ -120,10 +120,10 @@ fun DisplayZONTScreen(viewModel: ZONTViewModel) {
                 label = { Text(stringResource(R.string.next_payment_pdf)) },  // явный текст
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(min = 48.dp, max = 56.dp),
+                    .heightIn(min = 48.dp),
                 singleLine = true,
                 textStyle = LocalTextStyle.current.copy(
-                    fontSize = 14.sp,
+                    fontSize = 20.sp,
                     lineHeight = 20.sp
                 )
             )
@@ -135,10 +135,10 @@ fun DisplayZONTScreen(viewModel: ZONTViewModel) {
                 label = { Text(stringResource(R.string.period_months_label)) },  // явный текст
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(min = 48.dp, max = 56.dp),
+                    .heightIn(min = 48.dp),
                 singleLine = true,
                 textStyle = LocalTextStyle.current.copy(
-                    fontSize = 14.sp,
+                    fontSize = 20.sp,
                     lineHeight = 20.sp
                 )
             )
@@ -150,10 +150,10 @@ fun DisplayZONTScreen(viewModel: ZONTViewModel) {
                 label = { Text(stringResource(R.string.tariff_label)) },  // явный текст
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(min = 48.dp, max = 56.dp),
+                    .heightIn(min = 48.dp),
                 singleLine = true,
                 textStyle = LocalTextStyle.current.copy(
-                    fontSize = 14.sp,
+                    fontSize = 20.sp,
                     lineHeight = 20.sp
                 )
             )
@@ -186,12 +186,13 @@ fun DisplayZONTScreen(viewModel: ZONTViewModel) {
                 }
             }
             // Результат с ТВОИМИ ресурсами
-            uiState.result?.let { result ->
-                Card(
-                    modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer
-                    )
-                ) {
+            val result = uiState.result ?: uiState.lastResult
+            Card(
+                modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer
+                )
+            ) {
+                if (result != null) {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -227,26 +228,32 @@ fun DisplayZONTScreen(viewModel: ZONTViewModel) {
                             }
                         }
                     }
+                } else {
+                    Text(
+                        text = stringResource(R.string.no_saved_result),
+                        modifier = Modifier.padding(16.dp),
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                    )
                 }
-                Spacer(modifier = Modifier.height(8.dp))
-                Button(
-                    onClick = {
-                        bankSound?.start()
-                        showBankDialog.value = true
-                    }, modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(stringResource(R.string.select_bank_to_pay))
-                }
-                // Кнопка, открывающая диалог с выбором реквизитов
-                Button(
-                    onClick = {
-                        copySound?.start()
-                        showProviderDialog.value = true
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(stringResource(R.string.payment_details))
-                }
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            Button(
+                onClick = {
+                    bankSound?.start()
+                    showBankDialog.value = true
+                }, modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(stringResource(R.string.select_bank_to_pay))
+            }
+            // Кнопка, открывающая диалог с выбором реквизитов
+            Button(
+                onClick = {
+                    copySound?.start()
+                    showProviderDialog.value = true
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(stringResource(R.string.payment_details))
             }
             Spacer(modifier = Modifier.height(10.dp)) // небольшой отступ для красоты
         }
@@ -316,3 +323,4 @@ fun DisplayZONTScreen(viewModel: ZONTViewModel) {
         }
     }
 }
+

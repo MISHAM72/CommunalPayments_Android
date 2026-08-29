@@ -112,5 +112,11 @@ class AccountPreferences(context: Context) {
         return prefs.getString(serviceKey + DataConstants.WEBSITE_URL_SUFFIX, "") ?: ""
     }
 
+    fun saveString(key: String, value: String) {
+        prefs.edit { putString(key, value) }
+    }
 
+    fun getString(key: String, defaultValue: String? = null): String? {
+        return prefs.getString(key, defaultValue)
+    }
 }

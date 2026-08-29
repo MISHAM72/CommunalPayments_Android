@@ -122,9 +122,10 @@ fun DisplayElectricityScreen(viewModel: ElectricityViewModel) {
                 label = { Text(stringResource(R.string.current_reading_label_electricity)) },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(min = 48.dp, max = 56.dp),
+                    .heightIn(min = 48.dp),
+                singleLine = true,
                 textStyle = LocalTextStyle.current.copy(
-                    fontSize = 14.sp,
+                    fontSize = 20.sp,
                     lineHeight = 20.sp
                 )
             )
@@ -134,9 +135,9 @@ fun DisplayElectricityScreen(viewModel: ElectricityViewModel) {
                 label = { Text(stringResource(R.string.previous_reading_label_electricity)) },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(min = 48.dp, max = 56.dp),
+                    .heightIn(min = 48.dp),
                 textStyle = LocalTextStyle.current.copy(
-                    fontSize = 14.sp,
+                    fontSize = 20.sp,
                     lineHeight = 20.sp
                 )
             )
@@ -146,9 +147,9 @@ fun DisplayElectricityScreen(viewModel: ElectricityViewModel) {
                 label = { Text(stringResource(R.string.tariff_label)) },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(min = 48.dp, max = 56.dp),
+                    .heightIn(min = 48.dp),
                 textStyle = LocalTextStyle.current.copy(
-                    fontSize = 14.sp,
+                    fontSize = 20.sp,
                     lineHeight = 20.sp
                 )
             )
@@ -183,13 +184,15 @@ fun DisplayElectricityScreen(viewModel: ElectricityViewModel) {
                 null -> { /* ничего */
                 }
             }
-            uiState.result?.let { result ->
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer
-                    )
-                ) {
+            // Карточка с результатом (всегда видна)
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer
+                )
+            ) {
+                val result = uiState.lastResult
+                if (result != null) {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -221,7 +224,8 @@ fun DisplayElectricityScreen(viewModel: ElectricityViewModel) {
                                 onClick = {
                                     clipboardManager.setText(AnnotatedString(result.payment.amount.toString()))
                                     Toast.makeText(
-                                        context, context.getString(R.string.amount_copied, result.payment.amount),
+                                        context,
+                                        context.getString(R.string.amount_copied, result.payment.amount),
                                         Toast.LENGTH_SHORT
                                     ).show()
                                 },
@@ -234,30 +238,36 @@ fun DisplayElectricityScreen(viewModel: ElectricityViewModel) {
                             }
                         }
                     }
+                } else {
+                    Text(
+                        text = stringResource(R.string.no_saved_result), // нужно добавить в strings.xml
+                        modifier = Modifier.padding(16.dp),
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                    )
                 }
-                Spacer(modifier = Modifier.height(8.dp))
-                Button(
-                    onClick = {
-                        bankSound?.start()
-                        showBankDialog.value = true
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(stringResource(R.string.select_bank_to_pay))
-                }
-                Button(
-                    onClick = {
-                        copySound?.start()
-                        showProviderDialog.value = true
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(stringResource(R.string.payment_details))
-                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+            Button(
+                onClick = {
+                    bankSound?.start()
+                    showBankDialog.value = true
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(stringResource(R.string.select_bank_to_pay))
+            }
+            Button(
+                onClick = {
+                    copySound?.start()
+                    showProviderDialog.value = true
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(stringResource(R.string.payment_details))
             }
             Spacer(modifier = Modifier.height(10.dp))
         }
-        // Банковские диалоги (вынесены из Column, чтобы не мешать скроллу)
         if (showBankDialog.value) {
             val installedBanks = remember {
                 BankPaymentHelper.supportedBanks.filter { bank ->
@@ -331,3 +341,4 @@ fun DisplayElectricityScreen(viewModel: ElectricityViewModel) {
         }
     }
 }
+

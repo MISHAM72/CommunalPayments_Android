@@ -122,9 +122,9 @@ fun DisplayGasScreen(viewModel: GasViewModel) {
                 label = { Text(stringResource(R.string.current_reading_txt_water_and_gas)) },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(min = 48.dp, max = 56.dp), // сужаем
+                    .heightIn(min = 48.dp), // сужаем
                 textStyle = LocalTextStyle.current.copy(
-                    fontSize = 14.sp,
+                    fontSize = 20.sp,
                     lineHeight = 20.sp
                 )
             )
@@ -135,9 +135,9 @@ fun DisplayGasScreen(viewModel: GasViewModel) {
                 label = { Text(stringResource(R.string.previous_reading_txt_water_and_gas)) },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(min = 48.dp, max = 56.dp), // сужаем
+                    .heightIn(min = 48.dp), // сужаем
                 textStyle = LocalTextStyle.current.copy(
-                    fontSize = 14.sp,
+                    fontSize = 20.sp,
                     lineHeight = 20.sp
                 )
             )
@@ -148,9 +148,9 @@ fun DisplayGasScreen(viewModel: GasViewModel) {
                 label = { Text(stringResource(R.string.tariff_label)) },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(min = 48.dp, max = 56.dp), // сужаем
+                    .heightIn(min = 48.dp), // сужаем
                 textStyle = LocalTextStyle.current.copy(
-                    fontSize = 14.sp,
+                    fontSize = 20.sp,
                     lineHeight = 20.sp
                 )
             )
@@ -159,7 +159,8 @@ fun DisplayGasScreen(viewModel: GasViewModel) {
                 onClick = {
                     coinSound?.start()
                     viewModel.onCalculateClick()
-                }, modifier = Modifier.fillMaxWidth()
+                },
+                modifier = Modifier.fillMaxWidth()
             ) {
                 Text(stringResource(R.string.calculate_and_save))
             }
@@ -184,14 +185,15 @@ fun DisplayGasScreen(viewModel: GasViewModel) {
                 null -> { /* ничего */
                 }
             }
-            // Результат (как у тебя - с датой)
-            uiState.result?.let { result ->
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer
-                    )
-                ) {
+            // Карточка с результатом (всегда видна)
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer
+                )
+            ) {
+                val result = uiState.lastResult
+                if (result != null) {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -236,28 +238,35 @@ fun DisplayGasScreen(viewModel: GasViewModel) {
                             }
                         }
                     }
-                }
-                // Отступ
-                Spacer(modifier = Modifier.height(8.dp))
-                Button(
-                    onClick = {
-                        bankSound?.start()
-                        showBankDialog.value = true
-                    }, modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(stringResource(R.string.select_bank_to_pay))
-                }
-                Button(
-                    onClick = {
-                        copySound?.start()
-                        showProviderDialog.value = true
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(stringResource(R.string.payment_details))
+                } else {
+                    Text(
+                        text = stringResource(R.string.no_saved_result), // нужно добавить в strings.xml
+                        modifier = Modifier.padding(16.dp),
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                    )
                 }
             }
-            Spacer(modifier = Modifier.height(10.dp)) // небольшой отступ для красоты
+
+            Spacer(modifier = Modifier.height(8.dp))
+            Button(
+                onClick = {
+                    bankSound?.start()
+                    showBankDialog.value = true
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(stringResource(R.string.select_bank_to_pay))
+            }
+            Button(
+                onClick = {
+                    copySound?.start()
+                    showProviderDialog.value = true
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(stringResource(R.string.payment_details))
+            }
+            Spacer(modifier = Modifier.height(10.dp))
         }
         if (showBankDialog.value) {
             // Проверяем, какие банки из нашего списка установлены на телефоне
@@ -271,7 +280,6 @@ fun DisplayGasScreen(viewModel: GasViewModel) {
                     }
                 }
             }
-
             AlertDialog(
                 onDismissRequest = { showBankDialog.value = false },
                 title = { Text(stringResource(R.string.select_bank)) },
@@ -291,7 +299,8 @@ fun DisplayGasScreen(viewModel: GasViewModel) {
                             }
                         }
                     }
-                }, confirmButton = {
+                },
+                confirmButton = {
                     TextButton(onClick = { showBankDialog.value = false }) {
                         Text(stringResource(R.string.cancel))
                     }
@@ -331,3 +340,4 @@ fun DisplayGasScreen(viewModel: GasViewModel) {
         }
     }
 }
+

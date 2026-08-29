@@ -10,11 +10,13 @@ import com.github.misham72.communalpayments.domain.model.ProviderDetails
 import com.github.misham72.communalpayments.domain.model.ValidationError
 import com.github.misham72.communalpayments.domain.model.metric.WaterData
 import com.github.misham72.communalpayments.domain.repository.IProviderRepository
+import com.github.misham72.communalpayments.domain.repository.MeterRepository
 import com.github.misham72.communalpayments.domain.repository.UserSettingsRepository
 import com.github.misham72.communalpayments.domain.usecases.ExportHistoryUseCase
 import com.github.misham72.communalpayments.domain.usecases.MeterDataCollector
 import com.github.misham72.communalpayments.domain.usecases.TextHistoryUseCase
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
+import com.google.gson.Gson
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -25,11 +27,12 @@ import kotlinx.coroutines.launch
 
 class WaterViewModel(
     private val meterDataCollector: MeterDataCollector,
+    private val meterRepository: MeterRepository,
     private val settingsRepository: UserSettingsRepository,
     private val repository: IProviderRepository,
     private val textHistoryUseCase: TextHistoryUseCase,
-    private val exportHistoryUseCase: ExportHistoryUseCase
-
+    private val exportHistoryUseCase: ExportHistoryUseCase,
+    private val gson: Gson
 ) : ViewModel() {
     companion object {
         const val SERVICE_KEY = ServiceKeys.WATER
@@ -42,7 +45,9 @@ class WaterViewModel(
         val showAccountDialog: Boolean = false,
         val customDate: String = "",
         val result: MeterData? = null,
-        val error: ValidationError? = null
+        val error: ValidationError? = null,
+        val lastResult: MeterData? = null,
+        val showLastResult: Boolean = false
     )
 
     private val _uiState = MutableStateFlow(UiState())  //✅ MutableStateFlow для изменяемого состояния
@@ -55,6 +60,9 @@ class WaterViewModel(
             val savedTariff = settingsRepository.getTariff(SERVICE_KEY) ?: ""
             val savedDate = settingsRepository.getCustomDate(SERVICE_KEY)
             val details = detailsDeferred.await()
+            val savedJson = settingsRepository.getLastResult(SERVICE_KEY)
+            val lastResult = savedJson?.let { gson.fromJson(it, WaterData::class.java) }
+            _uiState.update { it.copy(lastResult = lastResult) }
 
             _uiState.update { currentState ->
                 currentState.copy(
@@ -133,6 +141,7 @@ class WaterViewModel(
         viewModelScope.launch {
             try {
                 val data = meterDataCollector.collectMeterData(
+                    repository = meterRepository,
                     current = current,
                     previous = previous,
                     tariff = tariff,
@@ -140,17 +149,17 @@ class WaterViewModel(
                     serviceKey = SERVICE_KEY,
                     factory = ::WaterData
                 )
-
+                settingsRepository.saveLastResult(SERVICE_KEY, gson.toJson(data))
                 _uiState.update { state ->
                     state.copy(
                         previousReading = state.currentReading, // перенос
-                        currentReading = "",                           // очистка для следующего ввода
+                        currentReading = "",
                         result = data,
-                        error = null
+                        error = null,
+                        lastResult = data
                     )
                 }
             } catch (e: InvalidReadingException) {
-                // 🛑 Ловим доменное исключение и показываем пользователю
                 _uiState.update {
                     it.copy(
                         error = ValidationError.DomainError(e.message ?: DomainMessages.DEFAULT_VALIDATION_ERROR),

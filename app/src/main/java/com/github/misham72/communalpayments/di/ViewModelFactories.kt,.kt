@@ -20,16 +20,18 @@ import com.github.misham72.communalpayments.presentation.screen.screens.troyka.T
 import com.github.misham72.communalpayments.presentation.screen.screens.water.WaterViewModel
 
 class ElectricityViewModelFactory(
-    private val container: AppContainer
+    private val container: AppContainer,
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(ElectricityViewModel::class.java)) {
             return ElectricityViewModel(
                 meterDataCollector = container.meterDataCollector,
+                meterRepository = container.electricityRepository,
                 settingsRepository = container.settingsRepository,
                 repository = container.providerRepository,
                 textHistoryUseCase = container.textHistoryUseCase,
-                exportHistoryUseCase = container.exportHistoryUseCase
+                exportHistoryUseCase = container.exportHistoryUseCase,
+                gson = container.gson
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
@@ -43,10 +45,12 @@ class GasViewModelFactory(
         if (modelClass.isAssignableFrom(GasViewModel::class.java)) {
             return GasViewModel(
                 meterDataCollector = container.meterDataCollector,
+                meterRepository = container.gasRepository,
                 settingsRepository = container.settingsRepository,
                 repository = container.providerRepository,
                 textHistoryUseCase = container.textHistoryUseCase,
-                exportHistoryUseCase = container.exportHistoryUseCase
+                exportHistoryUseCase = container.exportHistoryUseCase,
+                gson = container.gson
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
@@ -60,10 +64,12 @@ class WaterViewModelFactory(
         if (modelClass.isAssignableFrom(WaterViewModel::class.java)) {
             return WaterViewModel(
                 meterDataCollector = container.meterDataCollector,
+                meterRepository = container.waterRepository,
                 settingsRepository = container.settingsRepository,
                 repository = container.providerRepository,
                 textHistoryUseCase = container.textHistoryUseCase,
-                exportHistoryUseCase = container.exportHistoryUseCase
+                exportHistoryUseCase = container.exportHistoryUseCase,
+                gson = container.gson
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
@@ -80,7 +86,8 @@ class GarbageViewModelFactory(
                 settingsRepository = container.settingsRepository,
                 repository = container.providerRepository,
                 textHistoryUseCase = container.textHistoryUseCase,
-                exportHistoryUseCase = container.exportHistoryUseCase
+                exportHistoryUseCase = container.exportHistoryUseCase,
+                gson = container.gson
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
@@ -97,7 +104,8 @@ class ZONTViewModelFactory(
                 settingsRepository = container.settingsRepository,
                 repository = container.providerRepository,
                 textHistoryUseCase = container.textHistoryUseCase,
-                exportHistoryUseCase = container.exportHistoryUseCase
+                exportHistoryUseCase = container.exportHistoryUseCase,
+                gson = container.gson
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
@@ -114,7 +122,8 @@ class HostelViewModelFactory(
                 settingsRepository = container.settingsRepository,
                 repository = container.providerRepository,
                 textHistoryUseCase = container.textHistoryUseCase,
-                exportHistoryUseCase = container.exportHistoryUseCase
+                exportHistoryUseCase = container.exportHistoryUseCase,
+                gson = container.gson
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
@@ -131,7 +140,8 @@ class InternetViewModelFactory(
                 settingsRepository = container.settingsRepository,
                 repository = container.providerRepository,
                 textHistoryUseCase = container.textHistoryUseCase,
-                exportHistoryUseCase = container.exportHistoryUseCase
+                exportHistoryUseCase = container.exportHistoryUseCase,
+                gson = container.gson
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
@@ -148,7 +158,8 @@ class MTSViewModelFactory(
                 settingsRepository = container.settingsRepository,
                 repository = container.providerRepository,
                 textHistoryUseCase = container.textHistoryUseCase,
-                exportHistoryUseCase = container.exportHistoryUseCase
+                exportHistoryUseCase = container.exportHistoryUseCase,
+                gson = container.gson
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
@@ -165,7 +176,8 @@ class OSAGOViewModelFactory(
                 settingsRepository = container.settingsRepository,
                 repository = container.providerRepository,
                 textHistoryUseCase = container.textHistoryUseCase,
-                exportHistoryUseCase = container.exportHistoryUseCase
+                exportHistoryUseCase = container.exportHistoryUseCase,
+                gson = container.gson
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
@@ -182,7 +194,8 @@ class TaxesViewModelFactory(
                 settingsRepository = container.settingsRepository,
                 repository = container.providerRepository,
                 textHistoryUseCase = container.textHistoryUseCase,
-                exportHistoryUseCase = container.exportHistoryUseCase
+                exportHistoryUseCase = container.exportHistoryUseCase,
+                gson = container.gson
 
             ) as T
         }
@@ -200,7 +213,8 @@ class TinkoffViewModelFactory(
                 settingsRepository = container.settingsRepository,
                 repository = container.providerRepository,
                 textHistoryUseCase = container.textHistoryUseCase,
-                exportHistoryUseCase = container.exportHistoryUseCase
+                exportHistoryUseCase = container.exportHistoryUseCase,
+                gson = container.gson
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
@@ -217,7 +231,8 @@ class TroykaViewModelFactory(
                 settingsRepository = container.settingsRepository,
                 repository = container.providerRepository,
                 textHistoryUseCase = container.textHistoryUseCase,
-                exportHistoryUseCase = container.exportHistoryUseCase
+                exportHistoryUseCase = container.exportHistoryUseCase,
+                gson = container.gson
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")

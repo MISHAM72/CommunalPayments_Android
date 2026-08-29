@@ -1,6 +1,5 @@
 package com.github.misham72.communalpayments.data.repository.receipt
 
-import android.util.Log
 import com.github.misham72.communalpayments.data.local.file.FileManager
 import com.github.misham72.communalpayments.domain.model.Receipt
 import com.github.misham72.communalpayments.domain.repository.ReceiptRepository

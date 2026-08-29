@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -87,12 +86,11 @@ fun DisplayWaterScreen(viewModel: WaterViewModel) {
     } else {
         Column(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
                 .padding(1.dp)
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(1.dp)
-
         ) {
             ServiceTopBar(
 
@@ -103,7 +101,6 @@ fun DisplayWaterScreen(viewModel: WaterViewModel) {
                 onPdfExport = { viewModel.onPdfExport(context) },
                 onReceiptsClick = { showReceipts = true }
             )
-
             if (uiState.customDate.isNotBlank()) {
                 Text(
                     text = stringResource(R.string.payment_date, uiState.customDate), fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurface, modifier = Modifier.padding(top = 1.dp)
@@ -121,9 +118,9 @@ fun DisplayWaterScreen(viewModel: WaterViewModel) {
                 label = { Text(stringResource(R.string.current_reading_txt_water_and_gas)) },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(min = 48.dp, max = 56.dp), // сужаем
+                    .heightIn(min = 48.dp), // сужаем
                 textStyle = LocalTextStyle.current.copy(
-                    fontSize = 14.sp,
+                    fontSize = 20.sp,
                     lineHeight = 20.sp
                 )
             )
@@ -134,9 +131,9 @@ fun DisplayWaterScreen(viewModel: WaterViewModel) {
                 label = { Text(stringResource(R.string.previous_reading_txt_water_and_gas)) },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(min = 48.dp, max = 56.dp), // сужаем
+                    .heightIn(min = 48.dp), // сужаем
                 textStyle = LocalTextStyle.current.copy(
-                    fontSize = 14.sp, lineHeight = 20.sp
+                    fontSize = 20.sp, lineHeight = 20.sp
                 )
             )
 
@@ -146,9 +143,9 @@ fun DisplayWaterScreen(viewModel: WaterViewModel) {
                 label = { Text(stringResource(R.string.tariff_label)) },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(min = 48.dp, max = 56.dp), // сужаем
+                    .heightIn(min = 48.dp), // сужаем
                 textStyle = LocalTextStyle.current.copy(
-                    fontSize = 14.sp,
+                    fontSize = 20.sp,
                     lineHeight = 20.sp
                 )
             )
@@ -165,7 +162,8 @@ fun DisplayWaterScreen(viewModel: WaterViewModel) {
             val error = uiState.error
             when (error) {
                 ValidationError.InvalidInput -> Text(
-                    stringResource(R.string.error_invalid_input), color = Color.Red
+                    stringResource(R.string.error_invalid_input),
+                    color = Color.Red
                 )
 
                 ValidationError.SavingError -> Text(
@@ -181,21 +179,23 @@ fun DisplayWaterScreen(viewModel: WaterViewModel) {
                 }
             }
             // Результат (как у тебя - с датой)
-            uiState.result?.let { result ->
-                Card(
-                    modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer
-                    )
-                ) {
+            Card(
+                modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer
+                )
+            ) {
+                val result = uiState.lastResult
+                if (result != null) {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)
+                            .padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Text(
                             text = stringResource(R.string.result_water), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold
                         )
-                        Text(text = stringResource(R.string.consumption, result.consumption.value, R.string.unit_cubic_meter))
+                        Text(text = stringResource(R.string.consumption, result.consumption.value, stringResource(R.string.unit_cubic_meter)))
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -219,29 +219,36 @@ fun DisplayWaterScreen(viewModel: WaterViewModel) {
                             }
                         }
                     }
-                }
-                // Отступ
-                Spacer(modifier = Modifier.height(8.dp))
-                Button(
-                    onClick = {
-                        bankSound?.start()
-                        showBankDialog.value = true
-                    }, modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(stringResource(R.string.select_bank_to_pay))
-                }
-                // Кнопка, открывающая диалог с выбором реквизитов
-                Button(
-                    onClick = {
-                        copySound?.start()
-                        showProviderDialog.value = true
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(stringResource(R.string.payment_details))
+                } else {
+                    Text(
+                        text = stringResource(R.string.no_saved_result), // нужно добавить в strings.xml
+                        modifier = Modifier.padding(16.dp),
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                    )
                 }
             }
-            Spacer(modifier = Modifier.height(10.dp)) // небольшой отступ для красоты
+            // Отступ
+            Spacer(modifier = Modifier.height(8.dp))
+            Button(
+                onClick = {
+                    bankSound?.start()
+                    showBankDialog.value = true
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(stringResource(R.string.select_bank_to_pay))
+            }
+            // Кнопка, открывающая диалог с выбором реквизитов
+            Button(
+                onClick = {
+                    copySound?.start()
+                    showProviderDialog.value = true
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(stringResource(R.string.payment_details))
+            }
+            Spacer(modifier = Modifier.height(10.dp))
         }
         if (showBankDialog.value) {
             // Проверяем, какие банки из нашего списка установлены на телефоне
@@ -257,27 +264,33 @@ fun DisplayWaterScreen(viewModel: WaterViewModel) {
             }
             /**В AlertDialog мы проверяем список банков через PackageManager,
              * фильтруем только установленные и показываем их кнопками.*/
-            AlertDialog(onDismissRequest = { showBankDialog.value = false }, title = { Text(stringResource(R.string.select_bank)) }, text = {
-                Column {
-                    if (installedBanks.isEmpty()) {
-                        Text(stringResource(R.string.there_are_no_installed_banking_applications))
-                    } else {
-                        installedBanks.forEach { bank ->
-                            TextButton(
-                                onClick = {
-                                    showBankDialog.value = false
-                                    BankPaymentHelper.openBankApp(context, bank)
-                                }) {
-                                Text(bank.name)
+            AlertDialog(
+                onDismissRequest = { showBankDialog.value = false },
+                title = { Text(stringResource(R.string.select_bank)) },
+                text = {
+                    Column {
+                        if (installedBanks.isEmpty()) {
+                            Text(stringResource(R.string.there_are_no_installed_banking_applications))
+                        } else {
+                            installedBanks.forEach { bank ->
+                                TextButton(
+                                    onClick = {
+                                        showBankDialog.value = false
+                                        BankPaymentHelper.openBankApp(context, bank)
+                                    }
+                                ) {
+                                    Text(bank.name)
+                                }
                             }
                         }
                     }
+                },
+                confirmButton = {
+                    TextButton(onClick = { showBankDialog.value = false }) {
+                        Text(stringResource(R.string.cancel))
+                    }
                 }
-            }, confirmButton = {
-                TextButton(onClick = { showBankDialog.value = false }) {
-                    Text(stringResource(R.string.cancel))
-                }
-            })
+            )
         }
         // Диалог выбора: ИНН или Л/С
         if (showProviderDialog.value) {

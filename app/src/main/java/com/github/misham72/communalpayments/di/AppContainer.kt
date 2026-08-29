@@ -61,9 +61,12 @@ object AppContainer {
         private set
     lateinit var providerRepository: IProviderRepository
         private set
-    private lateinit var electricityRepository: MeterRepository
-    private lateinit var waterRepository: MeterRepository
-    private lateinit var gasRepository: MeterRepository
+    lateinit var electricityRepository: MeterRepository
+        private set
+    lateinit var waterRepository: MeterRepository
+        private set
+    lateinit var gasRepository: MeterRepository
+        private set
     private lateinit var periodicRepository: PeriodicRepository
     lateinit var periodicDataCollector: PeriodicDataCollector
         private set
@@ -112,6 +115,8 @@ object AppContainer {
         private set
     lateinit var meterDataCollector: MeterDataCollector
         private set
+    lateinit var gson: Gson
+        private set
 
     fun init(context: Context) {
 
@@ -132,8 +137,7 @@ object AppContainer {
         periodicRepository = PeriodicRepositoryImpl(context, fileManager)
 
         // UseCase
-        meterDataCollector = MeterDataCollector(electricityRepository, settingsRepository)
-
+        meterDataCollector = MeterDataCollector(settingsRepository)
         periodicDataCollector = PeriodicDataCollector(
             repository = periodicRepository,
             settingsRepository = settingsRepository,
@@ -184,5 +188,6 @@ object AppContainer {
         getReceiptsUseCase = GetReceiptsUseCase(receiptRepository)
         deleteReceiptUseCase = DeleteReceiptUseCase(receiptRepository)
         receiptsViewModelFactory = ReceiptsViewModelFactory(getReceiptsUseCase, deleteReceiptUseCase, saveReceiptUseCase)
+        gson = Gson()
     }
 }

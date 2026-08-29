@@ -10,11 +10,11 @@ import com.github.misham72.communalpayments.domain.repository.MeterRepository
 import com.github.misham72.communalpayments.domain.repository.UserSettingsRepository
 
 class MeterDataCollector(
-    private val repository: MeterRepository,
     private val settingsRepository: UserSettingsRepository   // ← замена
 
 ) {
     suspend fun collectMeterData(
+        repository: MeterRepository,
         current: Double,
         previous: Double,
         tariff: Double,

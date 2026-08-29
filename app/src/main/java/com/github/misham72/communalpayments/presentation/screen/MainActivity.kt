@@ -167,6 +167,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun handleReceivedFile(intent: Intent?) {
         if (intent == null) return
+        // Если запуск из лаунчера — просто выходим
+        if (intent.action == Intent.ACTION_MAIN && intent.categories?.contains(Intent.CATEGORY_LAUNCHER) == true) {
+            return
+        }
         var uri: Uri? = null
 
         when (intent.action) {

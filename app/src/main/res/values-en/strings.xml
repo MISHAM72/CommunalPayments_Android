@@ -262,6 +262,7 @@
     <string name="saving_receipt">Saving receipt</string>
     <string name="receipt_saved">Receipt saved %1$s\\nПуть: %2$s</string>
     <string name="error_saving_receipt">Error saving receipt: %1$s</string>
+    <string name="no_saved_result">No saved calculation</string>
 
 </resources>
 
