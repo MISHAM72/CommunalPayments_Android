@@ -1,17 +1,12 @@
 package com.github.misham72.communalpayments.data.local.preferences
 
 import android.content.Context
+import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.github.misham72.communalpayments.data.common.DataConstants
 
 @Suppress("HardcodedStringLiteral")
-class AccountPreferences(context: Context) {
-
-
-    private val prefs = context.getSharedPreferences(
-        DataConstants.PREFS_NAME, Context.MODE_PRIVATE
-    )
-
+class AccountPreferences(private val prefs: SharedPreferences) {
     // Ключи для периодических услуг
     fun saveAccount(serviceKey: String, number: String) {
         prefs.edit { putString(DataConstants.ACCOUNT_PREFIX + serviceKey, number) }

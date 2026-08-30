@@ -2,7 +2,6 @@ package com.github.misham72.communalpayments.data.common
 
 @Suppress("HardcodedStringLiteral")
 object DataConstants {
-    // Из FileConstants.kt
     const val INCOME_HISTORY_DIR = "income_history"
 // при необходимости можно добавить другие:
 // const val BACKUP_DIR = "backup"

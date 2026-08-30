@@ -5,31 +5,13 @@ import android.content.Intent
 import android.widget.Toast
 import androidx.core.net.toUri
 import com.github.misham72.communalpayments.R
+import com.github.misham72.communalpayments.domain.model.Bank
 
 object BankPaymentHelper {
 
-    // Класс для хранения информации о банке
-    data class BankInfo(
-        val name: String,        // Название банка для пользователя
-        val packageName: String, // Уникальный идентификатор приложения
-        val deepLink: String? = null // Ссылка для открытия конкретного раздела (пока не используем)
-    )
-
-    // Список поддерживаемых банков (пока один)
-    @Suppress("HardcodedStringLiteral")
-    val supportedBanks: List<BankInfo> = listOf(
-        BankInfo("СберБанк", "ru.sberbankmobile"),
-        BankInfo("Т-Банк", "com.idamob.tinkoff.android"),
-        BankInfo("ВТБ", "ru.vtb24.mobilebanking.android"),
-        BankInfo("Альфа-Банк", "ru.alfabank.mobile.android"),
-        BankInfo("Точка Банк", "ru.zhuck.webapp"),
-        BankInfo("ЮMoney", "ru.yoo.money"),
-        BankInfo("БКС банк", "ru.bcs.bcsbank")
-        // Здесь в будущем будут добавляться другие банки
-    )
 
     // Функция для открытия приложения банка
-    fun openBankApp(context: Context, bank: BankInfo) {
+    fun openBankApp(context: Context, bank: Bank) {
         val intent = context.packageManager.getLaunchIntentForPackage(bank.packageName)
         if (intent != null) {
             context.startActivity(intent)
@@ -42,7 +24,7 @@ object BankPaymentHelper {
     }
 
     // Функция для открытия страницы приложения в магазине
-    private fun openInStore(context: Context, bank: BankInfo) {
+    private fun openInStore(context: Context, bank: Bank) {
         try {
             @Suppress("HardcodedStringLiteral")
             val storeIntent = Intent(Intent.ACTION_VIEW, "market://details?id=${bank.packageName}".toUri())

@@ -213,7 +213,6 @@
     <string name="inn_label">ИНН</string>
     <string name="personal_account_taxes">ИНН: %s</string>
 
-    <string name="there_are_no_installed_banking_applications">Нет установленных банковских приложений.</string>
     <string name="select_bank">Выберите банк</string>
     <string name="select_bank_to_pay">🏦 Выбрать банк для оплаты</string>
     <string name="bank_account">Расчётный счёт</string>

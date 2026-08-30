@@ -2,10 +2,14 @@ package com.github.misham72.communalpayments.di
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.SharedPreferences
+import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.data.calculators.PeriodCalculatorImpl
+import com.github.misham72.communalpayments.data.common.DataConstants
 import com.github.misham72.communalpayments.data.local.file.FileManager
 import com.github.misham72.communalpayments.data.local.income.filemanager.IncomeFileManager
 import com.github.misham72.communalpayments.data.local.preferences.AccountPreferences
+import com.github.misham72.communalpayments.data.repository.BankRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.analytics.AnalyticsRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.backup.BackupRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.export.PdfHistoryRepositoryImpl
@@ -21,6 +25,7 @@ import com.github.misham72.communalpayments.data.repository.receipt.ReceiptRepos
 import com.github.misham72.communalpayments.data.repository.settings.UserSettingsRepositoryImpl
 import com.github.misham72.communalpayments.domain.repository.AnalyticsRepository
 import com.github.misham72.communalpayments.domain.repository.BackupRepository
+import com.github.misham72.communalpayments.domain.repository.BankRepository
 import com.github.misham72.communalpayments.domain.repository.HistoryRepository
 import com.github.misham72.communalpayments.domain.repository.IProviderRepository
 import com.github.misham72.communalpayments.domain.repository.IncomeRepository
@@ -117,12 +122,24 @@ object AppContainer {
         private set
     lateinit var gson: Gson
         private set
+    lateinit var bankRepository: BankRepository
+        private set
+    lateinit var sharedPrefs: SharedPreferences
+        private set
+
 
     fun init(context: Context) {
 
         // Общие зависимости
-        fileManager = FileManager(context.applicationContext)
-        accountPrefs = AccountPreferences(context.applicationContext)
+        fileManager = FileManager(
+            filesDir = context.filesDir,
+            historyDirName = context.getString(R.string.history),
+            emptyHistoryMessage = context.getString(R.string.empty_history_calculation)
+        )
+        sharedPrefs = context.getSharedPreferences(
+            DataConstants.PREFS_NAME, Context.MODE_PRIVATE
+        )
+        accountPrefs = AccountPreferences(sharedPrefs)
 
         // Репозитории
         settingsRepository = UserSettingsRepositoryImpl(accountPrefs)
@@ -155,7 +172,9 @@ object AppContainer {
         saveHistoryUseCase = SaveHistoryUseCase(historyRepository)
 
         // Доходы
-        incomeFileManager = IncomeFileManager(context.applicationContext)
+        incomeFileManager = IncomeFileManager(
+            filesDir = context.filesDir
+        )
         incomeRepository = IncomeRepositoryImpl(incomeFileManager)
         getYearlyIncomeUseCase = GetYearlyIncomeUseCase(incomeRepository)
         addIncomeUseCase = AddIncomeUseCase(incomeRepository)
@@ -189,5 +208,8 @@ object AppContainer {
         deleteReceiptUseCase = DeleteReceiptUseCase(receiptRepository)
         receiptsViewModelFactory = ReceiptsViewModelFactory(getReceiptsUseCase, deleteReceiptUseCase, saveReceiptUseCase)
         gson = Gson()
+
+        // Репозиторий для банков
+        bankRepository = BankRepositoryImpl()
     }
 }

@@ -1,7 +1,5 @@
 package com.github.misham72.communalpayments.data.local.file
 
-import android.content.Context
-import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.data.common.DataConstants
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -10,16 +8,20 @@ import java.io.FileWriter
 import java.io.IOException
 import java.io.InputStream
 
-class FileManager(private val context: Context) {
+class FileManager(
+    private val filesDir: File,
+    private val historyDirName: String,
+    private val emptyHistoryMessage: String
+) {
     //Проверяет, существует ли папка history.
     suspend fun readHistory(serviceKey: String): String = withContext(Dispatchers.IO) {
-        val directory = File(context.filesDir, context.getString(R.string.history))
+        val directory = File(filesDir, historyDirName)
         if (!directory.exists()) {
-            return@withContext context.getString(R.string.empty_history_calculation)
+            return@withContext emptyHistoryMessage
         }//Проверяет, существует ли файл <serviceKey>.txt.
         val file = File(directory, "$serviceKey.txt")
         if (!file.exists()) {
-            return@withContext context.getString(R.string.empty_history_calculation)
+            return@withContext emptyHistoryMessage
         }//Если файл есть — читает его содержимое как текст и возвращает.
         return@withContext file.readText()
     }
@@ -27,7 +29,7 @@ class FileManager(private val context: Context) {
 
     suspend fun appendRecord(serviceKey: String, recordText: String) {
         withContext(Dispatchers.IO) {
-            val directory = File(context.filesDir, context.getString(R.string.history))
+            val directory = File(filesDir, historyDirName)
             directory.mkdirs()
             val file = File(directory, "$serviceKey.txt")
             val existingText = if (file.exists()) file.readText() else ""
@@ -43,7 +45,7 @@ class FileManager(private val context: Context) {
     // Сохранение нового файла
     fun saveToFile(content: String, fileName: String): Boolean {
         return try {
-            val directory = File(context.filesDir, context.getString(R.string.history))
+            val directory = File(filesDir, historyDirName)
             if (!directory.exists()) {
                 directory.mkdirs()
             }
@@ -60,7 +62,7 @@ class FileManager(private val context: Context) {
 
     // ---------- Методы для квитанций ----------
     fun getReceiptsDir(): File {
-        val dir = File(context.filesDir, DataConstants.RECEIPTS_DIR)
+        val dir = File(filesDir, DataConstants.RECEIPTS_DIR)
         if (!dir.exists()) dir.mkdirs()
         return dir
     }

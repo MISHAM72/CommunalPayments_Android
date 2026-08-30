@@ -17,7 +17,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ContentCopy
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -27,7 +26,6 @@ import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -55,7 +53,7 @@ import com.github.misham72.communalpayments.presentation.screen.components.Provi
 import com.github.misham72.communalpayments.presentation.screen.components.ServiceTopBar
 import com.github.misham72.communalpayments.presentation.screen.screens.receipts.DisplayReceiptsScreen
 import com.github.misham72.communalpayments.presentation.screen.screens.receipts.ReceiptsViewModel
-import com.github.misham72.communalpayments.presentation.utils.BankPaymentHelper
+import com.github.misham72.communalpayments.presentation.ui.bank.BankSelectionDialog
 import com.github.misham72.communalpayments.presentation.utils.normalizeUrl
 import com.github.misham72.communalpayments.presentation.utils.rememberBankButtonSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberCoinSoundPlayer
@@ -258,40 +256,9 @@ fun DisplayZONTScreen(viewModel: ZONTViewModel) {
             Spacer(modifier = Modifier.height(10.dp)) // небольшой отступ для красоты
         }
         if (showBankDialog.value) {
-            // Проверяем, какие банки из нашего списка установлены на телефоне
-            val installedBanks = remember {
-                BankPaymentHelper.supportedBanks.filter { bank ->
-                    try {
-                        context.packageManager.getPackageInfo(bank.packageName, 0)
-                        true
-                    } catch (_: Exception) {
-                        false
-                    }
-                }
-            }
-            /**В AlertDialog мы проверяем список банков через PackageManager,
-             * фильтруем только установленные и показываем их кнопками.*/
-            AlertDialog(onDismissRequest = { showBankDialog.value = false }, title = { Text(stringResource(R.string.select_bank)) }, text = {
-                Column {
-                    if (installedBanks.isEmpty()) {
-                        Text(stringResource(R.string.there_are_no_installed_banking_applications))
-                    } else {
-                        installedBanks.forEach { bank ->
-                            TextButton(
-                                onClick = {
-                                    showBankDialog.value = false
-                                    BankPaymentHelper.openBankApp(context, bank)
-                                }) {
-                                Text(bank.name)
-                            }
-                        }
-                    }
-                }
-            }, confirmButton = {
-                TextButton(onClick = { showBankDialog.value = false }) {
-                    Text(stringResource(R.string.cancel))
-                }
-            })
+            BankSelectionDialog(
+                onDismiss = { showBankDialog.value = false }
+            )
         }
         // Диалог выбора: ИНН или Л/С
         if (showProviderDialog.value) {
