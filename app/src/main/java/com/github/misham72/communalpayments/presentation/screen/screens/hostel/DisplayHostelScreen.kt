@@ -93,7 +93,7 @@ fun DisplayHostelScreen(viewModel: HostelViewModel) {
 
                 title = uiState.providerDetails.customServiceName.ifBlank { stringResource(R.string.service_display_name_hostel) },
                 onEditClick = { viewModel.openAccountDialog() },
-                onShareClick = { viewModel.onShareClick(context) },
+                onTxtExport = { viewModel.onShareClick(context) },
                 onPdfExport = { viewModel.onPdfExport(context) },
                 modifier = Modifier.height(28.dp),
                 onReceiptsClick = { showReceipts = true }

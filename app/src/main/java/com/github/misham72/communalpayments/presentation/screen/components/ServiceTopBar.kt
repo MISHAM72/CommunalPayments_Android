@@ -34,7 +34,7 @@ import com.github.misham72.communalpayments.presentation.utils.rememberClockCuCu
 fun ServiceTopBar(
     title: String,
     onEditClick: () -> Unit,
-    onShareClick: () -> Unit,
+    onTxtExport: () -> Unit,
     onReceiptsClick: () -> Unit,
     modifier: Modifier = Modifier,
     onPdfExport: () -> Unit = {}
@@ -103,7 +103,7 @@ fun ServiceTopBar(
                         text = { Text(stringResource(R.string.export_txt)) },
                         onClick = {
                             showMenu = false
-                            onShareClick()// ← вызывает переданный колбэк для TXT
+                            onTxtExport()// ← вызывает переданный колбэк для TXT
                         }
                     )
                     DropdownMenuItem(// Пункт меню "Экспорт PDF"

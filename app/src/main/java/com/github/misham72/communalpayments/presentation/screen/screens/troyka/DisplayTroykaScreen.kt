@@ -93,7 +93,7 @@ fun DisplayTroykaScreen(viewModel: TroykaViewModel) {
 
                 title = uiState.providerDetails.customServiceName.ifBlank { stringResource(R.string.service_display_name_troyka) },
                 onEditClick = { viewModel.openAccountDialog() },
-                onShareClick = { viewModel.onShareClick(context) },
+                onTxtExport = { viewModel.onShareClick(context) },
                 modifier = Modifier.height(28.dp),
                 onPdfExport = { viewModel.onPdfExport(context) },
                 onReceiptsClick = { showReceipts = true }
