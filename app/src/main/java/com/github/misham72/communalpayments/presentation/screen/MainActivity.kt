@@ -141,7 +141,7 @@ class MainActivity : AppCompatActivity() {
                         .systemBarsPadding()
                 ) {
                     ControlBetweenScreens(
-                        exportHistoryUseCase = AppContainer.exportHistoryUseCase,
+                        pdfHistoryUseCase = AppContainer.pdfHistoryUseCase,
                         getHistoryUseCase = AppContainer.getHistoryUseCase,
                         saveHistoryUseCase = AppContainer.saveHistoryUseCase,
                         getAllServicesYearlySummaryUseCase = AppContainer.getAllServicesYearlySummaryUseCase,

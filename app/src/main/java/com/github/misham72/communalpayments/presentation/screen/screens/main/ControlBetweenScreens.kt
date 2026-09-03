@@ -46,7 +46,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.domain.repository.UserSettingsRepository
-import com.github.misham72.communalpayments.domain.usecases.ExportHistoryUseCase
+import com.github.misham72.communalpayments.domain.usecases.PdfHistoryUseCase
 import com.github.misham72.communalpayments.domain.usecases.GetAllServicesYearlySummaryUseCase
 import com.github.misham72.communalpayments.domain.usecases.GetHistoryUseCase
 import com.github.misham72.communalpayments.domain.usecases.SaveHistoryUseCase
@@ -76,7 +76,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun ControlBetweenScreens(
-    exportHistoryUseCase: ExportHistoryUseCase,
+    pdfHistoryUseCase: PdfHistoryUseCase,
     getHistoryUseCase: GetHistoryUseCase,
     saveHistoryUseCase: SaveHistoryUseCase,
     getAllServicesYearlySummaryUseCase: GetAllServicesYearlySummaryUseCase,
@@ -176,7 +176,7 @@ fun ControlBetweenScreens(
                         text = { Text(stringResource(R.string.export_all_pdf_title)) },
                         onClick = {
                             scope.launch {
-                                exportHistoryUseCase.exportAllHistoryPdf(context)
+                                pdfHistoryUseCase.exportAllHistoryPdf(context)
                             }
                             showMenu = false
                         }

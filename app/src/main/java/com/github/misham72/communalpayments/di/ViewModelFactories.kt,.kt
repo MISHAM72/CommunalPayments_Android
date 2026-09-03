@@ -30,7 +30,7 @@ class ElectricityViewModelFactory(
                 settingsRepository = container.settingsRepository,
                 repository = container.providerRepository,
                 textHistoryUseCase = container.textHistoryUseCase,
-                exportHistoryUseCase = container.exportHistoryUseCase,
+                pdfHistoryUseCase = container.pdfHistoryUseCase,
                 gson = container.gson
             ) as T
         }
@@ -49,7 +49,7 @@ class GasViewModelFactory(
                 settingsRepository = container.settingsRepository,
                 repository = container.providerRepository,
                 textHistoryUseCase = container.textHistoryUseCase,
-                exportHistoryUseCase = container.exportHistoryUseCase,
+                pdfHistoryUseCase = container.pdfHistoryUseCase,
                 gson = container.gson
             ) as T
         }
@@ -68,7 +68,7 @@ class WaterViewModelFactory(
                 settingsRepository = container.settingsRepository,
                 repository = container.providerRepository,
                 textHistoryUseCase = container.textHistoryUseCase,
-                exportHistoryUseCase = container.exportHistoryUseCase,
+                pdfHistoryUseCase = container.pdfHistoryUseCase,
                 gson = container.gson
             ) as T
         }
@@ -86,7 +86,7 @@ class GarbageViewModelFactory(
                 settingsRepository = container.settingsRepository,
                 repository = container.providerRepository,
                 textHistoryUseCase = container.textHistoryUseCase,
-                exportHistoryUseCase = container.exportHistoryUseCase,
+                pdfHistoryUseCase = container.pdfHistoryUseCase,
                 gson = container.gson
             ) as T
         }
@@ -104,7 +104,7 @@ class ZONTViewModelFactory(
                 settingsRepository = container.settingsRepository,
                 repository = container.providerRepository,
                 textHistoryUseCase = container.textHistoryUseCase,
-                exportHistoryUseCase = container.exportHistoryUseCase,
+                pdfHistoryUseCase = container.pdfHistoryUseCase,
                 gson = container.gson
             ) as T
         }
@@ -122,7 +122,7 @@ class HostelViewModelFactory(
                 settingsRepository = container.settingsRepository,
                 repository = container.providerRepository,
                 textHistoryUseCase = container.textHistoryUseCase,
-                exportHistoryUseCase = container.exportHistoryUseCase,
+                pdfHistoryUseCase = container.pdfHistoryUseCase,
                 gson = container.gson
             ) as T
         }
@@ -140,7 +140,7 @@ class InternetViewModelFactory(
                 settingsRepository = container.settingsRepository,
                 repository = container.providerRepository,
                 textHistoryUseCase = container.textHistoryUseCase,
-                exportHistoryUseCase = container.exportHistoryUseCase,
+                pdfHistoryUseCase = container.pdfHistoryUseCase,
                 gson = container.gson
             ) as T
         }
@@ -158,7 +158,7 @@ class MTSViewModelFactory(
                 settingsRepository = container.settingsRepository,
                 repository = container.providerRepository,
                 textHistoryUseCase = container.textHistoryUseCase,
-                exportHistoryUseCase = container.exportHistoryUseCase,
+                pdfHistoryUseCase = container.pdfHistoryUseCase,
                 gson = container.gson
             ) as T
         }
@@ -176,7 +176,7 @@ class OSAGOViewModelFactory(
                 settingsRepository = container.settingsRepository,
                 repository = container.providerRepository,
                 textHistoryUseCase = container.textHistoryUseCase,
-                exportHistoryUseCase = container.exportHistoryUseCase,
+                pdfHistoryUseCase = container.pdfHistoryUseCase,
                 gson = container.gson
             ) as T
         }
@@ -194,7 +194,7 @@ class TaxesViewModelFactory(
                 settingsRepository = container.settingsRepository,
                 repository = container.providerRepository,
                 textHistoryUseCase = container.textHistoryUseCase,
-                exportHistoryUseCase = container.exportHistoryUseCase,
+                pdfHistoryUseCase = container.pdfHistoryUseCase,
                 gson = container.gson
 
             ) as T
@@ -213,7 +213,7 @@ class TinkoffViewModelFactory(
                 settingsRepository = container.settingsRepository,
                 repository = container.providerRepository,
                 textHistoryUseCase = container.textHistoryUseCase,
-                exportHistoryUseCase = container.exportHistoryUseCase,
+                pdfHistoryUseCase = container.pdfHistoryUseCase,
                 gson = container.gson
             ) as T
         }
@@ -231,7 +231,7 @@ class TroykaViewModelFactory(
                 settingsRepository = container.settingsRepository,
                 repository = container.providerRepository,
                 textHistoryUseCase = container.textHistoryUseCase,
-                exportHistoryUseCase = container.exportHistoryUseCase,
+                pdfHistoryUseCase = container.pdfHistoryUseCase,
                 gson = container.gson
             ) as T
         }

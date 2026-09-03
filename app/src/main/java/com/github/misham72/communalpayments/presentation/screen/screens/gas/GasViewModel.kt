@@ -12,7 +12,7 @@ import com.github.misham72.communalpayments.domain.model.metric.MeterData
 import com.github.misham72.communalpayments.domain.repository.IProviderRepository
 import com.github.misham72.communalpayments.domain.repository.MeterRepository
 import com.github.misham72.communalpayments.domain.repository.UserSettingsRepository
-import com.github.misham72.communalpayments.domain.usecases.ExportHistoryUseCase
+import com.github.misham72.communalpayments.domain.usecases.PdfHistoryUseCase
 import com.github.misham72.communalpayments.domain.usecases.MeterDataCollector
 import com.github.misham72.communalpayments.domain.usecases.TextHistoryUseCase
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
@@ -30,7 +30,7 @@ class GasViewModel(
     private val settingsRepository: UserSettingsRepository,
     private val repository: IProviderRepository,
     private val textHistoryUseCase: TextHistoryUseCase,
-    private val exportHistoryUseCase: ExportHistoryUseCase,
+    private val pdfHistoryUseCase: PdfHistoryUseCase,
     private val gson: Gson
 ) : ViewModel() {
 
@@ -99,7 +99,7 @@ class GasViewModel(
 
     fun onPdfExport(context: Context) {
         viewModelScope.launch {
-            exportHistoryUseCase.exportSingleHistoryPdf(context, SERVICE_KEY)
+            pdfHistoryUseCase.exportSingleHistoryPdf(context, SERVICE_KEY)
         }
     }
 

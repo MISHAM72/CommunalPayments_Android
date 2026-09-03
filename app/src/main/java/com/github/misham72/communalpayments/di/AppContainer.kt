@@ -40,7 +40,7 @@ import com.github.misham72.communalpayments.domain.usecases.DeleteAllIncomeRecor
 import com.github.misham72.communalpayments.domain.usecases.DeleteIncomeRecordUseCase
 import com.github.misham72.communalpayments.domain.usecases.DeleteReceiptUseCase
 import com.github.misham72.communalpayments.domain.usecases.ExportBackupUseCase
-import com.github.misham72.communalpayments.domain.usecases.ExportHistoryUseCase
+import com.github.misham72.communalpayments.domain.usecases.PdfHistoryUseCase
 import com.github.misham72.communalpayments.domain.usecases.GetAllServicesYearlySummaryUseCase
 import com.github.misham72.communalpayments.domain.usecases.GetHistoryUseCase
 import com.github.misham72.communalpayments.domain.usecases.GetIncomeRecordsUseCase
@@ -77,7 +77,7 @@ object AppContainer {
     lateinit var periodicDataCollector: PeriodicDataCollector
         private set
     private lateinit var pdfHistoryRepository: PdfHistoryRepository
-    lateinit var exportHistoryUseCase: ExportHistoryUseCase
+    lateinit var pdfHistoryUseCase: PdfHistoryUseCase
         private set
     private lateinit var textHistoryRepository: TextHistoryRepository
 
@@ -257,7 +257,7 @@ object AppContainer {
             historyHeader = "🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩",
         )
 
-        exportHistoryUseCase = ExportHistoryUseCase(pdfHistoryRepository)
+        pdfHistoryUseCase = PdfHistoryUseCase(pdfHistoryRepository)
 
         textHistoryRepository = TextHistoryRepositoryImpl(
             fileManager = fileManager,

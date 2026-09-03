@@ -3,7 +3,7 @@ package com.github.misham72.communalpayments.domain.usecases
 import android.content.Context
 import com.github.misham72.communalpayments.domain.repository.PdfHistoryRepository
 
-class ExportHistoryUseCase(
+class PdfHistoryUseCase(
     private val pdfHistoryRepository: PdfHistoryRepository
 ) {
     suspend fun exportSingleHistoryPdf(context: Context, serviceKey: String) {
