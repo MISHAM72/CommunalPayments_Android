@@ -1,12 +1,16 @@
 package com.github.misham72.communalpayments.data.repository.base
 
-import android.content.Context
-import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.data.local.file.FileManager
 
 abstract class BasePeriodicRepository(
-    context: Context, fileManager: FileManager
-) : BaseRepository(context, fileManager) {
+    fileManager: FileManager,
+    dateFormatPattern: String,
+    private val personalAccountTemplate: String,
+    private val nextPaymentTemplate: String,
+    private val priceTariffTemplate: String,
+    private val periodMonthsTemplate: String,
+    private val currencyTemplate: String
+) : BaseRepository(fileManager, dateFormatPattern) {
 
     // ✅ ЕДИНЫЙ метод для ВСЕХ периодических платежей
     //внутри метода происходит сборка итоговой строки
@@ -26,14 +30,14 @@ abstract class BasePeriodicRepository(
                 appendLine(historyHeader)
             appendLine(dateTime)
             appendLine(headerSeparator)
-            appendLine(context.getString(R.string.personal_account_in_text_history, accountNumber))
+            appendLine(personalAccountTemplate.format(accountNumber))
             appendLine(serviceName)
             appendLine()
-            appendLine(context.getString(R.string.next_payment, nextPayment))
-            appendLine(context.getString(R.string.period_months_format, periodMonths))
-            appendLine(context.getString(R.string.tariff_card, priceTariff))
+            appendLine(nextPaymentTemplate.format(nextPayment))
+            appendLine(periodMonthsTemplate.format(periodMonths))
+            appendLine(priceTariffTemplate.format(priceTariff))
             appendLine()
-            appendLine(context.getString(R.string.currency_rub, priceTariff))
+            appendLine(currencyTemplate.format(priceTariff))
         }
     }
 }

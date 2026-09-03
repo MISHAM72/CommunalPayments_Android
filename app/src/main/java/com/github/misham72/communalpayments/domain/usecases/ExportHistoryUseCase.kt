@@ -6,8 +6,8 @@ import com.github.misham72.communalpayments.domain.repository.PdfHistoryReposito
 class ExportHistoryUseCase(
     private val pdfHistoryRepository: PdfHistoryRepository
 ) {
-    suspend fun exportAndShare(context: Context, serviceKey: String) {
-        pdfHistoryRepository.exportAndShare(context, serviceKey)
+    suspend fun exportSingleHistoryPdf(context: Context, serviceKey: String) {
+        pdfHistoryRepository.exportSingleHistoryPdf(context, serviceKey)
     }
 
     suspend fun exportAllHistoryPdf(context: Context) {

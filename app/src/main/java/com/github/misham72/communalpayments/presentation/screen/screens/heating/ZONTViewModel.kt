@@ -102,7 +102,7 @@ class ZONTViewModel(
 
     fun onPdfExport(context: Context) {
         viewModelScope.launch {
-            exportHistoryUseCase.exportAndShare(context, SERVICE_KEY)
+            exportHistoryUseCase.exportSingleHistoryPdf(context, SERVICE_KEY)
         }
     }
 

@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <paths>
+    <!-- Для файлов из кэша -->
+    <cache-path
+        name="cache"
+        path="/" />
+    <!-- Для файлов из внутреннего хранилища (если нужно) -->
     <files-path
         name="files"
         path="/" />

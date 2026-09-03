@@ -1,7 +1,5 @@
 package com.github.misham72.communalpayments.data.repository.backup
 
-import android.content.Context
-import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.domain.repository.BackupRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -13,17 +11,18 @@ import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
 
 class BackupRepositoryImpl(
-    private val context: Context
+    private val filesDir: File,
+    private val historyDirName: String,
+    private val incomeDirName: String
 ) : BackupRepository {
 
     // Папка с историей платежей
     private val historyDir: File
-        get() = File(context.filesDir, context.getString(R.string.history))
+        get() = File(filesDir, historyDirName)
 
     // Папка с доходами
     private val incomeDir: File
-        @Suppress("HardcodedStringLiteral")
-        get() = File(context.filesDir, "income_history")
+        get() = File(filesDir, incomeDirName)
 
     @Suppress("HardcodedStringLiteral")
     override suspend fun exportData(outputStream: OutputStream): Boolean {

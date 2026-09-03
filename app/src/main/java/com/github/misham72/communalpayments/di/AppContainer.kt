@@ -53,6 +53,7 @@ import com.github.misham72.communalpayments.domain.usecases.SaveHistoryUseCase
 import com.github.misham72.communalpayments.domain.usecases.SaveReceiptUseCase
 import com.github.misham72.communalpayments.domain.usecases.TextHistoryUseCase
 import com.github.misham72.communalpayments.domain.usecases.UpdateIncomeRecordUseCase
+import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 import com.github.misham72.communalpayments.presentation.screen.screens.analytics.IncomeViewModelFactory
 import com.google.gson.Gson
 
@@ -124,8 +125,7 @@ object AppContainer {
         private set
     lateinit var bankRepository: BankRepository
         private set
-    lateinit var sharedPrefs: SharedPreferences
-        private set
+    private lateinit var sharedPrefs: SharedPreferences
 
 
     fun init(context: Context) {
@@ -146,12 +146,65 @@ object AppContainer {
         providerRepository = ProviderRepositoryImpl(accountPrefs)
 
         // Репозитории для метрик
-        electricityRepository = ElectricityRepositoryImpl(context, fileManager)
-        waterRepository = WaterRepositoryImpl(context, fileManager)
-        gasRepository = GasRepositoryImpl(context, fileManager)
+        electricityRepository = ElectricityRepositoryImpl(
+            fileManager = fileManager,
+            dateFormatPattern = context.getString(R.string.yyyy_mm_dd_hh_mm_ss),
+            personalAccountTemplate = context.getString(R.string.personal_account_in_text_history),
+            currentReadingTemplate = context.getString(R.string.current_reading),
+            previousReadingTemplate = context.getString(R.string.previous_reading),
+            tariffTemplate = context.getString(R.string.tariff_card),
+            consumptionTemplate = context.getString(R.string.consumption),
+            currencyTemplate = context.getString(R.string.currency_rub),
+            serviceName = context.getString(R.string.service_display_name_electricity),
+            unit = context.getString(R.string.unit_kilowatt_hour)
+        )
+        waterRepository = WaterRepositoryImpl(
+            fileManager = fileManager,
+            dateFormatPattern = context.getString(R.string.yyyy_mm_dd_hh_mm_ss),
+            personalAccountTemplate = context.getString(R.string.personal_account_in_text_history),
+            currentReadingTemplate = context.getString(R.string.current_reading),
+            previousReadingTemplate = context.getString(R.string.previous_reading),
+            tariffTemplate = context.getString(R.string.tariff_card),
+            consumptionTemplate = context.getString(R.string.consumption),
+            currencyTemplate = context.getString(R.string.currency_rub),
+            serviceName = context.getString(R.string.service_display_name_water),
+            unit = context.getString(R.string.unit_cubic_meter)
+        )
+        gasRepository = GasRepositoryImpl(
+            fileManager = fileManager,
+            dateFormatPattern = context.getString(R.string.yyyy_mm_dd_hh_mm_ss),
+            personalAccountTemplate = context.getString(R.string.personal_account_in_text_history),
+            currentReadingTemplate = context.getString(R.string.current_reading),
+            previousReadingTemplate = context.getString(R.string.previous_reading),
+            tariffTemplate = context.getString(R.string.tariff_card),
+            consumptionTemplate = context.getString(R.string.consumption),
+            currencyTemplate = context.getString(R.string.currency_rub),
+            serviceName = context.getString(R.string.service_display_name_gas),
+            unit = context.getString(R.string.unit_cubic_meter)
+        )
 
         // Репозиторий для периодических услуг
-        periodicRepository = PeriodicRepositoryImpl(context, fileManager)
+
+        periodicRepository = PeriodicRepositoryImpl(
+            fileManager = fileManager,
+            dateFormatPattern = context.getString(R.string.yyyy_mm_dd_hh_mm_ss),
+            personalAccountTemplate = context.getString(R.string.personal_account_in_text_history),
+            nextPaymentTemplate = context.getString(R.string.next_payment),
+            priceTariffTemplate = context.getString(R.string.tariff_card),
+            periodMonthsTemplate = context.getString(R.string.period_months_format),
+            currencyTemplate = context.getString(R.string.currency_rub),
+            serviceDisplayNames = mapOf(
+                ServiceKeys.GARBAGE to context.getString(R.string.service_display_name_garbage),
+                ServiceKeys.MTS to context.getString(R.string.service_display_name_mts),
+                ServiceKeys.HOSTEL to context.getString(R.string.service_display_name_hostel),
+                ServiceKeys.TROYKA to context.getString(R.string.service_display_name_troyka),
+                ServiceKeys.OSAGO to context.getString(R.string.service_display_name_osago),
+                ServiceKeys.TAXES to context.getString(R.string.service_display_name_taxes),
+                ServiceKeys.TINKOFF to context.getString(R.string.service_display_name_tinkoff),
+                ServiceKeys.INTERNET to context.getString(R.string.service_display_name_internet),
+                ServiceKeys.ZONT to context.getString(R.string.service_display_name_zont)
+            )  // ← теперь карта, а не строка
+        )
 
         // UseCase
         meterDataCollector = MeterDataCollector(settingsRepository)
@@ -160,10 +213,59 @@ object AppContainer {
             settingsRepository = settingsRepository,
             calculator = PeriodCalculatorImpl()
         )
-        pdfHistoryRepository = PdfHistoryRepositoryImpl(fileManager, accountPrefs)
+        val serviceDisplayNames = mapOf(
+            ServiceKeys.ELECTRICITY to context.getString(R.string.service_display_name_electricity),
+            ServiceKeys.GAS to context.getString(R.string.service_display_name_gas),
+            ServiceKeys.WATER to context.getString(R.string.service_display_name_water),
+            ServiceKeys.GARBAGE to context.getString(R.string.service_display_name_garbage),
+            ServiceKeys.ZONT to context.getString(R.string.service_display_name_zont),
+            ServiceKeys.INTERNET to context.getString(R.string.service_display_name_internet),
+            ServiceKeys.MTS to context.getString(R.string.service_display_name_mts),
+            ServiceKeys.TINKOFF to context.getString(R.string.service_display_name_tinkoff),
+            ServiceKeys.TAXES to context.getString(R.string.service_display_name_taxes),
+            ServiceKeys.TROYKA to context.getString(R.string.service_display_name_troyka),
+            ServiceKeys.OSAGO to context.getString(R.string.service_display_name_osago),
+            ServiceKeys.HOSTEL to context.getString(R.string.service_display_name_hostel)
+        )
+        pdfHistoryRepository = PdfHistoryRepositoryImpl(
+            fileManager = fileManager,
+            accountPrefs = accountPrefs,
+            cacheDir = context.cacheDir,
+            packageName = context.packageName,
+            statusCalculated = context.getString(R.string.status_calculated),
+            currentReadingPdf = context.getString(R.string.current_reading_pdf),
+            previousReadingPdf = context.getString(R.string.previous_reading_pdf),
+            consumptionPdf = context.getString(R.string.consumption_pdf),
+            toBePaid = context.getString(R.string.to_be_paid),
+            tariff = context.getString(R.string.tariff),
+            periodPdf = context.getString(R.string.period_pdf),
+            nextPaymentPdf = context.getString(R.string.next_payment_pdf),
+            pdfTitleHistory = context.getString(R.string.pdf_title_history),
+            formed = context.getString(R.string.formed),
+            personalAccountLabel = context.getString(R.string.personal_account_label),
+            pdfTableDate = context.getString(R.string.pdf_table_date),
+            pdfTablePrevious = context.getString(R.string.pdf_table_previous),
+            pdfTableCurrent = context.getString(R.string.pdf_table_current),
+            amount = context.getString(R.string.amount),
+            pdfTableStatus = context.getString(R.string.pdf_table_status),
+            pdfTablePeriod = context.getString(R.string.pdf_table_period),
+            pdfAllHistoryTitle = context.getString(R.string.pdf_all_history_title),
+            pdfGenerated = context.getString(R.string.pdf_generated),
+            sendPdf = context.getString(R.string.send_pdf),
+            dateFormatPattern = context.getString(R.string.yyyy_mm_dd_hh_mm_ss),
+            serviceDisplayNames = serviceDisplayNames,
+            historyHeader = "🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩",
+        )
+
         exportHistoryUseCase = ExportHistoryUseCase(pdfHistoryRepository)
 
-        textHistoryRepository = TextHistoryRepositoryImpl(fileManager)
+        textHistoryRepository = TextHistoryRepositoryImpl(
+            fileManager = fileManager,
+            cacheDir = context.cacheDir,
+            packageName = context.packageName,
+            dateFormatPattern = context.getString(R.string.yyyy_mm_dd_hh_mm_ss),
+            exportHistoryMessage = context.getString(R.string.export_history)
+        )
         textHistoryUseCase = TextHistoryUseCase(textHistoryRepository)
 
         // di/AppContainer.kt
@@ -197,7 +299,11 @@ object AppContainer {
         getAllServicesYearlySummaryUseCase = GetAllServicesYearlySummaryUseCase(analyticsRepository)
 
         // Репозиторий для бекапа
-        backupRepository = BackupRepositoryImpl(context)
+        backupRepository = BackupRepositoryImpl(
+            filesDir = context.filesDir,
+            historyDirName = context.getString(R.string.history),
+            incomeDirName = DataConstants.INCOME_HISTORY_DIR
+        )
         exportBackupUseCase = ExportBackupUseCase(backupRepository)
         importBackupUseCase = ImportBackupUseCase(backupRepository)
 

@@ -22,7 +22,7 @@
 
     <!-- СТАРЫЕ строки (оставьте для результатов): -->
 
-    <string name="status_calculated">  ПОДСЧИТАНО</string>
+
     <string name="empty_history_calculation">История расчетов пуста</string>
     <string name="calculation_history">История расчетов</string>
     <string name="calculate_and_save">Рассчитать и Сохранить</string>
@@ -32,13 +32,14 @@
     <string name="export_history">Поделиться историей</string>
 
     <!--  В файле res/values/strings.xml замените эмодзи -->
+
+
     <string name="emoji_paid">🔴</string>
     <string name="emoji_pending">⏳</string>
     <string name="emoji_active">✅</string>
     <string name="emoji_under_review">🔍</string>
     <string name="emoji_cancelled">🚫</string>
     <string name="emoji_calculated">🤓</string>
-
 
     <color name="status_red">#F44336</color>
     <color name="status_yellow">#FFEB3B</color>
@@ -52,9 +53,42 @@
     <string name="status_text_under_review">НА ПРОВЕРКЕ</string>
     <string name="status_text_cancelled">ОТМЕНЕНО</string>
     <string name="Edit_the_entire_text_To_replace_the_status_in_the_last_entry_click_on_the_button_above">Редактируйте весь текст. Для замены статуса в последней записи нажмите на кнопку внизу</string>
+
+
+    <string name="current_reading_label_electricity">Текущие показания, (кВт.ч) - </string>
+    <string name="previous_reading_label_electricity">Предыдущие показания, (кВт.ч) - </string>
+    <string name="current_reading">Текущие показания:%1$.2f %2$s</string>
+    <string name="previous_reading">Предыдущие показания: %1$.2f %2$s</string>
+    <string name="current_reading_txt_water_and_gas">Текущие показания, (куб.м.) - </string>
+    <string name="previous_reading_txt_water_and_gas">Предыдущие показания, (куб.м.) - </string>
+    <string name="pdf_table_previous">Предыдущее</string>
+    <string name="pdf_table_current">Текущее</string>
+    <string name="current_reading_pdf">Текущие показания: </string>
+    <string name="previous_reading_pdf">Предыдущие показания: </string>
+
+    <string name="next_payment_pdf">"Дата оплаты: "</string>
+    <string name="next_payment">Дата оплаты:  %1$s</string>
+    <!-- запись в PDF файл -->
+    <string name="status_calculated">  ПОДСЧИТАНО</string>
+
+    <string name="consumption_pdf">Расход:</string>
+    <string name="to_be_paid">К оплате:</string>
+    <string name="tariff">Тариф:</string>
+    <string name="period_pdf">Период:</string>
+
+    <string name="pdf_title_history">История: %s</string>
+    <string name="formed">Сформировано:</string>
+    <string name="personal_account_label">Л/С:</string>
+    <string name="pdf_table_date">Дата</string>
+
+    <string name="amount">Сумма</string>
+    <string name="pdf_table_status">Статус</string>
+    <string name="pdf_table_period">Период</string>
+    <string name="pdf_all_history_title">Общая история</string>
+    <string name="pdf_generated">Сформировано: %s</string>
     <string name="status_label">Статус:</string>
-
-
+    <string name="send_pdf">Отправить PDF</string>
+    <string name="yyyy_mm_dd_hh_mm_ss">yyyy-MM-dd HH:mm:ss</string>
     <!--  НФЗВАНИЯ КАРТОЧЕК -->
     <string name="result_garbage">Результаты Мусор:</string>
     <string name="result_zont">Результат по  ZONT:</string>
@@ -78,7 +112,7 @@
     <string name="back">Назад</string>
     <string name="save">Сохранить</string>
     <string name="cancel">Отмена</string>
-    <string name="yyyy_mm_dd_hh_mm_ss">yyyy-MM-dd HH:mm:ss</string>
+
 
     <string name="editing">Редактирование</string>
     <string name="select_start_date">Выбрать дату начала: %s</string>
@@ -123,19 +157,6 @@
     <string name="system_default">Как в системе</string>
     <string name="light">Светлая</string>
     <string name="dark">Тёмная</string>
-
-    <string name="formed">"Сформировано: - "</string>
-
-    <string name="pdf_title_history">История: %s</string>
-    <string name="pdf_table_date">Дата</string>
-
-
-    <string name="pdf_table_status">Статус</string>
-
-
-    <string name="pdf_all_history_title">Общая история</string>
-    <string name="pdf_generated">Сформировано: %s</string> <!-- можешь переиспользовать formed, но он без даты -->
-    <string name="send_pdf">Отправить PDF</string>
     <string name="export_all_pdf_title">Общая история PDF</string>
     <string name="export_pdf">Экспорт PDF</string>
 
@@ -169,7 +190,6 @@
     <string name="this_action_is_irreversible">Это действие необратимо.</string>
     <string name="delete">Удалить</string>
     <string name="deposit_interests">Проценты с депозита</string>
-    <string name="amount">Сумма</string>
     <string name="source">Источник</string>
     <string name="add">Добавить</string>
     <string name="income_dialog_title">Доходы: %1$s</string>
@@ -222,7 +242,6 @@
 
     <!-- ЛИЦЕВОЙ СЧЕТ  -->
     <string name="change_personal_account">Изменить лицевой счёт</string>
-    <string name="personal_account_label">Лицевой счёт:</string>
     <string name="personal_account_in_text_history">Лицевой счёт: %s</string>
     <string name="personal_account">Л/С: %s</string>
     <string name="personal_account_not_specified">Л/С не указан</string>
@@ -235,9 +254,6 @@
     <string name="website_label_with_url">Адресс сайта: %s</string>
     <string name="copied">Скопировано</string>
 
-
-    <string name="pdf_table_period">Период: (мес)</string>
-
     <string name="period_months_label">Период, (в мес.) - </string>
 
 
@@ -245,45 +261,25 @@
 
     <string name="tariff_details">Тариф: %s</string>
     <string name="tariff_label">Тариф: руб.</string>
-    <string name="pdf_table_previous">Предыдущие</string>
-    <string name="pdf_table_current">Текущие</string>
-
-
-    <string name="tariff">Тариф:</string>
+    <string name="tariff_card">Тариф: %.2f руб.</string>
 
     <!-- общая дата  -->
     <string name="payment_date">Дата платежа: %s</string>
-
-    <string name="current_reading_label_electricity">Текущие показания, (кВт.ч) - </string>
-    <string name="previous_reading_label_electricity">Предыдущие показания, (кВт.ч) - </string>
-
-    <string name="current_reading_txt_water_and_gas">Текущие показания, (куб.м.) - </string>
-    <string name="previous_reading_txt_water_and_gas">Предыдущие показания, (куб.м.) - </string>
-    <string name="to_be_paid">К оплате:</string>
 
     <string name="unit_cubic_meter"> м./куб.</string>
     <string name="unit_kilowatt_hour"> кВт/ч</string>
 
 
     <!-- запись в Историю по периоду-->
-    <string name="next_payment">Дата оплаты:  %1$s</string>
+
     <string name="period_months_format">Период: %d мес.</string>
-    <string name="tariff_card">Тариф: %.2f руб.</string>
+
 
     <!-- запись в Историю по счетчику-->
-    <string name="current_reading">Текущие показания:%1$.2f %2$s</string>
-    <string name="previous_reading">Предыдущие показания: %1$.2f %2$s</string>
+
     <string name="consumption">Расход: %1$.2f %2$s</string>
     <string name="currency_rub">К оплате: %.2f руб.</string>
 
-    <!-- запись в PDF файл по счетчику-->
-    <string name="current_reading_pdf">Текущие показания:</string>
-    <string name="previous_reading_pdf">Предыдущие показания:</string>
-    <string name="consumption_pdf">Расход:</string>
-
-    <!-- запись в PDF файл по периоду-->
-    <string name="period_pdf">Период:</string>
-    <string name="next_payment_pdf">Дата оплаты:</string>
     <!-- <string name="tariff_pdf">Тариф:</string>-->
 
     <string name="receipts_title">Квитанции (%s)</string>
