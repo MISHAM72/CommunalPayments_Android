@@ -1,4 +1,4 @@
-package com.github.misham72.communalpayments.presentation.screen.screens.troyka
+package com.github.misham72.communalpayments.presentation.screen.screens.osago
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -51,7 +51,7 @@ import com.github.misham72.communalpayments.domain.model.ValidationError
 import com.github.misham72.communalpayments.presentation.screen.components.EditProviderDetailsDialog
 import com.github.misham72.communalpayments.presentation.screen.components.ProviderDetailsDialog
 import com.github.misham72.communalpayments.presentation.screen.components.ServiceTopBar
-import com.github.misham72.communalpayments.presentation.screen.screens.receipts.DisplayReceiptsScreen
+import com.github.misham72.communalpayments.presentation.screen.screens.receipts.ReceiptsScreen
 import com.github.misham72.communalpayments.presentation.screen.screens.receipts.ReceiptsViewModel
 import com.github.misham72.communalpayments.presentation.ui.bank.BankSelectionDialog
 import com.github.misham72.communalpayments.presentation.utils.normalizeUrl
@@ -61,7 +61,7 @@ import com.github.misham72.communalpayments.presentation.utils.rememberCopyButto
 
 @SuppressLint("LocalContextGetResourceValueCall")
 @Composable
-fun DisplayTroykaScreen(viewModel: TroykaViewModel) {
+fun OsagoScreen(viewModel: OsagoViewModel, appContainer: AppContainer) {
     val showBankDialog = remember { mutableStateOf(false) }
     val showProviderDialog = remember { mutableStateOf(false) }
     val context = LocalContext.current
@@ -72,13 +72,12 @@ fun DisplayTroykaScreen(viewModel: TroykaViewModel) {
     val uiState by viewModel.uiState.collectAsState()
 
     // ----- Квитанции -----
-    val appContainer = AppContainer
     val receiptsViewModelFactory = ReceiptsViewModelFactory(appContainer.getReceiptsUseCase, appContainer.deleteReceiptUseCase, appContainer.saveReceiptUseCase)
     val receiptsViewModel: ReceiptsViewModel = viewModel(factory = receiptsViewModelFactory)
     var showReceipts by remember { mutableStateOf(false) }
     if (showReceipts) {
-        DisplayReceiptsScreen(
-            serviceKey = TroykaViewModel.SERVICE_KEY,
+        ReceiptsScreen(
+            serviceKey = OsagoViewModel.SERVICE_KEY,
             viewModel = receiptsViewModel,
             onBack = { showReceipts = false }
         )
@@ -91,7 +90,7 @@ fun DisplayTroykaScreen(viewModel: TroykaViewModel) {
         ) {
             ServiceTopBar(
 
-                title = uiState.providerDetails.customServiceName.ifBlank { stringResource(R.string.service_display_name_troyka) },
+                title = uiState.providerDetails.customServiceName.ifBlank { stringResource(R.string.service_display_name_osago) },
                 onEditClick = { viewModel.openAccountDialog() },
                 onTxtExport = { viewModel.onShareClick(context) },
                 modifier = Modifier.height(28.dp),
@@ -103,17 +102,15 @@ fun DisplayTroykaScreen(viewModel: TroykaViewModel) {
                     text = stringResource(R.string.payment_date, uiState.customDate), fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurface, modifier = Modifier.padding(top = 1.dp)
                 )
             }
-// Номер под названием (отдельная строка)
             if (uiState.providerDetails.accountNumber.isNotBlank()) {
                 Text(
-                    text = stringResource(R.string.personal_account, uiState.providerDetails.accountNumber), fontSize = 14.sp, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(top = 1.dp)
+                    text = stringResource(R.string.policy_number, uiState.providerDetails.accountNumber), fontSize = 14.sp, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(top = 1.dp)
                 )
             }
-            // Поле ввода - день платежа
             OutlinedTextField(
                 value = uiState.paymentDay,
                 onValueChange = viewModel::onPaymentDayChange,
-                label = { Text(stringResource(R.string.next_payment_pdf)) },  // явный текст
+                label = { Text(stringResource(R.string.next_payment_pdf)) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = 48.dp),
@@ -123,12 +120,10 @@ fun DisplayTroykaScreen(viewModel: TroykaViewModel) {
                     lineHeight = 20.sp
                 )
             )
-
-            // Поле ввода - период в месяцах
             OutlinedTextField(
                 value = uiState.periodMonths,
                 onValueChange = viewModel::onPeriodMonthsChange,
-                label = { Text(stringResource(R.string.period_months_label)) },  // явный текст
+                label = { Text(stringResource(R.string.period_months_label)) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = 48.dp),
@@ -138,12 +133,10 @@ fun DisplayTroykaScreen(viewModel: TroykaViewModel) {
                     lineHeight = 20.sp
                 )
             )
-
-            // Поле ввода - тариф
             OutlinedTextField(
                 value = uiState.providerDetails.tariff,
                 onValueChange = viewModel::onPriceTariffChange,
-                label = { Text(stringResource(R.string.tariff_label)) },  // явный текст
+                label = { Text(stringResource(R.string.tariff_label)) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = 48.dp),
@@ -154,7 +147,6 @@ fun DisplayTroykaScreen(viewModel: TroykaViewModel) {
                 )
             )
             Spacer(modifier = Modifier.height(3.dp))
-            // Кнопка расчета
             Button(
                 onClick = {
                     coinSound?.start()
@@ -183,11 +175,8 @@ fun DisplayTroykaScreen(viewModel: TroykaViewModel) {
                 }
             }
             val result = uiState.result ?: uiState.lastResult
-
             Card(
-                modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer
-                )
+                modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
             ) {
                 if (result != null) {
                     Column(
@@ -196,13 +185,11 @@ fun DisplayTroykaScreen(viewModel: TroykaViewModel) {
                             .padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Text(
-                            text = stringResource(R.string.result_troyka), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold
+                            text = stringResource(R.string.result_osago), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold
                         )
-
                         Text(
                             text = stringResource(R.string.next_payment, result.nextPayment), fontWeight = FontWeight.Bold, color = Color.Red
                         )
-
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -252,11 +239,12 @@ fun DisplayTroykaScreen(viewModel: TroykaViewModel) {
                 Text(stringResource(R.string.payment_details))
             }
 
-            Spacer(modifier = Modifier.height(10.dp)) // небольшой отступ для красоты
+            Spacer(modifier = Modifier.height(10.dp))
         }
         if (showBankDialog.value) {
             BankSelectionDialog(
-                onDismiss = { showBankDialog.value = false }
+                onDismiss = { showBankDialog.value = false },
+                appContainer = appContainer
             )
         }
         // Диалог выбора: ИНН или Л/С
@@ -284,4 +272,3 @@ fun DisplayTroykaScreen(viewModel: TroykaViewModel) {
         }
     }
 }
-

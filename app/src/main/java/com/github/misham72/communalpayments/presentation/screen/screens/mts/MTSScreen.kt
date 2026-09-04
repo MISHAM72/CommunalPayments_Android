@@ -1,4 +1,4 @@
-package com.github.misham72.communalpayments.presentation.screen.screens.tinkoff
+package com.github.misham72.communalpayments.presentation.screen.screens.mts
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -51,7 +51,7 @@ import com.github.misham72.communalpayments.domain.model.ValidationError
 import com.github.misham72.communalpayments.presentation.screen.components.EditProviderDetailsDialog
 import com.github.misham72.communalpayments.presentation.screen.components.ProviderDetailsDialog
 import com.github.misham72.communalpayments.presentation.screen.components.ServiceTopBar
-import com.github.misham72.communalpayments.presentation.screen.screens.receipts.DisplayReceiptsScreen
+import com.github.misham72.communalpayments.presentation.screen.screens.receipts.ReceiptsScreen
 import com.github.misham72.communalpayments.presentation.screen.screens.receipts.ReceiptsViewModel
 import com.github.misham72.communalpayments.presentation.ui.bank.BankSelectionDialog
 import com.github.misham72.communalpayments.presentation.utils.normalizeUrl
@@ -61,7 +61,7 @@ import com.github.misham72.communalpayments.presentation.utils.rememberCopyButto
 
 @SuppressLint("LocalContextGetResourceValueCall")
 @Composable
-fun DisplayTinkoffScreen(viewModel: TinkoffViewModel) {
+fun MTSScreen(viewModel: MTSViewModel, appContainer: AppContainer) {
     val showBankDialog = remember { mutableStateOf(false) }
     val showProviderDialog = remember { mutableStateOf(false) }
     val context = LocalContext.current
@@ -72,13 +72,12 @@ fun DisplayTinkoffScreen(viewModel: TinkoffViewModel) {
     val uiState by viewModel.uiState.collectAsState()
 
     // ----- Квитанции -----
-    val appContainer = AppContainer
     val receiptsViewModelFactory = ReceiptsViewModelFactory(appContainer.getReceiptsUseCase, appContainer.deleteReceiptUseCase, appContainer.saveReceiptUseCase)
     val receiptsViewModel: ReceiptsViewModel = viewModel(factory = receiptsViewModelFactory)
     var showReceipts by remember { mutableStateOf(false) }
     if (showReceipts) {
-        DisplayReceiptsScreen(
-            serviceKey = TinkoffViewModel.SERVICE_KEY,
+        ReceiptsScreen(
+            serviceKey = MTSViewModel.SERVICE_KEY,
             viewModel = receiptsViewModel,
             onBack = { showReceipts = false }
         )
@@ -92,7 +91,7 @@ fun DisplayTinkoffScreen(viewModel: TinkoffViewModel) {
         ) {
             ServiceTopBar(
 
-                title = uiState.providerDetails.customServiceName.ifBlank { stringResource(R.string.service_display_name_tinkoff) },
+                title = uiState.providerDetails.customServiceName.ifBlank { stringResource(R.string.service_display_name_mts) },
                 onEditClick = { viewModel.openAccountDialog() },
                 onTxtExport = { viewModel.onShareClick(context) },
                 modifier = Modifier.height(28.dp),
@@ -104,7 +103,6 @@ fun DisplayTinkoffScreen(viewModel: TinkoffViewModel) {
                     text = stringResource(R.string.payment_date, uiState.customDate), fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurface, modifier = Modifier.padding(top = 1.dp)
                 )
             }
-// Номер под названием (отдельная строка)
             if (uiState.providerDetails.accountNumber.isNotBlank()) {
                 Text(
                     text = stringResource(R.string.number_phone, uiState.providerDetails.accountNumber), fontSize = 14.sp, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(top = 1.dp)
@@ -155,7 +153,6 @@ fun DisplayTinkoffScreen(viewModel: TinkoffViewModel) {
                 )
             )
             Spacer(modifier = Modifier.height(3.dp))
-            // Кнопка расчета
             Button(
                 onClick = {
                     coinSound?.start()
@@ -183,6 +180,7 @@ fun DisplayTinkoffScreen(viewModel: TinkoffViewModel) {
                 null -> { /* ничего */
                 }
             }
+
             val result = uiState.result ?: uiState.lastResult
             Card(
                 modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(
@@ -196,7 +194,7 @@ fun DisplayTinkoffScreen(viewModel: TinkoffViewModel) {
                             .padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Text(
-                            text = stringResource(R.string.result_tinkoff), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold
+                            text = stringResource(R.string.result_mts), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold
                         )
 
                         Text(
@@ -251,15 +249,15 @@ fun DisplayTinkoffScreen(viewModel: TinkoffViewModel) {
             ) {
                 Text(stringResource(R.string.payment_details))
             }
-
             Spacer(modifier = Modifier.height(10.dp)) // небольшой отступ для красоты
         }
         if (showBankDialog.value) {
             BankSelectionDialog(
-                onDismiss = { showBankDialog.value = false }
+                onDismiss = { showBankDialog.value = false },
+                appContainer = appContainer
             )
         }
-        // Диалог выбора: ИНН или Л/С
+// Диалог выбора: ИНН или Л/С
         if (showProviderDialog.value) {
             ProviderDetailsDialog(providerDetails = uiState.providerDetails, onDismiss = { showProviderDialog.value = false }, onCopyText = { text ->
                 clipboardManager.setText(AnnotatedString(text))

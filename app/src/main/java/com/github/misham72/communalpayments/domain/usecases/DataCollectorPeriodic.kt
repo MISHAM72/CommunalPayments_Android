@@ -9,7 +9,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class PeriodicDataCollector(
+class DataCollectorPeriodic(
     private val repository: PeriodicRepository,
     private val settingsRepository: UserSettingsRepository,
     private val calculator: PeriodCalculator

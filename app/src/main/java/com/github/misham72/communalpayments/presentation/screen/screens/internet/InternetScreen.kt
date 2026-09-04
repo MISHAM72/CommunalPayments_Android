@@ -1,4 +1,4 @@
-package com.github.misham72.communalpayments.presentation.screen.screens.heating
+package com.github.misham72.communalpayments.presentation.screen.screens.internet
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -51,7 +51,7 @@ import com.github.misham72.communalpayments.domain.model.ValidationError
 import com.github.misham72.communalpayments.presentation.screen.components.EditProviderDetailsDialog
 import com.github.misham72.communalpayments.presentation.screen.components.ProviderDetailsDialog
 import com.github.misham72.communalpayments.presentation.screen.components.ServiceTopBar
-import com.github.misham72.communalpayments.presentation.screen.screens.receipts.DisplayReceiptsScreen
+import com.github.misham72.communalpayments.presentation.screen.screens.receipts.ReceiptsScreen
 import com.github.misham72.communalpayments.presentation.screen.screens.receipts.ReceiptsViewModel
 import com.github.misham72.communalpayments.presentation.ui.bank.BankSelectionDialog
 import com.github.misham72.communalpayments.presentation.utils.normalizeUrl
@@ -61,7 +61,7 @@ import com.github.misham72.communalpayments.presentation.utils.rememberCopyButto
 
 @SuppressLint("LocalContextGetResourceValueCall")
 @Composable
-fun DisplayZONTScreen(viewModel: ZONTViewModel) {
+fun InternetScreen(viewModel: InternetViewModel, appContainer: AppContainer) {
     val showBankDialog = remember { mutableStateOf(false) }
     val showProviderDialog = remember { mutableStateOf(false) }
     val context = LocalContext.current
@@ -72,13 +72,12 @@ fun DisplayZONTScreen(viewModel: ZONTViewModel) {
     val uiState by viewModel.uiState.collectAsState()
 
     // ----- Квитанции -----
-    val appContainer = AppContainer
     val receiptsViewModelFactory = ReceiptsViewModelFactory(appContainer.getReceiptsUseCase, appContainer.deleteReceiptUseCase, appContainer.saveReceiptUseCase)
     val receiptsViewModel: ReceiptsViewModel = viewModel(factory = receiptsViewModelFactory)
     var showReceipts by remember { mutableStateOf(false) }
     if (showReceipts) {
-        DisplayReceiptsScreen(
-            serviceKey = ZONTViewModel.SERVICE_KEY,
+        ReceiptsScreen(
+            serviceKey = InternetViewModel.SERVICE_KEY,
             viewModel = receiptsViewModel,
             onBack = { showReceipts = false }
         )
@@ -87,13 +86,10 @@ fun DisplayZONTScreen(viewModel: ZONTViewModel) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(1.dp)
-                .verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(1.dp)
+                .verticalScroll(rememberScrollState()), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(1.dp)
         ) {
             ServiceTopBar(
-
-                title = uiState.providerDetails.customServiceName.ifBlank { stringResource(R.string.service_display_name_zont) },
+                title = uiState.providerDetails.customServiceName.ifBlank { stringResource(R.string.service_display_name_internet) },
                 onEditClick = { viewModel.openAccountDialog() },
                 onTxtExport = { viewModel.onShareClick(context) },
                 modifier = Modifier.height(28.dp),
@@ -108,9 +104,10 @@ fun DisplayZONTScreen(viewModel: ZONTViewModel) {
 // Номер под названием (отдельная строка)
             if (uiState.providerDetails.accountNumber.isNotBlank()) {
                 Text(
-                    text = stringResource(R.string.number_phone, uiState.providerDetails.accountNumber), fontSize = 14.sp, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(top = 1.dp)
+                    text = stringResource(R.string.contract_number, uiState.providerDetails.accountNumber), fontSize = 14.sp, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(top = 1.dp)
                 )
             }
+
             // Поле ввода - день платежа
             OutlinedTextField(
                 value = uiState.paymentDay,
@@ -118,41 +115,28 @@ fun DisplayZONTScreen(viewModel: ZONTViewModel) {
                 label = { Text(stringResource(R.string.next_payment_pdf)) },  // явный текст
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(min = 48.dp),
-                singleLine = true,
-                textStyle = LocalTextStyle.current.copy(
-                    fontSize = 20.sp,
-                    lineHeight = 20.sp
+                    .heightIn(min = 48.dp), singleLine = true, textStyle = LocalTextStyle.current.copy(
+                    fontSize = 20.sp, lineHeight = 20.sp
                 )
             )
 
             // Поле ввода - период в месяцах
             OutlinedTextField(
-                value = uiState.periodMonths,
-                onValueChange = viewModel::onPeriodMonthsChange,
-                label = { Text(stringResource(R.string.period_months_label)) },  // явный текст
+                value = uiState.periodMonths, onValueChange = viewModel::onPeriodMonthsChange, label = { Text(stringResource(R.string.period_months_label)) },  // явный текст
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(min = 48.dp),
-                singleLine = true,
-                textStyle = LocalTextStyle.current.copy(
-                    fontSize = 20.sp,
-                    lineHeight = 20.sp
+                    .heightIn(min = 48.dp), singleLine = true, textStyle = LocalTextStyle.current.copy(
+                    fontSize = 20.sp, lineHeight = 20.sp
                 )
             )
 
             // Поле ввода - тариф
             OutlinedTextField(
-                value = uiState.providerDetails.tariff,
-                onValueChange = viewModel::onPriceTariffChange,
-                label = { Text(stringResource(R.string.tariff_label)) },  // явный текст
+                value = uiState.providerDetails.tariff, onValueChange = viewModel::onPriceTariffChange, label = { Text(stringResource(R.string.tariff_label)) },  // явный текст
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(min = 48.dp),
-                singleLine = true,
-                textStyle = LocalTextStyle.current.copy(
-                    fontSize = 20.sp,
-                    lineHeight = 20.sp
+                    .heightIn(min = 48.dp), singleLine = true, textStyle = LocalTextStyle.current.copy(
+                    fontSize = 20.sp, lineHeight = 20.sp
                 )
             )
             Spacer(modifier = Modifier.height(3.dp))
@@ -183,7 +167,6 @@ fun DisplayZONTScreen(viewModel: ZONTViewModel) {
                 null -> { /* ничего */
                 }
             }
-            // Результат с ТВОИМИ ресурсами
             val result = uiState.result ?: uiState.lastResult
             Card(
                 modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(
@@ -197,12 +180,13 @@ fun DisplayZONTScreen(viewModel: ZONTViewModel) {
                             .padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Text(
-                            text = stringResource(R.string.result_zont), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold
+                            text = stringResource(R.string.result_internet), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold
                         )
 
                         Text(
                             text = stringResource(R.string.next_payment, result.nextPayment), fontWeight = FontWeight.Bold, color = Color.Red
                         )
+
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -243,21 +227,20 @@ fun DisplayZONTScreen(viewModel: ZONTViewModel) {
             ) {
                 Text(stringResource(R.string.select_bank_to_pay))
             }
-            // Кнопка, открывающая диалог с выбором реквизитов
             Button(
                 onClick = {
                     copySound?.start()
                     showProviderDialog.value = true
-                },
-                modifier = Modifier.fillMaxWidth()
+                }, modifier = Modifier.fillMaxWidth()
             ) {
                 Text(stringResource(R.string.payment_details))
             }
-            Spacer(modifier = Modifier.height(10.dp)) // небольшой отступ для красоты
+            Spacer(modifier = Modifier.height(10.dp))
         }
         if (showBankDialog.value) {
             BankSelectionDialog(
-                onDismiss = { showBankDialog.value = false }
+                onDismiss = { showBankDialog.value = false },
+                appContainer = appContainer
             )
         }
         // Диалог выбора: ИНН или Л/С
@@ -276,18 +259,13 @@ fun DisplayZONTScreen(viewModel: ZONTViewModel) {
                 }
             })
         }
+
         if (uiState.showAccountDialog) {
-            EditProviderDetailsDialog(
-                details = uiState.providerDetails,
-                customDate = uiState.customDate,
-                onSave = { updatedDetails, updatedDate ->
-                    viewModel.saveProviderDetails(updatedDetails)
-                    viewModel.updateCustomDate(updatedDate)
-                    viewModel.closeAccountDialog()
-                },
-                onDismiss = { viewModel.closeAccountDialog() }
-            )
+            EditProviderDetailsDialog(details = uiState.providerDetails, customDate = uiState.customDate, onSave = { updatedDetails, updatedDate ->
+                viewModel.saveProviderDetails(updatedDetails)
+                viewModel.updateCustomDate(updatedDate)
+                viewModel.closeAccountDialog()
+            }, onDismiss = { viewModel.closeAccountDialog() })
         }
     }
 }
-

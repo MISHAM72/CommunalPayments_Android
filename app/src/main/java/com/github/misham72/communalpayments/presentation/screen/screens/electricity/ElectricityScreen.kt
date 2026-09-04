@@ -1,4 +1,4 @@
-package com.github.misham72.communalpayments.presentation.screen.screens.osago
+package com.github.misham72.communalpayments.presentation.screen.screens.electricity
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -51,7 +50,7 @@ import com.github.misham72.communalpayments.domain.model.ValidationError
 import com.github.misham72.communalpayments.presentation.screen.components.EditProviderDetailsDialog
 import com.github.misham72.communalpayments.presentation.screen.components.ProviderDetailsDialog
 import com.github.misham72.communalpayments.presentation.screen.components.ServiceTopBar
-import com.github.misham72.communalpayments.presentation.screen.screens.receipts.DisplayReceiptsScreen
+import com.github.misham72.communalpayments.presentation.screen.screens.receipts.ReceiptsScreen
 import com.github.misham72.communalpayments.presentation.screen.screens.receipts.ReceiptsViewModel
 import com.github.misham72.communalpayments.presentation.ui.bank.BankSelectionDialog
 import com.github.misham72.communalpayments.presentation.utils.normalizeUrl
@@ -61,7 +60,7 @@ import com.github.misham72.communalpayments.presentation.utils.rememberCopyButto
 
 @SuppressLint("LocalContextGetResourceValueCall")
 @Composable
-fun DisplayOsagoScreen(viewModel: OsagoViewModel) {
+fun ElectricityScreen(viewModel: ElectricityViewModel, appContainer: AppContainer) {
     val showBankDialog = remember { mutableStateOf(false) }
     val showProviderDialog = remember { mutableStateOf(false) }
     val context = LocalContext.current
@@ -72,26 +71,27 @@ fun DisplayOsagoScreen(viewModel: OsagoViewModel) {
     val uiState by viewModel.uiState.collectAsState()
 
     // ----- Квитанции -----
-    val appContainer = AppContainer
+
     val receiptsViewModelFactory = ReceiptsViewModelFactory(appContainer.getReceiptsUseCase, appContainer.deleteReceiptUseCase, appContainer.saveReceiptUseCase)
     val receiptsViewModel: ReceiptsViewModel = viewModel(factory = receiptsViewModelFactory)
     var showReceipts by remember { mutableStateOf(false) }
     if (showReceipts) {
-        DisplayReceiptsScreen(
-            serviceKey = OsagoViewModel.SERVICE_KEY,
+        ReceiptsScreen(
+            serviceKey = ElectricityViewModel.SERVICE_KEY,
             viewModel = receiptsViewModel,
             onBack = { showReceipts = false }
         )
     } else {
         Column(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
                 .padding(1.dp)
-                .verticalScroll(rememberScrollState()), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(1.dp)
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(1.dp)
         ) {
             ServiceTopBar(
-
-                title = uiState.providerDetails.customServiceName.ifBlank { stringResource(R.string.service_display_name_osago) },
+                title = uiState.providerDetails.customServiceName.ifBlank { stringResource(R.string.service_display_name_electricity) },
                 onEditClick = { viewModel.openAccountDialog() },
                 onTxtExport = { viewModel.onShareClick(context) },
                 modifier = Modifier.height(28.dp),
@@ -100,18 +100,24 @@ fun DisplayOsagoScreen(viewModel: OsagoViewModel) {
             )
             if (uiState.customDate.isNotBlank()) {
                 Text(
-                    text = stringResource(R.string.payment_date, uiState.customDate), fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurface, modifier = Modifier.padding(top = 1.dp)
+                    text = stringResource(R.string.payment_date, uiState.customDate),
+                    fontSize = 14.sp,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.padding(top = 1.dp)
                 )
             }
             if (uiState.providerDetails.accountNumber.isNotBlank()) {
                 Text(
-                    text = stringResource(R.string.policy_number, uiState.providerDetails.accountNumber), fontSize = 14.sp, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(top = 1.dp)
+                    text = stringResource(R.string.personal_account, uiState.providerDetails.accountNumber),
+                    fontSize = 14.sp,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(top = 1.dp)
                 )
             }
             OutlinedTextField(
-                value = uiState.paymentDay,
-                onValueChange = viewModel::onPaymentDayChange,
-                label = { Text(stringResource(R.string.next_payment_pdf)) },
+                value = uiState.currentReading,
+                onValueChange = viewModel::onCurrentReadingChange,
+                label = { Text(stringResource(R.string.current_reading_label_electricity)) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = 48.dp),
@@ -122,13 +128,12 @@ fun DisplayOsagoScreen(viewModel: OsagoViewModel) {
                 )
             )
             OutlinedTextField(
-                value = uiState.periodMonths,
-                onValueChange = viewModel::onPeriodMonthsChange,
-                label = { Text(stringResource(R.string.period_months_label)) },
+                value = uiState.previousReading,
+                onValueChange = viewModel::onPreviousReadingChange,
+                label = { Text(stringResource(R.string.previous_reading_label_electricity)) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = 48.dp),
-                singleLine = true,
                 textStyle = LocalTextStyle.current.copy(
                     fontSize = 20.sp,
                     lineHeight = 20.sp
@@ -136,12 +141,11 @@ fun DisplayOsagoScreen(viewModel: OsagoViewModel) {
             )
             OutlinedTextField(
                 value = uiState.providerDetails.tariff,
-                onValueChange = viewModel::onPriceTariffChange,
+                onValueChange = viewModel::onTariffChange,
                 label = { Text(stringResource(R.string.tariff_label)) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = 48.dp),
-                singleLine = true,
                 textStyle = LocalTextStyle.current.copy(
                     fontSize = 20.sp,
                     lineHeight = 20.sp
@@ -152,7 +156,8 @@ fun DisplayOsagoScreen(viewModel: OsagoViewModel) {
                 onClick = {
                     coinSound?.start()
                     viewModel.onCalculateClick()
-                }, modifier = Modifier.fillMaxWidth()
+                },
+                modifier = Modifier.fillMaxWidth()
             ) {
                 Text(stringResource(R.string.calculate_and_save))
             }
@@ -160,11 +165,13 @@ fun DisplayOsagoScreen(viewModel: OsagoViewModel) {
             val error = uiState.error
             when (error) {
                 ValidationError.InvalidInput -> Text(
-                    stringResource(R.string.error_invalid_input), color = Color.Red
+                    stringResource(R.string.error_invalid_input),
+                    color = Color.Red
                 )
 
                 ValidationError.SavingError -> Text(
-                    stringResource(R.string.error_saving), color = Color.Red
+                    stringResource(R.string.error_saving),
+                    color = Color.Red
                 )
 
                 is ValidationError.DomainError -> Text(
@@ -175,35 +182,50 @@ fun DisplayOsagoScreen(viewModel: OsagoViewModel) {
                 null -> { /* ничего */
                 }
             }
-            val result = uiState.result ?: uiState.lastResult
+            // Карточка с результатом (всегда видна)
             Card(
-                modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer
+                )
             ) {
+                val result = uiState.lastResult
                 if (result != null) {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)
+                            .padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Text(
-                            text = stringResource(R.string.result_osago), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold
+                            text = stringResource(R.string.result_electricity),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold
                         )
                         Text(
-                            text = stringResource(R.string.next_payment, result.nextPayment), fontWeight = FontWeight.Bold, color = Color.Red
+                            text = stringResource(
+                                R.string.consumption,
+                                result.consumption.value,
+                                stringResource(R.string.unit_kilowatt_hour)
+                            )
                         )
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             Text(
-                                text = stringResource(R.string.currency_rub, result.priceTariff),
+                                text = stringResource(R.string.currency_rub, result.payment.amount),
                                 style = MaterialTheme.typography.headlineSmall,
                                 color = Color.Red
                             )
                             IconButton(
                                 onClick = {
-                                    clipboardManager.setText(AnnotatedString(result.priceTariff.toString()))
-                                    Toast.makeText(context, context.getString(R.string.amount_copied, result.priceTariff), Toast.LENGTH_SHORT).show()
+                                    clipboardManager.setText(AnnotatedString(result.payment.amount.toString()))
+                                    Toast.makeText(
+                                        context,
+                                        context.getString(R.string.amount_copied, result.payment.amount),
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                 },
                                 modifier = Modifier.size(24.dp)
                             ) {
@@ -216,18 +238,20 @@ fun DisplayOsagoScreen(viewModel: OsagoViewModel) {
                     }
                 } else {
                     Text(
-                        text = stringResource(R.string.no_saved_result),
+                        text = stringResource(R.string.no_saved_result), // нужно добавить в strings.xml
                         modifier = Modifier.padding(16.dp),
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                     )
                 }
             }
+
             Spacer(modifier = Modifier.height(8.dp))
             Button(
                 onClick = {
                     bankSound?.start()
                     showBankDialog.value = true
-                }, modifier = Modifier.fillMaxWidth()
+                },
+                modifier = Modifier.fillMaxWidth()
             ) {
                 Text(stringResource(R.string.select_bank_to_pay))
             }
@@ -235,40 +259,52 @@ fun DisplayOsagoScreen(viewModel: OsagoViewModel) {
                 onClick = {
                     copySound?.start()
                     showProviderDialog.value = true
-                }, modifier = Modifier.fillMaxWidth()
+                },
+                modifier = Modifier.fillMaxWidth()
             ) {
                 Text(stringResource(R.string.payment_details))
             }
-
             Spacer(modifier = Modifier.height(10.dp))
         }
         if (showBankDialog.value) {
             BankSelectionDialog(
-                onDismiss = { showBankDialog.value = false }
+                onDismiss = { showBankDialog.value = false },
+                onBankSelected = { /* опционально */ },
+                appContainer = appContainer
             )
         }
-        // Диалог выбора: ИНН или Л/С
         if (showProviderDialog.value) {
-            ProviderDetailsDialog(providerDetails = uiState.providerDetails, onDismiss = { showProviderDialog.value = false }, onCopyText = { text ->
-                clipboardManager.setText(AnnotatedString(text))
-                Toast.makeText(context, R.string.copied, Toast.LENGTH_SHORT).show()
-            }, onOpenUrl = { url ->
-                val finalUrl = url.normalizeUrl()
-                val intent = Intent(Intent.ACTION_VIEW, finalUrl.toUri())
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                try {
-                    context.startActivity(intent)
-                } catch (_: Exception) {
-                    Toast.makeText(context, R.string.no_browser, Toast.LENGTH_SHORT).show()
+            ProviderDetailsDialog(
+                providerDetails = uiState.providerDetails,
+                onDismiss = { showProviderDialog.value = false },
+                onCopyText = { text ->
+                    clipboardManager.setText(AnnotatedString(text))
+                    Toast.makeText(context, R.string.copied, Toast.LENGTH_SHORT).show()
+                },
+                onOpenUrl = { url ->
+                    val finalUrl = url.normalizeUrl()
+                    val intent = Intent(Intent.ACTION_VIEW, finalUrl.toUri())
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    try {
+                        context.startActivity(intent)
+                    } catch (_: Exception) {
+                        Toast.makeText(context, R.string.no_browser, Toast.LENGTH_SHORT).show()
+                    }
                 }
-            })
+            )
         }
         if (uiState.showAccountDialog) {
-            EditProviderDetailsDialog(details = uiState.providerDetails, customDate = uiState.customDate, onSave = { updatedDetails, updatedDate ->
-                viewModel.saveProviderDetails(updatedDetails)
-                viewModel.updateCustomDate(updatedDate)
-                viewModel.closeAccountDialog()
-            }, onDismiss = { viewModel.closeAccountDialog() })
+            EditProviderDetailsDialog(
+                details = uiState.providerDetails,
+                customDate = uiState.customDate,
+                onSave = { updatedDetails, updatedDate ->
+                    viewModel.saveProviderDetails(updatedDetails)
+                    viewModel.updateCustomDate(updatedDate)
+                    viewModel.closeAccountDialog()
+                },
+                onDismiss = { viewModel.closeAccountDialog() }
+            )
         }
     }
 }
+

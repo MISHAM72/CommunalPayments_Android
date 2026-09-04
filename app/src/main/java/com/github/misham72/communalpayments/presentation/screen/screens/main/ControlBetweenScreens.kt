@@ -45,6 +45,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import com.github.misham72.communalpayments.R
+import com.github.misham72.communalpayments.di.AppContainer
+import com.github.misham72.communalpayments.di.IncomeViewModelFactory
 import com.github.misham72.communalpayments.domain.repository.UserSettingsRepository
 import com.github.misham72.communalpayments.domain.usecases.PdfHistoryUseCase
 import com.github.misham72.communalpayments.domain.usecases.GetAllServicesYearlySummaryUseCase
@@ -54,8 +56,7 @@ import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 import com.github.misham72.communalpayments.presentation.screen.components.ServiceTab
 import com.github.misham72.communalpayments.presentation.screen.navigation.getListInitialScreen
 import com.github.misham72.communalpayments.presentation.screen.screens.analytics.AllServicesSummaryScreen
-import com.github.misham72.communalpayments.presentation.screen.screens.analytics.IncomeViewModelFactory
-import com.github.misham72.communalpayments.presentation.screen.screens.history.SimpleHistoryScreen
+import com.github.misham72.communalpayments.presentation.screen.screens.history.HistoryScreen
 import com.github.misham72.communalpayments.presentation.theme.ThemePrefs
 import com.github.misham72.communalpayments.presentation.utils.LanguageManager
 import com.github.misham72.communalpayments.presentation.utils.rememberBoilerSoundPlayer
@@ -83,14 +84,15 @@ fun ControlBetweenScreens(
     incomeViewModelFactory: IncomeViewModelFactory,
     settingsRepository: UserSettingsRepository,
     onExportBackup: () -> Unit = {},
-    onImportBackup: () -> Unit = {}
+    onImportBackup: () -> Unit = {},
+    appContainer: AppContainer
 
 ) {
     val context = LocalContext.current
     var selectedService by remember { mutableIntStateOf(0) }
     val showHistory = remember { mutableStateOf(false) }
     val showAllServicesSummary = remember { mutableStateOf(false) }   // новый флаг
-    val services = getListInitialScreen()
+    val services = getListInitialScreen(appContainer)
 
     val defaultError = stringResource(R.string.error_load_default)
     var dueDates by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
@@ -126,10 +128,11 @@ fun ControlBetweenScreens(
             onBack = { onNavigateBack() },
             getAllServicesYearlySummaryUseCase = getAllServicesYearlySummaryUseCase,  // используем существующую переменную
             defaultErrorMessage = defaultError,
-            incomeFactory = incomeViewModelFactory
+            incomeFactory = incomeViewModelFactory,
+            appContainer = appContainer
         )
     } else if (showHistory.value) {
-        SimpleHistoryScreen(
+        HistoryScreen(
             onBack = { onNavigateBack() },
             initialService = services[selectedService].fileKey,
             getHistoryUseCase = getHistoryUseCase,

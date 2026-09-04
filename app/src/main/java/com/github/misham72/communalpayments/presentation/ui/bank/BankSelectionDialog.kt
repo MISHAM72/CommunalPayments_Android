@@ -33,10 +33,11 @@ import com.github.misham72.communalpayments.presentation.utils.BankPaymentHelper
 @Composable
 fun BankSelectionDialog(
     onDismiss: () -> Unit,
-    onBankSelected: (Bank) -> Unit = {}
+    onBankSelected: (Bank) -> Unit = {},
+    appContainer: AppContainer
 ) {
     val context = LocalContext.current
-    val repository = remember { AppContainer.bankRepository }
+    val repository = remember { appContainer.bankRepository }
     val banks = remember { repository.getSupportedBanks() }
 
     AlertDialog(

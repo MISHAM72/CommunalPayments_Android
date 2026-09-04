@@ -1,4 +1,4 @@
-package com.github.misham72.communalpayments.presentation.screen.screens.garbage
+package com.github.misham72.communalpayments.presentation.screen.screens.hostel
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -51,7 +51,7 @@ import com.github.misham72.communalpayments.domain.model.ValidationError
 import com.github.misham72.communalpayments.presentation.screen.components.EditProviderDetailsDialog
 import com.github.misham72.communalpayments.presentation.screen.components.ProviderDetailsDialog
 import com.github.misham72.communalpayments.presentation.screen.components.ServiceTopBar
-import com.github.misham72.communalpayments.presentation.screen.screens.receipts.DisplayReceiptsScreen
+import com.github.misham72.communalpayments.presentation.screen.screens.receipts.ReceiptsScreen
 import com.github.misham72.communalpayments.presentation.screen.screens.receipts.ReceiptsViewModel
 import com.github.misham72.communalpayments.presentation.ui.bank.BankSelectionDialog
 import com.github.misham72.communalpayments.presentation.utils.normalizeUrl
@@ -61,7 +61,7 @@ import com.github.misham72.communalpayments.presentation.utils.rememberCopyButto
 
 @SuppressLint("LocalContextGetResourceValueCall")
 @Composable
-fun DisplayGarbageScreen(viewModel: GarbageViewModel) {
+fun HostelScreen(viewModel: HostelViewModel, appContainer: AppContainer) {
     val showBankDialog = remember { mutableStateOf(false) }
     val showProviderDialog = remember { mutableStateOf(false) }
     val context = LocalContext.current
@@ -72,13 +72,12 @@ fun DisplayGarbageScreen(viewModel: GarbageViewModel) {
     val uiState by viewModel.uiState.collectAsState()
 
     // ----- Квитанции -----
-    val appContainer = AppContainer
     val receiptsViewModelFactory = ReceiptsViewModelFactory(appContainer.getReceiptsUseCase, appContainer.deleteReceiptUseCase, appContainer.saveReceiptUseCase)
     val receiptsViewModel: ReceiptsViewModel = viewModel(factory = receiptsViewModelFactory)
     var showReceipts by remember { mutableStateOf(false) }
     if (showReceipts) {
-        DisplayReceiptsScreen(
-            serviceKey = GarbageViewModel.SERVICE_KEY,
+        ReceiptsScreen(
+            serviceKey = HostelViewModel.SERVICE_KEY,
             viewModel = receiptsViewModel,
             onBack = { showReceipts = false }
         )
@@ -87,71 +86,63 @@ fun DisplayGarbageScreen(viewModel: GarbageViewModel) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(1.dp)
-                .verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(1.dp)
+                .verticalScroll(rememberScrollState()), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(1.dp)
         ) {
             ServiceTopBar(
-                title = uiState.providerDetails.customServiceName.ifBlank { stringResource(R.string.service_display_name_garbage) },
+
+                title = uiState.providerDetails.customServiceName.ifBlank { stringResource(R.string.service_display_name_hostel) },
                 onEditClick = { viewModel.openAccountDialog() },
                 onTxtExport = { viewModel.onShareClick(context) },
-                modifier = Modifier.height(28.dp),
                 onPdfExport = { viewModel.onPdfExport(context) },
-                onReceiptsClick = { showReceipts = true },   // ← добавлен параметр
+                modifier = Modifier.height(28.dp),
+                onReceiptsClick = { showReceipts = true }
             )
             if (uiState.customDate.isNotBlank()) {
                 Text(
-                    text = stringResource(R.string.payment_date, uiState.customDate),
-                    fontSize = 14.sp,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.padding(top = 1.dp)
+                    text = stringResource(R.string.payment_date, uiState.customDate), fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurface, modifier = Modifier.padding(top = 1.dp)
                 )
             }
+// Номер под названием (отдельная строка)
             if (uiState.providerDetails.accountNumber.isNotBlank()) {
                 Text(
-                    text = stringResource(R.string.personal_account, uiState.providerDetails.accountNumber),
-                    fontSize = 14.sp,
-                    color = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.padding(top = 1.dp)
+                    text = stringResource(R.string.address, uiState.providerDetails.accountNumber), fontSize = 14.sp, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(top = 1.dp)
                 )
             }
+            // Поле ввода - день платежа
             OutlinedTextField(
                 value = uiState.paymentDay,
                 onValueChange = viewModel::onPaymentDayChange,
-                label = { Text(stringResource(R.string.next_payment_pdf)) },
+                label = { Text(stringResource(R.string.next_payment_pdf)) },  // явный текст
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(min = 48.dp),
-                singleLine = true,
-                textStyle = LocalTextStyle.current.copy(fontSize = 20.sp, lineHeight = 20.sp)
+                    .heightIn(min = 48.dp), singleLine = true, textStyle = LocalTextStyle.current.copy(
+                    fontSize = 20.sp, lineHeight = 20.sp
+                )
             )
+
+            // Поле ввода - период в месяцах
             OutlinedTextField(
-                value = uiState.periodMonths,
-                onValueChange = viewModel::onPeriodMonthsChange,
-                label = { Text(stringResource(R.string.period_months_label)) },
-                modifier = Modifier
+                value = uiState.periodMonths, onValueChange = viewModel::onPeriodMonthsChange, label = { Text(stringResource(R.string.period_months_label)) }, modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(min = 48.dp),
-                singleLine = true,
-                textStyle = LocalTextStyle.current.copy(fontSize = 20.sp, lineHeight = 20.sp)
+                    .heightIn(min = 48.dp), singleLine = true, textStyle = LocalTextStyle.current.copy(
+                    fontSize = 20.sp, lineHeight = 20.sp
+                )
             )
+
+            // Поле ввода - тариф
             OutlinedTextField(
-                value = uiState.providerDetails.tariff,
-                onValueChange = viewModel::onPriceTariffChange,
-                label = { Text(stringResource(R.string.tariff_label)) },
-                modifier = Modifier
+                value = uiState.providerDetails.tariff, onValueChange = viewModel::onPriceTariffChange, label = { Text(stringResource(R.string.tariff_label)) }, modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(min = 48.dp),
-                singleLine = true,
-                textStyle = LocalTextStyle.current.copy(fontSize = 20.sp, lineHeight = 20.sp)
+                    .heightIn(min = 48.dp), singleLine = true, textStyle = LocalTextStyle.current.copy(
+                    fontSize = 20.sp, lineHeight = 20.sp
+                )
             )
             Spacer(modifier = Modifier.height(3.dp))
             Button(
                 onClick = {
                     coinSound?.start()
                     viewModel.onCalculateClick()
-                },
-                modifier = Modifier.fillMaxWidth()
+                }, modifier = Modifier.fillMaxWidth()
             ) {
                 Text(stringResource(R.string.calculate_and_save))
             }
@@ -159,13 +150,11 @@ fun DisplayGarbageScreen(viewModel: GarbageViewModel) {
             val error = uiState.error
             when (error) {
                 ValidationError.InvalidInput -> Text(
-                    stringResource(R.string.error_invalid_input),
-                    color = Color.Red
+                    stringResource(R.string.error_invalid_input), color = Color.Red
                 )
 
                 ValidationError.SavingError -> Text(
-                    stringResource(R.string.error_saving),
-                    color = Color.Red
+                    stringResource(R.string.error_saving), color = Color.Red
                 )
 
                 is ValidationError.DomainError -> Text(
@@ -178,8 +167,7 @@ fun DisplayGarbageScreen(viewModel: GarbageViewModel) {
             }
             val result = uiState.result ?: uiState.lastResult
             Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
+                modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer
                 )
             ) {
@@ -187,19 +175,16 @@ fun DisplayGarbageScreen(viewModel: GarbageViewModel) {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                            .padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Text(
-                            text = stringResource(R.string.result_garbage),
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold
+                            text = stringResource(R.string.result_hostel), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold
                         )
+
                         Text(
-                            text = stringResource(R.string.next_payment, result.nextPayment),
-                            fontWeight = FontWeight.Bold,
-                            color = Color.Red
+                            text = stringResource(R.string.next_payment, result.nextPayment), fontWeight = FontWeight.Bold, color = Color.Red
                         )
+
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -232,12 +217,12 @@ fun DisplayGarbageScreen(viewModel: GarbageViewModel) {
                 }
             }
             Spacer(modifier = Modifier.height(8.dp))
+
             Button(
                 onClick = {
                     bankSound?.start()
                     showBankDialog.value = true
-                },
-                modifier = Modifier.fillMaxWidth()
+                }, modifier = Modifier.fillMaxWidth()
             ) {
                 Text(stringResource(R.string.select_bank_to_pay))
             }
@@ -245,52 +230,41 @@ fun DisplayGarbageScreen(viewModel: GarbageViewModel) {
                 onClick = {
                     copySound?.start()
                     showProviderDialog.value = true
-                },
-                modifier = Modifier.fillMaxWidth()
+                }, modifier = Modifier.fillMaxWidth()
             ) {
                 Text(stringResource(R.string.payment_details))
             }
-            Spacer(modifier = Modifier.height(10.dp))
+
+            Spacer(modifier = Modifier.height(10.dp)) // небольшой отступ для красоты
         }
         if (showBankDialog.value) {
             BankSelectionDialog(
                 onDismiss = { showBankDialog.value = false },
-                onBankSelected = { /* опционально */ }
+                appContainer = appContainer
             )
         }
-
+        // Диалог выбора: ИНН или Л/С
         if (showProviderDialog.value) {
-            ProviderDetailsDialog(
-                providerDetails = uiState.providerDetails,
-                onDismiss = { showProviderDialog.value = false },
-                onCopyText = { text ->
-                    clipboardManager.setText(AnnotatedString(text))
-                    Toast.makeText(context, R.string.copied, Toast.LENGTH_SHORT).show()
-                },
-                onOpenUrl = { url ->
-                    val finalUrl = url.normalizeUrl()
-                    val intent = Intent(Intent.ACTION_VIEW, finalUrl.toUri())
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    try {
-                        context.startActivity(intent)
-                    } catch (_: Exception) {
-                        Toast.makeText(context, R.string.no_browser, Toast.LENGTH_SHORT).show()
-                    }
+            ProviderDetailsDialog(providerDetails = uiState.providerDetails, onDismiss = { showProviderDialog.value = false }, onCopyText = { text ->
+                clipboardManager.setText(AnnotatedString(text))
+                Toast.makeText(context, R.string.copied, Toast.LENGTH_SHORT).show()
+            }, onOpenUrl = { url ->
+                val finalUrl = url.normalizeUrl()
+                val intent = Intent(Intent.ACTION_VIEW, finalUrl.toUri())
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                try {
+                    context.startActivity(intent)
+                } catch (_: Exception) {
+                    Toast.makeText(context, R.string.no_browser, Toast.LENGTH_SHORT).show()
                 }
-            )
+            })
         }
         if (uiState.showAccountDialog) {
-            EditProviderDetailsDialog(
-                details = uiState.providerDetails,
-                customDate = uiState.customDate,
-                onSave = { updatedDetails, updatedDate ->
-                    viewModel.saveProviderDetails(updatedDetails)
-                    viewModel.updateCustomDate(updatedDate)
-                    viewModel.closeAccountDialog()
-                },
-                onDismiss = { viewModel.closeAccountDialog() }
-            )
+            EditProviderDetailsDialog(details = uiState.providerDetails, customDate = uiState.customDate, onSave = { updatedDetails, updatedDate ->
+                viewModel.saveProviderDetails(updatedDetails)
+                viewModel.updateCustomDate(updatedDate)
+                viewModel.closeAccountDialog()
+            }, onDismiss = { viewModel.closeAccountDialog() })
         }
     }
 }
-

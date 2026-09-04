@@ -6,9 +6,10 @@ import com.github.misham72.communalpayments.di.AppContainer
 
 //это стартовая площадка приложения, которая при запуске включает фоновый планировщик уведомлений.
 class CommunalPaymentsApp : Application() {
+    lateinit var appContainer: AppContainer
     override fun onCreate() {
         super.onCreate()
-        AppContainer.init(this)
+        appContainer = AppContainer(this)
         // Запускаем периодическую проверку уведомлений (раз в день)
         NotificationScheduler.schedulePeriodic(this)
     }

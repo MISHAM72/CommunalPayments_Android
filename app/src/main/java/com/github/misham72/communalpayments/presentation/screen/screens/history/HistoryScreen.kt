@@ -65,7 +65,7 @@ import java.time.LocalDate
 
 @Composable
 //🔴//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-fun SimpleHistoryScreen(
+fun HistoryScreen(
     onBack: () -> Unit,
     initialService: String,
     getHistoryUseCase: GetHistoryUseCase,

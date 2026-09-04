@@ -25,7 +25,7 @@ import androidx.core.view.WindowCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.github.misham72.communalpayments.R
-import com.github.misham72.communalpayments.di.AppContainer
+import com.github.misham72.communalpayments.app.CommunalPaymentsApp
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 import com.github.misham72.communalpayments.presentation.common.UiConstants
 import com.github.misham72.communalpayments.presentation.screen.screens.main.ControlBetweenScreens
@@ -36,9 +36,10 @@ import com.github.misham72.communalpayments.presentation.viewmodel.BackupViewMod
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
+    private val container by lazy { (application as CommunalPaymentsApp).appContainer }
 
     private val backupViewModel by lazy {
-        BackupViewModel(AppContainer.exportBackupUseCase, AppContainer.importBackupUseCase)
+        BackupViewModel(container.exportBackupUseCase, container.importBackupUseCase)
     }
 
     private val createBackupLauncher = registerForActivityResult(
@@ -141,16 +142,17 @@ class MainActivity : AppCompatActivity() {
                         .systemBarsPadding()
                 ) {
                     ControlBetweenScreens(
-                        pdfHistoryUseCase = AppContainer.pdfHistoryUseCase,
-                        getHistoryUseCase = AppContainer.getHistoryUseCase,
-                        saveHistoryUseCase = AppContainer.saveHistoryUseCase,
-                        getAllServicesYearlySummaryUseCase = AppContainer.getAllServicesYearlySummaryUseCase,
-                        incomeViewModelFactory = AppContainer.incomeViewModelFactory,
-                        settingsRepository = AppContainer.settingsRepository,
+                        pdfHistoryUseCase = container.pdfHistoryUseCase,
+                        getHistoryUseCase = container.getHistoryUseCase,
+                        saveHistoryUseCase = container.saveHistoryUseCase,
+                        getAllServicesYearlySummaryUseCase = container.getAllServicesYearlySummaryUseCase,
+                        incomeViewModelFactory = container.incomeViewModelFactory,
+                        settingsRepository = container.settingsRepository,
                         onExportBackup = { createBackupLauncher.launch("backup_${System.currentTimeMillis()}.zip") },
                         onImportBackup = {
                             openBackupLauncher.launch(arrayOf("application/zip"))
-                        }
+                        },
+                        appContainer = container
                     )
                 }
             }
@@ -173,6 +175,7 @@ class MainActivity : AppCompatActivity() {
         }
         var uri: Uri? = null
 
+        @Suppress("DEPRECATION")
         when (intent.action) {
             Intent.ACTION_VIEW -> uri = intent.data
             Intent.ACTION_SEND -> uri = intent.getParcelableExtra(Intent.EXTRA_STREAM)
@@ -244,7 +247,7 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
             try {
                 Toast.makeText(this@MainActivity, getString(R.string.saving_receipt), Toast.LENGTH_SHORT).show()
-                val receipt = AppContainer.saveReceiptUseCase(serviceKey, inputStream, fileName)
+                val receipt = container.saveReceiptUseCase(serviceKey, inputStream, fileName)
                 Toast.makeText(
                     this@MainActivity,
                     getString(R.string.receipt_saved, receipt.fileName, receipt.filePath),

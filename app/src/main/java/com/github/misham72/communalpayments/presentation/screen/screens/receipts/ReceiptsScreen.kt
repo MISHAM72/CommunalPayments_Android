@@ -51,7 +51,7 @@ import java.text.SimpleDateFormat
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DisplayReceiptsScreen(
+fun ReceiptsScreen(
     serviceKey: String,
     viewModel: ReceiptsViewModel,
     onBack: () -> Unit

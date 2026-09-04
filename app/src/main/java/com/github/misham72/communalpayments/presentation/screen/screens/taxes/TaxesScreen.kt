@@ -1,4 +1,4 @@
-package com.github.misham72.communalpayments.presentation.screen.screens.hostel
+package com.github.misham72.communalpayments.presentation.screen.screens.taxes
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -51,7 +51,7 @@ import com.github.misham72.communalpayments.domain.model.ValidationError
 import com.github.misham72.communalpayments.presentation.screen.components.EditProviderDetailsDialog
 import com.github.misham72.communalpayments.presentation.screen.components.ProviderDetailsDialog
 import com.github.misham72.communalpayments.presentation.screen.components.ServiceTopBar
-import com.github.misham72.communalpayments.presentation.screen.screens.receipts.DisplayReceiptsScreen
+import com.github.misham72.communalpayments.presentation.screen.screens.receipts.ReceiptsScreen
 import com.github.misham72.communalpayments.presentation.screen.screens.receipts.ReceiptsViewModel
 import com.github.misham72.communalpayments.presentation.ui.bank.BankSelectionDialog
 import com.github.misham72.communalpayments.presentation.utils.normalizeUrl
@@ -61,7 +61,7 @@ import com.github.misham72.communalpayments.presentation.utils.rememberCopyButto
 
 @SuppressLint("LocalContextGetResourceValueCall")
 @Composable
-fun DisplayHostelScreen(viewModel: HostelViewModel) {
+fun TaxesScreen(viewModel: TaxesViewModel, appContainer: AppContainer) {
     val showBankDialog = remember { mutableStateOf(false) }
     val showProviderDialog = remember { mutableStateOf(false) }
     val context = LocalContext.current
@@ -72,13 +72,13 @@ fun DisplayHostelScreen(viewModel: HostelViewModel) {
     val uiState by viewModel.uiState.collectAsState()
 
     // ----- Квитанции -----
-    val appContainer = AppContainer
+
     val receiptsViewModelFactory = ReceiptsViewModelFactory(appContainer.getReceiptsUseCase, appContainer.deleteReceiptUseCase, appContainer.saveReceiptUseCase)
     val receiptsViewModel: ReceiptsViewModel = viewModel(factory = receiptsViewModelFactory)
     var showReceipts by remember { mutableStateOf(false) }
     if (showReceipts) {
-        DisplayReceiptsScreen(
-            serviceKey = HostelViewModel.SERVICE_KEY,
+        ReceiptsScreen(
+            serviceKey = TaxesViewModel.SERVICE_KEY,
             viewModel = receiptsViewModel,
             onBack = { showReceipts = false }
         )
@@ -88,14 +88,15 @@ fun DisplayHostelScreen(viewModel: HostelViewModel) {
                 .fillMaxSize()
                 .padding(1.dp)
                 .verticalScroll(rememberScrollState()), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(1.dp)
+
         ) {
             ServiceTopBar(
 
-                title = uiState.providerDetails.customServiceName.ifBlank { stringResource(R.string.service_display_name_hostel) },
+                title = uiState.providerDetails.customServiceName.ifBlank { stringResource(R.string.service_display_name_taxes) },
                 onEditClick = { viewModel.openAccountDialog() },
                 onTxtExport = { viewModel.onShareClick(context) },
-                onPdfExport = { viewModel.onPdfExport(context) },
                 modifier = Modifier.height(28.dp),
+                onPdfExport = { viewModel.onPdfExport(context) },
                 onReceiptsClick = { showReceipts = true }
             )
             if (uiState.customDate.isNotBlank()) {
@@ -106,7 +107,7 @@ fun DisplayHostelScreen(viewModel: HostelViewModel) {
 // Номер под названием (отдельная строка)
             if (uiState.providerDetails.accountNumber.isNotBlank()) {
                 Text(
-                    text = stringResource(R.string.address, uiState.providerDetails.accountNumber), fontSize = 14.sp, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(top = 1.dp)
+                    text = stringResource(R.string.personal_account_taxes, uiState.providerDetails.accountNumber), fontSize = 14.sp, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(top = 1.dp)
                 )
             }
             // Поле ввода - день платежа
@@ -116,26 +117,41 @@ fun DisplayHostelScreen(viewModel: HostelViewModel) {
                 label = { Text(stringResource(R.string.next_payment_pdf)) },  // явный текст
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(min = 48.dp), singleLine = true, textStyle = LocalTextStyle.current.copy(
-                    fontSize = 20.sp, lineHeight = 20.sp
+                    .heightIn(min = 48.dp),
+                singleLine = true,
+                textStyle = LocalTextStyle.current.copy(
+                    fontSize = 20.sp,
+                    lineHeight = 20.sp
                 )
             )
 
             // Поле ввода - период в месяцах
             OutlinedTextField(
-                value = uiState.periodMonths, onValueChange = viewModel::onPeriodMonthsChange, label = { Text(stringResource(R.string.period_months_label)) }, modifier = Modifier
+                value = uiState.periodMonths,
+                onValueChange = viewModel::onPeriodMonthsChange,
+                label = { Text(stringResource(R.string.period_months_label)) },  // явный текст
+                modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(min = 48.dp), singleLine = true, textStyle = LocalTextStyle.current.copy(
-                    fontSize = 20.sp, lineHeight = 20.sp
+                    .heightIn(min = 48.dp),
+                singleLine = true,
+                textStyle = LocalTextStyle.current.copy(
+                    fontSize = 20.sp,
+                    lineHeight = 20.sp
                 )
             )
 
             // Поле ввода - тариф
             OutlinedTextField(
-                value = uiState.providerDetails.tariff, onValueChange = viewModel::onPriceTariffChange, label = { Text(stringResource(R.string.tariff_label)) }, modifier = Modifier
+                value = uiState.providerDetails.tariff,
+                onValueChange = viewModel::onPriceTariffChange,
+                label = { Text(stringResource(R.string.tariff_label)) },  // явный текст
+                modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(min = 48.dp), singleLine = true, textStyle = LocalTextStyle.current.copy(
-                    fontSize = 20.sp, lineHeight = 20.sp
+                    .heightIn(min = 48.dp),
+                singleLine = true,
+                textStyle = LocalTextStyle.current.copy(
+                    fontSize = 20.sp,
+                    lineHeight = 20.sp
                 )
             )
             Spacer(modifier = Modifier.height(3.dp))
@@ -179,7 +195,7 @@ fun DisplayHostelScreen(viewModel: HostelViewModel) {
                             .padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Text(
-                            text = stringResource(R.string.result_hostel), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold
+                            text = stringResource(R.string.result_taxes), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold
                         )
 
                         Text(
@@ -218,7 +234,6 @@ fun DisplayHostelScreen(viewModel: HostelViewModel) {
                 }
             }
             Spacer(modifier = Modifier.height(8.dp))
-
             Button(
                 onClick = {
                     bankSound?.start()
@@ -236,11 +251,12 @@ fun DisplayHostelScreen(viewModel: HostelViewModel) {
                 Text(stringResource(R.string.payment_details))
             }
 
-            Spacer(modifier = Modifier.height(10.dp)) // небольшой отступ для красоты
+            Spacer(modifier = Modifier.height(10.dp))
         }
         if (showBankDialog.value) {
             BankSelectionDialog(
-                onDismiss = { showBankDialog.value = false }
+                onDismiss = { showBankDialog.value = false },
+                appContainer = appContainer
             )
         }
         // Диалог выбора: ИНН или Л/С

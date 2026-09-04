@@ -59,6 +59,8 @@ import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.misham72.communalpayments.R
+import com.github.misham72.communalpayments.di.AppContainer
+import com.github.misham72.communalpayments.di.IncomeViewModelFactory
 import com.github.misham72.communalpayments.domain.model.ExpenseSummary
 import com.github.misham72.communalpayments.domain.model.incomes.IncomeCategory
 import com.github.misham72.communalpayments.domain.model.incomes.IncomeRecord
@@ -76,12 +78,13 @@ private val chartColors = listOf(
 
 @Composable
 fun AllServicesSummaryScreen(
-    onBack: () -> Unit, getAllServicesYearlySummaryUseCase: GetAllServicesYearlySummaryUseCase, defaultErrorMessage: String = stringResource(R.string.error), incomeFactory: IncomeViewModelFactory
+    onBack: () -> Unit, getAllServicesYearlySummaryUseCase: GetAllServicesYearlySummaryUseCase, defaultErrorMessage: String = stringResource(R.string.error), incomeFactory: IncomeViewModelFactory, appContainer: AppContainer
 ) {
-    val allServices = getListInitialScreen()
+    val allServices = getListInitialScreen(appContainer)
     val expensesFactory = remember(allServices, defaultErrorMessage) {
         AllServicesSummaryViewModelFactory(
-            useCase = getAllServicesYearlySummaryUseCase, defaultErrorMessage = defaultErrorMessage
+            useCase = getAllServicesYearlySummaryUseCase,
+            defaultErrorMessage = defaultErrorMessage
         )
     }
 
@@ -115,7 +118,7 @@ fun AllServicesSummaryScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             when (selectedTab) {
-                0 -> ExpensesTab(expensesFactory)
+                0 -> ExpensesTab(expensesFactory, appContainer)
                 1 -> IncomesTab(incomeFactory)
             }
         }
@@ -124,10 +127,10 @@ fun AllServicesSummaryScreen(
 
 // ---------- Вкладка расходов ----------
 @Composable
-private fun ExpensesTab(factory: AllServicesSummaryViewModelFactory) {
+private fun ExpensesTab(factory: AllServicesSummaryViewModelFactory, appContainer: AppContainer) {
     val viewModel: AllServicesSummaryViewModel = viewModel(factory = factory)
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val allServices = getListInitialScreen()
+    val allServices = getListInitialScreen(appContainer)
 
     LaunchedEffect(Unit) {
         viewModel.loadSummary(allServices.map { it.fileKey })

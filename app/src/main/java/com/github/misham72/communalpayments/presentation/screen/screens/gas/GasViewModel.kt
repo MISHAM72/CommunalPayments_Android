@@ -13,7 +13,7 @@ import com.github.misham72.communalpayments.domain.repository.IProviderRepositor
 import com.github.misham72.communalpayments.domain.repository.MeterRepository
 import com.github.misham72.communalpayments.domain.repository.UserSettingsRepository
 import com.github.misham72.communalpayments.domain.usecases.PdfHistoryUseCase
-import com.github.misham72.communalpayments.domain.usecases.MeterDataCollector
+import com.github.misham72.communalpayments.domain.usecases.DataCollectorMeter
 import com.github.misham72.communalpayments.domain.usecases.TextHistoryUseCase
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 import com.google.gson.Gson
@@ -25,7 +25,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class GasViewModel(
-    private val meterDataCollector: MeterDataCollector,
+    private val dataCollectorMeter: DataCollectorMeter,
     private val meterRepository: MeterRepository,
     private val settingsRepository: UserSettingsRepository,
     private val repository: IProviderRepository,
@@ -140,7 +140,7 @@ class GasViewModel(
 
         viewModelScope.launch {
             try {
-                val data = meterDataCollector.collectMeterData(
+                val data = dataCollectorMeter.collectMeterData(
                     repository = meterRepository,
                     current = current,
                     previous = previous,

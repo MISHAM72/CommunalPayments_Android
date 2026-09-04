@@ -9,7 +9,7 @@ import com.github.misham72.communalpayments.domain.model.periodic.PeriodicData
 import com.github.misham72.communalpayments.domain.repository.IProviderRepository
 import com.github.misham72.communalpayments.domain.repository.UserSettingsRepository
 import com.github.misham72.communalpayments.domain.usecases.PdfHistoryUseCase
-import com.github.misham72.communalpayments.domain.usecases.PeriodicDataCollector
+import com.github.misham72.communalpayments.domain.usecases.DataCollectorPeriodic
 import com.github.misham72.communalpayments.domain.usecases.TextHistoryUseCase
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 import com.github.misham72.communalpayments.presentation.common.UiMessages
@@ -26,7 +26,7 @@ import java.util.Locale
 
 
 class TinkoffViewModel(
-    private val periodicDataCollector: PeriodicDataCollector,
+    private val dataCollectorPeriodic: DataCollectorPeriodic,
     private val settingsRepository: UserSettingsRepository,
     private val repository: IProviderRepository,
     private val textHistoryUseCase: TextHistoryUseCase,
@@ -155,7 +155,7 @@ class TinkoffViewModel(
         val startDate = parseStartDate(_uiState.value.customDate)
         viewModelScope.launch {
             try {
-                val data = periodicDataCollector.collectPeriodicData(
+                val data = dataCollectorPeriodic.collectPeriodicData(
                     serviceKey = ServiceKeys.TINKOFF,
                     isHistory = true,
                     paymentDay = paymentDay,

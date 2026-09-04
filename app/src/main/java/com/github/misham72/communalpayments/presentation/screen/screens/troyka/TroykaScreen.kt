@@ -1,4 +1,4 @@
-package com.github.misham72.communalpayments.presentation.screen.screens.mts
+package com.github.misham72.communalpayments.presentation.screen.screens.troyka
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -51,7 +51,7 @@ import com.github.misham72.communalpayments.domain.model.ValidationError
 import com.github.misham72.communalpayments.presentation.screen.components.EditProviderDetailsDialog
 import com.github.misham72.communalpayments.presentation.screen.components.ProviderDetailsDialog
 import com.github.misham72.communalpayments.presentation.screen.components.ServiceTopBar
-import com.github.misham72.communalpayments.presentation.screen.screens.receipts.DisplayReceiptsScreen
+import com.github.misham72.communalpayments.presentation.screen.screens.receipts.ReceiptsScreen
 import com.github.misham72.communalpayments.presentation.screen.screens.receipts.ReceiptsViewModel
 import com.github.misham72.communalpayments.presentation.ui.bank.BankSelectionDialog
 import com.github.misham72.communalpayments.presentation.utils.normalizeUrl
@@ -61,7 +61,7 @@ import com.github.misham72.communalpayments.presentation.utils.rememberCopyButto
 
 @SuppressLint("LocalContextGetResourceValueCall")
 @Composable
-fun DisplayMTSScreen(viewModel: MTSViewModel) {
+fun TroykaScreen(viewModel: TroykaViewModel, appContainer: AppContainer) {
     val showBankDialog = remember { mutableStateOf(false) }
     val showProviderDialog = remember { mutableStateOf(false) }
     val context = LocalContext.current
@@ -72,13 +72,12 @@ fun DisplayMTSScreen(viewModel: MTSViewModel) {
     val uiState by viewModel.uiState.collectAsState()
 
     // ----- Квитанции -----
-    val appContainer = AppContainer
     val receiptsViewModelFactory = ReceiptsViewModelFactory(appContainer.getReceiptsUseCase, appContainer.deleteReceiptUseCase, appContainer.saveReceiptUseCase)
     val receiptsViewModel: ReceiptsViewModel = viewModel(factory = receiptsViewModelFactory)
     var showReceipts by remember { mutableStateOf(false) }
     if (showReceipts) {
-        DisplayReceiptsScreen(
-            serviceKey = MTSViewModel.SERVICE_KEY,
+        ReceiptsScreen(
+            serviceKey = TroykaViewModel.SERVICE_KEY,
             viewModel = receiptsViewModel,
             onBack = { showReceipts = false }
         )
@@ -88,11 +87,10 @@ fun DisplayMTSScreen(viewModel: MTSViewModel) {
                 .fillMaxSize()
                 .padding(1.dp)
                 .verticalScroll(rememberScrollState()), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(1.dp)
-
         ) {
             ServiceTopBar(
 
-                title = uiState.providerDetails.customServiceName.ifBlank { stringResource(R.string.service_display_name_mts) },
+                title = uiState.providerDetails.customServiceName.ifBlank { stringResource(R.string.service_display_name_troyka) },
                 onEditClick = { viewModel.openAccountDialog() },
                 onTxtExport = { viewModel.onShareClick(context) },
                 modifier = Modifier.height(28.dp),
@@ -104,9 +102,10 @@ fun DisplayMTSScreen(viewModel: MTSViewModel) {
                     text = stringResource(R.string.payment_date, uiState.customDate), fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurface, modifier = Modifier.padding(top = 1.dp)
                 )
             }
+// Номер под названием (отдельная строка)
             if (uiState.providerDetails.accountNumber.isNotBlank()) {
                 Text(
-                    text = stringResource(R.string.number_phone, uiState.providerDetails.accountNumber), fontSize = 14.sp, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(top = 1.dp)
+                    text = stringResource(R.string.personal_account, uiState.providerDetails.accountNumber), fontSize = 14.sp, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(top = 1.dp)
                 )
             }
             // Поле ввода - день платежа
@@ -154,6 +153,7 @@ fun DisplayMTSScreen(viewModel: MTSViewModel) {
                 )
             )
             Spacer(modifier = Modifier.height(3.dp))
+            // Кнопка расчета
             Button(
                 onClick = {
                     coinSound?.start()
@@ -181,8 +181,8 @@ fun DisplayMTSScreen(viewModel: MTSViewModel) {
                 null -> { /* ничего */
                 }
             }
-
             val result = uiState.result ?: uiState.lastResult
+
             Card(
                 modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer
@@ -195,12 +195,13 @@ fun DisplayMTSScreen(viewModel: MTSViewModel) {
                             .padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Text(
-                            text = stringResource(R.string.result_mts), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold
+                            text = stringResource(R.string.result_troyka), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold
                         )
 
                         Text(
                             text = stringResource(R.string.next_payment, result.nextPayment), fontWeight = FontWeight.Bold, color = Color.Red
                         )
+
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -241,7 +242,6 @@ fun DisplayMTSScreen(viewModel: MTSViewModel) {
             ) {
                 Text(stringResource(R.string.select_bank_to_pay))
             }
-            // Кнопка, открывающая диалог с выбором реквизитов
             Button(
                 onClick = {
                     copySound?.start()
@@ -250,14 +250,16 @@ fun DisplayMTSScreen(viewModel: MTSViewModel) {
             ) {
                 Text(stringResource(R.string.payment_details))
             }
+
             Spacer(modifier = Modifier.height(10.dp)) // небольшой отступ для красоты
         }
         if (showBankDialog.value) {
             BankSelectionDialog(
-                onDismiss = { showBankDialog.value = false }
+                onDismiss = { showBankDialog.value = false },
+                appContainer = appContainer
             )
         }
-// Диалог выбора: ИНН или Л/С
+        // Диалог выбора: ИНН или Л/С
         if (showProviderDialog.value) {
             ProviderDetailsDialog(providerDetails = uiState.providerDetails, onDismiss = { showProviderDialog.value = false }, onCopyText = { text ->
                 clipboardManager.setText(AnnotatedString(text))
@@ -282,3 +284,4 @@ fun DisplayMTSScreen(viewModel: MTSViewModel) {
         }
     }
 }
+

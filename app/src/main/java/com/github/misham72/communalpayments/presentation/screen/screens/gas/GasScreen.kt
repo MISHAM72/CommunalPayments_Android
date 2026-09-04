@@ -1,4 +1,4 @@
-package com.github.misham72.communalpayments.presentation.screen.screens.water
+package com.github.misham72.communalpayments.presentation.screen.screens.gas
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -50,7 +50,7 @@ import com.github.misham72.communalpayments.domain.model.ValidationError
 import com.github.misham72.communalpayments.presentation.screen.components.EditProviderDetailsDialog
 import com.github.misham72.communalpayments.presentation.screen.components.ProviderDetailsDialog
 import com.github.misham72.communalpayments.presentation.screen.components.ServiceTopBar
-import com.github.misham72.communalpayments.presentation.screen.screens.receipts.DisplayReceiptsScreen
+import com.github.misham72.communalpayments.presentation.screen.screens.receipts.ReceiptsScreen
 import com.github.misham72.communalpayments.presentation.screen.screens.receipts.ReceiptsViewModel
 import com.github.misham72.communalpayments.presentation.ui.bank.BankSelectionDialog
 import com.github.misham72.communalpayments.presentation.utils.normalizeUrl
@@ -60,7 +60,7 @@ import com.github.misham72.communalpayments.presentation.utils.rememberCopyButto
 
 @SuppressLint("LocalContextGetResourceValueCall")
 @Composable
-fun DisplayWaterScreen(viewModel: WaterViewModel) {
+fun GasScreen(viewModel: GasViewModel, appContainer: AppContainer) {
     val showBankDialog = remember { mutableStateOf(false) }
     val showProviderDialog = remember { mutableStateOf(false) }
     val context = LocalContext.current
@@ -71,13 +71,12 @@ fun DisplayWaterScreen(viewModel: WaterViewModel) {
     val uiState by viewModel.uiState.collectAsState()
 
     // ----- Квитанции -----
-    val appContainer = AppContainer
     val receiptsViewModelFactory = ReceiptsViewModelFactory(appContainer.getReceiptsUseCase, appContainer.deleteReceiptUseCase, appContainer.saveReceiptUseCase)
     val receiptsViewModel: ReceiptsViewModel = viewModel(factory = receiptsViewModelFactory)
     var showReceipts by remember { mutableStateOf(false) }
     if (showReceipts) {
-        DisplayReceiptsScreen(
-            serviceKey = WaterViewModel.SERVICE_KEY,
+        ReceiptsScreen(
+            serviceKey = GasViewModel.SERVICE_KEY,
             viewModel = receiptsViewModel,
             onBack = { showReceipts = false }
         )
@@ -91,8 +90,7 @@ fun DisplayWaterScreen(viewModel: WaterViewModel) {
             verticalArrangement = Arrangement.spacedBy(1.dp)
         ) {
             ServiceTopBar(
-
-                title = uiState.providerDetails.customServiceName.ifBlank { stringResource(R.string.service_display_name_water) },
+                title = uiState.providerDetails.customServiceName.ifBlank { stringResource(R.string.service_display_name_gas) },
                 onEditClick = { viewModel.openAccountDialog() },
                 onTxtExport = { viewModel.onShareClick(context) },
                 modifier = Modifier.height(28.dp),
@@ -101,15 +99,20 @@ fun DisplayWaterScreen(viewModel: WaterViewModel) {
             )
             if (uiState.customDate.isNotBlank()) {
                 Text(
-                    text = stringResource(R.string.payment_date, uiState.customDate), fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurface, modifier = Modifier.padding(top = 1.dp)
+                    text = stringResource(R.string.payment_date, uiState.customDate),
+                    fontSize = 14.sp,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.padding(top = 1.dp)
                 )
             }
             if (uiState.providerDetails.accountNumber.isNotBlank()) {
                 Text(
-                    text = stringResource(R.string.personal_account, uiState.providerDetails.accountNumber), fontSize = 14.sp, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(top = 1.dp)
+                    text = stringResource(R.string.personal_account, uiState.providerDetails.accountNumber),
+                    fontSize = 14.sp,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(top = 1.dp)
                 )
             }
-            // Поля ввода (как у тебя - с ресурсами)
             OutlinedTextField(
                 value = uiState.currentReading,
                 onValueChange = viewModel::onCurrentReadingChange,
@@ -131,7 +134,8 @@ fun DisplayWaterScreen(viewModel: WaterViewModel) {
                     .fillMaxWidth()
                     .heightIn(min = 48.dp), // сужаем
                 textStyle = LocalTextStyle.current.copy(
-                    fontSize = 20.sp, lineHeight = 20.sp
+                    fontSize = 20.sp,
+                    lineHeight = 20.sp
                 )
             )
 
@@ -152,7 +156,8 @@ fun DisplayWaterScreen(viewModel: WaterViewModel) {
                 onClick = {
                     coinSound?.start()
                     viewModel.onCalculateClick()
-                }, modifier = Modifier.fillMaxWidth()
+                },
+                modifier = Modifier.fillMaxWidth()
             ) {
                 Text(stringResource(R.string.calculate_and_save))
             }
@@ -165,7 +170,8 @@ fun DisplayWaterScreen(viewModel: WaterViewModel) {
                 )
 
                 ValidationError.SavingError -> Text(
-                    stringResource(R.string.error_saving), color = Color.Red
+                    stringResource(R.string.error_saving),
+                    color = Color.Red
                 )
 
                 is ValidationError.DomainError -> Text(
@@ -176,9 +182,10 @@ fun DisplayWaterScreen(viewModel: WaterViewModel) {
                 null -> { /* ничего */
                 }
             }
-            // Результат (как у тебя - с датой)
+            // Карточка с результатом (всегда видна)
             Card(
-                modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer
                 )
             ) {
@@ -191,9 +198,17 @@ fun DisplayWaterScreen(viewModel: WaterViewModel) {
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Text(
-                            text = stringResource(R.string.result_water), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold
+                            text = stringResource(R.string.result_gas),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold
                         )
-                        Text(text = stringResource(R.string.consumption, result.consumption.value, stringResource(R.string.unit_cubic_meter)))
+                        Text(
+                            text = stringResource(
+                                R.string.consumption,
+                                result.consumption.value,
+                                stringResource(R.string.unit_cubic_meter)
+                            )
+                        )
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -206,7 +221,10 @@ fun DisplayWaterScreen(viewModel: WaterViewModel) {
                             IconButton(
                                 onClick = {
                                     clipboardManager.setText(AnnotatedString(result.payment.amount.toString()))
-                                    Toast.makeText(context, context.getString(R.string.amount_copied, result.payment.amount), Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(
+                                        context, context.getString(R.string.amount_copied, result.payment.amount),
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                 },
                                 modifier = Modifier.size(24.dp)
                             ) {
@@ -225,7 +243,7 @@ fun DisplayWaterScreen(viewModel: WaterViewModel) {
                     )
                 }
             }
-            // Отступ
+
             Spacer(modifier = Modifier.height(8.dp))
             Button(
                 onClick = {
@@ -236,7 +254,6 @@ fun DisplayWaterScreen(viewModel: WaterViewModel) {
             ) {
                 Text(stringResource(R.string.select_bank_to_pay))
             }
-            // Кнопка, открывающая диалог с выбором реквизитов
             Button(
                 onClick = {
                     copySound?.start()
@@ -250,24 +267,28 @@ fun DisplayWaterScreen(viewModel: WaterViewModel) {
         }
         if (showBankDialog.value) {
             BankSelectionDialog(
-                onDismiss = { showBankDialog.value = false }
+                onDismiss = { showBankDialog.value = false },
+                appContainer = appContainer
             )
         }
         // Диалог выбора: ИНН или Л/С
         if (showProviderDialog.value) {
-            ProviderDetailsDialog(providerDetails = uiState.providerDetails, onDismiss = { showProviderDialog.value = false }, onCopyText = { text ->
-                clipboardManager.setText(AnnotatedString(text))
-                Toast.makeText(context, R.string.copied, Toast.LENGTH_SHORT).show()
-            }, onOpenUrl = { url ->
-                val finalUrl = url.normalizeUrl()
-                val intent = Intent(Intent.ACTION_VIEW, finalUrl.toUri())
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                try {
-                    context.startActivity(intent)
-                } catch (_: Exception) {
-                    Toast.makeText(context, R.string.no_browser, Toast.LENGTH_SHORT).show()
-                }
-            })
+            ProviderDetailsDialog(
+                providerDetails = uiState.providerDetails,
+                onDismiss = { showProviderDialog.value = false },
+                onCopyText = { text ->
+                    clipboardManager.setText(AnnotatedString(text))
+                    Toast.makeText(context, R.string.copied, Toast.LENGTH_SHORT).show()
+                }, onOpenUrl = { url ->
+                    val finalUrl = url.normalizeUrl()
+                    val intent = Intent(Intent.ACTION_VIEW, finalUrl.toUri())
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    try {
+                        context.startActivity(intent)
+                    } catch (_: Exception) {
+                        Toast.makeText(context, R.string.no_browser, Toast.LENGTH_SHORT).show()
+                    }
+                })
         }
         if (uiState.showAccountDialog) {
             EditProviderDetailsDialog(
@@ -283,3 +304,4 @@ fun DisplayWaterScreen(viewModel: WaterViewModel) {
         }
     }
 }
+

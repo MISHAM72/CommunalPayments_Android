@@ -1,4 +1,4 @@
-package com.github.misham72.communalpayments.presentation.screen.screens.taxes
+package com.github.misham72.communalpayments.presentation.screen.screens.tinkoff
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -51,7 +51,7 @@ import com.github.misham72.communalpayments.domain.model.ValidationError
 import com.github.misham72.communalpayments.presentation.screen.components.EditProviderDetailsDialog
 import com.github.misham72.communalpayments.presentation.screen.components.ProviderDetailsDialog
 import com.github.misham72.communalpayments.presentation.screen.components.ServiceTopBar
-import com.github.misham72.communalpayments.presentation.screen.screens.receipts.DisplayReceiptsScreen
+import com.github.misham72.communalpayments.presentation.screen.screens.receipts.ReceiptsScreen
 import com.github.misham72.communalpayments.presentation.screen.screens.receipts.ReceiptsViewModel
 import com.github.misham72.communalpayments.presentation.ui.bank.BankSelectionDialog
 import com.github.misham72.communalpayments.presentation.utils.normalizeUrl
@@ -61,7 +61,7 @@ import com.github.misham72.communalpayments.presentation.utils.rememberCopyButto
 
 @SuppressLint("LocalContextGetResourceValueCall")
 @Composable
-fun DisplayTaxesScreen(viewModel: TaxesViewModel) {
+fun TinkoffScreen(viewModel: TinkoffViewModel, appContainer: AppContainer) {
     val showBankDialog = remember { mutableStateOf(false) }
     val showProviderDialog = remember { mutableStateOf(false) }
     val context = LocalContext.current
@@ -72,13 +72,12 @@ fun DisplayTaxesScreen(viewModel: TaxesViewModel) {
     val uiState by viewModel.uiState.collectAsState()
 
     // ----- Квитанции -----
-    val appContainer = AppContainer
     val receiptsViewModelFactory = ReceiptsViewModelFactory(appContainer.getReceiptsUseCase, appContainer.deleteReceiptUseCase, appContainer.saveReceiptUseCase)
     val receiptsViewModel: ReceiptsViewModel = viewModel(factory = receiptsViewModelFactory)
     var showReceipts by remember { mutableStateOf(false) }
     if (showReceipts) {
-        DisplayReceiptsScreen(
-            serviceKey = TaxesViewModel.SERVICE_KEY,
+        ReceiptsScreen(
+            serviceKey = TinkoffViewModel.SERVICE_KEY,
             viewModel = receiptsViewModel,
             onBack = { showReceipts = false }
         )
@@ -92,7 +91,7 @@ fun DisplayTaxesScreen(viewModel: TaxesViewModel) {
         ) {
             ServiceTopBar(
 
-                title = uiState.providerDetails.customServiceName.ifBlank { stringResource(R.string.service_display_name_taxes) },
+                title = uiState.providerDetails.customServiceName.ifBlank { stringResource(R.string.service_display_name_tinkoff) },
                 onEditClick = { viewModel.openAccountDialog() },
                 onTxtExport = { viewModel.onShareClick(context) },
                 modifier = Modifier.height(28.dp),
@@ -107,7 +106,7 @@ fun DisplayTaxesScreen(viewModel: TaxesViewModel) {
 // Номер под названием (отдельная строка)
             if (uiState.providerDetails.accountNumber.isNotBlank()) {
                 Text(
-                    text = stringResource(R.string.personal_account_taxes, uiState.providerDetails.accountNumber), fontSize = 14.sp, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(top = 1.dp)
+                    text = stringResource(R.string.number_phone, uiState.providerDetails.accountNumber), fontSize = 14.sp, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(top = 1.dp)
                 )
             }
             // Поле ввода - день платежа
@@ -155,6 +154,7 @@ fun DisplayTaxesScreen(viewModel: TaxesViewModel) {
                 )
             )
             Spacer(modifier = Modifier.height(3.dp))
+            // Кнопка расчета
             Button(
                 onClick = {
                     coinSound?.start()
@@ -195,13 +195,12 @@ fun DisplayTaxesScreen(viewModel: TaxesViewModel) {
                             .padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Text(
-                            text = stringResource(R.string.result_taxes), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold
+                            text = stringResource(R.string.result_tinkoff), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold
                         )
 
                         Text(
                             text = stringResource(R.string.next_payment, result.nextPayment), fontWeight = FontWeight.Bold, color = Color.Red
                         )
-
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -242,6 +241,7 @@ fun DisplayTaxesScreen(viewModel: TaxesViewModel) {
             ) {
                 Text(stringResource(R.string.select_bank_to_pay))
             }
+            // Кнопка, открывающая диалог с выбором реквизитов
             Button(
                 onClick = {
                     copySound?.start()
@@ -251,11 +251,12 @@ fun DisplayTaxesScreen(viewModel: TaxesViewModel) {
                 Text(stringResource(R.string.payment_details))
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(10.dp)) // небольшой отступ для красоты
         }
         if (showBankDialog.value) {
             BankSelectionDialog(
-                onDismiss = { showBankDialog.value = false }
+                onDismiss = { showBankDialog.value = false },
+                appContainer = appContainer
             )
         }
         // Диалог выбора: ИНН или Л/С

@@ -2,9 +2,16 @@ package com.github.misham72.communalpayments.di
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.github.misham72.communalpayments.domain.usecases.AddIncomeUseCase
+import com.github.misham72.communalpayments.domain.usecases.DeleteAllIncomeRecordsBySourceUseCase
+import com.github.misham72.communalpayments.domain.usecases.DeleteIncomeRecordUseCase
 import com.github.misham72.communalpayments.domain.usecases.DeleteReceiptUseCase
+import com.github.misham72.communalpayments.domain.usecases.GetIncomeRecordsUseCase
 import com.github.misham72.communalpayments.domain.usecases.GetReceiptsUseCase
+import com.github.misham72.communalpayments.domain.usecases.GetYearlyIncomeUseCase
 import com.github.misham72.communalpayments.domain.usecases.SaveReceiptUseCase
+import com.github.misham72.communalpayments.domain.usecases.UpdateIncomeRecordUseCase
+import com.github.misham72.communalpayments.presentation.screen.screens.analytics.IncomeViewModel
 import com.github.misham72.communalpayments.presentation.screen.screens.electricity.ElectricityViewModel
 import com.github.misham72.communalpayments.presentation.screen.screens.garbage.GarbageViewModel
 import com.github.misham72.communalpayments.presentation.screen.screens.gas.GasViewModel
@@ -25,7 +32,7 @@ class ElectricityViewModelFactory(
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(ElectricityViewModel::class.java)) {
             return ElectricityViewModel(
-                meterDataCollector = container.meterDataCollector,
+                dataCollectorMeter = container.dataCollectorMeter,
                 meterRepository = container.electricityRepository,
                 settingsRepository = container.settingsRepository,
                 repository = container.providerRepository,
@@ -44,7 +51,7 @@ class GasViewModelFactory(
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(GasViewModel::class.java)) {
             return GasViewModel(
-                meterDataCollector = container.meterDataCollector,
+                dataCollectorMeter = container.dataCollectorMeter,
                 meterRepository = container.gasRepository,
                 settingsRepository = container.settingsRepository,
                 repository = container.providerRepository,
@@ -63,7 +70,7 @@ class WaterViewModelFactory(
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(WaterViewModel::class.java)) {
             return WaterViewModel(
-                meterDataCollector = container.meterDataCollector,
+                dataCollectorMeter = container.dataCollectorMeter,
                 meterRepository = container.waterRepository,
                 settingsRepository = container.settingsRepository,
                 repository = container.providerRepository,
@@ -82,7 +89,7 @@ class GarbageViewModelFactory(
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(GarbageViewModel::class.java)) {
             return GarbageViewModel(
-                periodicDataCollector = container.periodicDataCollector,
+                dataCollectorPeriodic = container.dataCollectorPeriodic,
                 settingsRepository = container.settingsRepository,
                 repository = container.providerRepository,
                 textHistoryUseCase = container.textHistoryUseCase,
@@ -100,7 +107,7 @@ class ZONTViewModelFactory(
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(ZONTViewModel::class.java)) {
             return ZONTViewModel(
-                periodicDataCollector = container.periodicDataCollector,
+                dataCollectorPeriodic = container.dataCollectorPeriodic,
                 settingsRepository = container.settingsRepository,
                 repository = container.providerRepository,
                 textHistoryUseCase = container.textHistoryUseCase,
@@ -118,7 +125,7 @@ class HostelViewModelFactory(
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(HostelViewModel::class.java)) {
             return HostelViewModel(
-                periodicDataCollector = container.periodicDataCollector,
+                dataCollectorPeriodic = container.dataCollectorPeriodic,
                 settingsRepository = container.settingsRepository,
                 repository = container.providerRepository,
                 textHistoryUseCase = container.textHistoryUseCase,
@@ -136,7 +143,7 @@ class InternetViewModelFactory(
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(InternetViewModel::class.java)) {
             return InternetViewModel(
-                periodicDataCollector = container.periodicDataCollector,
+                dataCollectorPeriodic = container.dataCollectorPeriodic,
                 settingsRepository = container.settingsRepository,
                 repository = container.providerRepository,
                 textHistoryUseCase = container.textHistoryUseCase,
@@ -154,7 +161,7 @@ class MTSViewModelFactory(
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MTSViewModel::class.java)) {
             return MTSViewModel(
-                periodicDataCollector = container.periodicDataCollector,
+                dataCollectorPeriodic = container.dataCollectorPeriodic,
                 settingsRepository = container.settingsRepository,
                 repository = container.providerRepository,
                 textHistoryUseCase = container.textHistoryUseCase,
@@ -172,7 +179,7 @@ class OSAGOViewModelFactory(
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(OsagoViewModel::class.java)) {
             return OsagoViewModel(
-                periodicDataCollector = container.periodicDataCollector,
+                dataCollectorPeriodic = container.dataCollectorPeriodic,
                 settingsRepository = container.settingsRepository,
                 repository = container.providerRepository,
                 textHistoryUseCase = container.textHistoryUseCase,
@@ -190,7 +197,7 @@ class TaxesViewModelFactory(
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(TaxesViewModel::class.java)) {
             return TaxesViewModel(
-                periodicDataCollector = container.periodicDataCollector,
+                dataCollectorPeriodic = container.dataCollectorPeriodic,
                 settingsRepository = container.settingsRepository,
                 repository = container.providerRepository,
                 textHistoryUseCase = container.textHistoryUseCase,
@@ -209,7 +216,7 @@ class TinkoffViewModelFactory(
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(TinkoffViewModel::class.java)) {
             return TinkoffViewModel(
-                periodicDataCollector = container.periodicDataCollector,
+                dataCollectorPeriodic = container.dataCollectorPeriodic,
                 settingsRepository = container.settingsRepository,
                 repository = container.providerRepository,
                 textHistoryUseCase = container.textHistoryUseCase,
@@ -227,7 +234,7 @@ class TroykaViewModelFactory(
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(TroykaViewModel::class.java)) {
             return TroykaViewModel(
-                periodicDataCollector = container.periodicDataCollector,
+                dataCollectorPeriodic = container.dataCollectorPeriodic,
                 settingsRepository = container.settingsRepository,
                 repository = container.providerRepository,
                 textHistoryUseCase = container.textHistoryUseCase,
@@ -251,3 +258,27 @@ class ReceiptsViewModelFactory(
         throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
+
+class IncomeViewModelFactory(
+    private val getIncomeUseCase: GetYearlyIncomeUseCase,
+    private val addIncomeUseCase: AddIncomeUseCase,
+    private val getIncomeRecordsUseCase: GetIncomeRecordsUseCase,
+    private val updateIncomeRecordUseCase: UpdateIncomeRecordUseCase,
+    private val deleteIncomeRecordUseCase: DeleteIncomeRecordUseCase,
+    private val deleteAllIncomeRecordsBySourceUseCase: DeleteAllIncomeRecordsBySourceUseCase
+) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(IncomeViewModel::class.java)) {
+            return IncomeViewModel(
+                getIncomeUseCase,
+                addIncomeUseCase,
+                getIncomeRecordsUseCase,
+                updateIncomeRecordUseCase,
+                deleteIncomeRecordUseCase,
+                deleteAllIncomeRecordsBySourceUseCase
+            ) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
+    }
+}
+

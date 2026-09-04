@@ -7,7 +7,7 @@ import androidx.core.app.NotificationCompat
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.github.misham72.communalpayments.R
-import com.github.misham72.communalpayments.di.AppContainer
+import com.github.misham72.communalpayments.data.local.preferences.AccountPreferences
 import com.github.misham72.communalpayments.domain.utils.DateUtils
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 import kotlinx.coroutines.Dispatchers
@@ -16,12 +16,11 @@ import kotlinx.coroutines.withContext
 
 class PaymentNotificationWorker(
     context: Context,
-    params: WorkerParameters
+    params: WorkerParameters,
+    private val accountPrefs: AccountPreferences
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
-
-        val accountPrefs = AppContainer.accountPrefs
 
         val serviceNames = mapOf(
             ServiceKeys.ELECTRICITY to applicationContext.getString(R.string.service_display_name_electricity),
