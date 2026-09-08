@@ -143,7 +143,6 @@ class ElectricityViewModel(
 
         viewModelScope.launch {
             try {
-                // Вызываем новый UseCase – он создаст объект, сохранит, обновит Preferences
                 val data = dataCollectorMeter.collectMeterData(
                     repository = meterRepository,
                     current = current,
@@ -151,7 +150,7 @@ class ElectricityViewModel(
                     tariff = tariff,
                     accountNumber = account,
                     serviceKey = SERVICE_KEY,
-                    factory = ::ElectricityData   // фабрика – конструктор ElectricityData
+                    factory = ::ElectricityData
                 )
 // после получения data
                 settingsRepository.saveLastResult(SERVICE_KEY, gson.toJson(data))

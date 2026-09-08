@@ -32,7 +32,7 @@ abstract class BaseMeterRepository(
             if (isHistory) appendLine(historyHeader)
             appendLine(dateTime)
             appendLine(headerSeparator)
-            appendLine(personalAccountTemplate.format(accountNumber))
+            appendLine(personalAccountTemplate + accountNumber)
             appendLine(serviceName)
             appendLine()
             appendLine(currentReadingTemplate.format(current, unit))

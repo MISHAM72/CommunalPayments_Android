@@ -30,7 +30,7 @@ abstract class BasePeriodicRepository(
                 appendLine(historyHeader)
             appendLine(dateTime)
             appendLine(headerSeparator)
-            appendLine(personalAccountTemplate.format(accountNumber))
+            appendLine(personalAccountTemplate + accountNumber)
             appendLine(serviceName)
             appendLine()
             appendLine(nextPaymentTemplate.format(nextPayment))
