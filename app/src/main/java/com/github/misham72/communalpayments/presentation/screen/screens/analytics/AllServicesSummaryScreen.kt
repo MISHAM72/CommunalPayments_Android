@@ -59,6 +59,7 @@ import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.misham72.communalpayments.R
+import com.github.misham72.communalpayments.di.AllServicesSummaryViewModelFactory
 import com.github.misham72.communalpayments.di.AppContainer
 import com.github.misham72.communalpayments.di.IncomeViewModelFactory
 import com.github.misham72.communalpayments.domain.model.ExpenseSummary
