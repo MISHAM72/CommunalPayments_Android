@@ -9,7 +9,7 @@ import com.github.misham72.communalpayments.domain.model.valueobjects.Tariff
 import com.github.misham72.communalpayments.domain.repository.MeterRepository
 import com.github.misham72.communalpayments.domain.repository.UserSettingsRepository
 
-class DataCollectorMeter(
+class MeterDataUseCase(
     private val settingsRepository: UserSettingsRepository   // ← замена
 
 ) {

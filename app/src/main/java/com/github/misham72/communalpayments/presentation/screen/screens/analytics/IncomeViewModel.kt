@@ -4,12 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.misham72.communalpayments.domain.model.incomes.IncomeRecord
 import com.github.misham72.communalpayments.domain.model.incomes.IncomeSummary
-import com.github.misham72.communalpayments.domain.usecases.AddIncomeUseCase
-import com.github.misham72.communalpayments.domain.usecases.DeleteAllIncomeRecordsBySourceUseCase
-import com.github.misham72.communalpayments.domain.usecases.DeleteIncomeRecordUseCase
-import com.github.misham72.communalpayments.domain.usecases.GetIncomeRecordsUseCase
-import com.github.misham72.communalpayments.domain.usecases.GetYearlyIncomeUseCase
-import com.github.misham72.communalpayments.domain.usecases.UpdateIncomeRecordUseCase
+import com.github.misham72.communalpayments.domain.usecases.IncomeUseCase
+import com.github.misham72.communalpayments.presentation.common.UiMessages
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,15 +20,12 @@ data class IncomeUiState(
 )
 
 class IncomeViewModel(
-    private val getYearlyIncomeUseCase: GetYearlyIncomeUseCase,
-    private val addIncomeUseCase: AddIncomeUseCase,
-    private val getIncomeRecordsUseCase: GetIncomeRecordsUseCase,
-    private val updateIncomeRecordUseCase: UpdateIncomeRecordUseCase,
-    private val deleteIncomeRecordUseCase: DeleteIncomeRecordUseCase,
-    private val deleteAllIncomeRecordsBySourceUseCase: DeleteAllIncomeRecordsBySourceUseCase
+    private val incomeUseCase: IncomeUseCase
 ) : ViewModel() {
+
     private val _recordsBySource = MutableStateFlow<Map<String, List<IncomeRecord>>>(emptyMap())
     val recordsBySource: StateFlow<Map<String, List<IncomeRecord>>> = _recordsBySource.asStateFlow()
+
     private val _uiState = MutableStateFlow(IncomeUiState())
     val uiState: StateFlow<IncomeUiState> = _uiState.asStateFlow()
 
@@ -40,42 +33,40 @@ class IncomeViewModel(
         viewModelScope.launch {
             _uiState.value = IncomeUiState()
             try {
-                val summary = getYearlyIncomeUseCase(year)
-                val records = getIncomeRecordsUseCase(year)
+                val summary = incomeUseCase.getYearlyIncome(year)   // ← готовый IncomeSummary
+                val records = incomeUseCase.getIncomes(year)
                 _recordsBySource.value = records.groupBy { it.source }
                 _uiState.value = IncomeUiState(isLoading = false, summary = summary)
             } catch (e: Exception) {
-                @Suppress("HardcodedStringLiteral")
-                _uiState.value = IncomeUiState(isLoading = false, error = e.localizedMessage ?: "Ошибка загрузки")
+                _uiState.value = IncomeUiState(isLoading = false, error = e.localizedMessage ?: UiMessages.DOWNLOAD_ERROR)
             }
         }
     }
 
     fun addIncome(source: String, amount: Double, date: LocalDate = LocalDate.now()) {
         viewModelScope.launch {
-            // Не скрываем ошибку – пусть долетит до UI
-            addIncomeUseCase(Year.now().value, date, source, amount)
+            incomeUseCase.addIncome(Year.now().value, date, source, amount)
             loadIncome(Year.now().value)
         }
     }
 
     fun updateRecord(oldRecord: IncomeRecord, newRecord: IncomeRecord) {
         viewModelScope.launch {
-            updateIncomeRecordUseCase(Year.now().value, oldRecord, newRecord)
+            incomeUseCase.updateIncome(Year.now().value, oldRecord, newRecord)
             loadIncome()
         }
     }
 
     fun deleteRecord(record: IncomeRecord) {
         viewModelScope.launch {
-            deleteIncomeRecordUseCase(Year.now().value, record)
+            incomeUseCase.deleteIncome(Year.now().value, record)
             loadIncome()
         }
     }
 
     fun deleteAllRecordsBySource(source: String) {
         viewModelScope.launch {
-            deleteAllIncomeRecordsBySourceUseCase(Year.now().value, source)
+            incomeUseCase.deleteAllBySource(Year.now().value, source)
             loadIncome()
         }
     }

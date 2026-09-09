@@ -145,7 +145,7 @@ class MainActivity : AppCompatActivity() {
                         pdfHistoryUseCase = container.pdfHistoryUseCase,
                         getHistoryUseCase = container.getHistoryUseCase,
                         saveHistoryUseCase = container.saveHistoryUseCase,
-                        getAllServicesYearlySummaryUseCase = container.getAllServicesYearlySummaryUseCase,
+                        getExpensesUseCase = container.getExpensesUseCase,
                         incomeViewModelFactory = container.incomeViewModelFactory,
                         settingsRepository = container.settingsRepository,
                         onExportBackup = { createBackupLauncher.launch("backup_${System.currentTimeMillis()}.zip") },

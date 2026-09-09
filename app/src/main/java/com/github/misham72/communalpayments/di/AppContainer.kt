@@ -21,24 +21,19 @@ import com.github.misham72.communalpayments.data.repository.periodrepository.Per
 import com.github.misham72.communalpayments.data.repository.provider.ProviderRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.receipt.ReceiptRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.settings.UserSettingsRepositoryImpl
-import com.github.misham72.communalpayments.domain.usecases.AddIncomeUseCase
-import com.github.misham72.communalpayments.domain.usecases.DataCollectorMeter
-import com.github.misham72.communalpayments.domain.usecases.DataCollectorPeriodic
-import com.github.misham72.communalpayments.domain.usecases.DeleteAllIncomeRecordsBySourceUseCase
-import com.github.misham72.communalpayments.domain.usecases.DeleteIncomeRecordUseCase
 import com.github.misham72.communalpayments.domain.usecases.DeleteReceiptUseCase
 import com.github.misham72.communalpayments.domain.usecases.ExportBackupUseCase
-import com.github.misham72.communalpayments.domain.usecases.GetAllServicesYearlySummaryUseCase
+import com.github.misham72.communalpayments.domain.usecases.GetExpensesUseCase
 import com.github.misham72.communalpayments.domain.usecases.GetHistoryUseCase
-import com.github.misham72.communalpayments.domain.usecases.GetIncomeRecordsUseCase
 import com.github.misham72.communalpayments.domain.usecases.GetReceiptsUseCase
-import com.github.misham72.communalpayments.domain.usecases.GetYearlyIncomeUseCase
 import com.github.misham72.communalpayments.domain.usecases.ImportBackupUseCase
+import com.github.misham72.communalpayments.domain.usecases.IncomeUseCase
+import com.github.misham72.communalpayments.domain.usecases.MeterDataUseCase
 import com.github.misham72.communalpayments.domain.usecases.PdfHistoryUseCase
+import com.github.misham72.communalpayments.domain.usecases.PeriodicDataUseCase
 import com.github.misham72.communalpayments.domain.usecases.SaveHistoryUseCase
 import com.github.misham72.communalpayments.domain.usecases.SaveReceiptUseCase
 import com.github.misham72.communalpayments.domain.usecases.TextHistoryUseCase
-import com.github.misham72.communalpayments.domain.usecases.UpdateIncomeRecordUseCase
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 import com.google.gson.Gson
 
@@ -119,8 +114,8 @@ class AppContainer(context: Context) {
     )
 
     // UseCase
-    val dataCollectorMeter = DataCollectorMeter(settingsRepository)
-    val dataCollectorPeriodic = DataCollectorPeriodic(
+    val meterDataUseCase = MeterDataUseCase(settingsRepository)
+    val periodicDataUseCase = PeriodicDataUseCase(
         repository = periodicRepository,
         settingsRepository = settingsRepository,
         calculator = PeriodCalculatorImpl()
@@ -190,25 +185,13 @@ class AppContainer(context: Context) {
         filesDir = context.filesDir
     )
     private val incomeRepository = IncomeRepositoryImpl(incomeFileManager)
-    private val getYearlyIncomeUseCase = GetYearlyIncomeUseCase(incomeRepository)
-    private val addIncomeUseCase = AddIncomeUseCase(incomeRepository)
-    private val getIncomeRecordsUseCase = GetIncomeRecordsUseCase(incomeRepository)
-    private val updateIncomeRecordUseCase = UpdateIncomeRecordUseCase(incomeRepository)
-    private val deleteIncomeRecordUseCase = DeleteIncomeRecordUseCase(incomeRepository)
-    val deleteAllIncomeRecordsBySourceUseCase = DeleteAllIncomeRecordsBySourceUseCase(incomeRepository)
+    val incomeUseCase = IncomeUseCase(incomeRepository)
 
-    val incomeViewModelFactory = IncomeViewModelFactory(
-        getYearlyIncomeUseCase,
-        addIncomeUseCase,
-        getIncomeRecordsUseCase,
-        updateIncomeRecordUseCase,
-        deleteIncomeRecordUseCase,
-        deleteAllIncomeRecordsBySourceUseCase
-    )
+    val incomeViewModelFactory = IncomeViewModelFactory(incomeUseCase)
 
     // Аналитика (расходы)
     val analyticsRepository = AnalyticsRepositoryImpl(fileManager)
-    val getAllServicesYearlySummaryUseCase = GetAllServicesYearlySummaryUseCase(analyticsRepository)
+    val getExpensesUseCase = GetExpensesUseCase(analyticsRepository)
 
     // Репозиторий для бекапа
     val backupRepository = BackupRepositoryImpl(

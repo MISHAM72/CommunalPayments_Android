@@ -49,13 +49,13 @@ import com.github.misham72.communalpayments.di.AppContainer
 import com.github.misham72.communalpayments.di.IncomeViewModelFactory
 import com.github.misham72.communalpayments.domain.repository.UserSettingsRepository
 import com.github.misham72.communalpayments.domain.usecases.PdfHistoryUseCase
-import com.github.misham72.communalpayments.domain.usecases.GetAllServicesYearlySummaryUseCase
+import com.github.misham72.communalpayments.domain.usecases.GetExpensesUseCase
 import com.github.misham72.communalpayments.domain.usecases.GetHistoryUseCase
 import com.github.misham72.communalpayments.domain.usecases.SaveHistoryUseCase
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 import com.github.misham72.communalpayments.presentation.screen.components.ServiceTab
 import com.github.misham72.communalpayments.presentation.screen.navigation.getListInitialScreen
-import com.github.misham72.communalpayments.presentation.screen.screens.analytics.AllServicesSummaryScreen
+import com.github.misham72.communalpayments.presentation.screen.screens.analytics.ExpensesScreen
 import com.github.misham72.communalpayments.presentation.screen.screens.history.HistoryScreen
 import com.github.misham72.communalpayments.presentation.theme.ThemePrefs
 import com.github.misham72.communalpayments.presentation.utils.LanguageManager
@@ -80,7 +80,7 @@ fun ControlBetweenScreens(
     pdfHistoryUseCase: PdfHistoryUseCase,
     getHistoryUseCase: GetHistoryUseCase,
     saveHistoryUseCase: SaveHistoryUseCase,
-    getAllServicesYearlySummaryUseCase: GetAllServicesYearlySummaryUseCase,
+    getExpensesUseCase: GetExpensesUseCase,
     incomeViewModelFactory: IncomeViewModelFactory,
     settingsRepository: UserSettingsRepository,
     onExportBackup: () -> Unit = {},
@@ -124,9 +124,9 @@ fun ControlBetweenScreens(
     }
 
     if (showAllServicesSummary.value) {
-        AllServicesSummaryScreen(
+        ExpensesScreen(
             onBack = { onNavigateBack() },
-            getAllServicesYearlySummaryUseCase = getAllServicesYearlySummaryUseCase,  // используем существующую переменную
+            getExpensesUseCase = getExpensesUseCase,  // используем существующую переменную
             defaultErrorMessage = defaultError,
             incomeFactory = incomeViewModelFactory,
             appContainer = appContainer

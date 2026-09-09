@@ -20,7 +20,7 @@ class AnalyticsRepositoryImpl(private val fileManager: FileManager) : AnalyticsR
         }
     }
 
-    override suspend fun getAllServicesYearSummary(serviceKeys: List<String>, year: Int): Map<String, YearSummary> {
+    override suspend fun getExpenses(serviceKeys: List<String>, year: Int): Map<String, YearSummary> {
         return withContext(Dispatchers.IO) {
             val result = mutableMapOf<String, YearSummary>()
             for (key in serviceKeys) {

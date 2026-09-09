@@ -59,14 +59,14 @@ import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.misham72.communalpayments.R
-import com.github.misham72.communalpayments.di.AllServicesSummaryViewModelFactory
+import com.github.misham72.communalpayments.di.ExpensesViewModelFactory
 import com.github.misham72.communalpayments.di.AppContainer
 import com.github.misham72.communalpayments.di.IncomeViewModelFactory
 import com.github.misham72.communalpayments.domain.model.ExpenseSummary
 import com.github.misham72.communalpayments.domain.model.incomes.IncomeCategory
 import com.github.misham72.communalpayments.domain.model.incomes.IncomeRecord
 import com.github.misham72.communalpayments.domain.model.incomes.IncomeSummary
-import com.github.misham72.communalpayments.domain.usecases.GetAllServicesYearlySummaryUseCase
+import com.github.misham72.communalpayments.domain.usecases.GetExpensesUseCase
 import com.github.misham72.communalpayments.presentation.screen.navigation.InitialScreen
 import com.github.misham72.communalpayments.presentation.screen.navigation.getListInitialScreen
 import com.github.misham72.communalpayments.presentation.utils.nameRes
@@ -78,13 +78,13 @@ private val chartColors = listOf(
 )
 
 @Composable
-fun AllServicesSummaryScreen(
-    onBack: () -> Unit, getAllServicesYearlySummaryUseCase: GetAllServicesYearlySummaryUseCase, defaultErrorMessage: String = stringResource(R.string.error), incomeFactory: IncomeViewModelFactory, appContainer: AppContainer
+fun ExpensesScreen(
+    onBack: () -> Unit, getExpensesUseCase: GetExpensesUseCase, defaultErrorMessage: String = stringResource(R.string.error), incomeFactory: IncomeViewModelFactory, appContainer: AppContainer
 ) {
     val allServices = getListInitialScreen(appContainer)
     val expensesFactory = remember(allServices, defaultErrorMessage) {
-        AllServicesSummaryViewModelFactory(
-            useCase = getAllServicesYearlySummaryUseCase,
+        ExpensesViewModelFactory(
+            useCase = getExpensesUseCase,
             defaultErrorMessage = defaultErrorMessage
         )
     }
@@ -128,8 +128,8 @@ fun AllServicesSummaryScreen(
 
 // ---------- Вкладка расходов ----------
 @Composable
-private fun ExpensesTab(factory: AllServicesSummaryViewModelFactory, appContainer: AppContainer) {
-    val viewModel: AllServicesSummaryViewModel = viewModel(factory = factory)
+private fun ExpensesTab(factory: ExpensesViewModelFactory, appContainer: AppContainer) {
+    val viewModel: ExpensesViewModel = viewModel(factory = factory)
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val allServices = getListInitialScreen(appContainer)
 
