@@ -1,10 +1,18 @@
 package com.github.misham72.communalpayments.presentation.screen.screens.analytics
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.animateIntAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,6 +20,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -31,10 +40,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -53,14 +60,15 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.misham72.communalpayments.R
-import com.github.misham72.communalpayments.di.ExpensesViewModelFactory
 import com.github.misham72.communalpayments.di.AppContainer
+import com.github.misham72.communalpayments.di.ExpensesViewModelFactory
 import com.github.misham72.communalpayments.di.IncomeViewModelFactory
 import com.github.misham72.communalpayments.domain.model.ExpenseSummary
 import com.github.misham72.communalpayments.domain.model.incomes.IncomeCategory
@@ -111,16 +119,92 @@ fun ExpensesScreen(
             )
             Spacer(modifier = Modifier.height(8.dp))
 
-            PrimaryTabRow(selectedTabIndex = selectedTab) {
-                tabs.forEachIndexed { index, title ->
-                    Tab(selected = selectedTab == index, onClick = { selectedTab = index }, text = { Text(title) })
-                }
-            }
+            BankingTabSwitcher(
+                tabs = tabs,
+                selectedIndex = selectedTab,
+                onSelect = { selectedTab = it }
+            )
             Spacer(modifier = Modifier.height(16.dp))
 
-            when (selectedTab) {
-                0 -> ExpensesTab(expensesFactory, appContainer)
-                1 -> IncomesTab(incomeFactory)
+            AnimatedContent(
+                targetState = selectedTab,
+                transitionSpec = { fadeIn(tween(200)) togetherWith fadeOut(tween(200)) },
+                label = "tabContent"
+            ) { tab ->
+                when (tab) {
+                    0 -> ExpensesTab(expensesFactory, appContainer)
+                    1 -> IncomesTab(incomeFactory)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun BankingTabSwitcher(
+    tabs: List<String>,
+    selectedIndex: Int,
+    onSelect: (Int) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val animatedIndex by animateIntAsState(
+        targetValue = selectedIndex,
+        animationSpec = tween(durationMillis = 250),
+        label = "tabIndex"
+    )
+
+    Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(48.dp),
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
+    ) {
+        BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+            val tabWidth = maxWidth / tabs.size
+
+            // Плавающая белая капсула под активной вкладкой
+            Box(
+                modifier = Modifier
+                    .offset { IntOffset((tabWidth * animatedIndex).roundToPx(), 0) }
+                    .width(tabWidth)
+                    .fillMaxHeight()
+                    .padding(4.dp)
+                    .shadow(
+                        elevation = 4.dp,
+                        shape = RoundedCornerShape(12.dp),
+                        clip = false
+                    )
+                    .background(
+                        color = MaterialTheme.colorScheme.surface,
+                        shape = RoundedCornerShape(12.dp)
+                    )
+            )
+
+            Row(modifier = Modifier.fillMaxSize()) {
+                tabs.forEachIndexed { index, title ->
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
+                            .clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = null
+                            ) { onSelect(index) },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = title,
+                            fontSize = 15.sp,
+                            fontWeight = if (selectedIndex == index) FontWeight.SemiBold
+                            else FontWeight.Normal,
+                            color = if (selectedIndex == index)
+                                MaterialTheme.colorScheme.onSurface
+                            else
+                                MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
             }
         }
     }
@@ -175,14 +259,13 @@ private fun ExpensesTab(factory: ExpensesViewModelFactory, appContainer: AppCont
                 if (services.isNotEmpty()) {
                     items(services) { (key, total) ->
                         val screen = allServices.find { it.fileKey == key }
-                        val emoji = screen?.icon ?: "📊"
                         val displayName = screen?.name ?: key
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(vertical = 4.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(text = "$emoji $displayName", fontWeight = FontWeight.Bold)
+                            Text(text = displayName, fontWeight = FontWeight.Bold)
                             Text(
                                 text = stringResource(R.string.money_format).format(total), fontSize = 14.sp
                             )
@@ -226,7 +309,6 @@ private fun ExpensesChart(
                 val barColor = chartColors[index % chartColors.size]
 
                 val screen = allServices.find { it.fileKey == key }
-                val emoji = screen?.icon ?: "📊"
                 val displayName = screen?.name ?: key
 
                 Column(
@@ -260,7 +342,7 @@ private fun ExpensesChart(
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "$emoji ${displayName.take(8)}", fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, color = MaterialTheme.colorScheme.onSurface, modifier = Modifier.height(16.dp)
+                        text = displayName.take(8), fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, color = MaterialTheme.colorScheme.onSurface, modifier = Modifier.height(16.dp)
                     )
                 }
             }
@@ -351,7 +433,11 @@ private fun IncomesChart(summary: IncomeSummary) {
 
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = stringResource(category.nameRes()).take(8), fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, color = MaterialTheme.colorScheme.onSurface, modifier = Modifier.height(16.dp)
+                            text = stringResource(category.nameRes()).take(6),
+                            fontSize = 12.sp,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            color = MaterialTheme.colorScheme.onSurface,
                         )
                     }
                 }
@@ -364,7 +450,7 @@ private fun IncomesChart(summary: IncomeSummary) {
             Card(
                 modifier = Modifier
                     .align(Alignment.TopCenter)
-                    .padding(top = 4.dp)
+                    .padding(top = 100.dp)
                     .zIndex(10f), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.inverseSurface)
             ) {
                 Row(
@@ -373,7 +459,7 @@ private fun IncomesChart(summary: IncomeSummary) {
                     Text(
                         text = stringResource(category.nameRes()), fontSize = 18.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.inverseOnSurface
                     )
-                    Spacer(modifier = Modifier.width(3.dp))
+                    Spacer(modifier = Modifier.width(12.dp))
                     Text(
                         text = stringResource(R.string.money_format).format(total), fontSize = 18.sp, color = MaterialTheme.colorScheme.inverseOnSurface
                     )
@@ -414,14 +500,14 @@ private fun IncomesTab(factory: IncomeViewModelFactory) {
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 item {
                     Card(
-                        modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
+                        modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
                             Text(
-                                text = stringResource(R.string.total_income, Year.now().value), color = MaterialTheme.colorScheme.onSecondaryContainer, fontSize = 16.sp
+                                text = stringResource(R.string.total_income, Year.now().value), color = MaterialTheme.colorScheme.onPrimaryContainer, fontSize = 16.sp
                             )
                             Text(
-                                text = stringResource(R.string.money_format).format(summary.total), fontSize = 36.sp, fontWeight = FontWeight.ExtraBold, color = MaterialTheme.colorScheme.onSecondaryContainer
+                                text = stringResource(R.string.money_format).format(summary.total), fontSize = 36.sp, fontWeight = FontWeight.ExtraBold, color = MaterialTheme.colorScheme.onPrimaryContainer
                             )
                         }
                     }
@@ -433,29 +519,114 @@ private fun IncomesTab(factory: IncomeViewModelFactory) {
                 if (sources.isNotEmpty()) {
                     items(sources.size) { index ->
                         val (category, total) = sources[index]
-                        Row(
+                        val percent = if (summary.total > 0) (total / summary.total * 100) else 0.0
+                        val barColor = chartColors[index % chartColors.size]
+
+                        Card(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(vertical = 2.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically
+                                .padding(vertical = 4.dp),
+                            shape = RoundedCornerShape(14.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
+                            )
                         ) {
-                            Column {
-                                Text(
-                                    text = stringResource(category.nameRes()), fontWeight = FontWeight.Bold, fontSize = 16.sp
-                                )
-                                Text(
-                                    text = stringResource(R.string.money_format).format(total), fontSize = 16.sp
-                                )
-                            }
-                            Row {
-                                IconButton(
-                                    onClick = { selectedSourceForEdit = category.name }, modifier = Modifier.size(33.dp)
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 14.dp, vertical = 10.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                // Цветной квадратик с первой буквой категории
+                                Box(
+                                    modifier = Modifier
+                                        .size(36.dp)
+                                        .background(
+                                            color = barColor.copy(alpha = 0.15f),
+                                            shape = RoundedCornerShape(10.dp)
+                                        ),
+                                    contentAlignment = Alignment.Center
                                 ) {
-                                    Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(16.dp))
+                                    Text(
+                                        text = stringResource(category.nameRes()).take(1),
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = barColor
+                                    )
+                                }
+                                Spacer(modifier = Modifier.width(12.dp))
+
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            text = stringResource(category.nameRes()),
+                                            fontWeight = FontWeight.SemiBold,
+                                            fontSize = 15.sp,
+                                            modifier = Modifier.weight(1f)
+                                        )
+                                        // Процент справа от названия
+                                        Text(
+                                            text = "${percent.toInt()}%",
+                                            fontSize = 13.sp,
+                                            fontWeight = FontWeight.SemiBold,
+                                            color = barColor
+                                        )
+                                    }
+                                    Spacer(modifier = Modifier.height(2.dp))
+                                    Text(
+                                        text = stringResource(R.string.money_format).format(total),
+                                        fontSize = 13.sp,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                    Spacer(modifier = Modifier.height(6.dp))
+                                    // Мини-прогресс-бар доли
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(4.dp)
+                                            .background(
+                                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f),
+                                                shape = RoundedCornerShape(2.dp)
+                                            )
+                                    ) {
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxWidth((percent / 100.0).toFloat().coerceIn(0f, 1f))
+                                                .fillMaxHeight()
+                                                .background(
+                                                    color = barColor,
+                                                    shape = RoundedCornerShape(2.dp)
+                                                )
+                                        )
+                                    }
+                                }
+
+                                Spacer(modifier = Modifier.width(4.dp))
+
+                                IconButton(
+                                    onClick = { selectedSourceForEdit = category.name },
+                                    modifier = Modifier.size(32.dp)
+                                ) {
+                                    Icon(
+                                        Icons.Default.Edit,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(16.dp),
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
                                 }
                                 IconButton(
-                                    onClick = { showDeleteSourceConfirm = category.name }, modifier = Modifier.size(33.dp)
+                                    onClick = { showDeleteSourceConfirm = category.name },
+                                    modifier = Modifier.size(32.dp)
                                 ) {
-                                    Icon(Icons.Default.Delete, contentDescription = null, modifier = Modifier.size(16.dp))
+                                    Icon(
+                                        Icons.Default.Delete,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(16.dp),
+                                        tint = MaterialTheme.colorScheme.error
+                                    )
                                 }
                             }
                         }

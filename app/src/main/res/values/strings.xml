@@ -11,13 +11,13 @@
     <string name="service_display_name_gas">🔥 Газ</string>
     <string name="service_display_name_internet">🌐 Интернет</string>
     <string name="service_display_name_garbage">🗑️ Мусор</string>
-    <string name="service_display_name_mts">📱 Телефона 1</string>
-    <string name="service_display_name_osago">🚗 ААвтострахование</string>
-    <string name="service_display_name_taxes">📄 Налог на бизнес</string>
-    <string name="service_display_name_tinkoff">💳  Телефона 2</string>
+    <string name="service_display_name_mts">📱🔴 МТС</string>
+    <string name="service_display_name_osago">🚗 Автострахование</string>
+    <string name="service_display_name_taxes">💰 Налог на бизнес</string>
+    <string name="service_display_name_tinkoff">📱 🔵 Tinkoff</string>
     <string name="service_display_name_troyka">🚇 Проездной билет</string>
     <string name="service_display_name_zont">🏠 Отопление</string>
-    <string name="service_display_name_hostel">🏢 Общежитие</string>
+    <string name="service_display_name_hostel">\uD83D\uDECF\uFE0F Общежитие</string>
 
 
     <!-- СТАРЫЕ строки (оставьте для результатов): -->
@@ -297,4 +297,7 @@
     <string name="receipt_saved">Квитанция сохранена: %1$s\nПуть: %2$s</string>
     <string name="error_saving_receipt">Ошибка сохранения: %1$s</string>
     <string name="no_saved_result">Нет сохранённого расчёта</string>
+
+    <string name="delete_receipt">Удалить квитанцию ?</string>
+    <string name="delete_receipt_confirm">Вы уверены, что хотите удалить квитанцию: “%s”?</string>
 </resources>
