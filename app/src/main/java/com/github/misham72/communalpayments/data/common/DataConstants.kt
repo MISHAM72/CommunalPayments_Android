@@ -30,13 +30,9 @@ object DataConstants {
     const val BANK_ACCOUNT_SUFFIX = "_bankAccount"
     const val WEBSITE_URL_SUFFIX = "_websiteUrl"
 
-    // Форматы и имена файлов
-    const val DATE_FORMAT_FILENAME = "yyyyMMdd_HHmmss"
-
     // Форматы данных
     const val AMOUNT_FORMAT = "%.2f"
     const val INCOME_RECORD_DATE_PATTERN = "yyyy-MM-dd"
     const val RECEIPTS_DIR = "receipts"
     const val LAST_RESULT_PREFIX = "last_result_"
-    const val INCOME_ATTACHMENTS_DIR = "income_attachments"
 }

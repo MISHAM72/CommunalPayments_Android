@@ -185,16 +185,16 @@ class AppContainer(context: Context) {
         filesDir = context.filesDir
     )
     private val incomeRepository = IncomeRepositoryImpl(incomeFileManager)
-    val incomeUseCase = IncomeUseCase(incomeRepository)
+    private val incomeUseCase = IncomeUseCase(incomeRepository)
 
     val incomeViewModelFactory = IncomeViewModelFactory(incomeUseCase)
 
     // Аналитика (расходы)
-    val analyticsRepository = AnalyticsRepositoryImpl(fileManager)
+    private val analyticsRepository = AnalyticsRepositoryImpl(fileManager)
     val getExpensesUseCase = GetExpensesUseCase(analyticsRepository)
 
     // Репозиторий для бекапа
-    val backupRepository = BackupRepositoryImpl(
+    private val backupRepository = BackupRepositoryImpl(
         filesDir = context.filesDir,
         historyDirName = context.getString(R.string.history),
         incomeDirName = DataConstants.INCOME_HISTORY_DIR
@@ -203,7 +203,7 @@ class AppContainer(context: Context) {
     val importBackupUseCase = ImportBackupUseCase(backupRepository)
 
     // Репозиторий для квитанций
-    val receiptRepository = ReceiptRepositoryImpl(fileManager, Gson())
+    private val receiptRepository = ReceiptRepositoryImpl(fileManager, Gson())
     val saveReceiptUseCase = SaveReceiptUseCase(receiptRepository)
     val getReceiptsUseCase = GetReceiptsUseCase(receiptRepository)
     val deleteReceiptUseCase = DeleteReceiptUseCase(receiptRepository)

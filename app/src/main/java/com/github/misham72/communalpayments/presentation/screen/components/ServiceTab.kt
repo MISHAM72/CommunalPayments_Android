@@ -57,10 +57,12 @@ fun ServiceTab(
         )
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(service.name,
+            Text(
+                service.name,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Medium,
-                color = contentColor)
+                color = contentColor
+            )
 
         }
     }

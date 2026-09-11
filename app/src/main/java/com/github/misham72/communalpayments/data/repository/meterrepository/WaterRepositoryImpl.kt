@@ -1,7 +1,5 @@
 package com.github.misham72.communalpayments.data.repository.meterrepository
 
-import android.content.Context
-import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.data.local.file.FileManager
 import com.github.misham72.communalpayments.data.repository.base.BaseMeterRepository
 import com.github.misham72.communalpayments.domain.common.DomainMessages

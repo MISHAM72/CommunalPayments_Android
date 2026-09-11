@@ -1,6 +1,5 @@
 package com.github.misham72.communalpayments.data.local.preferences
 
-import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.github.misham72.communalpayments.data.common.DataConstants

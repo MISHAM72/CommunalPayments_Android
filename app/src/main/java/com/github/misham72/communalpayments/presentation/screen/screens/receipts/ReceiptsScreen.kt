@@ -1,7 +1,5 @@
 package com.github.misham72.communalpayments.presentation.screen.screens.receipts
 
-import android.R.attr.clickable
-import android.R.attr.contentDescription
 import android.content.Intent
 
 import android.net.Uri

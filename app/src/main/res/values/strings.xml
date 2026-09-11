@@ -17,7 +17,7 @@
     <string name="service_display_name_tinkoff">📱 🔵 Tinkoff</string>
     <string name="service_display_name_troyka">🚇 Проездной билет</string>
     <string name="service_display_name_zont">🏠 Отопление</string>
-    <string name="service_display_name_hostel">\uD83D\uDECF\uFE0F Общежитие</string>
+    <string name="service_display_name_hostel">🛏️  Общежитие</string>
 
 
     <!-- СТАРЫЕ строки (оставьте для результатов): -->
@@ -300,8 +300,5 @@
 
     <string name="delete_receipt">Удалить квитанцию ?</string>
     <string name="delete_receipt_confirm">Вы уверены, что хотите удалить квитанцию: “%s”?</string>
-
-    <string name="attach_file">Прикрепить файл</string>
-    <string name="default_attachment_name">вложение</string>
 
 </resources>
