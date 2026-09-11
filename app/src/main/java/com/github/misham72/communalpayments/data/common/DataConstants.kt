@@ -38,4 +38,5 @@ object DataConstants {
     const val INCOME_RECORD_DATE_PATTERN = "yyyy-MM-dd"
     const val RECEIPTS_DIR = "receipts"
     const val LAST_RESULT_PREFIX = "last_result_"
+    const val INCOME_ATTACHMENTS_DIR = "income_attachments"
 }

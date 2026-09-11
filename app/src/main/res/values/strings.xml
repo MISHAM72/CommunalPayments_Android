@@ -300,4 +300,8 @@
 
     <string name="delete_receipt">Удалить квитанцию ?</string>
     <string name="delete_receipt_confirm">Вы уверены, что хотите удалить квитанцию: “%s”?</string>
+
+    <string name="attach_file">Прикрепить файл</string>
+    <string name="default_attachment_name">вложение</string>
+
 </resources>

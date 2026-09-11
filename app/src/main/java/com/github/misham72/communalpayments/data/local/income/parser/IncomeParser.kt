@@ -17,7 +17,16 @@ object IncomeParser {
             val source = extractSource(block)
             val amount = extractAmount(block)
             if (date != null && source != null && amount != null) {
-                records.add(IncomeRecord(date, amount, source))
+                records.add(
+                    IncomeRecord(
+                        date = date,
+                        amount = amount,
+                        source = source,
+                        attachmentPath = extractAttachmentPath(block),
+                        attachmentName = extractAttachmentName(block),
+                        attachmentMime = extractAttachmentMime(block)
+                    )
+                )
             }
         }
         return records
@@ -58,5 +67,23 @@ object IncomeParser {
             }
         }
         return null
+    }
+
+    @Suppress("HardcodedStringLiteral")
+    private fun extractAttachmentPath(block: String): String? {
+        val regex = Regex("""Вложение:\s*(.+)""")
+        return regex.find(block)?.groupValues?.get(1)?.trim()
+    }
+
+    @Suppress("HardcodedStringLiteral")
+    private fun extractAttachmentName(block: String): String? {
+        val regex = Regex("""ИмяФайла:\s*(.+)""")
+        return regex.find(block)?.groupValues?.get(1)?.trim()
+    }
+
+    @Suppress("HardcodedStringLiteral")
+    private fun extractAttachmentMime(block: String): String? {
+        val regex = Regex("""MimeType:\s*(.+)""")
+        return regex.find(block)?.groupValues?.get(1)?.trim()
     }
 }

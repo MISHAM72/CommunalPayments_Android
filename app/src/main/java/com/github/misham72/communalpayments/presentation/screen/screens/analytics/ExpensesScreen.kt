@@ -1,6 +1,7 @@
 package com.github.misham72.communalpayments.presentation.screen.screens.analytics
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -25,7 +26,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
@@ -75,6 +76,7 @@ import com.github.misham72.communalpayments.domain.model.incomes.IncomeCategory
 import com.github.misham72.communalpayments.domain.model.incomes.IncomeRecord
 import com.github.misham72.communalpayments.domain.model.incomes.IncomeSummary
 import com.github.misham72.communalpayments.domain.usecases.GetExpensesUseCase
+import com.github.misham72.communalpayments.presentation.common.UiConstants
 import com.github.misham72.communalpayments.presentation.screen.navigation.InitialScreen
 import com.github.misham72.communalpayments.presentation.screen.navigation.getListInitialScreen
 import com.github.misham72.communalpayments.presentation.utils.nameRes
@@ -257,18 +259,108 @@ private fun ExpensesTab(factory: ExpensesViewModelFactory, appContainer: AppCont
                 }
                 val services = summary.byService.toList().sortedBy { (key, _) -> allServices.indexOfFirst { it.fileKey == key } }
                 if (services.isNotEmpty()) {
-                    items(services) { (key, total) ->
+                    itemsIndexed(services) { index, (key, total) ->
                         val screen = allServices.find { it.fileKey == key }
                         val displayName = screen?.name ?: key
-                        Row(
+
+                        // Эмодзи — всё, что идёт до первой буквы (сам смайл + пробел)
+                        val emoji = displayName.takeWhile { !it.isLetter() }.trim().ifBlank { "📊" }
+                        // Чистое название без эмодзи
+                        val cleanName = displayName.drop(emoji.length).trim().ifBlank { displayName }
+
+                        val percent = if (summary.total > 0) (total / summary.total * 100) else 0.0
+                        val barColor = chartColors[index % chartColors.size]
+                        // 👇 ВОТ ЭТО ДОБАВЛЯЕМ
+                        val progressAnim = remember { Animatable(0f) }
+                        LaunchedEffect(percent) {
+                            progressAnim.animateTo(
+                                targetValue = (percent / 100.0).toFloat().coerceIn(0f, 1f),
+                                animationSpec = tween(
+                                    durationMillis = 900,
+                                    delayMillis = index * 80
+                                )
+                            )
+                        }
+
+                        Card(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(vertical = 4.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(text = displayName, fontWeight = FontWeight.Bold)
-                            Text(
-                                text = stringResource(R.string.money_format).format(total), fontSize = 14.sp
+                                .padding(vertical = 4.dp),
+                            shape = RoundedCornerShape(14.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
                             )
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 14.dp, vertical = 10.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                // Аватар с эмодзи
+                                Box(
+                                    modifier = Modifier
+                                        .size(36.dp)
+                                        .background(
+                                            color = barColor.copy(alpha = 0.15f),
+                                            shape = RoundedCornerShape(10.dp)
+                                        ),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = emoji,
+                                        fontSize = 18.sp
+                                    )
+                                }
+                                Spacer(modifier = Modifier.width(12.dp))
+
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            text = cleanName,
+                                            fontWeight = FontWeight.SemiBold,
+                                            fontSize = 15.sp,
+                                            modifier = Modifier.weight(1f)
+                                        )
+                                        Text(
+                                            text = UiConstants.PERCENT_FORMAT.format(percent),
+                                            fontSize = 13.sp,
+                                            fontWeight = FontWeight.SemiBold,
+                                            color = barColor
+                                        )
+                                    }
+                                    Spacer(modifier = Modifier.height(2.dp))
+                                    Text(
+                                        text = stringResource(R.string.money_format).format(total),
+                                        fontSize = 13.sp,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                    Spacer(modifier = Modifier.height(6.dp))
+                                    // Мини-прогресс-бар
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(4.dp)
+                                            .background(
+                                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f),
+                                                shape = RoundedCornerShape(2.dp)
+                                            )
+                                    ) {
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxWidth(progressAnim.value)
+                                                .fillMaxHeight()
+                                                .background(
+                                                    color = barColor,
+                                                    shape = RoundedCornerShape(2.dp)
+                                                )
+                                        )
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -521,6 +613,16 @@ private fun IncomesTab(factory: IncomeViewModelFactory) {
                         val (category, total) = sources[index]
                         val percent = if (summary.total > 0) (total / summary.total * 100) else 0.0
                         val barColor = chartColors[index % chartColors.size]
+                        val progressAnim = remember { Animatable(0f) }
+                        LaunchedEffect(percent) {
+                            progressAnim.animateTo(
+                                targetValue = (percent / 100.0).toFloat().coerceIn(0f, 1f),
+                                animationSpec = tween(
+                                    durationMillis = 900,
+                                    delayMillis = index * 80
+                                )
+                            )
+                        }
 
                         Card(
                             modifier = Modifier
@@ -569,7 +671,7 @@ private fun IncomesTab(factory: IncomeViewModelFactory) {
                                         )
                                         // Процент справа от названия
                                         Text(
-                                            text = "${percent.toInt()}%",
+                                            text = UiConstants.PERCENT_FORMAT.format(percent),
                                             fontSize = 13.sp,
                                             fontWeight = FontWeight.SemiBold,
                                             color = barColor
@@ -594,7 +696,7 @@ private fun IncomesTab(factory: IncomeViewModelFactory) {
                                     ) {
                                         Box(
                                             modifier = Modifier
-                                                .fillMaxWidth((percent / 100.0).toFloat().coerceIn(0f, 1f))
+                                                .fillMaxWidth(progressAnim.value)
                                                 .fillMaxHeight()
                                                 .background(
                                                     color = barColor,

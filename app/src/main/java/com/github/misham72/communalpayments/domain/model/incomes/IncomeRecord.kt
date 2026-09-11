@@ -5,5 +5,8 @@ import java.time.LocalDate
 data class IncomeRecord(
     val date: LocalDate,   // теперь полная дата
     val amount: Double,
-    val source: String
+    val source: String,
+    val attachmentPath: String? = null,      // относительный путь от filesDir
+    val attachmentName: String? = null,      // оригинальное имя файла
+    val attachmentMime: String? = null       // "application/pdf" или "image/jpeg"
 )

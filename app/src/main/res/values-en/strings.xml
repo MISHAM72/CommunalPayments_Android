@@ -253,6 +253,7 @@
     <string name="error_prefix">Error %1$s</string>
     <string name="open_pdf">Open PDF</string>
     <string name="date_time_format">Date time format</string>
+    <string name="attach_file">Attach file</string>
     <string name="open">Open</string>
     <string name="error_intent_no_file">Error intent no file</string>
     <string name="list_services_empty">The  list of services is empty</string>
@@ -264,6 +265,7 @@
     <string name="no_saved_result">No saved calculation</string>
     <string name="delete_receipt">Delete receipt</string>
     <string name="delete_receipt_confirm">Delete receipt confirm : \"%s\"</string>
+    <string name="default_attachment_name">Default attachment name</string>
 
 </resources>
 
