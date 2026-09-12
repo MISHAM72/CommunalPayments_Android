@@ -35,4 +35,12 @@ object DataConstants {
     const val INCOME_RECORD_DATE_PATTERN = "yyyy-MM-dd"
     const val RECEIPTS_DIR = "receipts"
     const val LAST_RESULT_PREFIX = "last_result_"
+    const val DATE_TIME_FORMATE = "yyyy-MM-dd HH:mm:ss"
+    const val HISTORY_SEPARATOR = "🟩"
+    const val HISTORY_SEPARATOR_COUNT = 12
+    // В DataConstants:
+    const val KEY_PAYMENT_PREFIX = "К оплате"
+    const val KEY_TARIFF_PREFIX = "Тариф"
+
+
 }

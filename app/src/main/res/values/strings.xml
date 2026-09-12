@@ -242,7 +242,7 @@
 
     <!-- ЛИЦЕВОЙ СЧЕТ  -->
     <string name="change_personal_account">Изменить лицевой счёт</string>
-    <string name="personal_account_in_text_history">Лицевой счёт: %s</string>
+    <string name="personal_account_in_text_history">"Лицевой счёт: "</string>
     <string name="personal_account">Л/С: %s</string>
     <string name="personal_account_not_specified">Л/С не указан</string>
     <string name="enter_personal_account">Введите лицевой счёт</string>

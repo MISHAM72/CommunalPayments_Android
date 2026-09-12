@@ -113,7 +113,7 @@
     <string name="payment_date">Payment date: %s</string>
 
     <string name="personal_account_label">Personal account</string>
-    <string name="personal_account_in_text_history">Personal account: %s</string>
+    <string name="personal_account_in_text_history">"Personal account: "</string>
     <string name="personal_account">"Account: %s"</string>
     <string name="personal_account_taxes">SSN: %s</string>
     <string name="number_phone">Phone: %s</string>

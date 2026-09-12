@@ -11,9 +11,6 @@ abstract class BasePeriodicRepository(
     private val periodMonthsTemplate: String,
     private val currencyTemplate: String
 ) : BaseRepository(fileManager, dateFormatPattern) {
-
-    // ✅ ЕДИНЫЙ метод для ВСЕХ периодических платежей
-    //внутри метода происходит сборка итоговой строки
     @Suppress("SameParameterValue")
     protected fun formatPeriodicPayment(
         accountNumber: String = "",

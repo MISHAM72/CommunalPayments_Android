@@ -1,5 +1,6 @@
 package com.github.misham72.communalpayments.data.repository.analytics
 
+import com.github.misham72.communalpayments.data.common.DataConstants
 import com.github.misham72.communalpayments.data.local.file.FileManager
 import com.github.misham72.communalpayments.domain.model.incomes.YearSummary
 import com.github.misham72.communalpayments.domain.repository.AnalyticsRepository
@@ -34,10 +35,8 @@ class AnalyticsRepositoryImpl(private val fileManager: FileManager) : AnalyticsR
         val rawText = fileManager.readHistory(serviceKey)
         val monthly = mutableMapOf<Int, Double>()
         var total = 0.0
-
-        // Разделитель – 14 зелёных квадратов
-        val blocks = rawText.split("🟩".repeat(14)).filter { it.isNotBlank() }
-
+        val dateTimeRegex = Regex("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}")
+        val blocks = rawText.split(DataConstants.HISTORY_SEPARATOR.repeat(DataConstants.HISTORY_SEPARATOR_COUNT)).filter { it.isNotBlank() }
         for (block in blocks) {
             // Берём только оплаченные блоки (есть 🔴)
             if (!block.contains("🔴")) continue
@@ -49,7 +48,7 @@ class AnalyticsRepositoryImpl(private val fileManager: FileManager) : AnalyticsR
             for (line in lines) {
                 val trimmed = line.trim()
                 // Дата вида 2026-06-28 23:29:25
-                if (trimmed.matches(Regex("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}"))) {
+                if (trimmed.matches(dateTimeRegex)) {
                     dateStr = trimmed
                 }
                 @Suppress("HardcodedStringLiteral")
