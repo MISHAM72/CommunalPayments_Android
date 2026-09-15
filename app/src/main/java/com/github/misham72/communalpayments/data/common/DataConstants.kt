@@ -38,9 +38,13 @@ object DataConstants {
     const val DATE_TIME_FORMATE = "yyyy-MM-dd HH:mm:ss"
     const val HISTORY_SEPARATOR = "🟩"
     const val HISTORY_SEPARATOR_COUNT = 12
+
     // В DataConstants:
     const val KEY_PAYMENT_PREFIX = "К оплате"
     const val KEY_TARIFF_PREFIX = "Тариф"
-
+    const val HISTORY_ATTACHMENTS_DIR = "history_attachments"
+    const val INCOME_ATTACHMENTS_DIR = "income_attachments"
+    const val TXT_EXTENSION = "txt"
+    const val DATE_TIME_REGEX_PATTERN = """\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}"""
 
 }

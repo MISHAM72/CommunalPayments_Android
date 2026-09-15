@@ -21,9 +21,11 @@ import com.github.misham72.communalpayments.data.repository.periodrepository.Per
 import com.github.misham72.communalpayments.data.repository.provider.ProviderRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.receipt.ReceiptRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.settings.UserSettingsRepositoryImpl
+import com.github.misham72.communalpayments.domain.usecases.AttachHistoryAttachmentUseCase
 import com.github.misham72.communalpayments.domain.usecases.DeleteReceiptUseCase
 import com.github.misham72.communalpayments.domain.usecases.ExportBackupUseCase
 import com.github.misham72.communalpayments.domain.usecases.GetExpensesUseCase
+import com.github.misham72.communalpayments.domain.usecases.GetHistoryAttachmentUseCase
 import com.github.misham72.communalpayments.domain.usecases.GetHistoryUseCase
 import com.github.misham72.communalpayments.domain.usecases.GetReceiptsUseCase
 import com.github.misham72.communalpayments.domain.usecases.ImportBackupUseCase
@@ -31,6 +33,7 @@ import com.github.misham72.communalpayments.domain.usecases.IncomeUseCase
 import com.github.misham72.communalpayments.domain.usecases.MeterDataUseCase
 import com.github.misham72.communalpayments.domain.usecases.PdfHistoryUseCase
 import com.github.misham72.communalpayments.domain.usecases.PeriodicDataUseCase
+import com.github.misham72.communalpayments.domain.usecases.RemoveHistoryAttachmentUseCase
 import com.github.misham72.communalpayments.domain.usecases.SaveHistoryUseCase
 import com.github.misham72.communalpayments.domain.usecases.SaveReceiptUseCase
 import com.github.misham72.communalpayments.domain.usecases.TextHistoryUseCase
@@ -55,7 +58,7 @@ class AppContainer(context: Context) {
     // Репозитории для метрик
     val electricityRepository = ElectricityRepositoryImpl(
         fileManager = fileManager,
-        dateFormatPattern = context.getString(R.string.yyyy_mm_dd_hh_mm_ss),
+        dateFormatPattern = DataConstants.DATE_TIME_FORMATE,
         personalAccountTemplate = context.getString(R.string.personal_account_in_text_history),
         currentReadingTemplate = context.getString(R.string.current_reading),
         previousReadingTemplate = context.getString(R.string.previous_reading),
@@ -67,7 +70,7 @@ class AppContainer(context: Context) {
     )
     val waterRepository = WaterRepositoryImpl(
         fileManager = fileManager,
-        dateFormatPattern = context.getString(R.string.yyyy_mm_dd_hh_mm_ss),
+        dateFormatPattern = DataConstants.DATE_TIME_FORMATE,
         personalAccountTemplate = context.getString(R.string.personal_account_in_text_history),
         currentReadingTemplate = context.getString(R.string.current_reading),
         previousReadingTemplate = context.getString(R.string.previous_reading),
@@ -79,7 +82,7 @@ class AppContainer(context: Context) {
     )
     val gasRepository = GasRepositoryImpl(
         fileManager = fileManager,
-        dateFormatPattern = context.getString(R.string.yyyy_mm_dd_hh_mm_ss),
+        dateFormatPattern = DataConstants.DATE_TIME_FORMATE,
         personalAccountTemplate = context.getString(R.string.personal_account_in_text_history),
         currentReadingTemplate = context.getString(R.string.current_reading),
         previousReadingTemplate = context.getString(R.string.previous_reading),
@@ -94,7 +97,7 @@ class AppContainer(context: Context) {
 
     private val periodicRepository = PeriodicRepositoryImpl(
         fileManager = fileManager,
-        dateFormatPattern = context.getString(R.string.yyyy_mm_dd_hh_mm_ss),
+        dateFormatPattern = DataConstants.DATE_TIME_FORMATE,
         personalAccountTemplate = context.getString(R.string.personal_account_in_text_history),
         nextPaymentTemplate = context.getString(R.string.next_payment),
         priceTariffTemplate = context.getString(R.string.tariff_card),
@@ -159,7 +162,7 @@ class AppContainer(context: Context) {
         pdfAllHistoryTitle = context.getString(R.string.pdf_all_history_title),
         pdfGenerated = context.getString(R.string.pdf_generated),
         sendPdf = context.getString(R.string.send_pdf),
-        dateFormatPattern = context.getString(R.string.yyyy_mm_dd_hh_mm_ss),
+        dateFormatPattern = DataConstants.DATE_TIME_FORMATE,
         serviceDisplayNames = serviceDisplayNames,
         historyHeader = "🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩",
     )
@@ -170,7 +173,7 @@ class AppContainer(context: Context) {
         fileManager = fileManager,
         cacheDir = context.cacheDir,
         packageName = context.packageName,
-        dateFormatPattern = context.getString(R.string.yyyy_mm_dd_hh_mm_ss),
+        dateFormatPattern = DataConstants.DATE_TIME_FORMATE,
         exportHistoryMessage = context.getString(R.string.export_history)
     )
     val textHistoryUseCase = TextHistoryUseCase(textHistoryRepository)
@@ -179,6 +182,9 @@ class AppContainer(context: Context) {
     private val historyRepository = HistoryRepositoryImpl(fileManager)
     val getHistoryUseCase = GetHistoryUseCase(historyRepository)
     val saveHistoryUseCase = SaveHistoryUseCase(historyRepository)
+    val attachHistoryAttachmentUseCase = AttachHistoryAttachmentUseCase(fileManager)
+    val removeHistoryAttachmentUseCase = RemoveHistoryAttachmentUseCase(fileManager)
+    val getHistoryAttachmentUseCase = GetHistoryAttachmentUseCase(fileManager)
 
     // Доходы
     private val incomeFileManager = IncomeFileManager(

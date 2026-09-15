@@ -38,7 +38,6 @@ class AnalyticsRepositoryImpl(private val fileManager: FileManager) : AnalyticsR
         val dateTimeRegex = Regex("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}")
         val blocks = rawText.split(DataConstants.HISTORY_SEPARATOR.repeat(DataConstants.HISTORY_SEPARATOR_COUNT)).filter { it.isNotBlank() }
         for (block in blocks) {
-            // Берём только оплаченные блоки (есть 🔴)
             if (!block.contains("🔴")) continue
 
             val lines = block.lines()

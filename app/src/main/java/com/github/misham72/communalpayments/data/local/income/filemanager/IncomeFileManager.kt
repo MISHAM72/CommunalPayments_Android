@@ -34,4 +34,28 @@ class IncomeFileManager(private val filesDir: File) {
             file.writeText(content)
         }
     }
+    fun getIncomeAttachmentsDir(year: Int): File {
+        val dir = File(filesDir, "${DataConstants.INCOME_ATTACHMENTS_DIR}/$year")
+        if (!dir.exists()) dir.mkdirs()
+        return dir
+    }
+
+    suspend fun saveAttachment(year: Int, bytes: ByteArray, fileName: String): String {
+        return withContext(Dispatchers.IO) {
+            val dir = getIncomeAttachmentsDir(year)
+            val uniqueName = "${System.currentTimeMillis()}_$fileName"
+            val file = File(dir, uniqueName)
+            file.writeBytes(bytes)
+            file.absolutePath
+        }
+    }
+
+    fun deleteAttachment(path: String): Boolean {
+        return File(path).delete()
+    }
+
+    fun getAttachment(path: String): File? {
+        val file = File(path)
+        return if (file.exists()) file else null
+    }
 }

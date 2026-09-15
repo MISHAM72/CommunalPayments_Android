@@ -93,4 +93,64 @@ class FileManager(
         val file = File(path)
         return if (file.exists()) file else null
     }
+    // ---------- Вложения к истории платежей ----------
+
+    /**
+     * Перезаписывает файл истории целиком.
+     * Используется при прикреплении/удалении вложения (текст блока меняется).
+     */
+    suspend fun saveHistory(serviceKey: String, content: String) {
+        withContext(Dispatchers.IO) {
+            val directory = File(filesDir, historyDirName)
+            directory.mkdirs()
+            val file = File(directory, "$serviceKey.txt")
+            file.writeText(content)
+        }
+    }
+
+    /**
+     * Папка для вложений конкретной услуги.
+     * Пример: files/history_attachments/hostel/
+     */
+    private fun getHistoryAttachmentsDir(serviceKey: String): File {
+        val dir = File(File(filesDir, DataConstants.HISTORY_ATTACHMENTS_DIR), serviceKey)
+        if (!dir.exists()) dir.mkdirs()
+        return dir
+    }
+
+    /**
+     * Сохраняет файл-вложение к записи истории.
+     * Возвращает абсолютный путь к сохранённому файлу.
+     */
+    suspend fun saveHistoryAttachment(
+        inputStream: InputStream,
+        serviceKey: String,
+        fileName: String
+    ): String = withContext(Dispatchers.IO) {
+        val dir = getHistoryAttachmentsDir(serviceKey)
+        val uniqueFileName = "${System.currentTimeMillis()}_$fileName"
+        val file = File(dir, uniqueFileName)
+        file.outputStream().use { output ->
+            inputStream.copyTo(output)
+        }
+        file.absolutePath
+    }
+
+    /**
+     * Удаляет файл-вложение с диска.
+     * Возвращает true, если файл удалён.
+     */
+    fun deleteHistoryAttachment(path: String): Boolean {
+        val file = File(path)
+        return if (file.exists()) file.delete() else false
+    }
+
+    /**
+     * Возвращает File для открытия вложения.
+     * Null, если файл не найден.
+     */
+    fun getHistoryAttachment(path: String): File? {
+        val file = File(path)
+        return if (file.exists()) file else null
+    }
 }

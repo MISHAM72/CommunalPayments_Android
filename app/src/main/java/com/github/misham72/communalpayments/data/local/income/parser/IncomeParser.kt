@@ -1,10 +1,12 @@
 package com.github.misham72.communalpayments.data.local.income.parser
 
+import com.github.misham72.communalpayments.domain.model.Attachment
 import com.github.misham72.communalpayments.domain.model.incomes.IncomeRecord
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 object IncomeParser {
+
     @Suppress("HardcodedStringLiteral")
     private val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
     private const val BLOCK_SEPARATOR = "***"
@@ -13,30 +15,24 @@ object IncomeParser {
         val records = mutableListOf<IncomeRecord>()
         val blocks = rawText.split(BLOCK_SEPARATOR).filter { it.isNotBlank() }
         for (block in blocks) {
-            val date = extractDate(block)
-            val source = extractSource(block)
-            val amount = extractAmount(block)
-            if (date != null && source != null && amount != null) {
-                records.add(
-                    IncomeRecord(
-                        date = date,
-                        amount = amount,
-                        source = source,
-                        attachmentPath = extractAttachmentPath(block),
-                        attachmentName = extractAttachmentName(block),
-                        attachmentMime = extractAttachmentMime(block)
-                    )
+            val date = extractDate(block) ?: continue
+            val source = extractSource(block) ?: continue
+            val amount = extractAmount(block) ?: continue
+            records.add(
+                IncomeRecord(
+                    date = date,
+                    amount = amount,
+                    source = source,
+                    attachments = extractAttachments(block)
                 )
-            }
+            )
         }
         return records
     }
 
     private fun extractDate(block: String): LocalDate? {
-        val lines = block.lines()
-        for (line in lines) {
+        for (line in block.lines()) {
             val trimmed = line.trim()
-            // Проверка на формат yyyy-MM-dd в начале строки
             if (trimmed.length >= 10 && trimmed[4] == '-' && trimmed[7] == '-') {
                 try {
                     return LocalDate.parse(trimmed.substring(0, 10), dateFormatter)
@@ -50,40 +46,70 @@ object IncomeParser {
     private fun extractSource(block: String): String? {
         @Suppress("HardcodedStringLiteral")
         val regex = Regex("""Источник:\s*(.+)""")
-        val match = regex.find(block) ?: return null
-        return match.groupValues[1].trim()
+        return regex.find(block)?.groupValues?.get(1)?.trim()
     }
 
-    @Suppress("HardcodedStringLiteral")
     private fun extractAmount(block: String): Double? {
-        val lines = block.lines()
-        for (line in lines) {
+        for (line in block.lines()) {
             if (line.trim().startsWith("Сумма:")) {
                 val raw = line.substringAfter("Сумма:").trim()
                     .replace(" ", "")
-                    .replace(",", ".")   // допускает как запятую, так и точку
-                // Теперь raw может быть "1400", "1400.00", "1400,00" и т.д.
+                    .replace(",", ".")
                 return raw.toDoubleOrNull()
             }
         }
         return null
     }
 
-    @Suppress("HardcodedStringLiteral")
-    private fun extractAttachmentPath(block: String): String? {
-        val regex = Regex("""Вложение:\s*(.+)""")
-        return regex.find(block)?.groupValues?.get(1)?.trim()
-    }
+    /**
+     * Читает вложения. Поддерживает два формата:
+     *
+     * 1) НОВЫЙ: одна строка на вложение
+     *    Вложение: /path/to/file.jpg|photo.jpg|image/jpeg
+     *
+     * 2) СТАРЫЙ: три отдельные строки для одного вложения
+     *    Вложение: /path/to/file.jpg
+     *    ИмяФайла: photo.jpg
+     *    MimeType: image/jpeg
+     */
+    private fun extractAttachments(block: String): List<Attachment> {
+        val lines = block.lines()
 
-    @Suppress("HardcodedStringLiteral")
-    private fun extractAttachmentName(block: String): String? {
-        val regex = Regex("""ИмяФайла:\s*(.+)""")
-        return regex.find(block)?.groupValues?.get(1)?.trim()
-    }
+        // 1. Пробуем новый формат (с разделителями "|").
+        @Suppress("HardcodedStringLiteral")
+        val newFormatRegex = Regex("""Вложение:\s*(.+?)\|(.+?)\|(.+)""")
+        val newAttachments = lines.mapNotNull { line ->
+            val match = newFormatRegex.find(line.trim()) ?: return@mapNotNull null
+            Attachment(
+                path = match.groupValues[1].trim(),
+                name = match.groupValues[2].trim(),
+                mimeType = match.groupValues[3].trim()
+            )
+        }
+        if (newAttachments.isNotEmpty()) return newAttachments
 
-    @Suppress("HardcodedStringLiteral")
-    private fun extractAttachmentMime(block: String): String? {
-        val regex = Regex("""MimeType:\s*(.+)""")
-        return regex.find(block)?.groupValues?.get(1)?.trim()
+        // 2. Fallback — старый формат (одно вложение, 3 строки)
+        @Suppress("HardcodedStringLiteral")
+        val oldPathRegex = Regex("""Вложение:\s*(.+)""")
+
+        @Suppress("HardcodedStringLiteral")
+        val oldNameRegex = Regex("""ИмяФайла:\s*(.+)""")
+
+        @Suppress("HardcodedStringLiteral")
+        val oldMimeRegex = Regex("""MimeType:\s*(.+)""")
+
+        val path = oldPathRegex.find(block)?.groupValues?.get(1)?.trim()
+        val name = oldNameRegex.find(block)?.groupValues?.get(1)?.trim()
+        val mime = oldMimeRegex.find(block)?.groupValues?.get(1)?.trim()
+
+        return if (path != null) {
+            listOf(
+                Attachment(
+                    path = path,
+                    name = name ?: path.substringAfterLast('/'),
+                    mimeType = mime ?: "application/octet-stream"
+                )
+            )
+        } else emptyList()
     }
 }

@@ -1,9 +1,13 @@
 package com.github.misham72.communalpayments.presentation.screen.screens.history
 
+import android.content.Intent
+import android.net.Uri
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,10 +15,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -28,21 +32,27 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.FileProvider
 import com.github.misham72.communalpayments.R
+import com.github.misham72.communalpayments.data.parser.HistoryParser
+import com.github.misham72.communalpayments.domain.model.Attachment
+import com.github.misham72.communalpayments.domain.model.HistoryRecord
 import com.github.misham72.communalpayments.domain.model.PaymentStatus
+import com.github.misham72.communalpayments.domain.usecases.AttachHistoryAttachmentUseCase
+import com.github.misham72.communalpayments.domain.usecases.GetHistoryAttachmentUseCase
 import com.github.misham72.communalpayments.domain.usecases.GetHistoryUseCase
+import com.github.misham72.communalpayments.domain.usecases.RemoveHistoryAttachmentUseCase
 import com.github.misham72.communalpayments.domain.usecases.SaveHistoryUseCase
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
-import com.github.misham72.communalpayments.presentation.common.UiConstants
+import com.github.misham72.communalpayments.presentation.common.UiMessages
 import com.github.misham72.communalpayments.presentation.mapper.StatusDisplayMapper
+import com.github.misham72.communalpayments.presentation.screen.components.HistoryCard
 import com.github.misham72.communalpayments.presentation.utils.HISTORY_SEPARATOR
 import com.github.misham72.communalpayments.presentation.utils.rememberBoilerSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberButtonBuckSoundPlayer
@@ -61,7 +71,9 @@ import com.github.misham72.communalpayments.presentation.utils.rememberTinkoffSo
 import com.github.misham72.communalpayments.presentation.utils.rememberWaterSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberlightSoundPlayer
 import kotlinx.coroutines.launch
-import java.time.LocalDate
+import java.io.File
+
+private const val TAG = "HistoryScreen"
 
 @Composable
 //🔴//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -69,10 +81,16 @@ fun HistoryScreen(
     onBack: () -> Unit,
     initialService: String,
     getHistoryUseCase: GetHistoryUseCase,
-    saveHistoryUseCase: SaveHistoryUseCase
+    saveHistoryUseCase: SaveHistoryUseCase,
+    attachHistoryAttachmentUseCase: AttachHistoryAttachmentUseCase,
+    removeHistoryAttachmentUseCase: RemoveHistoryAttachmentUseCase,
+    getHistoryAttachmentUseCase: GetHistoryAttachmentUseCase
 
 ) {
     val loadingText = stringResource(R.string.loading)
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    var recordForAttach by remember { mutableStateOf<HistoryRecord?>(null) }
     var fileContent by remember { mutableStateOf(loadingText) }
     var isEditing by remember { mutableStateOf(false) }
     var selectedService by remember { mutableStateOf(initialService) }
@@ -96,10 +114,88 @@ fun HistoryScreen(
     val carSound = rememberCarSoundPlayer()
     val osagoSound = rememberOsagoSoundPlayer()
     val hostelSound = rememberHostelSoundPlayer()
-
     suspend fun refreshHistory() {
         fileContent = getHistoryUseCase.getHistory(selectedService)
     }
+
+    // Общая функция сохранения — используется всеми тремя launcher
+    fun saveAttachmentFromUri(uri: Uri, record: HistoryRecord) {
+        val mimeType = context.contentResolver.getType(uri)
+            ?: "application/octet-stream"
+        val fileName = getFileNameFromUri(context, uri)
+            ?: "file_${System.currentTimeMillis()}"
+        val bytes = context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
+        if (bytes == null || bytes.isEmpty()) return
+
+        scope.launch {
+            try {
+                attachHistoryAttachmentUseCase(
+                    serviceKey = selectedService,
+                    rawBlock = record.rawBlock,
+                    currentAttachments = record.attachments,
+                    bytes = bytes,
+                    fileName = fileName,
+                    mimeType = mimeType
+                )
+                refreshHistory()
+            } catch (e: Exception) {
+                Log.e(TAG, UiMessages.LOG_ATTACH_ERROR, e)
+            }
+        }
+    }
+
+    // 📎 — выбор любого файла
+    val attachLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        val record = recordForAttach
+        if (uri != null && record != null) saveAttachmentFromUri(uri, record)
+        recordForAttach = null
+    }
+
+    // 📷 — камера
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicturePreview()
+    ) { bitmap: android.graphics.Bitmap? ->
+        val record = recordForAttach
+        if (bitmap != null && record != null) {
+            // Сохраняем bitmap во временный файл
+            val tempFile = File(context.cacheDir, "camera_${System.currentTimeMillis()}.jpg")
+            tempFile.outputStream().use { out ->
+                bitmap.compress(android.graphics.Bitmap.CompressFormat.JPEG, 90, out)
+            }
+            val bytes = tempFile.readBytes()
+            tempFile.delete()
+            if (bytes.isNotEmpty()) {
+                scope.launch {
+                    try {
+                        attachHistoryAttachmentUseCase(
+                            serviceKey = selectedService,
+                            rawBlock = record.rawBlock,
+                            currentAttachments = record.attachments,
+                            bytes = bytes,
+                            fileName = "photo_${System.currentTimeMillis()}.jpg",
+                            mimeType = "image/jpeg"
+                        )
+                        refreshHistory()
+                    } catch (e: Exception) {
+                        Log.e(TAG, UiMessages.LOG_CAMERA_ERROR, e)
+                    }
+                }
+            }
+        }
+        recordForAttach = null
+    }
+
+    // 🖼 — галерея (только изображения)
+    val galleryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        val record = recordForAttach
+        if (uri != null && record != null) saveAttachmentFromUri(uri, record)
+        recordForAttach = null
+    }
+
     LaunchedEffect(selectedService) {
         fileContent = loadingText
         fileContent = try {
@@ -108,6 +204,7 @@ fun HistoryScreen(
             errorMessageTemplate.format(e.localizedMessage ?: unknownErrorText) // ← используем полученную переменную
         }
     }
+
     //🔴//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Вертикальная колонка — весь экран
     Column(
@@ -245,123 +342,79 @@ fun HistoryScreen(
             }
         } else {
 
-            val viewScrollState = rememberScrollState()
-            Card(
-                Modifier
+            // === СПИСОК КАРТОЧЕК С ВЛОЖЕНИЯМИ ===
+            val records = remember(fileContent, selectedService) {
+                HistoryParser.parse(fileContent, selectedService)
+            }
+
+            // Имя услуги для форматирования (жирным)
+            val serviceDisplayName = when (selectedService) {
+                ServiceKeys.ELECTRICITY -> stringResource(R.string.service_display_name_electricity)
+                ServiceKeys.GAS -> stringResource(R.string.service_display_name_gas)
+                ServiceKeys.WATER -> stringResource(R.string.service_display_name_water)
+                ServiceKeys.GARBAGE -> stringResource(R.string.service_display_name_garbage)
+                ServiceKeys.ZONT -> stringResource(R.string.service_display_name_zont)
+                ServiceKeys.INTERNET -> stringResource(R.string.service_display_name_internet)
+                ServiceKeys.MTS -> stringResource(R.string.service_display_name_mts)
+                ServiceKeys.TINKOFF -> stringResource(R.string.service_display_name_tinkoff)
+                ServiceKeys.TAXES -> stringResource(R.string.service_display_name_taxes)
+                ServiceKeys.TROYKA -> stringResource(R.string.service_display_name_troyka)
+                ServiceKeys.OSAGO -> stringResource(R.string.service_display_name_osago)
+                ServiceKeys.HOSTEL -> stringResource(R.string.service_display_name_hostel)
+                else -> ""
+            }
+
+            LazyColumn(
+                modifier = Modifier
                     .fillMaxWidth()
-                    .weight(10f)  // ← занимает всё свободное место
-
+                    .weight(1f),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                Box(
-                    Modifier
-                        .fillMaxSize()
-                        .background(Color.Blue.copy(alpha = 0.2f)) // Полупрозрачный
-                        .padding(40.dp)
-                        .verticalScroll(state = viewScrollState)
-                ) {
-                    val statusLabel = stringResource(R.string.status_label)
-                    val toBePaidLabel = stringResource(R.string.to_be_paid)
-                    val serviceDisplayName = when (selectedService) {
-                        ServiceKeys.ELECTRICITY -> stringResource(R.string.service_display_name_electricity)
-                        ServiceKeys.GAS -> stringResource(R.string.service_display_name_gas)
-                        ServiceKeys.WATER -> stringResource(R.string.service_display_name_water)
-                        ServiceKeys.GARBAGE -> stringResource(R.string.service_display_name_garbage)
-                        ServiceKeys.ZONT -> stringResource(R.string.service_display_name_zont)
-                        ServiceKeys.INTERNET -> stringResource(R.string.service_display_name_internet)
-                        ServiceKeys.MTS -> stringResource(R.string.service_display_name_mts)
-                        ServiceKeys.TINKOFF -> stringResource(R.string.service_display_name_tinkoff)
-                        ServiceKeys.TAXES -> stringResource(R.string.service_display_name_taxes)
-                        ServiceKeys.TROYKA -> stringResource(R.string.service_display_name_troyka)
-                        ServiceKeys.OSAGO -> stringResource(R.string.service_display_name_osago)
-                        ServiceKeys.HOSTEL -> stringResource(R.string.service_display_name_hostel)
-                        else -> ""
-                    }
-                    val formattedHistoryText = buildAnnotatedString {
-                        val lines = fileContent.replace("<br>", "\n").lines()
-                        val dateRegex = Regex(UiConstants.DATE_TIME_REGEX_PATTERN)
-                        val outputFormatter = java.time.format.DateTimeFormatter.ofPattern(UiConstants.DATE_OUTPUT_PATTERN, UiConstants.DEFAULT_LOCALE)
-
-                        lines.forEachIndexed { index, line ->
-                            val trimmed = line.trim()
-                            val isToBePaid = line.contains(toBePaidLabel)
-                            val isServiceName = trimmed == serviceDisplayName
-                            val dateMatch = dateRegex.find(line)
-                            val isDate = dateMatch != null
-                            val isOtherLabel = (line.startsWith("( ") && line.endsWith(" )")) ||
-                                line.contains(statusLabel)
-
-                            when {
-                                isToBePaid -> {
-                                    // ✅ Вся строка "К оплате: - 123.45 руб." – красная, крупная, жирная
-                                    withStyle(
-                                        style = SpanStyle(
-                                            fontWeight = FontWeight.Bold,
-                                            color = Color.Red,
-                                            fontSize = 20.sp
-                                        )
-                                    ) {
-                                        append(line)
-                                    }
-                                }
-
-                                isDate -> {
-                                    val dateStr = dateMatch.groupValues[1]
-                                    val formattedDate = try {
-                                        LocalDate.parse(dateStr).format(outputFormatter)
-                                    } catch (_: Exception) {
-                                        dateStr
-                                    }
-                                    withStyle(
-                                        style = SpanStyle(
-                                            fontWeight = FontWeight.Bold,
-                                            color = Color.Black,
-                                            fontSize = 20.sp
-                                        )
-                                    ) {
-                                        append(formattedDate)
-                                    }
-                                }
-
-                                isServiceName -> {
-                                    withStyle(
-                                        style = SpanStyle(
-                                            fontWeight = FontWeight.Bold,
-                                            color = Color.Black,
-                                            fontSize = 20.sp
-                                        )
-                                    ) {
-                                        append(line)
-                                    }
-                                }
-
-                                isOtherLabel -> {
-                                    withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                                        append(line)
-                                    }
-                                }
-
-                                else -> {
-                                    append(line)
+                items(records) { record ->
+                    HistoryCard(
+                        record = record,
+                        serviceDisplayName = serviceDisplayName,
+                        onAttachFile = {
+                            recordForAttach = record
+                            attachLauncher.launch("*/*")
+                        },
+                        onOpenCamera = {
+                            recordForAttach = record
+                            cameraLauncher.launch(null)
+                        },
+                        onOpenGallery = {
+                            recordForAttach = record
+                            galleryLauncher.launch("image/*")
+                        },
+                        onOpenAttachment = { attachment ->
+                            openAttachment(context, attachment, getHistoryAttachmentUseCase)
+                        },
+                        onRemoveAttachment = { attachment ->
+                            scope.launch {
+                                try {
+                                    removeHistoryAttachmentUseCase(
+                                        serviceKey = selectedService,
+                                        rawBlock = record.rawBlock,
+                                        currentAttachments = record.attachments,
+                                        attachmentToRemove = attachment
+                                    )
+                                    refreshHistory()
+                                } catch (e: Exception) {
+                                    Log.e(TAG, UiMessages.LOG_DELETE_ERROR, e)
                                 }
                             }
-
-                            if (index < lines.size - 1) append("\n")
                         }
-                    }
-                    Text(
-                        text = formattedHistoryText, fontSize = 16.sp
                     )
                 }
             }
-            //🔴///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            //  Кнопка «Редактировать историю»
-            //Переводит экран в режим редактирования.
+
             Spacer(modifier = Modifier.height(16.dp))
             Button(
                 onClick = {
                     editHistorySound?.start()
                     isEditing = true
-                }, modifier = Modifier.fillMaxWidth()
+                },
+                modifier = Modifier.fillMaxWidth()
             ) {
                 Text(stringResource(R.string.Edit_history))
             }
@@ -382,3 +435,34 @@ fun addStatusToLastRecord(content: String, newStatus: String): String {
     // Собираем обратно
     return before + "\n" + lines.joinToString("\n")
 }
+
+private fun openAttachment(
+    context: android.content.Context,
+    attachment: Attachment,
+    getHistoryAttachmentUseCase: GetHistoryAttachmentUseCase
+) {
+    val file = getHistoryAttachmentUseCase(attachment.path) ?: return
+
+    val uri = FileProvider.getUriForFile(
+        context,
+        "${context.packageName}.fileprovider",
+        file
+    )
+    val intent = Intent(Intent.ACTION_VIEW).apply {
+        setDataAndType(uri, attachment.mimeType)
+        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+    }
+    context.startActivity(Intent.createChooser(intent, context.getString(R.string.open)))
+}
+
+/**
+ * Достаёт имя файла из Uri (DISPLAY_NAME).
+ */
+private fun getFileNameFromUri(context: android.content.Context, uri: Uri): String? {
+    val cursor = context.contentResolver.query(uri, null, null, null, null)
+    return cursor?.use {
+        val nameIndex = it.getColumnIndex(android.provider.OpenableColumns.DISPLAY_NAME)
+        if (nameIndex != -1 && it.moveToFirst()) it.getString(nameIndex) else null
+    }
+}
+

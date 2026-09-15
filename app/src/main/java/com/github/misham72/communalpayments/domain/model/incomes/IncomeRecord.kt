@@ -1,12 +1,11 @@
 package com.github.misham72.communalpayments.domain.model.incomes
 
+import com.github.misham72.communalpayments.domain.model.Attachment
 import java.time.LocalDate
 
 data class IncomeRecord(
-    val date: LocalDate,   // теперь полная дата
+    val date: LocalDate,
     val amount: Double,
     val source: String,
-    val attachmentPath: String? = null,      // относительный путь от filesDir
-    val attachmentName: String? = null,      // оригинальное имя файла
-    val attachmentMime: String? = null       // "application/pdf" или "image/jpeg"
+    val attachments: List<Attachment> = emptyList()
 )

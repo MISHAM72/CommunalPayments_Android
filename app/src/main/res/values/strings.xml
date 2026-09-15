@@ -86,9 +86,7 @@
     <string name="pdf_table_period">Период</string>
     <string name="pdf_all_history_title">Общая история</string>
     <string name="pdf_generated">Сформировано: %s</string>
-    <string name="status_label">Статус:</string>
     <string name="send_pdf">Отправить PDF</string>
-    <string name="yyyy_mm_dd_hh_mm_ss">yyyy-MM-dd HH:mm:ss</string>
     <!--  НФЗВАНИЯ КАРТОЧЕК -->
     <string name="result_garbage">Результаты Мусор:</string>
     <string name="result_zont">Результат по  ZONT:</string>
@@ -300,5 +298,12 @@
 
     <string name="delete_receipt">Удалить квитанцию ?</string>
     <string name="delete_receipt_confirm">Вы уверены, что хотите удалить квитанцию: “%s”?</string>
+
+    <string name="attach_file">Прикрепить файл</string>
+    <string name="open_camera">Открыть камеру</string>
+    <string name="open_gallery">Открыть галерею</string>
+
+    <string name="delete_attachment">Удалить вложение</string>
+    <string name="delete_attachment_confirm">Вы уверены, что хотите удалить %s?</string>
 
 </resources>

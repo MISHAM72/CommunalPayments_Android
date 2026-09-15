@@ -1,8 +1,10 @@
 package com.github.misham72.communalpayments.domain.usecases
 
+import com.github.misham72.communalpayments.domain.model.Attachment
 import com.github.misham72.communalpayments.domain.model.incomes.IncomeRecord
 import com.github.misham72.communalpayments.domain.model.incomes.IncomeSummary
 import com.github.misham72.communalpayments.domain.repository.IncomeRepository
+import java.io.File
 import java.time.LocalDate
 
 class IncomeUseCase(
@@ -30,5 +32,23 @@ class IncomeUseCase(
 
     suspend fun deleteAllBySource(year: Int, source: String) {
         incomeRepository.deleteAllRecordsBySource(year, source)
+    }
+
+    suspend fun attachAttachment(
+        year: Int,
+        record: IncomeRecord,
+        bytes: ByteArray,
+        fileName: String,
+        mimeType: String
+    ) {
+        incomeRepository.attachAttachment(year, record, bytes, fileName, mimeType)
+    }
+
+    suspend fun removeAttachment(year: Int, record: IncomeRecord, attachment: Attachment) {
+        incomeRepository.removeAttachment(year, record, attachment)
+    }
+
+    fun getAttachment(path: String): File? {
+        return incomeRepository.getAttachment(path)
     }
 }

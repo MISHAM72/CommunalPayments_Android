@@ -1,5 +1,10 @@
 package com.github.misham72.communalpayments.presentation.screen.screens.analytics
 
+import android.content.Intent
+import android.net.Uri
+import android.provider.OpenableColumns
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.animateIntAsState
@@ -29,8 +34,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.PhotoCamera
+import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -58,6 +66,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -65,12 +74,14 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.core.content.FileProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.di.AppContainer
 import com.github.misham72.communalpayments.di.ExpensesViewModelFactory
 import com.github.misham72.communalpayments.di.IncomeViewModelFactory
+import com.github.misham72.communalpayments.domain.model.Attachment
 import com.github.misham72.communalpayments.domain.model.ExpenseSummary
 import com.github.misham72.communalpayments.domain.model.incomes.IncomeCategory
 import com.github.misham72.communalpayments.domain.model.incomes.IncomeRecord
@@ -81,6 +92,7 @@ import com.github.misham72.communalpayments.presentation.screen.navigation.Initi
 import com.github.misham72.communalpayments.presentation.screen.navigation.getListInitialScreen
 import com.github.misham72.communalpayments.presentation.utils.nameRes
 import com.github.misham72.communalpayments.presentation.utils.rememberButtonBuckSoundPlayer
+import java.io.File
 import java.time.Year
 
 private val chartColors = listOf(
@@ -642,7 +654,7 @@ private fun IncomesTab(factory: IncomeViewModelFactory) {
                                 // Цветной квадратик с первой буквой категории
                                 Box(
                                     modifier = Modifier
-                                        .size(36.dp)
+                                        .size(36.dp)//Цветной квадратик 36×36 dp,
                                         .background(
                                             color = barColor.copy(alpha = 0.15f),
                                             shape = RoundedCornerShape(10.dp)
@@ -650,15 +662,15 @@ private fun IncomesTab(factory: IncomeViewModelFactory) {
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Text(
-                                        text = stringResource(category.nameRes()).take(1),
+                                        text = stringResource(category.nameRes()).take(1),// внутри — первая буква категории (например, «З» для Зарплаты)
                                         fontSize = 16.sp,
                                         fontWeight = FontWeight.Bold,
-                                        color = barColor
+                                        color = barColor// Цвет берётся из barColor с прозрачностью 15%.
                                     )
                                 }
-                                Spacer(modifier = Modifier.width(12.dp))
+                                Spacer(modifier = Modifier.width(12.dp))//Отступ между квадратиком и текстом.
 
-                                Column(modifier = Modifier.weight(1f)) {
+                                Column(modifier = Modifier.weight(1f)) {//Основной блок с текстом. Занимает всё свободное место. Внутри:
                                     Row(
                                         modifier = Modifier.fillMaxWidth(),
                                         verticalAlignment = Alignment.CenterVertically
@@ -832,12 +844,70 @@ private fun AddIncomeDialog(
 @Composable
 private fun SourceRecordsDialog(
     source: String,
-    records: List<IncomeRecord>,   // ← используем этот список
+    records: List<IncomeRecord>,
     viewModel: IncomeViewModel,
     onDismiss: () -> Unit
 ) {
+    val context = LocalContext.current
+
     var editIndex by remember { mutableStateOf<Int?>(null) }
     var showDeleteConfirm by remember { mutableStateOf<IncomeRecord?>(null) }
+    var recordForAttach by remember { mutableStateOf<IncomeRecord?>(null) }
+    var attachmentToDelete by remember { mutableStateOf<Pair<IncomeRecord, Attachment>?>(null) }
+    // 📎 — любой файл
+    val attachLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        val record = recordForAttach
+        if (uri != null && record != null) {
+            val mimeType = context.contentResolver.getType(uri) ?: "application/octet-stream"
+            val fileName = getFileNameFromUri(context, uri) ?: "file_${System.currentTimeMillis()}"
+            val bytes = context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
+            if (bytes != null && bytes.isNotEmpty()) {
+                viewModel.attachAttachment(record, bytes, fileName, mimeType)
+            }
+        }
+        recordForAttach = null
+    }
+
+    // 📷 — камера
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicturePreview()
+    ) { bitmap: android.graphics.Bitmap? ->
+        val record = recordForAttach
+        if (bitmap != null && record != null) {
+            val tempFile = File(context.cacheDir, "camera_${System.currentTimeMillis()}.jpg")
+            tempFile.outputStream().use { out ->
+                bitmap.compress(android.graphics.Bitmap.CompressFormat.JPEG, 90, out)
+            }
+            val bytes = tempFile.readBytes()
+            tempFile.delete()
+            if (bytes.isNotEmpty()) {
+                viewModel.attachAttachment(
+                    record, bytes,
+                    "photo_${System.currentTimeMillis()}.jpg",
+                    "image/jpeg"
+                )
+            }
+        }
+        recordForAttach = null
+    }
+
+    // 🖼 — галерея
+    val galleryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        val record = recordForAttach
+        if (uri != null && record != null) {
+            val mimeType = context.contentResolver.getType(uri) ?: "image/jpeg"
+            val fileName = getFileNameFromUri(context, uri) ?: "image_${System.currentTimeMillis()}"
+            val bytes = context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
+            if (bytes != null && bytes.isNotEmpty()) {
+                viewModel.attachAttachment(record, bytes, fileName, mimeType)
+            }
+        }
+        recordForAttach = null
+    }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -870,15 +940,20 @@ private fun SourceRecordsDialog(
                                     modifier = Modifier.fillMaxWidth(),
                                     singleLine = true
                                 )
-                                Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
+                                Row(
+                                    horizontalArrangement = Arrangement.End,
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
                                     TextButton(onClick = {
                                         val newAmount = editAmount.toDoubleOrNull()
                                         if (newAmount != null && newAmount > 0 && editSource.isNotBlank()) {
-                                            val newRecord = IncomeRecord(record.date, newAmount, editSource)
+                                            // ✅ сохраняем вложения при редактировании
+                                            val newRecord = record.copy(
+                                                amount = newAmount,
+                                                source = editSource
+                                            )
                                             viewModel.updateRecord(record, newRecord)
                                             editIndex = null
-                                            // После сохранения закрываем диалог, чтобы обновить данные
-                                            onDismiss()
                                         }
                                     }) {
                                         Text(stringResource(R.string.save))
@@ -889,30 +964,102 @@ private fun SourceRecordsDialog(
                                 }
                             }
                         } else {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 4.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Column(modifier = Modifier.weight(1f)) {
-                                    Text(
-                                        text = stringResource(R.string.money_format).format(record.amount),
-                                        fontSize = 14.sp
-                                    )
-                                    Text(
-                                        text = record.date.toString(),
-                                        fontSize = 12.sp,
-                                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                                    )
-                                }
-                                Row {
-                                    IconButton(onClick = { editIndex = index }) {
-                                        Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.editing))
+                            Column(modifier = Modifier.padding(vertical = 4.dp)) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Text(
+                                            text = stringResource(R.string.money_format).format(record.amount),
+                                            fontSize = 14.sp
+                                        )
+                                        Text(
+                                            text = record.date.toString(),
+                                            fontSize = 12.sp,
+                                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                                        )
                                     }
-                                    IconButton(onClick = { showDeleteConfirm = record }) {
-                                        Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.delete))
+                                    Row {
+                                        IconButton(onClick = {
+                                            recordForAttach = record
+                                            attachLauncher.launch("*/*")
+                                        }) {
+                                            Icon(
+                                                Icons.Default.AttachFile,
+                                                contentDescription = stringResource(R.string.attach_file),
+                                                modifier = Modifier.size(20.dp)
+                                            )
+                                        }
+                                        IconButton(onClick = {
+                                            recordForAttach = record
+                                            cameraLauncher.launch(null)
+                                        }) {
+                                            Icon(
+                                                Icons.Default.PhotoCamera,
+                                                contentDescription = stringResource(R.string.open_camera),
+                                                modifier = Modifier.size(20.dp)
+                                            )
+                                        }
+                                        IconButton(onClick = {
+                                            recordForAttach = record
+                                            galleryLauncher.launch("image/*")
+                                        }) {
+                                            Icon(
+                                                Icons.Default.PhotoLibrary,
+                                                contentDescription = stringResource(R.string.open_gallery),
+                                                modifier = Modifier.size(20.dp)
+                                            )
+                                        }
+                                        IconButton(onClick = { editIndex = index }) {
+                                            Icon(
+                                                Icons.Default.Edit,
+                                                contentDescription = stringResource(R.string.editing),
+                                                modifier = Modifier.size(20.dp)
+                                            )
+                                        }
+                                        IconButton(onClick = { showDeleteConfirm = record }) {
+                                            Icon(
+                                                Icons.Default.Delete,
+                                                contentDescription = stringResource(R.string.delete),
+                                                modifier = Modifier.size(20.dp)
+                                            )
+                                        }
+                                    }
+                                }
+
+                                // Вложения
+                                record.attachments.forEach { attachment ->
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(start = 8.dp, top = 4.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            text = "📎 ${attachment.name}",
+                                            fontSize = 12.sp,
+                                            modifier = Modifier
+                                                .weight(1f)
+                                                .clickable {
+                                                    openIncomeAttachment(context, attachment, viewModel)
+                                                },
+                                            color = MaterialTheme.colorScheme.primary
+                                        )
+                                        IconButton(
+                                            onClick = {
+                                                attachmentToDelete = record to attachment
+                                            },
+                                            modifier = Modifier.size(24.dp)
+                                        ) {
+                                            Icon(
+                                                Icons.Default.Delete,
+                                                contentDescription = stringResource(R.string.delete),
+                                                modifier = Modifier.size(16.dp),
+                                                tint = MaterialTheme.colorScheme.error
+                                            )
+                                        }
                                     }
                                 }
                             }
@@ -927,26 +1074,77 @@ private fun SourceRecordsDialog(
             }
         }
     )
+//✅ Это диалог подтверждения удаления записи дохода
+    val deleteRecord = showDeleteConfirm
+    if (deleteRecord != null) {
+        AlertDialog(
+            onDismissRequest = { showDeleteConfirm = null },
+            title = { Text(stringResource(R.string.delete_record)) },
+            text = { Text(stringResource(R.string.delete_confirm_amount).format(deleteRecord.amount)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    viewModel.deleteRecord(deleteRecord)
+                    showDeleteConfirm = null
+                    onDismiss()
+                }) {
+                    Text(stringResource(R.string.delete))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteConfirm = null }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
+        )
+    }
+    // Диалог подтверждения удаления вложения
+    val pairToDelete = attachmentToDelete
+    if (pairToDelete != null) {
+        val (record, attachment) = pairToDelete
+        AlertDialog(
+            onDismissRequest = { attachmentToDelete = null },
+            title = { Text(stringResource(R.string.delete_attachment)) },
+            text = { Text(stringResource(R.string.delete_attachment_confirm, attachment.name)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    viewModel.removeAttachment(record, attachment)
+                    attachmentToDelete = null
+                }) {
+                    Text(stringResource(R.string.delete))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { attachmentToDelete = null }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
+        )
+    }
+}
+// ─── Вспомогательные функции (добавь в конец файла) ───
 
-    // Диалог подтверждения удаления одной записи
-    val deleteRecord = showDeleteConfirm ?: return
-    AlertDialog(
-        onDismissRequest = { showDeleteConfirm = null },
-        title = { Text(stringResource(R.string.delete_record)) },
-        text = { Text(stringResource(R.string.delete_confirm_amount).format(deleteRecord.amount)) },
-        confirmButton = {
-            TextButton(onClick = {
-                viewModel.deleteRecord(deleteRecord)
-                showDeleteConfirm = null
-                onDismiss()
-            }) {
-                Text(stringResource(R.string.delete))
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = { showDeleteConfirm = null }) {
-                Text(stringResource(R.string.cancel))
-            }
-        }
+private fun openIncomeAttachment(
+    context: android.content.Context,
+    attachment: Attachment,
+    viewModel: IncomeViewModel
+) {
+    val file = viewModel.getAttachmentFile(attachment.path) ?: return
+    val uri = FileProvider.getUriForFile(
+        context,
+        "${context.packageName}.fileprovider",
+        file
     )
+    val intent = Intent(Intent.ACTION_VIEW).apply {
+        setDataAndType(uri, attachment.mimeType)
+        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+    }
+    context.startActivity(Intent.createChooser(intent, attachment.name))
+}
+
+private fun getFileNameFromUri(context: android.content.Context, uri: Uri): String? {
+    val cursor = context.contentResolver.query(uri, null, null, null, null)
+    return cursor?.use {
+        val nameIndex = it.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+        if (nameIndex != -1 && it.moveToFirst()) it.getString(nameIndex) else null
+    }
 }

@@ -1,7 +1,9 @@
 package com.github.misham72.communalpayments.domain.repository
 
+import com.github.misham72.communalpayments.domain.model.Attachment
 import com.github.misham72.communalpayments.domain.model.incomes.IncomeRecord
 import com.github.misham72.communalpayments.domain.model.incomes.IncomeSummary
+import java.io.File
 import java.time.LocalDate
 
 interface IncomeRepository {
@@ -14,5 +16,8 @@ interface IncomeRepository {
     suspend fun deleteRecord(year: Int, record: IncomeRecord)
     suspend fun deleteAllRecordsBySource(year: Int, source: String)
     suspend fun getRecordsByYear(year: Int): List<IncomeRecord>
+    suspend fun attachAttachment(year: Int, record: IncomeRecord, bytes: ByteArray, fileName: String, mimeType: String)
+    suspend fun removeAttachment(year: Int, record: IncomeRecord, attachment: Attachment)
+    fun getAttachment(path: String): File?
 }
 

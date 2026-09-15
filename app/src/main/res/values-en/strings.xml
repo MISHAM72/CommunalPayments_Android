@@ -68,8 +68,6 @@
     <string name="Edit_the_entire_text_To_replace_the_status_in_the_last_entry_click_on_the_button_above">Edit the entire text. To replace the status in the last entry, click on the button above</string>
     <string name="to_be_paid">To be paid:</string>
 
-    <string name="status_label">Status:</string>
-
     <color name="status_red">#F44336</color>
     <color name="status_yellow">#FFEB3B</color>
     <color name="status_green">#4CAF50</color>
@@ -103,7 +101,6 @@
     <string name="tariff_card">Rate:  %.2f us$.</string>
 
 
-    <string name="yyyy_mm_dd_hh_mm_ss">yyyy-MM-dd HH:mm:ss</string>
     <string name="change_personal_account">Change your personal account</string>
 
     <string name="unknown_error">Unknown error</string>
@@ -264,6 +261,11 @@
     <string name="no_saved_result">No saved calculation</string>
     <string name="delete_receipt">Delete receipt</string>
     <string name="delete_receipt_confirm">Delete receipt confirm : \“%s\”</string>
+    <string name="attach_file">Attach file</string>
+    <string name="open_camera">Open camera</string>
+    <string name="open_gallery">Open gallery</string>
+    <string name="delete_attachment">Delete attachment</string>
+    <string name="delete_attachment_confirm">Delete attachment confirm %s?</string>
 
 </resources>
 

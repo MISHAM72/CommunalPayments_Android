@@ -136,7 +136,10 @@ fun ControlBetweenScreens(
             onBack = { onNavigateBack() },
             initialService = services[selectedService].fileKey,
             getHistoryUseCase = getHistoryUseCase,
-            saveHistoryUseCase = saveHistoryUseCase
+            saveHistoryUseCase = saveHistoryUseCase,
+            attachHistoryAttachmentUseCase = appContainer.attachHistoryAttachmentUseCase,
+            removeHistoryAttachmentUseCase = appContainer.removeHistoryAttachmentUseCase,
+            getHistoryAttachmentUseCase = appContainer.getHistoryAttachmentUseCase
         )
     } else {
         Surface(

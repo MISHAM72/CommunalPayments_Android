@@ -2,6 +2,7 @@ package com.github.misham72.communalpayments.presentation.screen.screens.analyti
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.github.misham72.communalpayments.domain.model.Attachment
 import com.github.misham72.communalpayments.domain.model.incomes.IncomeRecord
 import com.github.misham72.communalpayments.domain.model.incomes.IncomeSummary
 import com.github.misham72.communalpayments.domain.usecases.IncomeUseCase
@@ -10,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.io.File
 import java.time.LocalDate
 import java.time.Year
 
@@ -69,5 +71,33 @@ class IncomeViewModel(
             incomeUseCase.deleteAllBySource(Year.now().value, source)
             loadIncome()
         }
+    }
+    fun attachAttachment(
+        record: IncomeRecord,
+        bytes: ByteArray,
+        fileName: String,
+        mimeType: String
+    ) {
+        viewModelScope.launch {
+            incomeUseCase.attachAttachment(
+                year = Year.now().value,
+                record = record,
+                bytes = bytes,
+                fileName = fileName,
+                mimeType = mimeType
+            )
+            loadIncome()
+        }
+    }
+
+    fun removeAttachment(record: IncomeRecord, attachment: Attachment) {
+        viewModelScope.launch {
+            incomeUseCase.removeAttachment(Year.now().value, record, attachment)
+            loadIncome()
+        }
+    }
+
+    fun getAttachmentFile(path: String): File? {
+        return incomeUseCase.getAttachment(path)
     }
 }
