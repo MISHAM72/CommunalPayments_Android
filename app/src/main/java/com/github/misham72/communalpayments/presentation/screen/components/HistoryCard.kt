@@ -30,6 +30,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -37,6 +38,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.github.misham72.communalpayments.R
+import com.github.misham72.communalpayments.domain.common.HistoryKeys
 import com.github.misham72.communalpayments.domain.model.Attachment
 import com.github.misham72.communalpayments.domain.model.HistoryRecord
 import com.github.misham72.communalpayments.presentation.common.UiConstants
@@ -76,7 +79,7 @@ fun HistoryCard(
                 val outputFormatter = java.time.format.DateTimeFormatter.ofPattern(
                     UiConstants.DATE_OUTPUT_PATTERN, UiConstants.DEFAULT_LOCALE
                 )
-                val toBePaidLabel = "К оплате"
+                val toBePaidLabel = HistoryKeys.KEY_PAYMENT_PREFIX
                 val cleanService = serviceDisplayName
                     .filter { it.isLetterOrDigit() }
                     .lowercase()
@@ -170,7 +173,7 @@ fun HistoryCard(
                         ) {
                             Icon(
                                 imageVector = Icons.Filled.Visibility,
-                                contentDescription = "Открыть",
+                                contentDescription = stringResource(R.string.open),
                                 tint = MaterialTheme.colorScheme.primary
                             )
                         }
@@ -180,7 +183,7 @@ fun HistoryCard(
                         ) {
                             Icon(
                                 imageVector = Icons.Filled.Delete,
-                                contentDescription = "Удалить вложение",
+                                contentDescription = stringResource(R.string.delete_attachment),
                                 tint = MaterialTheme.colorScheme.error
                             )
                         }
@@ -199,21 +202,21 @@ fun HistoryCard(
                 IconButton(onClick = onAttachFile) {
                     Icon(
                         imageVector = Icons.Filled.AttachFile,
-                        contentDescription = "Прикрепить файл",
+                        contentDescription = stringResource(R.string.attach_file),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
                 IconButton(onClick = onOpenCamera) {
                     Icon(
                         imageVector = Icons.Filled.PhotoCamera,
-                        contentDescription = "Сделать фото",
+                        contentDescription = stringResource(R.string.open_camera),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
                 IconButton(onClick = onOpenGallery) {
                     Icon(
                         imageVector = Icons.Filled.PhotoLibrary,
-                        contentDescription = "Выбрать из галереи",
+                        contentDescription = stringResource(R.string.open_gallery),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
@@ -224,19 +227,19 @@ fun HistoryCard(
     attachmentToDelete?.let { attachment ->
         AlertDialog(
             onDismissRequest = { attachmentToDelete = null },
-            title = { Text("Удалить вложение?") },
+            title = { Text(stringResource(R.string.delete_attachment)) },
             text = { Text("Файл: ${attachment.name}") },
             confirmButton = {
                 TextButton(onClick = {
                     onRemoveAttachment(attachment)   // ← удаляем ТОЛЬКО тут
                     attachmentToDelete = null         // ← закрываем диалог
                 }) {
-                    Text("Удалить")
+                    Text(stringResource(R.string.delete))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { attachmentToDelete = null }) {
-                    Text("Отмена")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )

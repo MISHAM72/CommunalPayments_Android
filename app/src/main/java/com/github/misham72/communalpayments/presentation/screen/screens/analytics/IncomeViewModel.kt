@@ -72,6 +72,7 @@ class IncomeViewModel(
             loadIncome()
         }
     }
+
     fun attachAttachment(
         record: IncomeRecord,
         bytes: ByteArray,
