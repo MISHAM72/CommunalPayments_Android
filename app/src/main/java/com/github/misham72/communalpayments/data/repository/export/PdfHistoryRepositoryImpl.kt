@@ -391,6 +391,8 @@ class PdfHistoryRepositoryImpl(
             serviceDisplayNames[ServiceKeys.WATER] ?: "",
             serviceDisplayNames[ServiceKeys.GAS] ?: "",
             serviceDisplayNames[ServiceKeys.GARBAGE] ?: "",
+            serviceDisplayNames[ServiceKeys.ZONT] ?: "",
+            serviceDisplayNames[ServiceKeys.INTERNET] ?: "",
             serviceDisplayNames[ServiceKeys.MTS] ?: "",
             serviceDisplayNames[ServiceKeys.TINKOFF] ?: "",
             serviceDisplayNames[ServiceKeys.TAXES] ?: "",

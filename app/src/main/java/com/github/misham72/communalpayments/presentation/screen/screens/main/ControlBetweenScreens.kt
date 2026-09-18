@@ -2,6 +2,7 @@ package com.github.misham72.communalpayments.presentation.screen.screens.main
 
 import android.app.Activity
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,9 +14,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -28,6 +31,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -54,7 +58,7 @@ import com.github.misham72.communalpayments.domain.usecases.GetHistoryUseCase
 import com.github.misham72.communalpayments.domain.usecases.SaveHistoryUseCase
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 import com.github.misham72.communalpayments.presentation.screen.components.ServiceTab
-import com.github.misham72.communalpayments.presentation.screen.navigation.getListInitialScreen
+import com.github.misham72.communalpayments.presentation.screen.navigation.getSelectedScreens
 import com.github.misham72.communalpayments.presentation.screen.screens.analytics.ExpensesScreen
 import com.github.misham72.communalpayments.presentation.screen.screens.history.HistoryScreen
 import com.github.misham72.communalpayments.presentation.theme.ThemePrefs
@@ -74,6 +78,7 @@ import com.github.misham72.communalpayments.presentation.utils.rememberTinkoffSo
 import com.github.misham72.communalpayments.presentation.utils.rememberWaterSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberlightSoundPlayer
 import kotlinx.coroutines.launch
+import com.github.misham72.communalpayments.presentation.screen.screens.services.ServicesSelectionScreen
 
 @Composable
 fun ControlBetweenScreens(
@@ -92,308 +97,358 @@ fun ControlBetweenScreens(
     var selectedService by remember { mutableIntStateOf(0) }
     val showHistory = remember { mutableStateOf(false) }
     val showAllServicesSummary = remember { mutableStateOf(false) }   // новый флаг
-    val services = getListInitialScreen(appContainer)
+    var showServicesSelection by remember { mutableStateOf(false) }
 
-    val defaultError = stringResource(R.string.error_load_default)
-    var dueDates by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
-    var showMenu by remember { mutableStateOf(false) }
-    val scope = rememberCoroutineScope()
-    var showLanguageDialog by remember { mutableStateOf(false) }
-    var showThemeDialog by remember { mutableStateOf(false) }
-    var showBackupDialog by remember { mutableStateOf(false) }
-    val historySound = rememberHistorySoundPlayer()
-    val mockingPipeSound = rememberInTotalSoundPlayer()
-    // Перезагружаем даты при каждом возобновлении экрана
-    LifecycleResumeEffect(Unit) {
-        scope.launch {
-            val dates = mutableMapOf<String, String>()
-            services.forEach { service ->
-                val date = settingsRepository.getCustomDate(service.fileKey)
-                if (date.isNotBlank()) {
-                    dates[service.fileKey] = date
-                }
-            }
-            dueDates = dates
+    val services = getSelectedScreens(appContainer)
+    LaunchedEffect(services.size) {
+        if (selectedService >= services.size) {
+            selectedService = 0
         }
-        onPauseOrDispose { }
     }
 
-    fun onNavigateBack() {
-        showHistory.value = false
-        showAllServicesSummary.value = false
-    }
-
-    if (showAllServicesSummary.value) {
-        ExpensesScreen(
-            onBack = { onNavigateBack() },
-            getExpensesUseCase = getExpensesUseCase,  // используем существующую переменную
-            defaultErrorMessage = defaultError,
-            incomeFactory = incomeViewModelFactory,
-            appContainer = appContainer
+    if (showServicesSelection) {
+        ServicesSelectionScreen(
+            appContainer = appContainer,
+            onBack = { showServicesSelection = false },
+            onSaved = {
+                showServicesSelection = false
+            }
         )
-    } else if (showHistory.value) {
-        HistoryScreen(
-            onBack = { onNavigateBack() },
-            initialService = services[selectedService].fileKey,
-            getHistoryUseCase = getHistoryUseCase,
-            saveHistoryUseCase = saveHistoryUseCase,
-            attachHistoryAttachmentUseCase = appContainer.attachHistoryAttachmentUseCase,
-            removeHistoryAttachmentUseCase = appContainer.removeHistoryAttachmentUseCase,
-            getHistoryAttachmentUseCase = appContainer.getHistoryAttachmentUseCase
-        )
-    } else {
+    } else if (services.isEmpty()) {
         Surface(
-            modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(4.dp)
-                    .navigationBarsPadding()
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.clickable { showServicesSelection = true }
                 ) {
                     Text(
-                        stringResource(R.string.app_name),
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onBackground
+                        text = stringResource(R.string.choose_services_in_settings),
+                        fontSize = 16.sp
                     )
-                    IconButton(onClick = { showMenu = true }) {
-                        Icon(Icons.Default.MoreVert, contentDescription = stringResource(R.string.menu))
+                    Spacer(Modifier.height(8.dp))
+                    Icon(
+                        imageVector = Icons.Default.Settings,
+                        contentDescription = stringResource(R.string.settings),
+                        modifier = Modifier.size(48.dp)
+                    )
+                }
+            }
+        }
+    } else {
+        val defaultError = stringResource(R.string.error_load_default)
+        var dueDates by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
+        var showMenu by remember { mutableStateOf(false) }
+        val scope = rememberCoroutineScope()
+        var showLanguageDialog by remember { mutableStateOf(false) }
+        var showThemeDialog by remember { mutableStateOf(false) }
+        var showBackupDialog by remember { mutableStateOf(false) }
+        val historySound = rememberHistorySoundPlayer()
+        val mockingPipeSound = rememberInTotalSoundPlayer()
+        // Перезагружаем даты при каждом возобновлении экрана
+        LifecycleResumeEffect(Unit) {
+            scope.launch {
+                val dates = mutableMapOf<String, String>()
+                services.forEach { service ->
+                    val date = settingsRepository.getCustomDate(service.fileKey)
+                    if (date.isNotBlank()) {
+                        dates[service.fileKey] = date
                     }
                 }
+                dueDates = dates
+            }
+            onPauseOrDispose { }
+        }
 
-                DropdownMenu(
-                    expanded = showMenu,
-                    onDismissRequest = { showMenu = false }
+        fun onNavigateBack() {
+            showHistory.value = false
+            showAllServicesSummary.value = false
+        }
+
+        if (showAllServicesSummary.value) {
+            ExpensesScreen(
+                onBack = { onNavigateBack() },
+                getExpensesUseCase = getExpensesUseCase,  // используем существующую переменную
+                defaultErrorMessage = defaultError,
+                incomeFactory = incomeViewModelFactory,
+                appContainer = appContainer
+            )
+        } else if (showHistory.value) {
+            HistoryScreen(
+                onBack = { onNavigateBack() },
+                initialService = services[selectedService].fileKey,
+                getHistoryUseCase = getHistoryUseCase,
+                saveHistoryUseCase = saveHistoryUseCase,
+                attachHistoryAttachmentUseCase = appContainer.attachHistoryAttachmentUseCase,
+                removeHistoryAttachmentUseCase = appContainer.removeHistoryAttachmentUseCase,
+                getHistoryAttachmentUseCase = appContainer.getHistoryAttachmentUseCase
+            )
+        } else {
+            Surface(
+                modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(4.dp)
+                        .navigationBarsPadding()
                 ) {
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.exit), fontSize = 20.sp) },
-                        onClick = {
-                            (context as? Activity)?.finishAffinity()
-                            showMenu = false
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            stringResource(R.string.app_name),
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onBackground
+                        )
+                        IconButton(onClick = { showMenu = true }) {
+                            Icon(Icons.Default.MoreVert, contentDescription = stringResource(R.string.menu))
                         }
-                    )
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.export_all_pdf_title)) },
-                        onClick = {
-                            scope.launch {
-                                pdfHistoryUseCase.exportAllHistoryPdf(context)
+                    }
+
+                    DropdownMenu(
+                        expanded = showMenu,
+                        onDismissRequest = { showMenu = false }
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.choose_services)) },
+                            onClick = {
+                                showMenu = false
+                                showServicesSelection = true
                             }
-                            showMenu = false
-                        }
-                    )
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.language)) },
-                        onClick = {
-                            showMenu = false
-                            showLanguageDialog = true
-                        }
-                    )
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.theme)) },
-                        onClick = {
-                            showMenu = false
-                            showThemeDialog = true
-                        }
-                    )
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.backup_title)) },
-                        onClick = {
-                            showMenu = false
-                            showBackupDialog = true
-                        }
-                    )
-                }
+                        )
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.exit), fontSize = 20.sp) },
+                            onClick = {
+                                (context as? Activity)?.finishAffinity()
+                                showMenu = false
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.export_all_pdf_title)) },
+                            onClick = {
+                                scope.launch {
+                                    pdfHistoryUseCase.exportAllHistoryPdf(context)
+                                }
+                                showMenu = false
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.language)) },
+                            onClick = {
+                                showMenu = false
+                                showLanguageDialog = true
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.theme)) },
+                            onClick = {
+                                showMenu = false
+                                showThemeDialog = true
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.backup_title)) },
+                            onClick = {
+                                showMenu = false
+                                showBackupDialog = true
+                            }
+                        )
+                    }
 
 // Диалог резервного копирования
-                if (showBackupDialog) {
-                    AlertDialog(
-                        onDismissRequest = { showBackupDialog = false },
-                        title = { Text(stringResource(R.string.backup_title)) },
-                        text = {
-                            Column {
-                                Text(stringResource(R.string.backup_choose_action))
-                                Spacer(modifier = Modifier.height(16.dp))
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceEvenly
-                                ) {
-                                    Button(onClick = {
-                                        showBackupDialog = false
-                                        onExportBackup()
-                                    }) {
-                                        Text(stringResource(R.string.backup_create))
+                    if (showBackupDialog) {
+                        AlertDialog(
+                            onDismissRequest = { showBackupDialog = false },
+                            title = { Text(stringResource(R.string.backup_title)) },
+                            text = {
+                                Column {
+                                    Text(stringResource(R.string.backup_choose_action))
+                                    Spacer(modifier = Modifier.height(16.dp))
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceEvenly
+                                    ) {
+                                        Button(onClick = {
+                                            showBackupDialog = false
+                                            onExportBackup()
+                                        }) {
+                                            Text(stringResource(R.string.backup_create))
+                                        }
+                                        Button(onClick = {
+                                            showBackupDialog = false
+                                            onImportBackup()
+                                        }) {
+                                            Text(stringResource(R.string.backup_restore))
+                                        }
                                     }
-                                    Button(onClick = {
-                                        showBackupDialog = false
-                                        onImportBackup()
+                                }
+                            },
+                            confirmButton = {
+                                TextButton(onClick = { showBackupDialog = false }) {
+                                    Text(stringResource(R.string.close))
+                                }
+                            }
+                        )
+                    }
+                    if (showLanguageDialog) {
+                        AlertDialog(
+                            onDismissRequest = { showLanguageDialog = false },
+                            title = { Text(stringResource(R.string.select_language)) },
+                            text = {
+                                Column {
+                                    TextButton(onClick = {
+                                        LanguageManager.setLanguage(context, LanguageManager.DEFAULT_LANG)
+                                        showLanguageDialog = false
+                                        (context as? Activity)?.recreate()
                                     }) {
-                                        Text(stringResource(R.string.backup_restore))
+                                        Text(stringResource(R.string.russian))
+                                    }
+                                    TextButton(onClick = {
+                                        LanguageManager.setLanguage(context, LanguageManager.ENGLISH_LANG)
+                                        showLanguageDialog = false
+                                        (context as? Activity)?.recreate()
+                                    }) {
+                                        Text(stringResource(R.string.english))
                                     }
                                 }
-                            }
-                        },
-                        confirmButton = {
-                            TextButton(onClick = { showBackupDialog = false }) {
-                                Text(stringResource(R.string.close))
-                            }
-                        }
-                    )
-                }
-                if (showLanguageDialog) {
-                    AlertDialog(
-                        onDismissRequest = { showLanguageDialog = false },
-                        title = { Text(stringResource(R.string.select_language)) },
-                        text = {
-                            Column {
-                                TextButton(onClick = {
-                                    LanguageManager.setLanguage(context, LanguageManager.DEFAULT_LANG)
-                                    showLanguageDialog = false
-                                    (context as? Activity)?.recreate()
-                                }) {
-                                    Text(stringResource(R.string.russian))
-                                }
-                                TextButton(onClick = {
-                                    LanguageManager.setLanguage(context, LanguageManager.ENGLISH_LANG)
-                                    showLanguageDialog = false
-                                    (context as? Activity)?.recreate()
-                                }) {
-                                    Text(stringResource(R.string.english))
+                            },
+                            confirmButton = {
+                                TextButton(onClick = { showLanguageDialog = false }) {
+                                    Text(stringResource(R.string.cancel))
                                 }
                             }
-                        },
-                        confirmButton = {
-                            TextButton(onClick = { showLanguageDialog = false }) {
-                                Text(stringResource(R.string.cancel))
-                            }
-                        }
-                    )
-                }
-                if (showThemeDialog) {
-                    AlertDialog(
-                        onDismissRequest = { showThemeDialog = false },
-                        title = { Text(stringResource(R.string.select_theme)) },
-                        text = {
-                            Column {
-                                TextButton(onClick = {
-                                    ThemePrefs.setThemeMode(context, ThemePrefs.MODE_SYSTEM)
-                                    showThemeDialog = false
-                                    (context as? Activity)?.recreate()
-                                }) {
-                                    Text(stringResource(R.string.system_default))
-                                }
-                                TextButton(onClick = {
-                                    ThemePrefs.setThemeMode(context, ThemePrefs.MODE_LIGHT)
-                                    showThemeDialog = false
-                                    (context as? Activity)?.recreate()
-                                }) {
-                                    Text(stringResource(R.string.light))
-                                }
-                                TextButton(onClick = {
-                                    ThemePrefs.setThemeMode(context, ThemePrefs.MODE_DARK)
-                                    showThemeDialog = false
-                                    (context as? Activity)?.recreate()
-                                }) {
-                                    Text(stringResource(R.string.dark))
-                                }
-                            }
-                        },
-                        confirmButton = {
-                            TextButton(onClick = { showThemeDialog = false }) {
-                                Text(stringResource(R.string.cancel))
-                            }
-                        }
-                    )
-                }
-
-
-                //Создание плееров (по одному на каждый тип звука)
-                val light = rememberlightSoundPlayer()
-                val gasSound = rememberGasSoundPlayer()
-                val waterSound = rememberWaterSoundPlayer()
-                val garbageSound = rememberGarbageSoundPlayer()
-                val boilerSound = rememberBoilerSoundPlayer()
-                val internetSound = rememberInternetSoundPlayer()
-                val mtsSound = rememberMTSSoundPlayer()
-                val tinkoffSound = rememberTinkoffSoundPlayer()
-                val taxesSound = rememberTaxesSoundPlayer()
-                val carSound = rememberCarSoundPlayer()
-                val osagoSound = rememberOsagoSoundPlayer()
-                val hostelSound = rememberHostelSoundPlayer()
-
-
-                Row(            //Определение звука для каждой услуги (when). Row с горизонтальным скроллом — чтобы все чипсы поместились.
-                    modifier = Modifier.horizontalScroll(rememberScrollState())
-                ) {
-                    services.forEachIndexed { index, service ->   //services — список всех услуг (получен из getListInitialScreen()).forEachIndexed — для каждой услуги создаётся ServiceTab (кастомный компонент-чипс).
-                        val sound = when (service.fileKey) {  // sound — выбирается соответствующий звук для нажатия на чипс (чтобы при переключении играл специфичный звук, если задан).
-                            ServiceKeys.ELECTRICITY -> light
-                            ServiceKeys.GAS -> gasSound               // 🔥 → звук газа
-                            ServiceKeys.WATER -> waterSound            // 💧 → звук воды
-                            ServiceKeys.GARBAGE -> garbageSound
-                            ServiceKeys.ZONT -> boilerSound
-                            ServiceKeys.INTERNET -> internetSound
-                            ServiceKeys.MTS -> mtsSound
-                            ServiceKeys.TINKOFF -> tinkoffSound
-                            ServiceKeys.TAXES -> taxesSound
-                            ServiceKeys.TROYKA -> carSound
-                            ServiceKeys.OSAGO -> osagoSound  // 🚗 → звук ОСАГО
-                            ServiceKeys.HOSTEL -> hostelSound
-                            else -> null  // Для остальных пока без звука
-                        }
-                        //Передача звука в кнопку
-                        ServiceTab(   // ServiceTab — отображает название услуги, эмодзи/иконку, дату следующего платежа (если есть). По клику меняет selectedService (индекс выбранной вкладки) и запускает звук.
-                            service = service,
-                            isSelected = selectedService == index,
-                            dueDate = dueDates[service.fileKey],
-                            onClick = { selectedService = index },
-                            onSound = { sound?.start() })    // ← Передаём запуск звука
+                        )
                     }
-                }
-                Spacer(modifier = Modifier.height(9.dp))
+                    if (showThemeDialog) {
+                        AlertDialog(
+                            onDismissRequest = { showThemeDialog = false },
+                            title = { Text(stringResource(R.string.select_theme)) },
+                            text = {
+                                Column {
+                                    TextButton(onClick = {
+                                        ThemePrefs.setThemeMode(context, ThemePrefs.MODE_SYSTEM)
+                                        showThemeDialog = false
+                                        (context as? Activity)?.recreate()
+                                    }) {
+                                        Text(stringResource(R.string.system_default))
+                                    }
+                                    TextButton(onClick = {
+                                        ThemePrefs.setThemeMode(context, ThemePrefs.MODE_LIGHT)
+                                        showThemeDialog = false
+                                        (context as? Activity)?.recreate()
+                                    }) {
+                                        Text(stringResource(R.string.light))
+                                    }
+                                    TextButton(onClick = {
+                                        ThemePrefs.setThemeMode(context, ThemePrefs.MODE_DARK)
+                                        showThemeDialog = false
+                                        (context as? Activity)?.recreate()
+                                    }) {
+                                        Text(stringResource(R.string.dark))
+                                    }
+                                }
+                            },
+                            confirmButton = {
+                                TextButton(onClick = { showThemeDialog = false }) {
+                                    Text(stringResource(R.string.cancel))
+                                }
+                            }
+                        )
+                    }
 
-                Box(modifier = Modifier.weight(1f)) {   // Box — контейнер, в который помещается UI текущей услуги, weight(1f) — заставляет его растянуться на всю высоту внутри Column. Сейчас внутри Box ровно один элемент — результат вызова.
-                    services[selectedService].screen()   // — динамически подставляет экран выбранной услуги.
-                }
-                Image(
-                    painter = painterResource(R.drawable.night),
-                    contentDescription = stringResource(R.string.summer_night),
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(0.7f)
-                )
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Button(
-                        onClick = {
-                            mockingPipeSound?.start()
-                            showAllServicesSummary.value = true
-                        },
-                        modifier = Modifier.weight(1f),
-                        colors = ButtonDefaults.buttonColors()
+                    //Создание плееров (по одному на каждый тип звука)
+                    val light = rememberlightSoundPlayer()
+                    val gasSound = rememberGasSoundPlayer()
+                    val waterSound = rememberWaterSoundPlayer()
+                    val garbageSound = rememberGarbageSoundPlayer()
+                    val boilerSound = rememberBoilerSoundPlayer()
+                    val internetSound = rememberInternetSoundPlayer()
+                    val mtsSound = rememberMTSSoundPlayer()
+                    val tinkoffSound = rememberTinkoffSoundPlayer()
+                    val taxesSound = rememberTaxesSoundPlayer()
+                    val carSound = rememberCarSoundPlayer()
+                    val osagoSound = rememberOsagoSoundPlayer()
+                    val hostelSound = rememberHostelSoundPlayer()
+
+
+                    Row(            //Определение звука для каждой услуги (when). Row с горизонтальным скроллом — чтобы все чипсы поместились.
+                        modifier = Modifier.horizontalScroll(rememberScrollState())
                     ) {
-                        Text(stringResource(R.string.annual_countdown), fontSize = 12.sp)
+                        services.forEachIndexed { index, service ->   //services — список всех услуг (получен из getListInitialScreen()).forEachIndexed — для каждой услуги создаётся ServiceTab (кастомный компонент-чипс).
+                            val sound = when (service.fileKey) {  // sound — выбирается соответствующий звук для нажатия на чипс (чтобы при переключении играл специфичный звук, если задан).
+                                ServiceKeys.ELECTRICITY -> light
+                                ServiceKeys.GAS -> gasSound               // 🔥 → звук газа
+                                ServiceKeys.WATER -> waterSound            // 💧 → звук воды
+                                ServiceKeys.GARBAGE -> garbageSound
+                                ServiceKeys.ZONT -> boilerSound
+                                ServiceKeys.INTERNET -> internetSound
+                                ServiceKeys.MTS -> mtsSound
+                                ServiceKeys.TINKOFF -> tinkoffSound
+                                ServiceKeys.TAXES -> taxesSound
+                                ServiceKeys.TROYKA -> carSound
+                                ServiceKeys.OSAGO -> osagoSound  // 🚗 → звук ОСАГО
+                                ServiceKeys.HOSTEL -> hostelSound
+                                else -> null  // Для остальных пока без звука
+                            }
+                            //Передача звука в кнопку
+                            ServiceTab(   // ServiceTab — отображает название услуги, эмодзи/иконку, дату следующего платежа (если есть). По клику меняет selectedService (индекс выбранной вкладки) и запускает звук.
+                                service = service,
+                                isSelected = selectedService == index,
+                                dueDate = dueDates[service.fileKey],
+                                onClick = { selectedService = index },
+                                onSound = { sound?.start() })    // ← Передаём запуск звука
+                        }
                     }
-                    Button(
-                        onClick = {
-                            historySound?.start()
-                            showHistory.value = true
-                        },
-                        modifier = Modifier.weight(1f),
-                        colors = ButtonDefaults.buttonColors()
-                    ) {
-                        Text(stringResource(R.string.history), fontSize = 12.sp)
-                    }
+                    Spacer(modifier = Modifier.height(9.dp))
 
+                    Box(modifier = Modifier.weight(1f)) {   // Box — контейнер, в который помещается UI текущей услуги, weight(1f) — заставляет его растянуться на всю высоту внутри Column. Сейчас внутри Box ровно один элемент — результат вызова.
+                        services[selectedService].screen()   // — динамически подставляет экран выбранной услуги.
+                    }
+                    Image(
+                        painter = painterResource(R.drawable.night),
+                        contentDescription = stringResource(R.string.summer_night),
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(0.7f)
+                    )
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Button(
+                            onClick = {
+                                mockingPipeSound?.start()
+                                showAllServicesSummary.value = true
+                            },
+                            modifier = Modifier.weight(1f),
+                            colors = ButtonDefaults.buttonColors()
+                        ) {
+                            Text(stringResource(R.string.annual_countdown), fontSize = 12.sp)
+                        }
+                        Button(
+                            onClick = {
+                                historySound?.start()
+                                showHistory.value = true
+                            },
+                            modifier = Modifier.weight(1f),
+                            colors = ButtonDefaults.buttonColors()
+                        ) {
+                            Text(stringResource(R.string.history), fontSize = 12.sp)
+                        }
+
+                    }
                 }
             }
         }

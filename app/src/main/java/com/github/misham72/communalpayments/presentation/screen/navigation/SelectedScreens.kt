@@ -97,3 +97,10 @@ fun getListInitialScreen(appContainer: AppContainer): List<InitialScreen> {
         })
     )
 }
+
+@Composable
+fun getSelectedScreens(appContainer: AppContainer): List<InitialScreen> {
+    val allServices = getListInitialScreen(appContainer)
+    val selected = appContainer.selectedServicesRepository.getSelected()
+    return allServices.filter { selected.contains(it.fileKey) }
+}

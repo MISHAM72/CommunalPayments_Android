@@ -16,5 +16,4 @@ data class HistoryRecord(
     val attachments: List<Attachment> = emptyList()
 ) {
     val hasAttachments: Boolean get() = attachments.isNotEmpty()
-    val attachmentsCount: Int get() = attachments.size
 }

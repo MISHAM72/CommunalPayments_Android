@@ -8,6 +8,7 @@ import com.github.misham72.communalpayments.data.local.file.FileManager
 import com.github.misham72.communalpayments.data.local.income.filemanager.IncomeFileManager
 import com.github.misham72.communalpayments.data.local.preferences.AccountPreferences
 import com.github.misham72.communalpayments.data.repository.BankRepositoryImpl
+import com.github.misham72.communalpayments.data.repository.SelectedServicesRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.analytics.AnalyticsRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.backup.BackupRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.export.PdfHistoryRepositoryImpl
@@ -38,7 +39,9 @@ import com.github.misham72.communalpayments.domain.usecases.SaveHistoryUseCase
 import com.github.misham72.communalpayments.domain.usecases.SaveReceiptUseCase
 import com.github.misham72.communalpayments.domain.usecases.TextHistoryUseCase
 import com.github.misham72.communalpayments.domain.utils.ServiceKeys
+import com.github.misham72.communalpayments.presentation.common.UiConstants
 import com.google.gson.Gson
+import java.io.File
 
 class AppContainer(context: Context) {
     val fileManager = FileManager(
@@ -50,6 +53,7 @@ class AppContainer(context: Context) {
         DataConstants.PREFS_NAME, Context.MODE_PRIVATE
     )
     private val accountPrefs = AccountPreferences(sharedPrefs)
+    val selectedServicesRepository = SelectedServicesRepositoryImpl(sharedPrefs)
 
     // Репозитории
     val settingsRepository = UserSettingsRepositoryImpl(accountPrefs)
@@ -218,5 +222,19 @@ class AppContainer(context: Context) {
 
     // Репозиторий для банков
     val bankRepository = BankRepositoryImpl()
+
+    // ← ДОБАВЬ ЭТО:
+    init {
+        val historyDir = File(context.filesDir, context.getString(R.string.history))
+        val existingServiceKeys: Set<String> = if (historyDir.exists()) {
+            historyDir.listFiles()
+                ?.filter { it.isFile && it.extension == UiConstants.FILE_EXTENSION_TXT }
+                ?.map { it.nameWithoutExtension }
+                ?.toSet()
+                ?: emptySet()
+        } else emptySet()
+
+        selectedServicesRepository.initializeFromExistingServices(existingServiceKeys)
+    }
 }
 

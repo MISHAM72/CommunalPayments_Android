@@ -13,5 +13,7 @@ object UiConstants {
     const val URI_SCHEME_FILE = "file://"
     const val DEFAULT_RECEIPT_FILENAME_TEMPLATE = "квитанция_%d.pdf"
     const val PERCENT_FORMAT = "%.1f%%"
+    const val HEADER_KEY_PREFIX = "header_"
+    const val FILE_EXTENSION_TXT = "txt"
 
 }

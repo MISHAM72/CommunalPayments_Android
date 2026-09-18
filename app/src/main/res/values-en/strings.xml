@@ -45,6 +45,7 @@
     <string name="history">History</string>
     <string name="back">Back</string>
     <string name="calculation_history">Calculation history</string>
+    <string name="group_periodic">Group periodic</string>
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>
     <string name="Edit_history">Edit story</string>
@@ -266,6 +267,10 @@
     <string name="open_gallery">Open gallery</string>
     <string name="delete_attachment">Delete attachment</string>
     <string name="delete_attachment_confirm">Delete attachment confirm %s?</string>
-
+    <string name="select_services_title">Select services title</string>
+    <string name="group_meters">Group meters</string>
+    <string name="choose_services">Choose services</string>
+    <string name="choose_services_in_settings">Choose services in settings</string>
+    <string name="settings">Settings</string>
 </resources>
 

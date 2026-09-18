@@ -30,8 +30,8 @@ android {
         applicationId = "com.github.misham72.communalpayments"
         minSdk = 26
         targetSdk = 37
-        versionCode = 21
-        versionName = "2.6.0"
+        versionCode = 22
+        versionName = "2.7.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         // Чтение API-ключа из local.properties
@@ -103,4 +103,5 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.gson)
     implementation(libs.coroutines.android)
+    implementation(libs.lottie.compose)
 }

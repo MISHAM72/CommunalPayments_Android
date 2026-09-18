@@ -1,8 +1,21 @@
+@file:Suppress("HardcodedStringLiteral")
+
 package com.github.misham72.communalpayments.data.parser
+
 
 import com.github.misham72.communalpayments.data.common.DataConstants
 import com.github.misham72.communalpayments.domain.model.Attachment
 import com.github.misham72.communalpayments.domain.model.HistoryRecord
+
+@Suppress("HardcodedStringLiteral")
+object HistoryFormat {
+    const val ATTACHMENT = "Вложение:"
+    const val FILE_NAME = "ИмяФайла:"
+    const val MIME_TYPE = "MimeType:"
+    const val ATTACHMENT_PREFIX = "Вложение"
+    const val FILE_NAME_PREFIX = "ИмяФайла"
+    const val MIME_TYPE_PREFIX = "MimeType"
+}
 
 object HistoryParser {
 
@@ -12,9 +25,9 @@ object HistoryParser {
     private val dateTimeRegex = Regex(DataConstants.DATE_TIME_REGEX_PATTERN)
 
     // Регулярка для строк вида "Вложение1: /path/to/file", "ИмяФайла2: ...", "MimeType3: ..."
-    private val attachmentPathRegex = Regex("""^Вложение(\d+):\s*(.+)$""")
-    private val attachmentNameRegex = Regex("""^ИмяФайла(\d+):\s*(.+)$""")
-    private val attachmentMimeRegex = Regex("""^MimeType(\d+):\s*(.+)$""")
+    private val attachmentPathRegex = Regex("""^${HistoryFormat.ATTACHMENT_PREFIX}(\d+):\s*(.+)$""")
+    private val attachmentNameRegex = Regex("""^${HistoryFormat.FILE_NAME_PREFIX}(\d+):\s*(.+)$""")
+    private val attachmentMimeRegex = Regex("""^${HistoryFormat.MIME_TYPE_PREFIX}(\d+):\s*(.+)$""")
 
     fun parse(content: String, serviceKey: String): List<HistoryRecord> {
         if (content.isBlank()) return emptyList()
@@ -83,17 +96,19 @@ object HistoryParser {
      * Обновляет строки вложений в блоке.
      * Полностью заменяет все строки Вложение/ИмяФайла/MimeType на новые.
      */
+
     fun updateBlockAttachments(
         block: String,
         attachments: List<Attachment>
     ): String {
+
         // Убираем все старые строки вложений
         val linesWithoutAttachments = block.lines()
             .filterNot {
                 val t = it.trim()
-                t.startsWith("Вложение:") ||         // старая версия (одно)
-                    t.startsWith("ИмяФайла:") ||
-                    t.startsWith("MimeType:") ||
+                t.startsWith(HistoryFormat.ATTACHMENT) ||         // старая версия (одно)
+                    t.startsWith(HistoryFormat.FILE_NAME) ||
+                    t.startsWith(HistoryFormat.MIME_TYPE) ||
                     attachmentPathRegex.matches(t) ||
                     attachmentNameRegex.matches(t) ||
                     attachmentMimeRegex.matches(t)

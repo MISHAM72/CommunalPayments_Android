@@ -18,6 +18,8 @@ import com.github.misham72.communalpayments.presentation.screen.screens.internet
 import com.github.misham72.communalpayments.presentation.screen.screens.mts.MTSViewModel
 import com.github.misham72.communalpayments.presentation.screen.screens.osago.OsagoViewModel
 import com.github.misham72.communalpayments.presentation.screen.screens.receipts.ReceiptsViewModel
+import com.github.misham72.communalpayments.presentation.screen.screens.services.ServiceItem
+import com.github.misham72.communalpayments.presentation.screen.screens.services.ServicesSelectionViewModel
 import com.github.misham72.communalpayments.presentation.screen.screens.taxes.TaxesViewModel
 import com.github.misham72.communalpayments.presentation.screen.screens.tinkoff.TinkoffViewModel
 import com.github.misham72.communalpayments.presentation.screen.screens.troyka.TroykaViewModel
@@ -280,4 +282,24 @@ class ExpensesViewModelFactory(
     }
 }
 
+class ServicesSelectionViewModelFactory(
+    private val appContainer: AppContainer,
+    private val meterItems: List<ServiceItem>,
+    private val periodicItems: List<ServiceItem>,
+    private val groupTitles: Pair<String, String>,
+) : ViewModelProvider.Factory {
+
+    @Suppress("UNCHECKED_CAST")
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(ServicesSelectionViewModel::class.java)) {
+            return ServicesSelectionViewModel(
+                repository = appContainer.selectedServicesRepository,
+                meterItems = meterItems,
+                periodicItems = periodicItems,
+                groupTitles = groupTitles,
+            ) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
+    }
+}
 

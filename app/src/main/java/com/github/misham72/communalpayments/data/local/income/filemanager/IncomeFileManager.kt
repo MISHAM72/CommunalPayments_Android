@@ -36,7 +36,7 @@ class IncomeFileManager(private val filesDir: File) {
     }
 
     private fun getIncomeAttachmentsDir(year: Int): File {
-        val dir = File(filesDir, "${DataConstants.INCOME_ATTACHMENTS_DIR}/$year")
+        val dir = File(File(filesDir, DataConstants.INCOME_ATTACHMENTS_DIR), year.toString())
         if (!dir.exists()) dir.mkdirs()
         return dir
     }

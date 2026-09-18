@@ -104,11 +104,6 @@
     <string name="loading">Загрузка</string>
 
 
-    <string name="days_payment_for">Через %d дня(ей) платеж по %s</string>
-
-
-    <string name="back">Назад</string>
-    <string name="save">Сохранить</string>
     <string name="cancel">Отмена</string>
 
 
@@ -305,5 +300,15 @@
 
     <string name="delete_attachment">Удалить вложение</string>
     <string name="delete_attachment_confirm">Вы уверены, что хотите удалить %s?</string>
+
+    <string name="select_services_title">Выбор услуг</string>
+    <string name="group_meters">СЧЁТЧИКИ</string>
+    <string name="group_periodic">ПЕРИОДИЧЕСКИЕ</string>
+    <string name="save">Сохранить</string>
+    <string name="back">Назад</string>
+    <string name="choose_services">Выбрать услуги</string>
+    <string name="choose_services_in_settings">Выберите услуги в настройках</string>
+    <string name="settings">Настройки</string>
+    <string name="days_payment_for">Через %d дня(ей) платеж по %s</string>
 
 </resources>
