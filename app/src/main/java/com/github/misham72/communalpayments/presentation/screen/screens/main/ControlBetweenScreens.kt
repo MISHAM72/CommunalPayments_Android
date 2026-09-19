@@ -81,7 +81,7 @@ import kotlinx.coroutines.launch
 import com.github.misham72.communalpayments.presentation.screen.screens.services.ServicesSelectionScreen
 
 @Composable
-fun ControlBetweenScreens(
+fun ControlBetweenScreens( //Звуки (какой звук играть при клике)
     pdfHistoryUseCase: PdfHistoryUseCase,
     getHistoryUseCase: GetHistoryUseCase,
     saveHistoryUseCase: SaveHistoryUseCase,

@@ -1,9 +1,7 @@
 package com.github.misham72.communalpayments.presentation.screen.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.di.AppContainer
 import com.github.misham72.communalpayments.di.ElectricityViewModelFactory
 import com.github.misham72.communalpayments.di.GarbageViewModelFactory
@@ -34,6 +32,8 @@ import com.github.misham72.communalpayments.presentation.screen.screens.mts.MTSS
 import com.github.misham72.communalpayments.presentation.screen.screens.mts.MTSViewModel
 import com.github.misham72.communalpayments.presentation.screen.screens.osago.OsagoScreen
 import com.github.misham72.communalpayments.presentation.screen.screens.osago.OsagoViewModel
+import com.github.misham72.communalpayments.presentation.screen.screens.services.ServiceRegistry
+import com.github.misham72.communalpayments.presentation.screen.screens.services.displayName
 import com.github.misham72.communalpayments.presentation.screen.screens.taxes.TaxesScreen
 import com.github.misham72.communalpayments.presentation.screen.screens.taxes.TaxesViewModel
 import com.github.misham72.communalpayments.presentation.screen.screens.tinkoff.TinkoffScreen
@@ -44,60 +44,60 @@ import com.github.misham72.communalpayments.presentation.screen.screens.water.Wa
 import com.github.misham72.communalpayments.presentation.screen.screens.water.WaterViewModel
 
 @Composable
+//Названия услуг, Ключи, Экраны (что показать при клике)
 fun getListInitialScreen(appContainer: AppContainer): List<InitialScreen> {
     return listOf(
-        InitialScreen(stringResource(R.string.service_display_name_electricity), ServiceKeys.ELECTRICITY, {  //"⚡"
+        InitialScreen(ServiceRegistry.byKey(ServiceKeys.ELECTRICITY)!!.displayName(), ServiceKeys.ELECTRICITY, {
             val factory = ElectricityViewModelFactory(appContainer)
             val viewModel: ElectricityViewModel = viewModel(factory = factory)
             ElectricityScreen(viewModel = viewModel, appContainer = appContainer)
-        }), InitialScreen(stringResource(R.string.service_display_name_gas), ServiceKeys.GAS, { //"🔥"
+        }), InitialScreen(ServiceRegistry.byKey(ServiceKeys.GAS)!!.displayName(), ServiceKeys.GAS, {
             val factory = GasViewModelFactory(appContainer)
             val viewModel: GasViewModel = viewModel(factory = factory)
             GasScreen(viewModel = viewModel, appContainer = appContainer)
-        }), InitialScreen(stringResource(R.string.service_display_name_water), ServiceKeys.WATER, { //ю"💧",
+        }), InitialScreen(ServiceRegistry.byKey(ServiceKeys.WATER)!!.displayName(), ServiceKeys.WATER, {
             val factory = WaterViewModelFactory(appContainer)
             val viewModel: WaterViewModel = viewModel(factory = factory)
             WaterScreen(viewModel = viewModel, appContainer = appContainer)
-        }), InitialScreen(stringResource(R.string.service_display_name_garbage), ServiceKeys.GARBAGE, { //"🗑️",
+        }), InitialScreen(ServiceRegistry.byKey(ServiceKeys.GARBAGE)!!.displayName(), ServiceKeys.GARBAGE, {
             val factory = GarbageViewModelFactory(appContainer)
             val viewModel: GarbageViewModel = viewModel(factory = factory)
             GarbageScreen(viewModel = viewModel, appContainer = appContainer)
-        }), InitialScreen(stringResource(R.string.service_display_name_zont), ServiceKeys.ZONT, { //"🌡️"
+        }), InitialScreen(ServiceRegistry.byKey(ServiceKeys.ZONT)!!.displayName(), ServiceKeys.ZONT, {
             val factory = ZONTViewModelFactory(appContainer)
             val viewModel: ZONTViewModel = viewModel(factory = factory)
             ZONTScreen(viewModel = viewModel, appContainer = appContainer)
-        }), InitialScreen(stringResource(R.string.service_display_name_internet), ServiceKeys.INTERNET, { //"📶",
+        }), InitialScreen(ServiceRegistry.byKey(ServiceKeys.INTERNET)!!.displayName(), ServiceKeys.INTERNET, {
             val factory = InternetViewModelFactory(appContainer)
             val viewModel: InternetViewModel = viewModel(factory = factory)
             InternetScreen(viewModel = viewModel, appContainer = appContainer)
-        }), InitialScreen(stringResource(R.string.service_display_name_mts), ServiceKeys.MTS, {
+        }), InitialScreen(ServiceRegistry.byKey(ServiceKeys.MTS)!!.displayName(), ServiceKeys.MTS, {
             val factory = MTSViewModelFactory(appContainer)
             val viewModel: MTSViewModel = viewModel(factory = factory)
             MTSScreen(viewModel = viewModel, appContainer = appContainer)
-        }), InitialScreen(stringResource(R.string.service_display_name_tinkoff), ServiceKeys.TINKOFF, {
+        }), InitialScreen(ServiceRegistry.byKey(ServiceKeys.TINKOFF)!!.displayName(), ServiceKeys.TINKOFF, {
             val factory = TinkoffViewModelFactory(appContainer)
             val viewModel: TinkoffViewModel = viewModel(factory = factory)
             TinkoffScreen(viewModel = viewModel, appContainer = appContainer)
-        }), InitialScreen(stringResource(R.string.service_display_name_taxes), ServiceKeys.TAXES, { //ю"💰",
+        }), InitialScreen(ServiceRegistry.byKey(ServiceKeys.TAXES)!!.displayName(), ServiceKeys.TAXES, {
             val factory = TaxesViewModelFactory(appContainer)
             val viewModel: TaxesViewModel = viewModel(factory = factory)
             TaxesScreen(viewModel = viewModel, appContainer = appContainer)
-        }), InitialScreen(stringResource(R.string.service_display_name_troyka), ServiceKeys.TROYKA, { //"🚇",
+        }), InitialScreen(ServiceRegistry.byKey(ServiceKeys.TROYKA)!!.displayName(), ServiceKeys.TROYKA, {
             val factory = TroykaViewModelFactory(appContainer)
             val viewModel: TroykaViewModel = viewModel(factory = factory)
             TroykaScreen(viewModel = viewModel, appContainer = appContainer)
-        }), InitialScreen(stringResource(R.string.service_display_name_osago), ServiceKeys.OSAGO, { //"🚗",
+        }), InitialScreen(ServiceRegistry.byKey(ServiceKeys.OSAGO)!!.displayName(), ServiceKeys.OSAGO, {
             val factory = OSAGOViewModelFactory(appContainer)
             val viewModel: OsagoViewModel = viewModel(factory = factory)
             OsagoScreen(viewModel = viewModel, appContainer = appContainer)
-        }), InitialScreen(stringResource(R.string.service_display_name_hostel), ServiceKeys.HOSTEL, {//🛏️ ,
+        }), InitialScreen(ServiceRegistry.byKey(ServiceKeys.HOSTEL)!!.displayName(), ServiceKeys.HOSTEL, {
             val factory = HostelViewModelFactory(appContainer)
             val viewModel: HostelViewModel = viewModel(factory = factory)
             HostelScreen(viewModel = viewModel, appContainer = appContainer)
         })
     )
 }
-
 @Composable
 fun getSelectedScreens(appContainer: AppContainer): List<InitialScreen> {
     val allServices = getListInitialScreen(appContainer)

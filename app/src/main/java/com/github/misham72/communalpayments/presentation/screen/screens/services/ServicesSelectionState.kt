@@ -2,8 +2,7 @@ package com.github.misham72.communalpayments.presentation.screen.screens.service
 
 data class ServiceItem(
     val key: String,
-    val displayName: String,
-    val emoji: String,
+    val displayName: String
 )
 
 data class ServiceGroup(

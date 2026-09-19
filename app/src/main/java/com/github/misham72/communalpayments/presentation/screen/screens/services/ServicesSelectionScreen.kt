@@ -35,7 +35,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.di.AppContainer
 import com.github.misham72.communalpayments.di.ServicesSelectionViewModelFactory
-import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 import com.github.misham72.communalpayments.presentation.common.UiConstants
 import com.github.misham72.communalpayments.presentation.screen.components.CatAnimation
 
@@ -46,36 +45,18 @@ fun ServicesSelectionScreen(
     onBack: () -> Unit,
     onSaved: () -> Unit = onBack,
 ) {
-    val electricity = stringResource(R.string.service_display_name_electricity)
-    val gas = stringResource(R.string.service_display_name_gas)
-    val water = stringResource(R.string.service_display_name_water)
-    val garbage = stringResource(R.string.service_display_name_garbage)
-    val zont = stringResource(R.string.service_display_name_zont)
-    val internet = stringResource(R.string.service_display_name_internet)
-    val mts = stringResource(R.string.service_display_name_mts)
-    val tinkoff = stringResource(R.string.service_display_name_tinkoff)
-    val taxes = stringResource(R.string.service_display_name_taxes)
-    val troyka = stringResource(R.string.service_display_name_troyka)
-    val osago = stringResource(R.string.service_display_name_osago)
-    val hostel = stringResource(R.string.service_display_name_hostel)
-
-    val meterItems = listOf(
-        ServiceItem(ServiceKeys.ELECTRICITY, electricity, "⚡"),
-        ServiceItem(ServiceKeys.GAS, gas, "🔥"),
-        ServiceItem(ServiceKeys.WATER, water, "💧"),
-    )
-
-    val periodicItems = listOf(
-        ServiceItem(ServiceKeys.GARBAGE, garbage, "🗑️"),
-        ServiceItem(ServiceKeys.ZONT, zont, "🌡️"),
-        ServiceItem(ServiceKeys.INTERNET, internet, "📶"),
-        ServiceItem(ServiceKeys.MTS, mts, "📱"),
-        ServiceItem(ServiceKeys.TINKOFF, tinkoff, "🟦"),
-        ServiceItem(ServiceKeys.TAXES, taxes, "💰"),
-        ServiceItem(ServiceKeys.TROYKA, troyka, "🚇"),
-        ServiceItem(ServiceKeys.OSAGO, osago, "🚗"),
-        ServiceItem(ServiceKeys.HOSTEL, hostel, "🏢"),
-    )
+    val meterItems = ServiceRegistry.meters().map { def ->
+        ServiceItem(
+            key = def.key,
+            displayName = def.displayName(),
+        )
+    }
+    val periodicItems = ServiceRegistry.periodic().map { def ->
+        ServiceItem(
+            key = def.key,
+            displayName = def.displayName(),
+        )
+    }
     val groupTitles = stringResource(R.string.group_meters) to stringResource(R.string.group_periodic)
 
     val factory = remember {
@@ -155,7 +136,6 @@ private fun ServiceRow(
             .padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(item.emoji, fontSize = 24.sp, modifier = Modifier.padding(end = 12.dp))
         Text(
             text = item.displayName,
             modifier = Modifier.weight(1f),

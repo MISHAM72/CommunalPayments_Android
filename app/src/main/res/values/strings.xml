@@ -6,18 +6,18 @@
 
     <!-- НАЗВАНИЯ ВКЛАДОК В ИСТОРИИ-->
     <!-- Services -->
-    <string name="service_display_name_electricity"> 💡Свет</string>
-    <string name="service_display_name_water">💧 Вода</string>
-    <string name="service_display_name_gas">🔥 Газ</string>
-    <string name="service_display_name_internet">🌐 Интернет</string>
-    <string name="service_display_name_garbage">🗑️ Мусор</string>
-    <string name="service_display_name_mts">📱🔴 МТС</string>
-    <string name="service_display_name_osago">🚗 Автострахование</string>
-    <string name="service_display_name_taxes">💰 Налог на бизнес</string>
-    <string name="service_display_name_tinkoff">📱 🔵 Tinkoff</string>
-    <string name="service_display_name_troyka">🚇 Проездной билет</string>
-    <string name="service_display_name_zont">🏠 Отопление</string>
-    <string name="service_display_name_hostel">🛏️  Общежитие</string>
+    <string name="service_display_name_electricity">Свет</string>
+    <string name="service_display_name_water">Вода</string>
+    <string name="service_display_name_gas">Газ</string>
+    <string name="service_display_name_internet">Интернет</string>
+    <string name="service_display_name_garbage">Мусор</string>
+    <string name="service_display_name_mts">МТС</string>
+    <string name="service_display_name_osago">Автострахование</string>
+    <string name="service_display_name_taxes">Налог на бизнес</string>
+    <string name="service_display_name_tinkoff">Tinkoff</string>
+    <string name="service_display_name_troyka">Проездной билет</string>
+    <string name="service_display_name_zont">Отопление</string>
+    <string name="service_display_name_hostel">Общежитие</string>
 
 
     <!-- СТАРЫЕ строки (оставьте для результатов): -->

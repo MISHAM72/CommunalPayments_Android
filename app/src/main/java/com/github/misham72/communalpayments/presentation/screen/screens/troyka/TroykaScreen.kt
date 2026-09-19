@@ -48,11 +48,13 @@ import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.di.AppContainer
 import com.github.misham72.communalpayments.di.ReceiptsViewModelFactory
 import com.github.misham72.communalpayments.domain.model.ValidationError
+import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 import com.github.misham72.communalpayments.presentation.screen.components.EditProviderDetailsDialog
 import com.github.misham72.communalpayments.presentation.screen.components.ProviderDetailsDialog
 import com.github.misham72.communalpayments.presentation.screen.components.ServiceTopBar
 import com.github.misham72.communalpayments.presentation.screen.screens.receipts.ReceiptsScreen
 import com.github.misham72.communalpayments.presentation.screen.screens.receipts.ReceiptsViewModel
+import com.github.misham72.communalpayments.presentation.screen.screens.services.serviceName
 import com.github.misham72.communalpayments.presentation.ui.bank.BankSelectionDialog
 import com.github.misham72.communalpayments.presentation.utils.normalizeUrl
 import com.github.misham72.communalpayments.presentation.utils.rememberBankButtonSoundPlayer
@@ -90,7 +92,7 @@ fun TroykaScreen(viewModel: TroykaViewModel, appContainer: AppContainer) {
         ) {
             ServiceTopBar(
 
-                title = uiState.providerDetails.customServiceName.ifBlank { stringResource(R.string.service_display_name_troyka) },
+                title = uiState.providerDetails.customServiceName.ifBlank { serviceName(ServiceKeys.TROYKA) },
                 onEditClick = { viewModel.openAccountDialog() },
                 onTxtExport = { viewModel.onShareClick(context) },
                 modifier = Modifier.height(28.dp),

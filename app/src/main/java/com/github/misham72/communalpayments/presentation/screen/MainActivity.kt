@@ -26,7 +26,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.app.CommunalPaymentsApp
-import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 import com.github.misham72.communalpayments.presentation.common.UiConstants
 import com.github.misham72.communalpayments.presentation.screen.screens.main.ControlBetweenScreens
 import com.github.misham72.communalpayments.presentation.theme.AppTheme
@@ -34,6 +33,8 @@ import com.github.misham72.communalpayments.presentation.theme.ThemePrefs
 import com.github.misham72.communalpayments.presentation.utils.LanguageManager
 import com.github.misham72.communalpayments.presentation.viewmodel.BackupViewModel
 import kotlinx.coroutines.launch
+import kotlin.getValue
+import com.github.misham72.communalpayments.presentation.screen.screens.services.ServiceRegistry
 
 class MainActivity : AppCompatActivity() {
     private val container by lazy { (application as CommunalPaymentsApp).appContainer }
@@ -68,24 +69,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // Список услуг для диалога (без Compose, просто данные)
     private val serviceItems by lazy {
-        listOf(
-            getString(R.string.service_display_name_electricity) to ServiceKeys.ELECTRICITY,
-            getString(R.string.service_display_name_gas) to ServiceKeys.GAS,
-            getString(R.string.service_display_name_water) to ServiceKeys.WATER,
-            getString(R.string.service_display_name_garbage) to ServiceKeys.GARBAGE,
-            getString(R.string.service_display_name_zont) to ServiceKeys.ZONT,
-            getString(R.string.service_display_name_internet) to ServiceKeys.INTERNET,
-            getString(R.string.service_display_name_mts) to ServiceKeys.MTS,
-            getString(R.string.service_display_name_tinkoff) to ServiceKeys.TINKOFF,
-            getString(R.string.service_display_name_taxes) to ServiceKeys.TAXES,
-            getString(R.string.service_display_name_troyka) to ServiceKeys.TROYKA,
-            getString(R.string.service_display_name_osago) to ServiceKeys.OSAGO,
-            getString(R.string.service_display_name_hostel) to ServiceKeys.HOSTEL,
-        )
+        ServiceRegistry.all.map { def ->
+            "${def.emoji} ${getString(def.nameRes)}" to def.key
+        }
     }
-
     private var pendingFileUri: Uri? = null
     private var pendingFileName: String? = null
 
