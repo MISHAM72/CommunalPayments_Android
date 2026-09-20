@@ -3,19 +3,20 @@ package com.github.misham72.communalpayments.presentation.screen.navigation
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.misham72.communalpayments.di.AppContainer
+import com.github.misham72.communalpayments.di.ColdWaterViewModelFactory
 import com.github.misham72.communalpayments.di.ElectricityViewModelFactory
 import com.github.misham72.communalpayments.di.GarbageViewModelFactory
 import com.github.misham72.communalpayments.di.GasViewModelFactory
 import com.github.misham72.communalpayments.di.HostelViewModelFactory
+import com.github.misham72.communalpayments.di.HotWaterViewModelFactory
 import com.github.misham72.communalpayments.di.InternetViewModelFactory
 import com.github.misham72.communalpayments.di.MTSViewModelFactory
 import com.github.misham72.communalpayments.di.OSAGOViewModelFactory
 import com.github.misham72.communalpayments.di.TaxesViewModelFactory
 import com.github.misham72.communalpayments.di.TinkoffViewModelFactory
 import com.github.misham72.communalpayments.di.TroykaViewModelFactory
-import com.github.misham72.communalpayments.di.WaterViewModelFactory
 import com.github.misham72.communalpayments.di.ZONTViewModelFactory
-import com.github.misham72.communalpayments.domain.utils.ServiceKeys
+import com.github.misham72.communalpayments.domain.constants.ServiceKeys
 import com.github.misham72.communalpayments.presentation.screen.screens.electricity.ElectricityScreen
 import com.github.misham72.communalpayments.presentation.screen.screens.electricity.ElectricityViewModel
 import com.github.misham72.communalpayments.presentation.screen.screens.garbage.GarbageScreen
@@ -40,8 +41,10 @@ import com.github.misham72.communalpayments.presentation.screen.screens.tinkoff.
 import com.github.misham72.communalpayments.presentation.screen.screens.tinkoff.TinkoffViewModel
 import com.github.misham72.communalpayments.presentation.screen.screens.troyka.TroykaScreen
 import com.github.misham72.communalpayments.presentation.screen.screens.troyka.TroykaViewModel
-import com.github.misham72.communalpayments.presentation.screen.screens.water.WaterScreen
-import com.github.misham72.communalpayments.presentation.screen.screens.water.WaterViewModel
+import com.github.misham72.communalpayments.presentation.screen.screens.watercold.ColdWaterScreen
+import com.github.misham72.communalpayments.presentation.screen.screens.watercold.ColdWaterViewModel
+import com.github.misham72.communalpayments.presentation.screen.screens.waterhot.HotWaterScreen
+import com.github.misham72.communalpayments.presentation.screen.screens.waterhot.HotWaterViewModel
 
 @Composable
 //Названия услуг, Ключи, Экраны (что показать при клике)
@@ -56,9 +59,13 @@ fun getListInitialScreen(appContainer: AppContainer): List<InitialScreen> {
             val viewModel: GasViewModel = viewModel(factory = factory)
             GasScreen(viewModel = viewModel, appContainer = appContainer)
         }), InitialScreen(ServiceRegistry.byKey(ServiceKeys.COLDWATER)!!.displayName(), ServiceKeys.COLDWATER, {
-            val factory = WaterViewModelFactory(appContainer)
-            val viewModel: WaterViewModel = viewModel(factory = factory)
-            WaterScreen(viewModel = viewModel, appContainer = appContainer)
+            val factory = ColdWaterViewModelFactory(appContainer)
+            val viewModel: ColdWaterViewModel = viewModel(factory = factory)
+            ColdWaterScreen(viewModel = viewModel, appContainer = appContainer)
+        }), InitialScreen(ServiceRegistry.byKey(ServiceKeys.HOTWATER)!!.displayName(), ServiceKeys.HOTWATER, {
+            val factory = HotWaterViewModelFactory(appContainer)
+            val viewModel: HotWaterViewModel = viewModel(factory = factory)
+            HotWaterScreen(viewModel = viewModel, appContainer = appContainer)
         }), InitialScreen(ServiceRegistry.byKey(ServiceKeys.GARBAGE)!!.displayName(), ServiceKeys.GARBAGE, {
             val factory = GarbageViewModelFactory(appContainer)
             val viewModel: GarbageViewModel = viewModel(factory = factory)

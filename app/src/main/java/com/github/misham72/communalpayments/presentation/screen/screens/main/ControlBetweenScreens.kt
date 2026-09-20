@@ -56,7 +56,7 @@ import com.github.misham72.communalpayments.domain.usecases.PdfHistoryUseCase
 import com.github.misham72.communalpayments.domain.usecases.GetExpensesUseCase
 import com.github.misham72.communalpayments.domain.usecases.GetHistoryUseCase
 import com.github.misham72.communalpayments.domain.usecases.SaveHistoryUseCase
-import com.github.misham72.communalpayments.domain.utils.ServiceKeys
+import com.github.misham72.communalpayments.domain.constants.ServiceKeys
 import com.github.misham72.communalpayments.presentation.screen.components.ServiceTab
 import com.github.misham72.communalpayments.presentation.screen.navigation.getSelectedScreens
 import com.github.misham72.communalpayments.presentation.screen.screens.analytics.ExpensesScreen
@@ -79,6 +79,7 @@ import com.github.misham72.communalpayments.presentation.utils.rememberlightSoun
 import kotlinx.coroutines.launch
 import com.github.misham72.communalpayments.presentation.screen.screens.services.ServicesSelectionScreen
 import com.github.misham72.communalpayments.presentation.utils.rememberColdWaterSoundPlayer
+import com.github.misham72.communalpayments.presentation.utils.rememberHotWaterSoundPlayer
 
 @Composable
 fun ControlBetweenScreens( //Звуки (какой звук играть при клике)
@@ -370,6 +371,7 @@ fun ControlBetweenScreens( //Звуки (какой звук играть при
                     val light = rememberlightSoundPlayer()
                     val gasSound = rememberGasSoundPlayer()
                     val coldWaterSound = rememberColdWaterSoundPlayer()
+                    val hotWaterSound = rememberHotWaterSoundPlayer()
                     val garbageSound = rememberGarbageSoundPlayer()
                     val boilerSound = rememberBoilerSoundPlayer()
                     val internetSound = rememberInternetSoundPlayer()
@@ -388,7 +390,8 @@ fun ControlBetweenScreens( //Звуки (какой звук играть при
                             val sound = when (service.fileKey) {  // sound — выбирается соответствующий звук для нажатия на чипс (чтобы при переключении играл специфичный звук, если задан).
                                 ServiceKeys.ELECTRICITY -> light
                                 ServiceKeys.GAS -> gasSound               // 🔥 → звук газа
-                                ServiceKeys.COLDWATER -> coldWaterSound            // 💧 → звук воды
+                                ServiceKeys.COLDWATER -> coldWaterSound
+                                ServiceKeys.HOTWATER -> hotWaterSound
                                 ServiceKeys.GARBAGE -> garbageSound
                                 ServiceKeys.ZONT -> boilerSound
                                 ServiceKeys.INTERNET -> internetSound

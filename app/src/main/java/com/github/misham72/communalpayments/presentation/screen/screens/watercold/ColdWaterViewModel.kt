@@ -1,4 +1,4 @@
-package com.github.misham72.communalpayments.presentation.screen.screens.water
+package com.github.misham72.communalpayments.presentation.screen.screens.watercold
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
@@ -15,7 +15,7 @@ import com.github.misham72.communalpayments.domain.repository.UserSettingsReposi
 import com.github.misham72.communalpayments.domain.usecases.PdfHistoryUseCase
 import com.github.misham72.communalpayments.domain.usecases.MeterDataUseCase
 import com.github.misham72.communalpayments.domain.usecases.TextHistoryUseCase
-import com.github.misham72.communalpayments.domain.utils.ServiceKeys
+import com.github.misham72.communalpayments.domain.constants.ServiceKeys
 import com.google.gson.Gson
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,7 +25,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 
-class WaterViewModel(
+class ColdWaterViewModel(
     private val meterDataUseCase: MeterDataUseCase,
     private val meterRepository: MeterRepository,
     private val settingsRepository: UserSettingsRepository,

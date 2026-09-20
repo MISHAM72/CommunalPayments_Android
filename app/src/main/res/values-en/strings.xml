@@ -7,6 +7,7 @@
 
     <string name="service_display_name_electricity">Electricity</string>
     <string name="service_display_name_coldwater">Cold water</string>
+    <string name="service_display_name_hotwater">Hot water</string>
     <string name="service_display_name_gas">Gas</string>
     <string name="service_display_name_internet">Internet</string>
     <string name="service_display_name_garbage">Garbage</string>

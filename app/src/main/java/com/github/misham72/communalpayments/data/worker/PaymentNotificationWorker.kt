@@ -9,7 +9,7 @@ import androidx.work.WorkerParameters
 import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.data.local.preferences.AccountPreferences
 import com.github.misham72.communalpayments.domain.utils.DateUtils
-import com.github.misham72.communalpayments.domain.utils.ServiceKeys
+import com.github.misham72.communalpayments.domain.constants.ServiceKeys
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext

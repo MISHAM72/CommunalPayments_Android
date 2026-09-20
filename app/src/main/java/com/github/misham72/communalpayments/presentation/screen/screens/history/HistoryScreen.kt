@@ -49,7 +49,7 @@ import com.github.misham72.communalpayments.domain.usecases.GetHistoryAttachment
 import com.github.misham72.communalpayments.domain.usecases.GetHistoryUseCase
 import com.github.misham72.communalpayments.domain.usecases.RemoveHistoryAttachmentUseCase
 import com.github.misham72.communalpayments.domain.usecases.SaveHistoryUseCase
-import com.github.misham72.communalpayments.domain.utils.ServiceKeys
+import com.github.misham72.communalpayments.domain.constants.ServiceKeys
 import com.github.misham72.communalpayments.presentation.common.UiMessages
 import com.github.misham72.communalpayments.presentation.mapper.StatusDisplayMapper
 import com.github.misham72.communalpayments.presentation.screen.components.HistoryCard

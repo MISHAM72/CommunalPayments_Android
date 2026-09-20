@@ -71,7 +71,8 @@ fun rememberGasSoundPlayer(): MediaPlayer? = rememberSoundPlayer(R.raw.gas_sound
 
 @Composable
 fun rememberColdWaterSoundPlayer(): MediaPlayer? = rememberSoundPlayer(R.raw.water_sound)
-
+@Composable
+fun rememberHotWaterSoundPlayer(): MediaPlayer? = rememberSoundPlayer(R.raw.hot_water_sound)
 
 @Composable
 fun rememberGarbageSoundPlayer(): MediaPlayer? = rememberSoundPlayer(R.raw.gagbage_sound)

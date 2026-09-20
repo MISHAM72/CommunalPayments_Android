@@ -4,7 +4,7 @@ import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.github.misham72.communalpayments.R
-import com.github.misham72.communalpayments.domain.utils.ServiceKeys
+import com.github.misham72.communalpayments.domain.constants.ServiceKeys
 
 enum class ServiceGroupType { METERS, PERIODIC }
 
@@ -36,6 +36,13 @@ object ServiceRegistry {
             nameRes = R.string.service_display_name_coldwater,
             group = ServiceGroupType.METERS,
         ),
+        ServiceDefinition(
+            key = ServiceKeys.HOTWATER,
+            emoji = "\uD83E\uDE78",
+            nameRes = R.string.service_display_name_hotwater,
+            group = ServiceGroupType.METERS
+        ),
+
         ServiceDefinition(
             key = ServiceKeys.GARBAGE,
             emoji = "🗑️",

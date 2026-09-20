@@ -15,7 +15,7 @@ import com.github.misham72.communalpayments.domain.repository.UserSettingsReposi
 import com.github.misham72.communalpayments.domain.usecases.PdfHistoryUseCase
 import com.github.misham72.communalpayments.domain.usecases.MeterDataUseCase
 import com.github.misham72.communalpayments.domain.usecases.TextHistoryUseCase
-import com.github.misham72.communalpayments.domain.utils.ServiceKeys
+import com.github.misham72.communalpayments.domain.constants.ServiceKeys
 import com.google.gson.Gson
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow

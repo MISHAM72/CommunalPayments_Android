@@ -1,4 +1,5 @@
-package com.github.misham72.communalpayments.presentation.screen.screens.water
+package com.github.misham72.communalpayments.presentation.screen.screens.waterhot
+
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -47,7 +48,7 @@ import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.di.AppContainer
 import com.github.misham72.communalpayments.di.ReceiptsViewModelFactory
 import com.github.misham72.communalpayments.domain.model.ValidationError
-import com.github.misham72.communalpayments.domain.utils.ServiceKeys
+import com.github.misham72.communalpayments.domain.constants.ServiceKeys
 import com.github.misham72.communalpayments.presentation.screen.components.EditProviderDetailsDialog
 import com.github.misham72.communalpayments.presentation.screen.components.ProviderDetailsDialog
 import com.github.misham72.communalpayments.presentation.screen.components.ServiceTopBar
@@ -62,7 +63,7 @@ import com.github.misham72.communalpayments.presentation.utils.rememberCopyButto
 
 @SuppressLint("LocalContextGetResourceValueCall")
 @Composable
-fun WaterScreen(viewModel: WaterViewModel, appContainer: AppContainer) {
+fun HotWaterScreen(viewModel: HotWaterViewModel, appContainer: AppContainer) {
     val showBankDialog = remember { mutableStateOf(false) }
     val showProviderDialog = remember { mutableStateOf(false) }
     val context = LocalContext.current
@@ -78,7 +79,7 @@ fun WaterScreen(viewModel: WaterViewModel, appContainer: AppContainer) {
     var showReceipts by remember { mutableStateOf(false) }
     if (showReceipts) {
         ReceiptsScreen(
-            serviceKey = WaterViewModel.SERVICE_KEY,
+            serviceKey = HotWaterViewModel.SERVICE_KEY,
             viewModel = receiptsViewModel,
             onBack = { showReceipts = false }
         )

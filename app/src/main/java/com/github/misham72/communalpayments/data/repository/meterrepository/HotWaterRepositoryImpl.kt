@@ -1,14 +1,15 @@
 package com.github.misham72.communalpayments.data.repository.meterrepository
 
+
 import com.github.misham72.communalpayments.data.local.file.FileManager
 import com.github.misham72.communalpayments.data.repository.base.BaseMeterRepository
 import com.github.misham72.communalpayments.domain.common.DomainMessages
+import com.github.misham72.communalpayments.domain.constants.ServiceKeys
 import com.github.misham72.communalpayments.domain.model.metric.MeterData
 import com.github.misham72.communalpayments.domain.model.metric.WaterData
 import com.github.misham72.communalpayments.domain.repository.MeterRepository
-import com.github.misham72.communalpayments.domain.utils.ServiceKeys
 
-class WaterRepositoryImpl(
+class HotWaterRepositoryImpl(
     fileManager: FileManager,
     dateFormatPattern: String,
     personalAccountTemplate: String,

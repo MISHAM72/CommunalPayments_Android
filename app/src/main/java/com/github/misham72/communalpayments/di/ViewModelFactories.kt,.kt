@@ -23,7 +23,9 @@ import com.github.misham72.communalpayments.presentation.screen.screens.services
 import com.github.misham72.communalpayments.presentation.screen.screens.taxes.TaxesViewModel
 import com.github.misham72.communalpayments.presentation.screen.screens.tinkoff.TinkoffViewModel
 import com.github.misham72.communalpayments.presentation.screen.screens.troyka.TroykaViewModel
-import com.github.misham72.communalpayments.presentation.screen.screens.water.WaterViewModel
+import com.github.misham72.communalpayments.presentation.screen.screens.watercold.ColdWaterViewModel
+import com.github.misham72.communalpayments.presentation.screen.screens.waterhot.HotWaterViewModel
+import kotlin.jvm.java
 
 class ElectricityViewModelFactory(
     private val container: AppContainer,
@@ -63,14 +65,14 @@ class GasViewModelFactory(
     }
 }
 
-class WaterViewModelFactory(
+class ColdWaterViewModelFactory(
     private val container: AppContainer
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(WaterViewModel::class.java)) {
-            return WaterViewModel(
+        if (modelClass.isAssignableFrom(ColdWaterViewModel::class.java)) {
+            return ColdWaterViewModel(
                 meterDataUseCase = container.meterDataUseCase,
-                meterRepository = container.waterRepository,
+                meterRepository = container.coldWaterRepository,
                 settingsRepository = container.settingsRepository,
                 repository = container.providerRepository,
                 textHistoryUseCase = container.textHistoryUseCase,
@@ -82,6 +84,24 @@ class WaterViewModelFactory(
     }
 }
 
+class HotWaterViewModelFactory(
+    private val container: AppContainer
+) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(HotWaterViewModel::class.java)) {
+            return HotWaterViewModel(
+                meterDataUseCase = container.meterDataUseCase,
+                meterRepository = container.hotWaterRepository,
+                settingsRepository = container.settingsRepository,
+                repository = container.providerRepository,
+                textHistoryUseCase = container.textHistoryUseCase,
+                pdfHistoryUseCase = container.pdfHistoryUseCase,
+                gson = container.gson
+            ) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
+    }
+}
 class GarbageViewModelFactory(
     private val container: AppContainer
 ) : ViewModelProvider.Factory {

@@ -16,9 +16,10 @@ import com.github.misham72.communalpayments.data.repository.export.PdfHistoryRep
 import com.github.misham72.communalpayments.data.repository.export.TextHistoryRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.history.HistoryRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.income.IncomeRepositoryImpl
+import com.github.misham72.communalpayments.data.repository.meterrepository.ColdWaterRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.meterrepository.ElectricityRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.meterrepository.GasRepositoryImpl
-import com.github.misham72.communalpayments.data.repository.meterrepository.WaterRepositoryImpl
+import com.github.misham72.communalpayments.data.repository.meterrepository.HotWaterRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.periodrepository.PeriodicRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.provider.ProviderRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.receipt.ReceiptRepositoryImpl
@@ -39,7 +40,7 @@ import com.github.misham72.communalpayments.domain.usecases.RemoveHistoryAttachm
 import com.github.misham72.communalpayments.domain.usecases.SaveHistoryUseCase
 import com.github.misham72.communalpayments.domain.usecases.SaveReceiptUseCase
 import com.github.misham72.communalpayments.domain.usecases.TextHistoryUseCase
-import com.github.misham72.communalpayments.domain.utils.ServiceKeys
+import com.github.misham72.communalpayments.domain.constants.ServiceKeys
 import com.github.misham72.communalpayments.presentation.common.UiConstants
 import com.google.gson.Gson
 import java.io.File
@@ -73,7 +74,19 @@ class AppContainer(context: Context) {
         serviceName = context.getString(R.string.service_display_name_electricity),
         unit = context.getString(R.string.unit_kilowatt_hour)
     )
-    val waterRepository = WaterRepositoryImpl(
+    val coldWaterRepository = ColdWaterRepositoryImpl(
+        fileManager = fileManager,
+        dateFormatPattern = DataConstants.DATE_TIME_FORMATE,
+        personalAccountTemplate = context.getString(R.string.personal_account_in_text_history),
+        currentReadingTemplate = context.getString(R.string.current_reading),
+        previousReadingTemplate = context.getString(R.string.previous_reading),
+        tariffTemplate = context.getString(R.string.tariff_card),
+        consumptionTemplate = context.getString(R.string.consumption),
+        currencyTemplate = context.getString(R.string.currency_rub),
+        serviceName = context.getString(R.string.service_display_name_coldwater),
+        unit = context.getString(R.string.unit_cubic_meter)
+    )
+    val hotWaterRepository = HotWaterRepositoryImpl(
         fileManager = fileManager,
         dateFormatPattern = DataConstants.DATE_TIME_FORMATE,
         personalAccountTemplate = context.getString(R.string.personal_account_in_text_history),

@@ -1,21 +1,21 @@
-package com.github.misham72.communalpayments.presentation.screen.screens.electricity
+package com.github.misham72.communalpayments.presentation.screen.screens.waterhot
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.misham72.communalpayments.domain.common.DomainMessages
+import com.github.misham72.communalpayments.domain.constants.ServiceKeys
 import com.github.misham72.communalpayments.domain.exceptions.InvalidReadingException
 import com.github.misham72.communalpayments.domain.model.ProviderDetails
 import com.github.misham72.communalpayments.domain.model.ValidationError
-import com.github.misham72.communalpayments.domain.model.metric.ElectricityData
 import com.github.misham72.communalpayments.domain.model.metric.MeterData
+import com.github.misham72.communalpayments.domain.model.metric.WaterData
 import com.github.misham72.communalpayments.domain.repository.IProviderRepository
 import com.github.misham72.communalpayments.domain.repository.MeterRepository
 import com.github.misham72.communalpayments.domain.repository.UserSettingsRepository
-import com.github.misham72.communalpayments.domain.usecases.PdfHistoryUseCase
 import com.github.misham72.communalpayments.domain.usecases.MeterDataUseCase
+import com.github.misham72.communalpayments.domain.usecases.PdfHistoryUseCase
 import com.github.misham72.communalpayments.domain.usecases.TextHistoryUseCase
-import com.github.misham72.communalpayments.domain.constants.ServiceKeys
 import com.google.gson.Gson
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,8 +24,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+class HotWaterViewModel(
 
-class ElectricityViewModel(
     private val meterDataUseCase: MeterDataUseCase,
     private val meterRepository: MeterRepository,
     private val settingsRepository: UserSettingsRepository,
@@ -33,19 +33,16 @@ class ElectricityViewModel(
     private val textHistoryUseCase: TextHistoryUseCase,
     private val pdfHistoryUseCase: PdfHistoryUseCase,
     private val gson: Gson
-
-) : ViewModel() {  //✅ Объявление класса ViewModel – чертёж будущих объектов.
-
+) : ViewModel() {
     companion object {
-        const val SERVICE_KEY = ServiceKeys.ELECTRICITY//– чертежи переменных.
+        const val SERVICE_KEY = ServiceKeys.HOTWATER
     }
 
-    /**Принимает пользовательский ввод (текущие показания, прошлые показания, тариф) и временно хранит их в UiState.*/
     data class UiState(
         val currentReading: String = "",
         val previousReading: String = "",
-        val providerDetails: ProviderDetails = ProviderDetails(),  //Все реквизиты (название, ЛС, тариф, компания, ИНН, р/с) хранятся внутри этого объекта.
-        val showAccountDialog: Boolean = false,   // флаг для диалога
+        val providerDetails: ProviderDetails = ProviderDetails(),
+        val showAccountDialog: Boolean = false,
         val customDate: String = "",
         val result: MeterData? = null,
         val error: ValidationError? = null,
@@ -53,18 +50,18 @@ class ElectricityViewModel(
         val showLastResult: Boolean = false
     )
 
-    private val _uiState = MutableStateFlow(UiState())  //✅ – чертежи переменных.
-    val uiState: StateFlow<UiState> = _uiState.asStateFlow()  //✅– чертежи переменных. Это StateFlow<UiState>, который хранит текущее состояние экрана.
+    private val _uiState = MutableStateFlow(UiState())  //✅ MutableStateFlow для изменяемого состояния
+    val uiState: StateFlow<UiState> = _uiState.asStateFlow()  //✅ StateFlow для неизменяемого публичного доступа
 
-    init {//– чертежи действий (инструкции).
+    init {
         viewModelScope.launch {
-            val detailsDeferred = async { repository.loadProviderDetails(ServiceKeys.ELECTRICITY) }
+            val detailsDeferred = async { repository.loadProviderDetails(ServiceKeys.HOTWATER) }
             val savedLastReading = settingsRepository.getLastReading(SERVICE_KEY) ?: ""
             val savedTariff = settingsRepository.getTariff(SERVICE_KEY) ?: ""
             val savedDate = settingsRepository.getCustomDate(SERVICE_KEY)
             val details = detailsDeferred.await()
             val savedJson = settingsRepository.getLastResult(SERVICE_KEY)
-            val lastResult = savedJson?.let { gson.fromJson(it, ElectricityData::class.java) }
+            val lastResult = savedJson?.let { gson.fromJson(it, WaterData::class.java) }
             _uiState.update { it.copy(lastResult = lastResult) }
 
             _uiState.update { currentState ->
@@ -79,9 +76,9 @@ class ElectricityViewModel(
         }
     }
 
-    fun saveProviderDetails(details: ProviderDetails) {//– чертежи действий (инструкции).
+    fun saveProviderDetails(details: ProviderDetails) {
         viewModelScope.launch {
-            repository.saveProviderDetails(ServiceKeys.ELECTRICITY, details)
+            repository.saveProviderDetails(ServiceKeys.HOTWATER, details)
             _uiState.update { it.copy(providerDetails = details) }
             // Если нужно обновить другие поля (тариф и т.д.) – можно сделать здесь
         }
@@ -130,7 +127,7 @@ class ElectricityViewModel(
         }
     }
 
-    fun onCalculateClick() {//– чертежи действий (инструкции).
+    fun onCalculateClick() {
         val current = _uiState.value.currentReading.toDoubleOrNull()
         val previous = _uiState.value.previousReading.toDoubleOrNull()
         val tariff = _uiState.value.providerDetails.tariff.toDoubleOrNull()
@@ -150,13 +147,12 @@ class ElectricityViewModel(
                     tariff = tariff,
                     accountNumber = account,
                     serviceKey = SERVICE_KEY,
-                    factory = ::ElectricityData
+                    factory = ::WaterData
                 )
-// после получения data
                 settingsRepository.saveLastResult(SERVICE_KEY, gson.toJson(data))
                 _uiState.update { state ->
                     state.copy(
-                        previousReading = state.currentReading,
+                        previousReading = state.currentReading, // перенос
                         currentReading = "",
                         result = data,
                         error = null,

@@ -6,7 +6,7 @@ import com.github.misham72.communalpayments.domain.common.DomainMessages
 import com.github.misham72.communalpayments.domain.model.metric.GasData
 import com.github.misham72.communalpayments.domain.model.metric.MeterData
 import com.github.misham72.communalpayments.domain.repository.MeterRepository
-import com.github.misham72.communalpayments.domain.utils.ServiceKeys
+import com.github.misham72.communalpayments.domain.constants.ServiceKeys
 
 class GasRepositoryImpl(
     fileManager: FileManager,

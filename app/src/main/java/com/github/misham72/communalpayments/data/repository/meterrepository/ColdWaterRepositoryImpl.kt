@@ -3,12 +3,12 @@ package com.github.misham72.communalpayments.data.repository.meterrepository
 import com.github.misham72.communalpayments.data.local.file.FileManager
 import com.github.misham72.communalpayments.data.repository.base.BaseMeterRepository
 import com.github.misham72.communalpayments.domain.common.DomainMessages
-import com.github.misham72.communalpayments.domain.model.metric.ElectricityData
 import com.github.misham72.communalpayments.domain.model.metric.MeterData
+import com.github.misham72.communalpayments.domain.model.metric.WaterData
 import com.github.misham72.communalpayments.domain.repository.MeterRepository
 import com.github.misham72.communalpayments.domain.constants.ServiceKeys
 
-class ElectricityRepositoryImpl(
+class ColdWaterRepositoryImpl(
     fileManager: FileManager,
     dateFormatPattern: String,
     personalAccountTemplate: String,
@@ -30,9 +30,9 @@ class ElectricityRepositoryImpl(
     currencyTemplate
 ), MeterRepository {
     override suspend fun save(data: MeterData) {
-        require(data is ElectricityData) { DomainMessages.EXPECTED_ELECTRICITY_DATA }
+        require(data is WaterData) { DomainMessages.EXPECTED_WATER_DATA }
         val dateTime = getCurrentDateTime()
-        val serviceKey = ServiceKeys.ELECTRICITY
+        val serviceKey = ServiceKeys.COLDWATER
         val content = formatMeterPayment(
             accountNumber = data.accountNumber.value,
             dateTime = dateTime,

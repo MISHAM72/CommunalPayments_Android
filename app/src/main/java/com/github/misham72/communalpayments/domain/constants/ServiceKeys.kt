@@ -1,10 +1,11 @@
-package com.github.misham72.communalpayments.domain.utils
+package com.github.misham72.communalpayments.domain.constants
 
 @Suppress("HardcodedStringLiteral")
 object ServiceKeys {
     const val ELECTRICITY: String = "electricity"
     const val GAS: String = "gas"
     const val COLDWATER: String = "coldwater"
+    const val HOTWATER: String = "hotwater"
     const val ZONT: String = "zont"
     const val INTERNET: String = "internet"
     const val MTS: String = "mts"
