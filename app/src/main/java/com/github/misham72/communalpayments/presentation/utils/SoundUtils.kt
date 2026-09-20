@@ -70,7 +70,7 @@ fun rememberlightSoundPlayer(): MediaPlayer? = rememberSoundPlayer(R.raw.light)
 fun rememberGasSoundPlayer(): MediaPlayer? = rememberSoundPlayer(R.raw.gas_sound)
 
 @Composable
-fun rememberWaterSoundPlayer(): MediaPlayer? = rememberSoundPlayer(R.raw.water_sound)
+fun rememberColdWaterSoundPlayer(): MediaPlayer? = rememberSoundPlayer(R.raw.water_sound)
 
 
 @Composable

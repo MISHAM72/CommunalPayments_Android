@@ -93,7 +93,7 @@ fun WaterScreen(viewModel: WaterViewModel, appContainer: AppContainer) {
         ) {
             ServiceTopBar(
 
-                title = uiState.providerDetails.customServiceName.ifBlank { serviceName(ServiceKeys.WATER) },
+                title = uiState.providerDetails.customServiceName.ifBlank { serviceName(ServiceKeys.COLDWATER) },
                 onEditClick = { viewModel.openAccountDialog() },
                 onTxtExport = { viewModel.onShareClick(context) },
                 modifier = Modifier.height(28.dp),

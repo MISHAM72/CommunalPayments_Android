@@ -35,7 +35,7 @@ class WaterViewModel(
     private val gson: Gson
 ) : ViewModel() {
     companion object {
-        const val SERVICE_KEY = ServiceKeys.WATER
+        const val SERVICE_KEY = ServiceKeys.COLDWATER
     }
 
     data class UiState( //✅ UiState как единый источник правды для экрана
@@ -55,7 +55,7 @@ class WaterViewModel(
 
     init {
         viewModelScope.launch {
-            val detailsDeferred = async { repository.loadProviderDetails(ServiceKeys.WATER) }
+            val detailsDeferred = async { repository.loadProviderDetails(ServiceKeys.COLDWATER) }
             val savedLastReading = settingsRepository.getLastReading(SERVICE_KEY) ?: ""
             val savedTariff = settingsRepository.getTariff(SERVICE_KEY) ?: ""
             val savedDate = settingsRepository.getCustomDate(SERVICE_KEY)
@@ -78,7 +78,7 @@ class WaterViewModel(
 
     fun saveProviderDetails(details: ProviderDetails) {
         viewModelScope.launch {
-            repository.saveProviderDetails(ServiceKeys.WATER, details)
+            repository.saveProviderDetails(ServiceKeys.COLDWATER, details)
             _uiState.update { it.copy(providerDetails = details) }
             // Если нужно обновить другие поля (тариф и т.д.) – можно сделать здесь
         }

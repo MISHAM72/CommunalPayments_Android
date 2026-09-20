@@ -58,6 +58,7 @@ import com.github.misham72.communalpayments.presentation.utils.rememberBoilerSou
 import com.github.misham72.communalpayments.presentation.utils.rememberButtonBuckSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberCancelButtonSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberCarSoundPlayer
+import com.github.misham72.communalpayments.presentation.utils.rememberColdWaterSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberEditHistoryButtonSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberGarbageSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberGasSoundPlayer
@@ -68,7 +69,6 @@ import com.github.misham72.communalpayments.presentation.utils.rememberOsagoSoun
 import com.github.misham72.communalpayments.presentation.utils.rememberSaveButtonSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberTaxesSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberTinkoffSoundPlayer
-import com.github.misham72.communalpayments.presentation.utils.rememberWaterSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberlightSoundPlayer
 import kotlinx.coroutines.launch
 import java.io.File
@@ -104,7 +104,7 @@ fun HistoryScreen(
     // ↓↓↓ ДОБАВИТЬ ЭТИ 11 ПЛЕЕРОВ ↓↓↓
     val light = rememberlightSoundPlayer()
     val gasSound = rememberGasSoundPlayer()
-    val waterSound = rememberWaterSoundPlayer()
+    val coldWaterSound = rememberColdWaterSoundPlayer()
     val garbageSound = rememberGarbageSoundPlayer()
     val boilerSound = rememberBoilerSoundPlayer()
     val internetSound = rememberInternetSoundPlayer()
@@ -234,7 +234,7 @@ fun HistoryScreen(
             val services = listOf(
                 ServiceKeys.ELECTRICITY to R.string.service_display_name_electricity,
                 ServiceKeys.GAS to R.string.service_display_name_gas,
-                ServiceKeys.WATER to R.string.service_display_name_water,
+                ServiceKeys.COLDWATER to R.string.service_display_name_coldwater,
                 ServiceKeys.GARBAGE to R.string.service_display_name_garbage,
                 ServiceKeys.ZONT to R.string.service_display_name_zont,
                 ServiceKeys.INTERNET to R.string.service_display_name_internet,
@@ -251,7 +251,7 @@ fun HistoryScreen(
                 val sound = when (key) {
                     ServiceKeys.ELECTRICITY -> light
                     ServiceKeys.GAS -> gasSound
-                    ServiceKeys.WATER -> waterSound
+                    ServiceKeys.COLDWATER -> coldWaterSound
                     ServiceKeys.GARBAGE -> garbageSound
                     ServiceKeys.ZONT -> boilerSound
                     ServiceKeys.INTERNET -> internetSound
@@ -351,7 +351,7 @@ fun HistoryScreen(
             val serviceDisplayName = when (selectedService) {
                 ServiceKeys.ELECTRICITY -> stringResource(R.string.service_display_name_electricity)
                 ServiceKeys.GAS -> stringResource(R.string.service_display_name_gas)
-                ServiceKeys.WATER -> stringResource(R.string.service_display_name_water)
+                ServiceKeys.COLDWATER -> stringResource(R.string.service_display_name_coldwater)
                 ServiceKeys.GARBAGE -> stringResource(R.string.service_display_name_garbage)
                 ServiceKeys.ZONT -> stringResource(R.string.service_display_name_zont)
                 ServiceKeys.INTERNET -> stringResource(R.string.service_display_name_internet)

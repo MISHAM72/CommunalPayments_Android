@@ -7,6 +7,7 @@ import com.github.misham72.communalpayments.data.common.DataConstants
 import com.github.misham72.communalpayments.data.local.file.FileManager
 import com.github.misham72.communalpayments.data.local.income.filemanager.IncomeFileManager
 import com.github.misham72.communalpayments.data.local.preferences.AccountPreferences
+import com.github.misham72.communalpayments.data.migration.WaterToColdwaterMigration
 import com.github.misham72.communalpayments.data.repository.BankRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.SelectedServicesRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.analytics.AnalyticsRepositoryImpl
@@ -81,7 +82,7 @@ class AppContainer(context: Context) {
         tariffTemplate = context.getString(R.string.tariff_card),
         consumptionTemplate = context.getString(R.string.consumption),
         currencyTemplate = context.getString(R.string.currency_rub),
-        serviceName = context.getString(R.string.service_display_name_water),
+        serviceName = context.getString(R.string.service_display_name_coldwater),
         unit = context.getString(R.string.unit_cubic_meter)
     )
     val gasRepository = GasRepositoryImpl(
@@ -130,7 +131,7 @@ class AppContainer(context: Context) {
     private val serviceDisplayNames = mapOf(
         ServiceKeys.ELECTRICITY to context.getString(R.string.service_display_name_electricity),
         ServiceKeys.GAS to context.getString(R.string.service_display_name_gas),
-        ServiceKeys.WATER to context.getString(R.string.service_display_name_water),
+        ServiceKeys.COLDWATER to context.getString(R.string.service_display_name_coldwater),
         ServiceKeys.GARBAGE to context.getString(R.string.service_display_name_garbage),
         ServiceKeys.ZONT to context.getString(R.string.service_display_name_zont),
         ServiceKeys.INTERNET to context.getString(R.string.service_display_name_internet),
@@ -225,6 +226,8 @@ class AppContainer(context: Context) {
 
     // ← ДОБАВЬ ЭТО:
     init {
+        // 1. Миграция "water" → "coldwater"
+        WaterToColdwaterMigration.migrate(context, sharedPrefs)
         val historyDir = File(context.filesDir, context.getString(R.string.history))
         val existingServiceKeys: Set<String> = if (historyDir.exists()) {
             historyDir.listFiles()

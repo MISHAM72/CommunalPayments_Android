@@ -25,7 +25,7 @@ class PaymentNotificationWorker(
         val serviceNames = mapOf(
             ServiceKeys.ELECTRICITY to applicationContext.getString(R.string.service_display_name_electricity),
             ServiceKeys.GAS to applicationContext.getString(R.string.service_display_name_gas),
-            ServiceKeys.WATER to applicationContext.getString(R.string.service_display_name_water),
+            ServiceKeys.COLDWATER to applicationContext.getString(R.string.service_display_name_coldwater),
             ServiceKeys.GARBAGE to applicationContext.getString(R.string.service_display_name_garbage),
             ServiceKeys.ZONT to applicationContext.getString(R.string.service_display_name_zont),
             ServiceKeys.INTERNET to applicationContext.getString(R.string.service_display_name_internet),

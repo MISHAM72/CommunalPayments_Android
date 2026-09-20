@@ -6,7 +6,7 @@
     // НАЗВАНИЯ ВКЛАДОК В ИСТОРИИ
 
     <string name="service_display_name_electricity">Electricity</string>
-    <string name="service_display_name_water">Water</string>
+    <string name="service_display_name_coldwater">Cold water</string>
     <string name="service_display_name_gas">Gas</string>
     <string name="service_display_name_internet">Internet</string>
     <string name="service_display_name_garbage">Garbage</string>

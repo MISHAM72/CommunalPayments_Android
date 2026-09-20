@@ -4,7 +4,7 @@ package com.github.misham72.communalpayments.domain.utils
 object ServiceKeys {
     const val ELECTRICITY: String = "electricity"
     const val GAS: String = "gas"
-    const val WATER: String = "water"
+    const val COLDWATER: String = "coldwater"
     const val ZONT: String = "zont"
     const val INTERNET: String = "internet"
     const val MTS: String = "mts"

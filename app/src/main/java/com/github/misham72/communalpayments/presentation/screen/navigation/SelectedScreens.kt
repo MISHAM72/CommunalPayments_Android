@@ -55,7 +55,7 @@ fun getListInitialScreen(appContainer: AppContainer): List<InitialScreen> {
             val factory = GasViewModelFactory(appContainer)
             val viewModel: GasViewModel = viewModel(factory = factory)
             GasScreen(viewModel = viewModel, appContainer = appContainer)
-        }), InitialScreen(ServiceRegistry.byKey(ServiceKeys.WATER)!!.displayName(), ServiceKeys.WATER, {
+        }), InitialScreen(ServiceRegistry.byKey(ServiceKeys.COLDWATER)!!.displayName(), ServiceKeys.COLDWATER, {
             val factory = WaterViewModelFactory(appContainer)
             val viewModel: WaterViewModel = viewModel(factory = factory)
             WaterScreen(viewModel = viewModel, appContainer = appContainer)
@@ -98,6 +98,7 @@ fun getListInitialScreen(appContainer: AppContainer): List<InitialScreen> {
         })
     )
 }
+
 @Composable
 fun getSelectedScreens(appContainer: AppContainer): List<InitialScreen> {
     val allServices = getListInitialScreen(appContainer)

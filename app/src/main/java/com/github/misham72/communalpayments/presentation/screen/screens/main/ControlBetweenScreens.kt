@@ -75,10 +75,10 @@ import com.github.misham72.communalpayments.presentation.utils.rememberMTSSoundP
 import com.github.misham72.communalpayments.presentation.utils.rememberOsagoSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberTaxesSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberTinkoffSoundPlayer
-import com.github.misham72.communalpayments.presentation.utils.rememberWaterSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberlightSoundPlayer
 import kotlinx.coroutines.launch
 import com.github.misham72.communalpayments.presentation.screen.screens.services.ServicesSelectionScreen
+import com.github.misham72.communalpayments.presentation.utils.rememberColdWaterSoundPlayer
 
 @Composable
 fun ControlBetweenScreens( //Звуки (какой звук играть при клике)
@@ -369,7 +369,7 @@ fun ControlBetweenScreens( //Звуки (какой звук играть при
                     //Создание плееров (по одному на каждый тип звука)
                     val light = rememberlightSoundPlayer()
                     val gasSound = rememberGasSoundPlayer()
-                    val waterSound = rememberWaterSoundPlayer()
+                    val coldWaterSound = rememberColdWaterSoundPlayer()
                     val garbageSound = rememberGarbageSoundPlayer()
                     val boilerSound = rememberBoilerSoundPlayer()
                     val internetSound = rememberInternetSoundPlayer()
@@ -388,7 +388,7 @@ fun ControlBetweenScreens( //Звуки (какой звук играть при
                             val sound = when (service.fileKey) {  // sound — выбирается соответствующий звук для нажатия на чипс (чтобы при переключении играл специфичный звук, если задан).
                                 ServiceKeys.ELECTRICITY -> light
                                 ServiceKeys.GAS -> gasSound               // 🔥 → звук газа
-                                ServiceKeys.WATER -> waterSound            // 💧 → звук воды
+                                ServiceKeys.COLDWATER -> coldWaterSound            // 💧 → звук воды
                                 ServiceKeys.GARBAGE -> garbageSound
                                 ServiceKeys.ZONT -> boilerSound
                                 ServiceKeys.INTERNET -> internetSound

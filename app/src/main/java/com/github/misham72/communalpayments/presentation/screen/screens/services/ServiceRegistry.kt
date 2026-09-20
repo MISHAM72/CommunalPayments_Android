@@ -31,9 +31,9 @@ object ServiceRegistry {
             group = ServiceGroupType.METERS,
         ),
         ServiceDefinition(
-            key = ServiceKeys.WATER,
+            key = ServiceKeys.COLDWATER,
             emoji = "💧",
-            nameRes = R.string.service_display_name_water,
+            nameRes = R.string.service_display_name_coldwater,
             group = ServiceGroupType.METERS,
         ),
         ServiceDefinition(

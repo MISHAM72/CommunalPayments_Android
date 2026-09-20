@@ -7,7 +7,7 @@
     <!-- НАЗВАНИЯ ВКЛАДОК В ИСТОРИИ-->
     <!-- Services -->
     <string name="service_display_name_electricity">Свет</string>
-    <string name="service_display_name_water">Вода</string>
+    <string name="service_display_name_coldwater">Вода (ХВС)</string>
     <string name="service_display_name_gas">Газ</string>
     <string name="service_display_name_internet">Интернет</string>
     <string name="service_display_name_garbage">Мусор</string>

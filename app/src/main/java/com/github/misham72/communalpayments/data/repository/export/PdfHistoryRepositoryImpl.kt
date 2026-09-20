@@ -83,7 +83,7 @@ class PdfHistoryRepositoryImpl(
 
     private fun isMeterService(serviceKey: String): Boolean {
         return serviceKey == ServiceKeys.ELECTRICITY ||
-            serviceKey == ServiceKeys.WATER ||
+            serviceKey == ServiceKeys.COLDWATER ||
             serviceKey == ServiceKeys.GAS
     }
 
@@ -297,7 +297,7 @@ class PdfHistoryRepositoryImpl(
         withContext(Dispatchers.IO) {
 
             val allKeys = listOf(
-                ServiceKeys.ELECTRICITY, ServiceKeys.GAS, ServiceKeys.WATER,
+                ServiceKeys.ELECTRICITY, ServiceKeys.GAS, ServiceKeys.COLDWATER,
                 ServiceKeys.GARBAGE, ServiceKeys.ZONT, ServiceKeys.INTERNET,
                 ServiceKeys.MTS, ServiceKeys.TINKOFF, ServiceKeys.TAXES,
                 ServiceKeys.TROYKA, ServiceKeys.OSAGO, ServiceKeys.HOSTEL
@@ -388,7 +388,7 @@ class PdfHistoryRepositoryImpl(
 
         val serviceOrder = listOf(
             serviceDisplayNames[ServiceKeys.ELECTRICITY] ?: "",
-            serviceDisplayNames[ServiceKeys.WATER] ?: "",
+            serviceDisplayNames[ServiceKeys.COLDWATER] ?: "",
             serviceDisplayNames[ServiceKeys.GAS] ?: "",
             serviceDisplayNames[ServiceKeys.GARBAGE] ?: "",
             serviceDisplayNames[ServiceKeys.ZONT] ?: "",
