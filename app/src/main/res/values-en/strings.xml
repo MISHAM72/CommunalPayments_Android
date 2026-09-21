@@ -8,6 +8,7 @@
     <string name="service_display_name_electricity">Electricity</string>
     <string name="service_display_name_coldwater">Cold water</string>
     <string name="service_display_name_hotwater">Hot water</string>
+    <string name="service_display_name_drainage">Drainage</string>
     <string name="service_display_name_gas">Gas</string>
     <string name="service_display_name_internet">Internet</string>
     <string name="service_display_name_garbage">Garbage</string>
@@ -270,8 +271,17 @@
     <string name="delete_attachment_confirm">Delete attachment confirm %s?</string>
     <string name="select_services_title">Select services title</string>
     <string name="group_meters">Group meters</string>
-    <string name="choose_services">Choose services</string>
+    <string name="choose_services">⚙️Choose services</string>
     <string name="choose_services_in_settings">Choose services in settings</string>
     <string name="settings">Settings</string>
+
+    <string name="has_hot_water">I have central hot water</string>
+    <string name="drainage_result_title">Drainage result:</string>
+    <string name="cold_water_usage">Cold water: %1$.2f %2$s</string>
+    <string name="hot_water_usage">Hot water: %1$.2f %2$s</string>
+    <string name="total_usage">Total: %1$.2f %2$s</string>
+    <string name="no_cold_water_data">⚠️ Fill cold water first</string>
+    <string name="no_hot_water_data">⚠️ Fill hot water first</string>
+    <string name="contributions_for_capital_repairs">Contributions for capital repairs</string>
 </resources>
 

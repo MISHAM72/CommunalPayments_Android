@@ -9,6 +9,7 @@
     <string name="service_display_name_electricity">Свет</string>
     <string name="service_display_name_coldwater">Вода (ХВС)</string>
     <string name="service_display_name_hotwater">Вода (ГВС)</string>
+    <string name="service_display_name_drainage">Водоотведение</string>
     <string name="service_display_name_gas">Газ</string>
     <string name="service_display_name_internet">Интернет</string>
     <string name="service_display_name_garbage">Мусор</string>
@@ -307,9 +308,20 @@
     <string name="group_periodic">ПЕРИОДИЧЕСКИЕ</string>
     <string name="save">Сохранить</string>
     <string name="back">Назад</string>
-    <string name="choose_services">Выбрать услуги</string>
+    <string name="choose_services">⚙️ Выбрать услуги</string>
     <string name="choose_services_in_settings">Выберите услуги в настройках</string>
     <string name="settings">Настройки</string>
     <string name="days_payment_for">Через %d дня(ей) платеж по %s</string>
+
+    <!-- ВОДООТВЕДЕНИЕ -->
+    <string name="has_hot_water">У меня есть центральное ГВС</string>
+    <string name="drainage_result_title">Результат водоотведения:</string>
+    <string name="cold_water_usage">Расход ХВС: %1$.2f %2$s</string>
+    <string name="hot_water_usage">Расход ГВС: %1$.2f %2$s</string>
+    <string name="total_usage">Итого: %1$.2f %2$s</string>
+    <string name="no_cold_water_data">⚠️ Сначала заполните ХВС</string>
+    <string name="no_hot_water_data">⚠️ Сначала заполните ГВС</string>
+
+    <string name="contributions_for_capital_repairs">Взносы на капитальный ремонт</string>
 
 </resources>

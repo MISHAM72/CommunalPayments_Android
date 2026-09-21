@@ -42,7 +42,12 @@ object ServiceRegistry {
             nameRes = R.string.service_display_name_hotwater,
             group = ServiceGroupType.METERS
         ),
-
+        ServiceDefinition(
+            key = ServiceKeys.DRAINAGE,
+            emoji = "🚿",
+            nameRes = R.string.service_display_name_drainage,
+            group = ServiceGroupType.PERIODIC,
+        ),
         ServiceDefinition(
             key = ServiceKeys.GARBAGE,
             emoji = "🗑️",

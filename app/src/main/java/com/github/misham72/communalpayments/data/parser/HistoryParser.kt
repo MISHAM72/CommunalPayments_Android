@@ -28,7 +28,13 @@ object HistoryParser {
     private val attachmentPathRegex = Regex("""^${HistoryFormat.ATTACHMENT_PREFIX}(\d+):\s*(.+)$""")
     private val attachmentNameRegex = Regex("""^${HistoryFormat.FILE_NAME_PREFIX}(\d+):\s*(.+)$""")
     private val attachmentMimeRegex = Regex("""^${HistoryFormat.MIME_TYPE_PREFIX}(\d+):\s*(.+)$""")
+    private val CONSUMPTION_REGEX = Regex("""Расход:?\s*-?\s*([\d.,]+)""")
 
+    fun extractLatestConsumption(content: String): Double? {
+        if (content.isBlank()) return null
+        val match = CONSUMPTION_REGEX.find(content) ?: return null
+        return match.groupValues[1].replace(',', '.').toDoubleOrNull()
+    }
     fun parse(content: String, serviceKey: String): List<HistoryRecord> {
         if (content.isBlank()) return emptyList()
 

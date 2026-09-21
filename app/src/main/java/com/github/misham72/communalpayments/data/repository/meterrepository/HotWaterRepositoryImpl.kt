@@ -33,7 +33,7 @@ class HotWaterRepositoryImpl(
     override suspend fun save(data: MeterData) {
         require(data is WaterData) { DomainMessages.EXPECTED_WATER_DATA }
         val dateTime = getCurrentDateTime()
-        val serviceKey = ServiceKeys.COLDWATER
+        val serviceKey = ServiceKeys.HOTWATER
         val content = formatMeterPayment(
             accountNumber = data.accountNumber.value,
             dateTime = dateTime,

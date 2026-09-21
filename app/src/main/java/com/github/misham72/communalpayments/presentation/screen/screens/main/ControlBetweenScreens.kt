@@ -187,7 +187,8 @@ fun ControlBetweenScreens( //Звуки (какой звук играть при
                 saveHistoryUseCase = saveHistoryUseCase,
                 attachHistoryAttachmentUseCase = appContainer.attachHistoryAttachmentUseCase,
                 removeHistoryAttachmentUseCase = appContainer.removeHistoryAttachmentUseCase,
-                getHistoryAttachmentUseCase = appContainer.getHistoryAttachmentUseCase
+                getHistoryAttachmentUseCase = appContainer.getHistoryAttachmentUseCase,
+                appContainer = appContainer
             )
         } else {
             Surface(

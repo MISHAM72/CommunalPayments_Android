@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
 import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.data.parser.HistoryParser
+import com.github.misham72.communalpayments.di.AppContainer
 import com.github.misham72.communalpayments.domain.model.Attachment
 import com.github.misham72.communalpayments.domain.model.HistoryRecord
 import com.github.misham72.communalpayments.domain.model.PaymentStatus
@@ -53,6 +54,8 @@ import com.github.misham72.communalpayments.domain.constants.ServiceKeys
 import com.github.misham72.communalpayments.presentation.common.UiMessages
 import com.github.misham72.communalpayments.presentation.mapper.StatusDisplayMapper
 import com.github.misham72.communalpayments.presentation.screen.components.HistoryCard
+import com.github.misham72.communalpayments.presentation.screen.screens.services.ServiceRegistry
+import com.github.misham72.communalpayments.presentation.screen.screens.services.displayName
 import com.github.misham72.communalpayments.presentation.utils.HISTORY_SEPARATOR
 import com.github.misham72.communalpayments.presentation.utils.rememberBoilerSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberButtonBuckSoundPlayer
@@ -63,6 +66,7 @@ import com.github.misham72.communalpayments.presentation.utils.rememberEditHisto
 import com.github.misham72.communalpayments.presentation.utils.rememberGarbageSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberGasSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberHostelSoundPlayer
+import com.github.misham72.communalpayments.presentation.utils.rememberHotWaterSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberInternetSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberMTSSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberOsagoSoundPlayer
@@ -84,9 +88,10 @@ fun HistoryScreen(
     saveHistoryUseCase: SaveHistoryUseCase,
     attachHistoryAttachmentUseCase: AttachHistoryAttachmentUseCase,
     removeHistoryAttachmentUseCase: RemoveHistoryAttachmentUseCase,
-    getHistoryAttachmentUseCase: GetHistoryAttachmentUseCase
+    getHistoryAttachmentUseCase: GetHistoryAttachmentUseCase,
+    appContainer: AppContainer,
 
-) {
+    ) {
     val loadingText = stringResource(R.string.loading)
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -105,6 +110,7 @@ fun HistoryScreen(
     val light = rememberlightSoundPlayer()
     val gasSound = rememberGasSoundPlayer()
     val coldWaterSound = rememberColdWaterSoundPlayer()
+    val hotWaterSound = rememberHotWaterSoundPlayer()
     val garbageSound = rememberGarbageSoundPlayer()
     val boilerSound = rememberBoilerSoundPlayer()
     val internetSound = rememberInternetSoundPlayer()
@@ -231,27 +237,21 @@ fun HistoryScreen(
                 .padding(vertical = 16.dp)
                 .horizontalScroll(state = rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            val services = listOf(
-                ServiceKeys.ELECTRICITY to R.string.service_display_name_electricity,
-                ServiceKeys.GAS to R.string.service_display_name_gas,
-                ServiceKeys.COLDWATER to R.string.service_display_name_coldwater,
-                ServiceKeys.GARBAGE to R.string.service_display_name_garbage,
-                ServiceKeys.ZONT to R.string.service_display_name_zont,
-                ServiceKeys.INTERNET to R.string.service_display_name_internet,
-                ServiceKeys.MTS to R.string.service_display_name_mts,
-                ServiceKeys.TINKOFF to R.string.service_display_name_tinkoff,
-                ServiceKeys.TAXES to R.string.service_display_name_taxes,
-                ServiceKeys.TROYKA to R.string.service_display_name_troyka,
-                ServiceKeys.OSAGO to R.string.service_display_name_osago,
-                ServiceKeys.HOSTEL to R.string.service_display_name_hostel
-            ).map { (key, nameRes) -> key to stringResource(nameRes) }
+            val selected = appContainer.selectedServicesRepository.getSelected()
 
+            val services = ServiceRegistry.all
+                .filter { selected.contains(it.key) }
+                .map { def ->
+                    def.key to def.displayName()
+                }
             services.forEach { (key, displayName) ->
                 // Определяем звук для каждой услуги
                 val sound = when (key) {
                     ServiceKeys.ELECTRICITY -> light
                     ServiceKeys.GAS -> gasSound
                     ServiceKeys.COLDWATER -> coldWaterSound
+                    ServiceKeys.HOTWATER -> hotWaterSound
+                    ServiceKeys.DRAINAGE -> null
                     ServiceKeys.GARBAGE -> garbageSound
                     ServiceKeys.ZONT -> boilerSound
                     ServiceKeys.INTERNET -> internetSound

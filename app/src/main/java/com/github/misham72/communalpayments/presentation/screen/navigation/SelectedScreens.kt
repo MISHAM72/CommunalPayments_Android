@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.misham72.communalpayments.di.AppContainer
 import com.github.misham72.communalpayments.di.ColdWaterViewModelFactory
+import com.github.misham72.communalpayments.di.DrainageViewModelFactory
 import com.github.misham72.communalpayments.di.ElectricityViewModelFactory
 import com.github.misham72.communalpayments.di.GarbageViewModelFactory
 import com.github.misham72.communalpayments.di.GasViewModelFactory
@@ -17,6 +18,8 @@ import com.github.misham72.communalpayments.di.TinkoffViewModelFactory
 import com.github.misham72.communalpayments.di.TroykaViewModelFactory
 import com.github.misham72.communalpayments.di.ZONTViewModelFactory
 import com.github.misham72.communalpayments.domain.constants.ServiceKeys
+import com.github.misham72.communalpayments.presentation.screen.screens.drainage.DrainageScreen
+import com.github.misham72.communalpayments.presentation.screen.screens.drainage.DrainageViewModel
 import com.github.misham72.communalpayments.presentation.screen.screens.electricity.ElectricityScreen
 import com.github.misham72.communalpayments.presentation.screen.screens.electricity.ElectricityViewModel
 import com.github.misham72.communalpayments.presentation.screen.screens.garbage.GarbageScreen
@@ -66,6 +69,10 @@ fun getListInitialScreen(appContainer: AppContainer): List<InitialScreen> {
             val factory = HotWaterViewModelFactory(appContainer)
             val viewModel: HotWaterViewModel = viewModel(factory = factory)
             HotWaterScreen(viewModel = viewModel, appContainer = appContainer)
+        }), InitialScreen(ServiceRegistry.byKey(ServiceKeys.DRAINAGE)!!.displayName(), ServiceKeys.DRAINAGE, {
+            val factory = DrainageViewModelFactory(appContainer)
+            val viewModel: DrainageViewModel = viewModel(factory = factory)
+            DrainageScreen(viewModel = viewModel, appContainer = appContainer)
         }), InitialScreen(ServiceRegistry.byKey(ServiceKeys.GARBAGE)!!.displayName(), ServiceKeys.GARBAGE, {
             val factory = GarbageViewModelFactory(appContainer)
             val viewModel: GarbageViewModel = viewModel(factory = factory)

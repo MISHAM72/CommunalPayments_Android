@@ -1,6 +1,7 @@
 package com.github.misham72.communalpayments.di
 
 import android.content.Context
+import android.content.SharedPreferences
 import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.data.calculators.PeriodCalculatorImpl
 import com.github.misham72.communalpayments.data.common.DataConstants
@@ -12,6 +13,7 @@ import com.github.misham72.communalpayments.data.repository.BankRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.SelectedServicesRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.analytics.AnalyticsRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.backup.BackupRepositoryImpl
+import com.github.misham72.communalpayments.data.repository.drainagerepository.DrainageRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.export.PdfHistoryRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.export.TextHistoryRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.history.HistoryRepositoryImpl
@@ -24,6 +26,7 @@ import com.github.misham72.communalpayments.data.repository.periodrepository.Per
 import com.github.misham72.communalpayments.data.repository.provider.ProviderRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.receipt.ReceiptRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.settings.UserSettingsRepositoryImpl
+import com.github.misham72.communalpayments.domain.constants.ServiceKeys
 import com.github.misham72.communalpayments.domain.usecases.AttachHistoryAttachmentUseCase
 import com.github.misham72.communalpayments.domain.usecases.DeleteReceiptUseCase
 import com.github.misham72.communalpayments.domain.usecases.ExportBackupUseCase
@@ -40,7 +43,6 @@ import com.github.misham72.communalpayments.domain.usecases.RemoveHistoryAttachm
 import com.github.misham72.communalpayments.domain.usecases.SaveHistoryUseCase
 import com.github.misham72.communalpayments.domain.usecases.SaveReceiptUseCase
 import com.github.misham72.communalpayments.domain.usecases.TextHistoryUseCase
-import com.github.misham72.communalpayments.domain.constants.ServiceKeys
 import com.github.misham72.communalpayments.presentation.common.UiConstants
 import com.google.gson.Gson
 import java.io.File
@@ -51,7 +53,7 @@ class AppContainer(context: Context) {
         historyDirName = context.getString(R.string.history),
         emptyHistoryMessage = context.getString(R.string.empty_history_calculation)
     )
-    private val sharedPrefs = context.getSharedPreferences(
+    val sharedPrefs: SharedPreferences = context.getSharedPreferences(
         DataConstants.PREFS_NAME, Context.MODE_PRIVATE
     )
     private val accountPrefs = AccountPreferences(sharedPrefs)
@@ -95,7 +97,16 @@ class AppContainer(context: Context) {
         tariffTemplate = context.getString(R.string.tariff_card),
         consumptionTemplate = context.getString(R.string.consumption),
         currencyTemplate = context.getString(R.string.currency_rub),
-        serviceName = context.getString(R.string.service_display_name_coldwater),
+        serviceName = context.getString(R.string.service_display_name_hotwater),
+        unit = context.getString(R.string.unit_cubic_meter)
+    )
+    val drainageRepository = DrainageRepositoryImpl(
+        fileManager = fileManager,
+        dateFormatPattern = DataConstants.DATE_TIME_FORMATE,
+        personalAccountTemplate = context.getString(R.string.personal_account_in_text_history),
+        consumptionTemplate = context.getString(R.string.consumption),
+        currencyTemplate = context.getString(R.string.currency_rub),
+        serviceName = context.getString(R.string.service_display_name_drainage),
         unit = context.getString(R.string.unit_cubic_meter)
     )
     val gasRepository = GasRepositoryImpl(

@@ -9,6 +9,7 @@ import com.github.misham72.communalpayments.domain.usecases.IncomeUseCase
 import com.github.misham72.communalpayments.domain.usecases.SaveReceiptUseCase
 import com.github.misham72.communalpayments.presentation.screen.screens.analytics.ExpensesViewModel
 import com.github.misham72.communalpayments.presentation.screen.screens.analytics.IncomeViewModel
+import com.github.misham72.communalpayments.presentation.screen.screens.drainage.DrainageViewModel
 import com.github.misham72.communalpayments.presentation.screen.screens.electricity.ElectricityViewModel
 import com.github.misham72.communalpayments.presentation.screen.screens.garbage.GarbageViewModel
 import com.github.misham72.communalpayments.presentation.screen.screens.gas.GasViewModel
@@ -25,7 +26,6 @@ import com.github.misham72.communalpayments.presentation.screen.screens.tinkoff.
 import com.github.misham72.communalpayments.presentation.screen.screens.troyka.TroykaViewModel
 import com.github.misham72.communalpayments.presentation.screen.screens.watercold.ColdWaterViewModel
 import com.github.misham72.communalpayments.presentation.screen.screens.waterhot.HotWaterViewModel
-import kotlin.jvm.java
 
 class ElectricityViewModelFactory(
     private val container: AppContainer,
@@ -102,6 +102,25 @@ class HotWaterViewModelFactory(
         throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
+
+class DrainageViewModelFactory(
+    private val container: AppContainer
+) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(DrainageViewModel::class.java)) {
+            return DrainageViewModel(
+                settingsRepository = container.settingsRepository,
+                repository = container.providerRepository,
+                drainageRepository = container.drainageRepository,   // ← новое
+                fileManager = container.fileManager,
+                textHistoryUseCase = container.textHistoryUseCase,
+                pdfHistoryUseCase = container.pdfHistoryUseCase
+            ) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
+    }
+}
+
 class GarbageViewModelFactory(
     private val container: AppContainer
 ) : ViewModelProvider.Factory {
