@@ -282,6 +282,12 @@
     <string name="total_usage">Total: %1$.2f %2$s</string>
     <string name="no_cold_water_data">⚠️ Fill cold water first</string>
     <string name="no_hot_water_data">⚠️ Fill hot water first</string>
-    <string name="contributions_for_capital_repairs">Contributions for capital repairs</string>
+
+    <string name="service_display_name_capital_repair">Capital repair</string>
+
+    <string name="area_label">Area, m²</string>
+    <string name="area_format">Area: %1$.2f m²</string>
+    <string name="tariff_per_sqm">Tariff: %.2f rub/m²</string>
+    <string name="result_capital_repair">Capital repair result:</string>
 </resources>
 

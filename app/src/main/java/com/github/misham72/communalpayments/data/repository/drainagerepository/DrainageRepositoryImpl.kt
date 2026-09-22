@@ -1,5 +1,6 @@
 package com.github.misham72.communalpayments.data.repository.drainagerepository
 
+import com.github.misham72.communalpayments.data.common.DataConstants
 import com.github.misham72.communalpayments.data.local.file.FileManager
 import com.github.misham72.communalpayments.data.repository.base.BaseRepository
 import com.github.misham72.communalpayments.domain.constants.ServiceKeys
@@ -33,12 +34,12 @@ class DrainageRepositoryImpl(
             appendLine(personalAccountTemplate + accountNumber)
             appendLine(serviceName)
             appendLine()
-            appendLine("Период: $periodMonths мес.")
-            appendLine("Дата оплаты: $nextPaymentDate")
-            appendLine("ХВС: ${consumptionTemplate.format(coldUsage, unit)}")
-            appendLine("ГВС: ${consumptionTemplate.format(hotUsage, unit)}")
-            appendLine("Итого: ${consumptionTemplate.format(totalUsage, unit)}")
-            appendLine("Тариф: $tariff")
+            appendLine(DataConstants.LABEL_PERIOD + periodMonths + DataConstants.LABEL_PERIOD_SUFFIX)
+            appendLine(DataConstants.LABEL_NEXT_PAYMENT + nextPaymentDate)
+            appendLine(DataConstants.LABEL_COLD_WATER + consumptionTemplate.format(coldUsage, unit))
+            appendLine(DataConstants.LABEL_HOT_WATER + consumptionTemplate.format(coldUsage, unit))
+            appendLine(DataConstants.LABEL_TOTAL + consumptionTemplate.format(totalUsage, unit))
+            appendLine(DataConstants.LABEL_TARIFF + tariff)
             appendLine()
             appendLine(currencyTemplate.format(payment))
         }

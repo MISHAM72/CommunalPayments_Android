@@ -1,6 +1,7 @@
 package com.github.misham72.communalpayments.presentation.screen.screens.services
 
 import androidx.annotation.StringRes
+import androidx.compose.animation.core.keyframes
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.github.misham72.communalpayments.R
@@ -102,6 +103,12 @@ object ServiceRegistry {
             nameRes = R.string.service_display_name_hostel,
             group = ServiceGroupType.PERIODIC,
         ),
+        ServiceDefinition(
+            key = ServiceKeys.CAPITAL_REPAIR,
+            emoji = "\uD83C\uDFD7\uFE0F",
+            nameRes = R.string.service_display_name_capital_repair,
+            group = ServiceGroupType.PERIODIC
+        )
     )
 
     fun byKey(key: String): ServiceDefinition? = all.firstOrNull { it.key == key }
@@ -112,9 +119,11 @@ object ServiceRegistry {
     fun periodic(): List<ServiceDefinition> =
         all.filter { it.group == ServiceGroupType.PERIODIC }
 }
+
 @Composable
 fun ServiceDefinition.displayName(): String =
     "$emoji ${stringResource(nameRes)}"
+
 @Composable
 fun serviceName(key: String): String =
     ServiceRegistry.byKey(key)!!.displayName()

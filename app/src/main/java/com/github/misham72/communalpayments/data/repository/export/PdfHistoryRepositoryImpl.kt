@@ -113,7 +113,7 @@ class PdfHistoryRepositoryImpl(
                 when {
 
                     @Suppress("HardcodedStringLiteral")
-                    trimmed.matches(Regex("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}")) -> date = trimmed
+                    trimmed.matches(Regex("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}")) -> date = trimmed.substringBefore(" ")
 
                     trimmed.startsWith(currentReadingPdf) -> currentReading = trimmed.substringAfter(":").trim()
                     trimmed.startsWith(previousReadingPdf) -> previousReading = trimmed.substringAfter(":").trim()
@@ -247,16 +247,18 @@ class PdfHistoryRepositoryImpl(
             }
         } else {  // Для периодических услуг (общежитие и пр.):
             val xDate = 40f
-            val xPer = 190f
-            val xDay = 305f
-            val xTariff = 425f
-            val xStat = 525f
+            val xPer = 150f
+            val xDay = 240f
+            val xTariff = 340f
+            val xAmount = 420f
+            val xStat = 520f
 
             // Заголовки для периодических
             canvas.drawText(pdfTableDate, xDate, y, headerFont)
             canvas.drawText(pdfTablePeriod, xPer, y, headerFont)
             canvas.drawText(nextPaymentPdf, xDay, y, headerFont)
             canvas.drawText(tariff, xTariff, y, headerFont)
+            canvas.drawText(amount, xAmount, y, headerFont)
             canvas.drawText(pdfTableStatus, xStat, y, headerFont)
             y += 25
 
@@ -265,6 +267,7 @@ class PdfHistoryRepositoryImpl(
                 canvas.drawText(r.periodMonths, xPer, y, tableFont)
                 canvas.drawText(r.nextPayment, xDay, y, tableFont)
                 canvas.drawText(r.tariff, xTariff, y, tableFont)
+                canvas.drawText(r.amount, xAmount, y, tableFont)
                 canvas.drawText(r.status, xStat, y, tableFont)
                 y += 22
             }

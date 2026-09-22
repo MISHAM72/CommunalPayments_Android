@@ -47,4 +47,18 @@ object DataConstants {
     const val TXT_EXTENSION = "txt"
     const val DATE_TIME_REGEX_PATTERN = """\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}"""
 
+    // Метки для записей в историю
+    const val LABEL_NEXT_PAYMENT = "Дата оплаты: "
+    const val LABEL_PERIOD = "Период: "
+    const val LABEL_PERIOD_SUFFIX = " мес."
+    const val LABEL_COLD_WATER = "ХВС: "
+    const val LABEL_HOT_WATER = "ГВС: "
+    const val LABEL_TOTAL = "Итого: "
+    const val LABEL_TARIFF = "Тариф: "
+    const val LABEL_AREA = "Площадь: "
+    const val LABEL_TARIFF_PER_SQM = "Тариф: %.2f руб./м²"
+    const val LABEL_AREA_FORMAT = "Площадь: %.2f м²"
+    const val LABEL_AMOUNT = "Сумма: "
+    const val LABEL_SOURCE = "Источник: "
+
 }

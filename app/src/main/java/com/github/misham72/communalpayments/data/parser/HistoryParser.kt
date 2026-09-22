@@ -35,6 +35,7 @@ object HistoryParser {
         val match = CONSUMPTION_REGEX.find(content) ?: return null
         return match.groupValues[1].replace(',', '.').toDoubleOrNull()
     }
+
     fun parse(content: String, serviceKey: String): List<HistoryRecord> {
         if (content.isBlank()) return emptyList()
 

@@ -93,11 +93,10 @@ class IncomeRepositoryImpl(
             val lines = block.lines()
             val hasDate = lines.any { it.trim() == targetDate }
 
-            @Suppress("HardcodedStringLiteral")
-            val hasSource = lines.any { it.trim() == "Источник: $targetSource" }
 
-            @Suppress("HardcodedStringLiteral")
-            val hasAmount = lines.any { it.trim().startsWith("Сумма:") && it.contains(targetAmount) }
+            val hasSource = lines.any { it.trim() == DataConstants.LABEL_SOURCE + targetSource }
+
+            val hasAmount = lines.any { it.trim().startsWith(DataConstants.LABEL_AMOUNT) && it.contains(targetAmount) }
 
             if (hasDate && hasSource && hasAmount) return block
         }
@@ -109,9 +108,7 @@ class IncomeRepositoryImpl(
         val blocks = raw.split("\n***\n").filter { it.isNotBlank() }
         val filtered = blocks.filter { block ->
             val lines = block.lines()
-
-            @Suppress("HardcodedStringLiteral")
-            val blockSource = lines.firstOrNull { it.startsWith("Источник:") }?.substringAfter("Источник:")?.trim()
+            val blockSource = lines.firstOrNull { it.startsWith(DataConstants.LABEL_SOURCE) }?.substringAfter(DataConstants.LABEL_SOURCE)?.trim()
             blockSource != source
         }
         val updated = filtered.joinToString("\n***\n")
@@ -124,8 +121,8 @@ class IncomeRepositoryImpl(
         val formattedAmount = DataConstants.AMOUNT_FORMAT.format(record.amount).replace(',', '.')
         return buildString {
             appendLine(dateString)
-            appendLine("Источник: ${record.source}")
-            appendLine("Сумма: $formattedAmount")
+            appendLine(DataConstants.LABEL_SOURCE + record.source)
+            appendLine(DataConstants.LABEL_AMOUNT + formattedAmount)
             record.attachments.forEach { att ->
                 @Suppress("HardcodedStringLiteral")
                 appendLine("Вложение: ${att.path}|${att.name}|${att.mimeType}")

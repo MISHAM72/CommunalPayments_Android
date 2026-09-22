@@ -9,6 +9,7 @@ import com.github.misham72.communalpayments.domain.usecases.IncomeUseCase
 import com.github.misham72.communalpayments.domain.usecases.SaveReceiptUseCase
 import com.github.misham72.communalpayments.presentation.screen.screens.analytics.ExpensesViewModel
 import com.github.misham72.communalpayments.presentation.screen.screens.analytics.IncomeViewModel
+import com.github.misham72.communalpayments.presentation.screen.screens.capitalrepair.CapitalRepairViewModel
 import com.github.misham72.communalpayments.presentation.screen.screens.drainage.DrainageViewModel
 import com.github.misham72.communalpayments.presentation.screen.screens.electricity.ElectricityViewModel
 import com.github.misham72.communalpayments.presentation.screen.screens.garbage.GarbageViewModel
@@ -103,6 +104,24 @@ class HotWaterViewModelFactory(
     }
 }
 
+class CapitalRepairViewModelFactory(
+    private val container: AppContainer
+) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(CapitalRepairViewModel::class.java)) {
+            return CapitalRepairViewModel(
+                settingsRepository = container.settingsRepository,
+                repository = container.providerRepository,
+                capitalRepairRepository = container.capitalRepairRepository,
+                textHistoryUseCase = container.textHistoryUseCase,
+                pdfHistoryUseCase = container.pdfHistoryUseCase,
+                gson = container.gson,
+            ) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
+    }
+}
+
 class DrainageViewModelFactory(
     private val container: AppContainer
 ) : ViewModelProvider.Factory {
@@ -114,7 +133,8 @@ class DrainageViewModelFactory(
                 drainageRepository = container.drainageRepository,   // ← новое
                 fileManager = container.fileManager,
                 textHistoryUseCase = container.textHistoryUseCase,
-                pdfHistoryUseCase = container.pdfHistoryUseCase
+                pdfHistoryUseCase = container.pdfHistoryUseCase,
+                gson = container.gson,
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
@@ -341,4 +361,5 @@ class ServicesSelectionViewModelFactory(
         throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
     }
 }
+
 

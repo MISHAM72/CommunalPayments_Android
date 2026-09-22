@@ -12,6 +12,7 @@ import com.github.misham72.communalpayments.domain.repository.IProviderRepositor
 import com.github.misham72.communalpayments.domain.repository.UserSettingsRepository
 import com.github.misham72.communalpayments.domain.usecases.PdfHistoryUseCase
 import com.github.misham72.communalpayments.domain.usecases.TextHistoryUseCase
+import com.google.gson.Gson
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -26,6 +27,7 @@ class DrainageViewModel(
     private val fileManager: FileManager,
     private val textHistoryUseCase: TextHistoryUseCase,
     private val pdfHistoryUseCase: PdfHistoryUseCase,
+    private val gson: Gson
 ) : ViewModel() {
 
     companion object {
@@ -78,7 +80,8 @@ class DrainageViewModel(
             ) ?: 0.0
 
             val details = detailsDeferred.await()
-
+            val savedJson = settingsRepository.getLastResult(SERVICE_KEY)
+            val lastResult = savedJson?.let { gson.fromJson(it, DrainageResult::class.java) }
             _uiState.update {
                 it.copy(
                     coldUsage = coldUsage,
@@ -86,6 +89,7 @@ class DrainageViewModel(
                     hasHotWater = savedHasHotWater,
                     hasColdData = coldUsage > 0.0,
                     hasHotData = hotUsage > 0.0,
+                    lastResult = lastResult,
                     providerDetails = details.copy(tariff = savedTariff.ifBlank { details.tariff }),
                     customDate = savedDate,
                 )
@@ -161,7 +165,14 @@ class DrainageViewModel(
                 isHistory = true
             )
             settingsRepository.saveTariff(SERVICE_KEY, tariff.toString())
-
+            val result = DrainageResult(
+                coldUsage = state.coldUsage,
+                hotUsage = if (state.hasHotWater) state.hotUsage else 0.0,
+                totalUsage = total,
+                tariff = tariff,
+                payment = payment,
+            )
+            settingsRepository.saveLastResult(SERVICE_KEY, gson.toJson(result))
             _uiState.update {
                 it.copy(
                     totalUsage = total,

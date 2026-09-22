@@ -1,5 +1,6 @@
 package com.github.misham72.communalpayments.data.local.income.parser
 
+import com.github.misham72.communalpayments.data.common.DataConstants
 import com.github.misham72.communalpayments.domain.model.Attachment
 import com.github.misham72.communalpayments.domain.model.incomes.IncomeRecord
 import java.time.LocalDate
@@ -51,8 +52,8 @@ object IncomeParser {
 
     private fun extractAmount(block: String): Double? {
         for (line in block.lines()) {
-            if (line.trim().startsWith("Сумма:")) {
-                val raw = line.substringAfter("Сумма:").trim()
+            if (line.trim().startsWith(DataConstants.LABEL_AMOUNT)) {
+                val raw = line.substringAfter(DataConstants.LABEL_AMOUNT).trim()
                     .replace(" ", "")
                     .replace(",", ".")
                 return raw.toDoubleOrNull()

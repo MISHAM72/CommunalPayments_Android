@@ -322,6 +322,11 @@
     <string name="no_cold_water_data">⚠️ Сначала заполните ХВС</string>
     <string name="no_hot_water_data">⚠️ Сначала заполните ГВС</string>
 
-    <string name="contributions_for_capital_repairs">Взносы на капитальный ремонт</string>
+    <string name="service_display_name_capital_repair">Капремонт</string>
+
+    <string name="area_label">Площадь, м²</string>
+    <string name="area_format">Площадь: %1$.2f м²</string>
+    <string name="tariff_per_sqm">Тариф: %.2f руб./м²</string>
+    <string name="result_capital_repair">Результат по капремонту:</string>
 
 </resources>

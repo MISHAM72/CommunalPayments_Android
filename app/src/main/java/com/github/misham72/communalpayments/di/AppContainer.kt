@@ -13,6 +13,7 @@ import com.github.misham72.communalpayments.data.repository.BankRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.SelectedServicesRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.analytics.AnalyticsRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.backup.BackupRepositoryImpl
+import com.github.misham72.communalpayments.data.repository.capitalrepair.CapitalRepairRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.drainagerepository.DrainageRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.export.PdfHistoryRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.export.TextHistoryRepositoryImpl
@@ -108,6 +109,15 @@ class AppContainer(context: Context) {
         currencyTemplate = context.getString(R.string.currency_rub),
         serviceName = context.getString(R.string.service_display_name_drainage),
         unit = context.getString(R.string.unit_cubic_meter)
+    )
+    val capitalRepairRepository = CapitalRepairRepositoryImpl(
+        fileManager = fileManager,
+        dateFormatPattern = DataConstants.DATE_TIME_FORMATE,
+        personalAccountTemplate = context.getString(R.string.personal_account_in_text_history),
+        areaTemplate = context.getString(R.string.area_format),
+        tariffTemplate = context.getString(R.string.tariff_per_sqm),
+        currencyTemplate = context.getString(R.string.currency_rub),
+        serviceName = context.getString(R.string.service_display_name_capital_repair)
     )
     val gasRepository = GasRepositoryImpl(
         fileManager = fileManager,

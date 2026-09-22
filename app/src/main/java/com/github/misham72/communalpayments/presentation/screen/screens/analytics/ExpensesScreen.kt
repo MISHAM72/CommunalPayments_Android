@@ -89,7 +89,7 @@ import com.github.misham72.communalpayments.domain.model.incomes.IncomeSummary
 import com.github.misham72.communalpayments.domain.usecases.GetExpensesUseCase
 import com.github.misham72.communalpayments.presentation.common.UiConstants
 import com.github.misham72.communalpayments.presentation.screen.navigation.InitialScreen
-import com.github.misham72.communalpayments.presentation.screen.navigation.getListInitialScreen
+import com.github.misham72.communalpayments.presentation.screen.screens.services.getListInitialScreen
 import com.github.misham72.communalpayments.presentation.utils.nameRes
 import com.github.misham72.communalpayments.presentation.utils.rememberButtonBuckSoundPlayer
 import java.io.File
