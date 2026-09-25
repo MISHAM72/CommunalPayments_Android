@@ -329,4 +329,25 @@
     <string name="tariff_per_sqm">Тариф: %.2f руб./м²</string>
     <string name="result_capital_repair">Результат по капремонту:</string>
 
+    <string name="period_year">Год</string>
+    <string name="period_month">Месяц</string>
+    <string name="total_expenses_summary_month">Общая сумма расходов за %1$s %2$d</string>
+    <string name="total_income_month">Общий доход за %1$s %2$d</string>
+    <string-array name="months">
+        <item>Январь</item>
+        <item>Февраль</item>
+        <item>Март</item>
+        <item>Апрель</item>
+        <item>Май</item>
+        <item>Июнь</item>
+        <item>Июль</item>
+        <item>Август</item>
+        <item>Сентябрь</item>
+        <item>Октябрь</item>
+        <item>Ноябрь</item>
+        <item>Декабрь</item>
+    </string-array>
+
+    <string name="file_label">Файл: %1$s</string>
+
 </resources>

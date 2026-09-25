@@ -302,9 +302,11 @@ class PdfHistoryRepositoryImpl(
 
             val allKeys = listOf(
                 ServiceKeys.ELECTRICITY, ServiceKeys.GAS, ServiceKeys.COLDWATER,
+                ServiceKeys.HOTWATER, ServiceKeys.DRAINAGE,
                 ServiceKeys.GARBAGE, ServiceKeys.ZONT, ServiceKeys.INTERNET,
                 ServiceKeys.MTS, ServiceKeys.TINKOFF, ServiceKeys.TAXES,
-                ServiceKeys.TROYKA, ServiceKeys.OSAGO, ServiceKeys.HOSTEL
+                ServiceKeys.TROYKA, ServiceKeys.OSAGO, ServiceKeys.HOSTEL,
+                ServiceKeys.CAPITAL_REPAIR
             )
 
             val allRecords = mutableListOf<Pair<String, UniversalRecord>>()
@@ -390,25 +392,25 @@ class PdfHistoryRepositoryImpl(
 
         val grouped = records.groupBy { it.first }
 
-        val serviceOrder = listOf(
-            serviceDisplayNames[ServiceKeys.ELECTRICITY] ?: "",
-            serviceDisplayNames[ServiceKeys.COLDWATER] ?: "",
-            serviceDisplayNames[ServiceKeys.HOTWATER] ?: "",
-            serviceDisplayNames[ServiceKeys.DRAINAGE] ?: "",
-            serviceDisplayNames[ServiceKeys.GAS] ?: "",
-            serviceDisplayNames[ServiceKeys.GARBAGE] ?: "",
-            serviceDisplayNames[ServiceKeys.ZONT] ?: "",
-            serviceDisplayNames[ServiceKeys.INTERNET] ?: "",
-            serviceDisplayNames[ServiceKeys.MTS] ?: "",
-            serviceDisplayNames[ServiceKeys.TINKOFF] ?: "",
-            serviceDisplayNames[ServiceKeys.TAXES] ?: "",
-            serviceDisplayNames[ServiceKeys.TROYKA] ?: "",
-            serviceDisplayNames[ServiceKeys.OSAGO] ?: "",
-            serviceDisplayNames[ServiceKeys.HOSTEL] ?: ""
+        val serviceOrderKeys = listOf(
+            ServiceKeys.ELECTRICITY,
+            ServiceKeys.COLDWATER,
+            ServiceKeys.HOTWATER,
+            ServiceKeys.DRAINAGE,
+            ServiceKeys.GAS,
+            ServiceKeys.GARBAGE,
+            ServiceKeys.ZONT,
+            ServiceKeys.INTERNET,
+            ServiceKeys.MTS,
+            ServiceKeys.TINKOFF,
+            ServiceKeys.TAXES,
+            ServiceKeys.TROYKA,
+            ServiceKeys.OSAGO,
+            ServiceKeys.HOSTEL,
+            ServiceKeys.CAPITAL_REPAIR
         )
-        val orderMap = serviceOrder.withIndex().associate { it.value to it.index }
+        val orderMap = serviceOrderKeys.withIndex().associate { it.value to it.index }
         val sortedGroups = grouped.entries.sortedBy { orderMap[it.key] ?: Int.MAX_VALUE }
-
         // Колонки таблицы (подобраны под портретную ширину)
         val xDate = 40f
         val xAmount = 200f

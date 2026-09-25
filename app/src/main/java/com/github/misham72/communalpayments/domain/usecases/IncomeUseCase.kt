@@ -14,6 +14,10 @@ class IncomeUseCase(
         return incomeRepository.getYearlyIncome(year)
     }
 
+    suspend fun getMonthlyIncome(year: Int, month: Int): IncomeSummary {
+        return incomeRepository.getMonthlyIncome(year, month)
+    }
+
     suspend fun getIncomes(year: Int): List<IncomeRecord> {
         return incomeRepository.getRecordsByYear(year)
     }

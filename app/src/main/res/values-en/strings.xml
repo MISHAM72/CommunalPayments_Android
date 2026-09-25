@@ -289,5 +289,25 @@
     <string name="area_format">Area: %1$.2f m²</string>
     <string name="tariff_per_sqm">Tariff: %.2f rub/m²</string>
     <string name="result_capital_repair">Capital repair result:</string>
+
+    <string name="period_year">Year</string>
+    <string name="period_month">Month</string>
+    <string name="total_expenses_summary_month">Total expenses for %1$s %2$d</string>
+    <string name="total_income_month">Total income for %1$s %2$d</string>
+    <string-array name="months">
+        <item>January</item>
+        <item>February</item>
+        <item>March</item>
+        <item>April</item>
+        <item>May</item>
+        <item>June</item>
+        <item>July</item>
+        <item>August</item>
+        <item>September</item>
+        <item>October</item>
+        <item>November</item>
+        <item>December</item>
+    </string-array>
+    <string name="file_label">File: %1$s</string>
 </resources>
 

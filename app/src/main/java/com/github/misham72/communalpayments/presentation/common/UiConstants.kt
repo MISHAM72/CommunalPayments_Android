@@ -15,5 +15,8 @@ object UiConstants {
     const val PERCENT_FORMAT = "%.1f%%"
     const val HEADER_KEY_PREFIX = "header_"
     const val FILE_EXTENSION_TXT = "txt"
+    const val FILE_NAME_TEMPLATE = "file_%d"
+    const val IMAGE_NAME_TEMPLATE = "image_%d"
+    const val MIME_TYPE_IMAGE = "image/*"
 
 }

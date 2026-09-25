@@ -1,4 +1,4 @@
-package com.github.misham72.communalpayments.presentation.screen.screens.analytics
+package com.github.misham72.communalpayments.presentation.screen.screens.expensesincome
 
 import android.content.Intent
 import android.net.Uri
@@ -34,6 +34,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
@@ -67,6 +69,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -93,7 +96,6 @@ import com.github.misham72.communalpayments.presentation.screen.screens.services
 import com.github.misham72.communalpayments.presentation.utils.nameRes
 import com.github.misham72.communalpayments.presentation.utils.rememberButtonBuckSoundPlayer
 import java.io.File
-import java.time.Year
 
 private val chartColors = listOf(
     Color(0xFFE91E63), Color(0xFFFFEB3B), Color(0xFF2196F3), Color(0xFF4CAF50), Color(0xFFFF9800), Color(0xFF9C27B0), Color(0xFF00BCD4), Color(0xFF795548), Color(0xFF3F51B5), Color(0xFF8BC34A), Color(0xFFFF5722), Color(0xFF607D8B)
@@ -251,24 +253,67 @@ private fun ExpensesTab(factory: ExpensesViewModelFactory, appContainer: AppCont
         uiState.data != null -> {
             val summary = uiState.data ?: return
             LazyColumn(modifier = Modifier.fillMaxSize()) {
+                // 1. Переключатель Год/Месяц
+                item {
+                    BankingTabSwitcher(
+                        tabs = listOf(
+                            stringResource(R.string.period_year),
+                            stringResource(R.string.period_month)
+                        ),
+                        selectedIndex = if (uiState.period == Period.Year) 0 else 1,
+                        onSelect = {
+                            viewModel.setPeriod(if (it == 0) Period.Year else Period.Month)
+                        }
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                }
+                // 2. Стрелки месяца (если Месяц)
+                if (uiState.period == Period.Month) {
+                    item {
+                        MonthSelector(
+                            month = uiState.selectedMonth,
+                            year = uiState.selectedYear,
+                            onPrevious = { viewModel.previousMonth() },
+                            onNext = { viewModel.nextMonth() }
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
+                }
+                // 3. Карточка "Общая сумма"
                 item {
                     Card(
-                        modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
                             Text(
-                                text = stringResource(R.string.total_expenses_summary, Year.now().value), color = MaterialTheme.colorScheme.onPrimaryContainer, fontSize = 16.sp
+                                text = if (uiState.period == Period.Year) {
+                                    stringResource(R.string.total_expenses_summary, uiState.selectedYear)
+                                } else {
+                                    stringResource(
+                                        R.string.total_expenses_summary_month,
+                                        monthName(uiState.selectedMonth),
+                                        uiState.selectedYear
+                                    )
+                                },
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                fontSize = 16.sp
                             )
                             Text(
-                                text = stringResource(R.string.money_format).format(summary.total), fontSize = 36.sp, fontWeight = FontWeight.ExtraBold, color = MaterialTheme.colorScheme.onPrimaryContainer
+                                text = stringResource(R.string.money_format).format(summary.total),
+                                fontSize = 36.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer
                             )
                         }
                     }
                 }
+                // 4. График ← ЭТО ПРОПАЛО
                 item {
                     ExpensesChart(summary, allServices)
                     Spacer(modifier = Modifier.height(8.dp))
                 }
+                // 5. Список услуг
                 val services = summary.byService.toList().sortedBy { (key, _) -> allServices.indexOfFirst { it.fileKey == key } }
                 if (services.isNotEmpty()) {
                     itemsIndexed(services) { index, (key, total) ->
@@ -595,7 +640,9 @@ private fun IncomesTab(factory: IncomeViewModelFactory) {
 
         uiState.error != null -> {
             Text(
-                text = uiState.error ?: stringResource(R.string.error), color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodyLarge
+                text = uiState.error ?: stringResource(R.string.error),
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodyLarge
             )
         }
 
@@ -603,22 +650,64 @@ private fun IncomesTab(factory: IncomeViewModelFactory) {
             val summary = uiState.summary ?: return
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 item {
+                    BankingTabSwitcher(
+                        tabs = listOf(
+                            stringResource(R.string.period_year),
+                            stringResource(R.string.period_month)
+                        ),
+                        selectedIndex = if (uiState.period == IncomePeriod.Year) 0 else 1,
+                        onSelect = {
+                            viewModel.setPeriod(if (it == 0) IncomePeriod.Year else IncomePeriod.Month)
+                        }
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                }
+
+                if (uiState.period == IncomePeriod.Month) {
+                    item {
+                        MonthSelector(
+                            month = uiState.selectedMonth,
+                            year = uiState.selectedYear,
+                            onPrevious = { viewModel.previousMonth() },
+                            onNext = { viewModel.nextMonth() }
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
+                }
+
+                item {
                     Card(
-                        modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
                             Text(
-                                text = stringResource(R.string.total_income, Year.now().value), color = MaterialTheme.colorScheme.onPrimaryContainer, fontSize = 16.sp
+                                text = if (uiState.period == IncomePeriod.Year) {
+                                    stringResource(R.string.total_income, uiState.selectedYear)
+                                } else {
+                                    stringResource(
+                                        R.string.total_income_month,
+                                        monthName(uiState.selectedMonth),
+                                        uiState.selectedYear
+                                    )
+                                },
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                fontSize = 16.sp
                             )
                             Text(
-                                text = stringResource(R.string.money_format).format(summary.total), fontSize = 36.sp, fontWeight = FontWeight.ExtraBold, color = MaterialTheme.colorScheme.onPrimaryContainer
+                                text = stringResource(R.string.money_format).format(summary.total),
+                                fontSize = 36.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer
                             )
                         }
                     }
                 }
+
                 item {
                     IncomesChart(summary)
                 }
+
                 val sources = summary.bySource.toList().sortedBy { (category, _) -> category.order }
                 if (sources.isNotEmpty()) {
                     items(sources.size) { index ->
@@ -629,10 +718,7 @@ private fun IncomesTab(factory: IncomeViewModelFactory) {
                         LaunchedEffect(percent) {
                             progressAnim.animateTo(
                                 targetValue = (percent / 100.0).toFloat().coerceIn(0f, 1f),
-                                animationSpec = tween(
-                                    durationMillis = 900,
-                                    delayMillis = index * 80
-                                )
+                                animationSpec = tween(durationMillis = 900, delayMillis = index * 80)
                             )
                         }
 
@@ -651,10 +737,9 @@ private fun IncomesTab(factory: IncomeViewModelFactory) {
                                     .padding(horizontal = 14.dp, vertical = 10.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                // Цветной квадратик с первой буквой категории
                                 Box(
                                     modifier = Modifier
-                                        .size(36.dp)//Цветной квадратик 36×36 dp,
+                                        .size(36.dp)
                                         .background(
                                             color = barColor.copy(alpha = 0.15f),
                                             shape = RoundedCornerShape(10.dp)
@@ -662,15 +747,15 @@ private fun IncomesTab(factory: IncomeViewModelFactory) {
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Text(
-                                        text = stringResource(category.nameRes()).take(1),// внутри — первая буква категории (например, «З» для Зарплаты)
+                                        text = stringResource(category.nameRes()).take(1),
                                         fontSize = 16.sp,
                                         fontWeight = FontWeight.Bold,
-                                        color = barColor// Цвет берётся из barColor с прозрачностью 15%.
+                                        color = barColor
                                     )
                                 }
-                                Spacer(modifier = Modifier.width(12.dp))//Отступ между квадратиком и текстом.
+                                Spacer(modifier = Modifier.width(12.dp))
 
-                                Column(modifier = Modifier.weight(1f)) {//Основной блок с текстом. Занимает всё свободное место. Внутри:
+                                Column(modifier = Modifier.weight(1f)) {
                                     Row(
                                         modifier = Modifier.fillMaxWidth(),
                                         verticalAlignment = Alignment.CenterVertically
@@ -681,7 +766,6 @@ private fun IncomesTab(factory: IncomeViewModelFactory) {
                                             fontSize = 15.sp,
                                             modifier = Modifier.weight(1f)
                                         )
-                                        // Процент справа от названия
                                         Text(
                                             text = UiConstants.PERCENT_FORMAT.format(percent),
                                             fontSize = 13.sp,
@@ -696,7 +780,6 @@ private fun IncomesTab(factory: IncomeViewModelFactory) {
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                     Spacer(modifier = Modifier.height(6.dp))
-                                    // Мини-прогресс-бар доли
                                     Box(
                                         modifier = Modifier
                                             .fillMaxWidth()
@@ -746,6 +829,7 @@ private fun IncomesTab(factory: IncomeViewModelFactory) {
                         }
                     }
                 }
+
                 item {
                     Spacer(modifier = Modifier.height(12.dp))
                     Button(onClick = { showAddDialog = true }) {
@@ -781,18 +865,24 @@ private fun IncomesTab(factory: IncomeViewModelFactory) {
     // Диалог подтверждения удаления всех записей источника
     if (showDeleteSourceConfirm != null) {
         val source = showDeleteSourceConfirm ?: return
-        AlertDialog(onDismissRequest = { showDeleteSourceConfirm = null }, title = { Text(stringResource(R.string.remove_all_incomes, source)) }, text = { Text(stringResource(R.string.this_action_is_irreversible)) }, confirmButton = {
-            TextButton(onClick = {
-                viewModel.deleteAllRecordsBySource(source)
-                showDeleteSourceConfirm = null
-            }) {
-                Text(stringResource(R.string.delete))
+        AlertDialog(
+            onDismissRequest = { showDeleteSourceConfirm = null },
+            title = { Text(stringResource(R.string.remove_all_incomes, source)) },
+            text = { Text(stringResource(R.string.this_action_is_irreversible)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    viewModel.deleteAllRecordsBySource(source)
+                    showDeleteSourceConfirm = null
+                }) {
+                    Text(stringResource(R.string.delete))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteSourceConfirm = null }) {
+                    Text(stringResource(R.string.cancel))
+                }
             }
-        }, dismissButton = {
-            TextButton(onClick = { showDeleteSourceConfirm = null }) {
-                Text(stringResource(R.string.cancel))
-            }
-        })
+        )
     }
 }
 
@@ -861,7 +951,11 @@ private fun SourceRecordsDialog(
         val record = recordForAttach
         if (uri != null && record != null) {
             val mimeType = context.contentResolver.getType(uri) ?: "application/octet-stream"
-            val fileName = getFileNameFromUri(context, uri) ?: "file_${System.currentTimeMillis()}"
+
+            /** «Создай переменную fileName. Попробуй получить имя файла из uri.
+             *  Если не получилось — сгенерируй имя сам,
+             * используя текущее время».*/
+            val fileName = getFileNameFromUri(context, uri) ?: UiConstants.FILE_NAME_TEMPLATE.format(System.currentTimeMillis())
             val bytes = context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
             if (bytes != null && bytes.isNotEmpty()) {
                 viewModel.attachAttachment(record, bytes, fileName, mimeType)
@@ -900,7 +994,7 @@ private fun SourceRecordsDialog(
         val record = recordForAttach
         if (uri != null && record != null) {
             val mimeType = context.contentResolver.getType(uri) ?: "image/jpeg"
-            val fileName = getFileNameFromUri(context, uri) ?: "image_${System.currentTimeMillis()}"
+            val fileName = getFileNameFromUri(context, uri) ?: UiConstants.IMAGE_NAME_TEMPLATE.format(System.currentTimeMillis())
             val bytes = context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
             if (bytes != null && bytes.isNotEmpty()) {
                 viewModel.attachAttachment(record, bytes, fileName, mimeType)
@@ -1004,7 +1098,7 @@ private fun SourceRecordsDialog(
                                         }
                                         IconButton(onClick = {
                                             recordForAttach = record
-                                            galleryLauncher.launch("image/*")
+                                            galleryLauncher.launch(UiConstants.MIME_TYPE_IMAGE)
                                         }) {
                                             Icon(
                                                 Icons.Default.PhotoLibrary,
@@ -1147,4 +1241,36 @@ private fun getFileNameFromUri(context: android.content.Context, uri: Uri): Stri
         val nameIndex = it.getColumnIndex(OpenableColumns.DISPLAY_NAME)
         if (nameIndex != -1 && it.moveToFirst()) it.getString(nameIndex) else null
     }
+}
+
+@Composable
+private fun MonthSelector(
+    month: Int,
+    year: Int,
+    onPrevious: () -> Unit,
+    onNext: () -> Unit,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        IconButton(onClick = onPrevious) {
+            Icon(Icons.Default.ArrowBack, contentDescription = null)
+        }
+        Text(
+            text = "${monthName(month)} $year",
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold
+        )
+        IconButton(onClick = onNext) {
+            Icon(Icons.Default.ArrowForward, contentDescription = null)
+        }
+    }
+}
+
+@Composable
+private fun monthName(month: Int): String {
+    val months = stringArrayResource(R.array.months)
+    return months.getOrElse(month - 1) { "" }
 }

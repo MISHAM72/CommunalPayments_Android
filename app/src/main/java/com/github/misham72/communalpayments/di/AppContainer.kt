@@ -11,10 +11,10 @@ import com.github.misham72.communalpayments.data.local.preferences.AccountPrefer
 import com.github.misham72.communalpayments.data.migration.WaterToColdwaterMigration
 import com.github.misham72.communalpayments.data.repository.BankRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.SelectedServicesRepositoryImpl
-import com.github.misham72.communalpayments.data.repository.analytics.AnalyticsRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.backup.BackupRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.capitalrepair.CapitalRepairRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.drainagerepository.DrainageRepositoryImpl
+import com.github.misham72.communalpayments.data.repository.expenses.ExpensesRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.export.PdfHistoryRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.export.TextHistoryRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.history.HistoryRepositoryImpl
@@ -235,8 +235,8 @@ class AppContainer(context: Context) {
     val incomeViewModelFactory = IncomeViewModelFactory(incomeUseCase)
 
     // Аналитика (расходы)
-    private val analyticsRepository = AnalyticsRepositoryImpl(fileManager)
-    val getExpensesUseCase = GetExpensesUseCase(analyticsRepository)
+    private val expensesRepository = ExpensesRepositoryImpl(fileManager)
+    val getExpensesUseCase = GetExpensesUseCase(expensesRepository)
 
     // Репозиторий для бекапа
     private val backupRepository = BackupRepositoryImpl(

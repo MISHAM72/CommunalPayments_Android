@@ -27,7 +27,7 @@ class IncomeRepositoryImpl(
         val byCategory = bySourceString.mapKeys { (key, _) ->
             try {
                 enumValueOf<IncomeCategory>(key)
-            } catch (e: IllegalArgumentException) {
+            } catch (_: IllegalArgumentException) {
                 // Если встретилась старая русская строка (например, "Зарплата"),
                 // маппим в OTHER и игнорируем – данные потеряются.
                 IncomeCategory.OTHER
@@ -49,6 +49,36 @@ class IncomeRepositoryImpl(
         )
     }
 
+    override suspend fun getMonthlyIncome(year: Int, month: Int): IncomeSummary {
+        val rawText = fileManager.readIncome(year)
+        val records = IncomeParser.parse(rawText)
+            .filter { it.date.year == year && it.date.monthValue == month }
+
+        val bySourceString = records.groupBy { it.source }
+            .mapValues { entry -> entry.value.sumOf { it.amount } }
+
+        val byCategory = bySourceString.mapKeys { (key, _) ->
+            try {
+                enumValueOf<IncomeCategory>(key)
+            } catch (_: IllegalArgumentException) {
+                IncomeCategory.OTHER
+            }
+        }
+
+        val total = byCategory.values.sum()
+        val nonEmptyCategories = byCategory.filter { it.value > 0.0 }
+        val average = if (nonEmptyCategories.isNotEmpty()) total / nonEmptyCategories.size else 0.0
+        val maxSource = nonEmptyCategories.maxByOrNull { it.value }?.key
+        val minSource = nonEmptyCategories.minByOrNull { it.value }?.key
+
+        return IncomeSummary(
+            total = total,
+            bySource = byCategory,
+            average = average,
+            maxSource = maxSource,
+            minSource = minSource
+        )
+    }
 
     override suspend fun addIncome(year: Int, date: LocalDate, source: String, amount: Double) {
         val record = buildBlock(IncomeRecord(date = date, amount = amount, source = source))

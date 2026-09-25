@@ -1,9 +1,9 @@
-package com.github.misham72.communalpayments.data.repository.analytics
+package com.github.misham72.communalpayments.data.repository.expenses
 
 import com.github.misham72.communalpayments.data.common.DataConstants
 import com.github.misham72.communalpayments.data.local.file.FileManager
 import com.github.misham72.communalpayments.domain.model.incomes.YearSummary
-import com.github.misham72.communalpayments.domain.repository.AnalyticsRepository
+import com.github.misham72.communalpayments.domain.repository.ExpensesRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
@@ -11,17 +11,17 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 @Suppress("HardcodedStringLiteral")
-class AnalyticsRepositoryImpl(private val fileManager: FileManager) : AnalyticsRepository {
+class ExpensesRepositoryImpl(private val fileManager: FileManager) : ExpensesRepository {
 
     private val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
 
-    override suspend fun getYearSummary(serviceKey: String, year: Int): YearSummary {
+    override suspend fun getYearlyExpense(serviceKey: String, year: Int): YearSummary {
         return withContext(Dispatchers.IO) {
             calculateYearSummary(serviceKey, year)
         }
     }
 
-    override suspend fun getExpenses(serviceKeys: List<String>, year: Int): Map<String, YearSummary> {
+    override suspend fun getYearlyExpenses(serviceKeys: List<String>, year: Int): Map<String, YearSummary> {
         return withContext(Dispatchers.IO) {
             val result = mutableMapOf<String, YearSummary>()
             for (key in serviceKeys) {
@@ -31,7 +31,21 @@ class AnalyticsRepositoryImpl(private val fileManager: FileManager) : AnalyticsR
         }
     }
 
-    private suspend fun calculateYearSummary(serviceKey: String, year: Int): YearSummary {
+    override suspend fun getMonthlyExpenses(serviceKeys: List<String>, year: Int, month: Int): Map<String, YearSummary> {
+        return withContext(Dispatchers.IO) {
+            val result = mutableMapOf<String, YearSummary>()
+            for (key in serviceKeys) {
+                result[key] = calculateYearSummary(key, year, filterMonth = month)
+            }
+            result
+        }
+    }
+
+    private suspend fun calculateYearSummary(
+        serviceKey: String,
+        year: Int,
+        filterMonth: Int? = null,
+    ): YearSummary {
         val rawText = fileManager.readHistory(serviceKey)
         val monthly = mutableMapOf<Int, Double>()
         var total = 0.0
@@ -62,13 +76,12 @@ class AnalyticsRepositoryImpl(private val fileManager: FileManager) : AnalyticsR
             if (dateStr != null && amount != null) {
                 try {
                     val date = LocalDate.parse(dateStr, dateFormatter)
-                    if (date.year == year) {
-                        val month = date.monthValue
-                        monthly[month] = (monthly[month] ?: 0.0) + amount
+                    if (date.year == year && (filterMonth == null || date.monthValue == filterMonth)) {
+                        val m = date.monthValue
+                        monthly[m] = (monthly[m] ?: 0.0) + amount
                         total += amount
                     }
                 } catch (_: Exception) {
-                    // игнорируем неверные даты
                 }
             }
         }

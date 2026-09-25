@@ -7,8 +7,8 @@ import com.github.misham72.communalpayments.domain.usecases.GetExpensesUseCase
 import com.github.misham72.communalpayments.domain.usecases.GetReceiptsUseCase
 import com.github.misham72.communalpayments.domain.usecases.IncomeUseCase
 import com.github.misham72.communalpayments.domain.usecases.SaveReceiptUseCase
-import com.github.misham72.communalpayments.presentation.screen.screens.analytics.ExpensesViewModel
-import com.github.misham72.communalpayments.presentation.screen.screens.analytics.IncomeViewModel
+import com.github.misham72.communalpayments.presentation.screen.screens.expensesincome.ExpensesViewModel
+import com.github.misham72.communalpayments.presentation.screen.screens.expensesincome.IncomeViewModel
 import com.github.misham72.communalpayments.presentation.screen.screens.capitalrepair.CapitalRepairViewModel
 import com.github.misham72.communalpayments.presentation.screen.screens.drainage.DrainageViewModel
 import com.github.misham72.communalpayments.presentation.screen.screens.electricity.ElectricityViewModel
@@ -143,7 +143,7 @@ class DrainageViewModelFactory(
 
 class GarbageViewModelFactory(
     private val container: AppContainer
-) : ViewModelProvider.Factory{
+) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(GarbageViewModel::class.java)) {
             return GarbageViewModel(

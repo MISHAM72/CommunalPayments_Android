@@ -8,6 +8,7 @@ import java.time.LocalDate
 
 interface IncomeRepository {
     suspend fun getYearlyIncome(year: Int): IncomeSummary
+    suspend fun getMonthlyIncome(year: Int, month: Int): IncomeSummary
     suspend fun addIncome(year: Int, date: LocalDate, source: String, amount: Double)
     suspend fun updateIncome(year: Int, content: String)
 

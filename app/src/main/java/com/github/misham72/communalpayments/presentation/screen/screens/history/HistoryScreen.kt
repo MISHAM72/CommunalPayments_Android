@@ -51,6 +51,7 @@ import com.github.misham72.communalpayments.domain.usecases.GetHistoryUseCase
 import com.github.misham72.communalpayments.domain.usecases.RemoveHistoryAttachmentUseCase
 import com.github.misham72.communalpayments.domain.usecases.SaveHistoryUseCase
 import com.github.misham72.communalpayments.domain.constants.ServiceKeys
+import com.github.misham72.communalpayments.presentation.common.UiConstants
 import com.github.misham72.communalpayments.presentation.common.UiMessages
 import com.github.misham72.communalpayments.presentation.mapper.StatusDisplayMapper
 import com.github.misham72.communalpayments.presentation.screen.components.HistoryCard
@@ -129,7 +130,7 @@ fun HistoryScreen(
         val mimeType = context.contentResolver.getType(uri)
             ?: "application/octet-stream"
         val fileName = getFileNameFromUri(context, uri)
-            ?: "file_${System.currentTimeMillis()}"
+            ?: UiConstants.FILE_NAME_TEMPLATE.format(System.currentTimeMillis())
         val bytes = context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
         if (bytes == null || bytes.isEmpty()) return
 
@@ -384,7 +385,7 @@ fun HistoryScreen(
                         },
                         onOpenGallery = {
                             recordForAttach = record
-                            galleryLauncher.launch("image/*")
+                            galleryLauncher.launch(UiConstants.MIME_TYPE_IMAGE)
                         },
                         onOpenAttachment = { attachment ->
                             openAttachment(context, attachment, getHistoryAttachmentUseCase)

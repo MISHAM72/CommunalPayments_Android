@@ -59,7 +59,7 @@ import com.github.misham72.communalpayments.domain.usecases.SaveHistoryUseCase
 import com.github.misham72.communalpayments.domain.constants.ServiceKeys
 import com.github.misham72.communalpayments.presentation.screen.components.ServiceTab
 import com.github.misham72.communalpayments.presentation.screen.screens.services.getSelectedScreens
-import com.github.misham72.communalpayments.presentation.screen.screens.analytics.ExpensesScreen
+import com.github.misham72.communalpayments.presentation.screen.screens.expensesincome.ExpensesScreen
 import com.github.misham72.communalpayments.presentation.screen.screens.history.HistoryScreen
 import com.github.misham72.communalpayments.presentation.theme.ThemePrefs
 import com.github.misham72.communalpayments.presentation.utils.LanguageManager

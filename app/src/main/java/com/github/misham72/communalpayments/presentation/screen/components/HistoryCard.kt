@@ -45,6 +45,7 @@ import com.github.misham72.communalpayments.domain.model.HistoryRecord
 import com.github.misham72.communalpayments.presentation.common.UiConstants
 import java.time.LocalDate
 
+@Suppress("HardcodedStringLiteral")
 // Регулярки для скрытия служебных строк вложений (старый и новый формат)
 private val attachmentLineRegex = Regex(
     """^(Вложение\d*:|ИмяФайла\d*:|MimeType\d*:).*$"""
@@ -228,7 +229,7 @@ fun HistoryCard(
         AlertDialog(
             onDismissRequest = { attachmentToDelete = null },
             title = { Text(stringResource(R.string.delete_attachment)) },
-            text = { Text("Файл: ${attachment.name}") },
+            text = { Text(stringResource(R.string.file_label, attachment.name)) },
             confirmButton = {
                 TextButton(onClick = {
                     onRemoveAttachment(attachment)   // ← удаляем ТОЛЬКО тут
