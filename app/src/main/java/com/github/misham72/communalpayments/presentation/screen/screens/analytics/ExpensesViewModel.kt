@@ -1,4 +1,4 @@
-package com.github.misham72.communalpayments.presentation.screen.screens.expensesincome
+package com.github.misham72.communalpayments.presentation.screen.screens.analytics
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -12,7 +12,6 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.Year
 
-enum class Period { Year, Month }
 
 data class ExpensesUiState(
     val isLoading: Boolean = true,

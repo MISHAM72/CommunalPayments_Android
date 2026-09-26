@@ -1,4 +1,4 @@
-package com.github.misham72.communalpayments.presentation.screen.screens.expensesincome
+package com.github.misham72.communalpayments.presentation.screen.screens.analytics
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -16,13 +16,11 @@ import java.io.File
 import java.time.LocalDate
 import java.time.Year
 
-enum class IncomePeriod { Year, Month }
-
 data class IncomeUiState(
     val isLoading: Boolean = true,
     val summary: IncomeSummary? = null,
     val error: String? = null,
-    val period: IncomePeriod = IncomePeriod.Year,
+    val period: Period = Period.Year,
     val selectedYear: Int = Year.now().value,
     val selectedMonth: Int = LocalDate.now().monthValue,
 )
@@ -42,7 +40,7 @@ class IncomeViewModel(
         loadInternal()
     }
 
-    fun setPeriod(period: IncomePeriod) {
+    fun setPeriod(period: Period) {
         _uiState.update { it.copy(period = period) }
         loadInternal()
     }
@@ -70,7 +68,7 @@ class IncomeViewModel(
             _uiState.update { it.copy(isLoading = true, error = null) }
             try {
                 val state = _uiState.value
-                val summary = if (state.period == IncomePeriod.Year) {
+                val summary = if (state.period == Period.Year) {
                     incomeUseCase.getYearlyIncome(state.selectedYear)
                 } else {
                     incomeUseCase.getMonthlyIncome(state.selectedYear, state.selectedMonth)

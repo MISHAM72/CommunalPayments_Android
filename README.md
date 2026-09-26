@@ -164,3 +164,4 @@
 1. Клонируйте репозиторий:
    ```bash
    git clone https://github.com/MISHAM72/CommunalPayments_Android.git
+   https://console.rustore.ru/apps/2063707211
