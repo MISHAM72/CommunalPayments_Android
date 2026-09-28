@@ -68,10 +68,10 @@ fun HistoryCard(
             .fillMaxWidth()
             .padding(vertical = 4.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.Blue.copy(alpha = 0.2f)
+            containerColor = MaterialTheme.colorScheme.surfaceDim
         )
     ) {
-        Column(modifier = Modifier.padding(12.dp)) {
+        Column(modifier = Modifier.padding(7.dp)) {
 
             // === Форматированный текст записи (без служебных строк) ===
             val formattedText = buildAnnotatedString {

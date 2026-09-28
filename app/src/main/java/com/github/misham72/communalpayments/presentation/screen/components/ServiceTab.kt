@@ -30,7 +30,7 @@ fun ServiceTab(
         when {
             daysLeft <= 0 -> Color(0xFFC62828)
             daysLeft <= 3 -> Color(0xFFFFC107)
-            else -> Color(0xFF2E7D32)
+            else -> Color(0xFF0e6b58)
         }
     } else {
         Color.Gray

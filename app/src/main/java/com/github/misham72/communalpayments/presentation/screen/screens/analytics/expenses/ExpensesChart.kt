@@ -40,7 +40,7 @@ import com.github.misham72.communalpayments.presentation.screen.screens.analytic
 
 // График расходов (исправленный – с эмодзи и русскими именами)
 @Composable
- fun ExpensesChart(
+fun ExpensesChart(
     summary: ExpenseSummary, allServices: List<InitialScreen>
 ) {
     val services = summary.byService.toList().sortedBy { (key, _) -> allServices.indexOfFirst { it.fileKey == key } }

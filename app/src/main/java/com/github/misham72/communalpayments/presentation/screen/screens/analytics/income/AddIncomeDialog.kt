@@ -30,7 +30,7 @@ import com.github.misham72.communalpayments.presentation.utils.nameRes
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
- fun AddIncomeDialog(
+fun AddIncomeDialog(
     onDismiss: () -> Unit, onAdd: (source: String, amount: Double) -> Unit
 ) {
     val categories = IncomeCategory.entries

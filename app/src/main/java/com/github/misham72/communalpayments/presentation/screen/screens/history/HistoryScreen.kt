@@ -20,6 +20,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.Button
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -217,7 +218,7 @@ fun HistoryScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(10.dp)
+            .padding(20.dp)
     ) {
         //🔴////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         //При нажатии вызывает onBack, переданный извне.
@@ -285,8 +286,8 @@ fun HistoryScreen(
                     value = fileContent,
                     onValueChange = { fileContent = it },
                     modifier = Modifier
-                        .padding(20.dp)
-                        .background(Color.Green.copy(alpha = 0.2f))
+                        .padding(10.dp)
+                        .background(MaterialTheme.colorScheme.surface)
                         .fillMaxWidth()
                         .weight(1f),
                     label = { Text(stringResource(R.string.Edit_the_entire_text_To_replace_the_status_in_the_last_entry_click_on_the_button_above)) })
@@ -295,7 +296,8 @@ fun HistoryScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 10.dp)
-                        .horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        .horizontalScroll(rememberScrollState()),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     PaymentStatus.entries.forEach { paymentStatus ->
                         val displayInfo = StatusDisplayMapper.map(paymentStatus)

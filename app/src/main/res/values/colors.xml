@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <color name="status_purple">#800080</color> <!-- или любой другой оттенок фиолетового -->
+    <color name="status_purple">#800080</color>
 </resources>

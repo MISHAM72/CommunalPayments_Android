@@ -197,7 +197,7 @@ fun ControlBetweenScreens( //Звуки (какой звук играть при
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(4.dp)
+                        .padding(1.dp)
                         .navigationBarsPadding()
                 ) {
                     Row(
