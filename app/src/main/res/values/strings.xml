@@ -20,6 +20,7 @@
     <string name="service_display_name_troyka">Проездной билет</string>
     <string name="service_display_name_zont">Отопление</string>
     <string name="service_display_name_hostel">Общежитие</string>
+    <string name="service_display_name_capital_repair">Капитальный ремонт</string>
 
 
     <!-- СТАРЫЕ строки (оставьте для результатов): -->
@@ -125,8 +126,6 @@
     <string name="notifications_about_upcoming_service_payments">Уведомления о скорых платежах по услугам</string>
     <string name="notifications">Напоминания: %1$s</string>
     <string name="payment_reminder_channel">Канал напоминаний о платежах</string>
-
-    <string name="payment_tomorrow">Завтра платеж по %s</string>
 
 
     <string name="language">Язык</string>
@@ -311,7 +310,6 @@
     <string name="choose_services">⚙️ Выбрать услуги</string>
     <string name="choose_services_in_settings">Выберите услуги в настройках</string>
     <string name="settings">Настройки</string>
-    <string name="days_payment_for">Через %d дня(ей) платеж по %s</string>
 
     <!-- ВОДООТВЕДЕНИЕ -->
     <string name="has_hot_water">У меня есть центральное ГВС</string>
@@ -321,8 +319,6 @@
     <string name="total_usage">Итого: %1$.2f %2$s</string>
     <string name="no_cold_water_data">⚠️ Сначала заполните ХВС</string>
     <string name="no_hot_water_data">⚠️ Сначала заполните ГВС</string>
-
-    <string name="service_display_name_capital_repair">Капремонт</string>
 
     <string name="area_label">Площадь, м²</string>
     <string name="area_format">Площадь: %1$.2f м²</string>
@@ -349,5 +345,13 @@
     </string-array>
 
     <string name="file_label">Файл: %1$s</string>
+    <string name="payment_tomorrow">Завтра платеж по %s</string>
+    <string name="payment_today">Сегодня платёж по: %1$s</string>
+    <string name="payment_in_2_days">Через 2 дня платёж по: %1$s</string>
+    <string name="payment_in_3_days">Через 3 дня платёж по: %1$s</string>
+    <string name="payment_overdue_1">Вы должны были заплатить вчера по: %1$s</string>
+    <string name="payment_overdue_2">Вы должны были заплатить 2 дня назад по: %1$s</string>
+    <string name="payment_overdue_3">Вы должны были заплатить 3 дня назад по: %1$s</string>
+    <string name="payment_overdue_many">Вы должны были заплатить %1$d дней назад по: %2$s</string>
 
 </resources>

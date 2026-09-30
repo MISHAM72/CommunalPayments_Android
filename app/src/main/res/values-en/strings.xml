@@ -18,6 +18,7 @@
     <string name="service_display_name_tinkoff"> Phone number 2</string>
     <string name="service_display_name_troyka">Travel ticket</string>
     <string name="service_display_name_zont">Heating</string>
+    <string name="service_display_name_capital_repair">Capital repair</string>
 
 
     // общие
@@ -128,9 +129,6 @@
 
     <string name="notifications_about_upcoming_service_payments">notifications_upcoming_payments</string>
     <string name="payment_reminder_channel">Payment Reminder Channel</string>
-
-    <string name="payment_tomorrow">Payment due tomorrow %s</string>
-    <string name="days_payment_for">After %d day(s) payment for %s</string>
     <string name="export_history">Export history</string>
     <string name="notifications">Reminders: %1$s</string>
 
@@ -283,8 +281,6 @@
     <string name="no_cold_water_data">⚠️ Fill cold water first</string>
     <string name="no_hot_water_data">⚠️ Fill hot water first</string>
 
-    <string name="service_display_name_capital_repair">Capital repair</string>
-
     <string name="area_label">Area, m²</string>
     <string name="area_format">Area: %1$.2f m²</string>
     <string name="tariff_per_sqm">Tariff: %.2f rub/m²</string>
@@ -309,5 +305,13 @@
         <item>December</item>
     </string-array>
     <string name="file_label">File: %1$s</string>
+    <string name="payment_tomorrow">Payment due tomorrow %s</string>
+    <string name="payment_today">Payment today for: %1$s</string>
+    <string name="payment_in_2_days">Payment in 2 days for: %1$s</string>
+    <string name="payment_in_3_days">Payment in 3 days for: %1$s</string>
+    <string name="payment_overdue_1">You should have paid yesterday for: %1$s</string>
+    <string name="payment_overdue_2">You should have paid 2 days ago for: %1$s</string>
+    <string name="payment_overdue_3">You should have paid 3 days ago for: %1$s</string>
+    <string name="payment_overdue_many">You should have paid %1$d days ago for: %2$s</string>
 </resources>
 

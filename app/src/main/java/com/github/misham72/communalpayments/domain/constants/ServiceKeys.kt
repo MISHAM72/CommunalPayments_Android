@@ -17,6 +17,4 @@ object ServiceKeys {
     const val OSAGO: String = "osago"
     const val HOSTEL: String = "hostel"
     const val CAPITAL_REPAIR: String = "capital_repair"
-    const val KEY_DRAINAGE_HAS_HOT_WATER = "drainage_has_hot_water"
-
 }

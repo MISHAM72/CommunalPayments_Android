@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.github.misham72.communalpayments.data.local.file.FileManager
 import com.github.misham72.communalpayments.data.parser.HistoryParser
 import com.github.misham72.communalpayments.data.repository.drainagerepository.DrainageRepositoryImpl
+import com.github.misham72.communalpayments.domain.constants.PreferenceKeys
 import com.github.misham72.communalpayments.domain.constants.ServiceKeys
 import com.github.misham72.communalpayments.domain.model.ProviderDetails
 import com.github.misham72.communalpayments.domain.repository.IProviderRepository
@@ -32,7 +33,7 @@ class DrainageViewModel(
 
     companion object {
         const val SERVICE_KEY = ServiceKeys.DRAINAGE
-        private const val KEY_HAS_HOT_WATER = ServiceKeys.KEY_DRAINAGE_HAS_HOT_WATER
+        private const val KEY_HAS_HOT_WATER = PreferenceKeys.DRAINAGE_HAS_HOT_WATER
     }
 
     data class UiState(

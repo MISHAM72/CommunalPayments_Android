@@ -30,13 +30,12 @@ import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.app.CommunalPaymentsApp
 import com.github.misham72.communalpayments.presentation.common.UiConstants
 import com.github.misham72.communalpayments.presentation.screen.screens.main.ControlBetweenScreens
+import com.github.misham72.communalpayments.presentation.screen.screens.services.ServiceRegistry
 import com.github.misham72.communalpayments.presentation.theme.AppTheme
 import com.github.misham72.communalpayments.presentation.theme.ThemePrefs
 import com.github.misham72.communalpayments.presentation.utils.LanguageManager
 import com.github.misham72.communalpayments.presentation.viewmodel.BackupViewModel
 import kotlinx.coroutines.launch
-import kotlin.getValue
-import com.github.misham72.communalpayments.presentation.screen.screens.services.ServiceRegistry
 
 class MainActivity : AppCompatActivity() {
     private val container by lazy { (application as CommunalPaymentsApp).appContainer }

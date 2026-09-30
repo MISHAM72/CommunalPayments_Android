@@ -27,6 +27,7 @@ import com.github.misham72.communalpayments.data.repository.periodrepository.Per
 import com.github.misham72.communalpayments.data.repository.provider.ProviderRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.receipt.ReceiptRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.settings.UserSettingsRepositoryImpl
+import com.github.misham72.communalpayments.data.worker.PaymentWorkerFactory
 import com.github.misham72.communalpayments.domain.constants.ServiceKeys
 import com.github.misham72.communalpayments.domain.usecases.AttachHistoryAttachmentUseCase
 import com.github.misham72.communalpayments.domain.usecases.DeleteReceiptUseCase
@@ -54,10 +55,13 @@ class AppContainer(context: Context) {
         historyDirName = context.getString(R.string.history),
         emptyHistoryMessage = context.getString(R.string.empty_history_calculation)
     )
-    val sharedPrefs: SharedPreferences = context.getSharedPreferences(
+    private val sharedPrefs: SharedPreferences = context.getSharedPreferences(
         DataConstants.PREFS_NAME, Context.MODE_PRIVATE
     )
     private val accountPrefs = AccountPreferences(sharedPrefs)
+    val workerFactory: PaymentWorkerFactory by lazy {
+        PaymentWorkerFactory(accountPrefs, selectedServicesRepository)
+    }
     val selectedServicesRepository = SelectedServicesRepositoryImpl(sharedPrefs)
 
     // Репозитории
