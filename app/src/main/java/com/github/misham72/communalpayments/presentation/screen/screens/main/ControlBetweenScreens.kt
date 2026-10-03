@@ -51,24 +51,27 @@ import androidx.lifecycle.compose.LifecycleResumeEffect
 import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.di.AppContainer
 import com.github.misham72.communalpayments.di.IncomeViewModelFactory
+import com.github.misham72.communalpayments.domain.constants.ServiceKeys
 import com.github.misham72.communalpayments.domain.repository.UserSettingsRepository
-import com.github.misham72.communalpayments.domain.usecases.PdfHistoryUseCase
 import com.github.misham72.communalpayments.domain.usecases.GetExpensesUseCase
 import com.github.misham72.communalpayments.domain.usecases.GetHistoryUseCase
+import com.github.misham72.communalpayments.domain.usecases.PdfHistoryUseCase
 import com.github.misham72.communalpayments.domain.usecases.SaveHistoryUseCase
-import com.github.misham72.communalpayments.domain.constants.ServiceKeys
 import com.github.misham72.communalpayments.presentation.screen.components.ServiceTab
-import com.github.misham72.communalpayments.presentation.screen.screens.services.getSelectedScreens
 import com.github.misham72.communalpayments.presentation.screen.screens.analytics.AnalyticsScreen
 import com.github.misham72.communalpayments.presentation.screen.screens.history.HistoryScreen
+import com.github.misham72.communalpayments.presentation.screen.screens.services.ServicesSelectionScreen
+import com.github.misham72.communalpayments.presentation.screen.screens.services.getSelectedScreens
 import com.github.misham72.communalpayments.presentation.theme.ThemePrefs
 import com.github.misham72.communalpayments.presentation.utils.LanguageManager
 import com.github.misham72.communalpayments.presentation.utils.rememberBoilerSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberCarSoundPlayer
+import com.github.misham72.communalpayments.presentation.utils.rememberColdWaterSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberGarbageSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberGasSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberHistorySoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberHostelSoundPlayer
+import com.github.misham72.communalpayments.presentation.utils.rememberHotWaterSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberInTotalSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberInternetSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberMTSSoundPlayer
@@ -77,12 +80,9 @@ import com.github.misham72.communalpayments.presentation.utils.rememberTaxesSoun
 import com.github.misham72.communalpayments.presentation.utils.rememberTinkoffSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberlightSoundPlayer
 import kotlinx.coroutines.launch
-import com.github.misham72.communalpayments.presentation.screen.screens.services.ServicesSelectionScreen
-import com.github.misham72.communalpayments.presentation.utils.rememberColdWaterSoundPlayer
-import com.github.misham72.communalpayments.presentation.utils.rememberHotWaterSoundPlayer
 
 @Composable
-fun ControlBetweenScreens( //Звуки (какой звук играть при клике)
+fun ControlBetweenScreens(
     pdfHistoryUseCase: PdfHistoryUseCase,
     getHistoryUseCase: GetHistoryUseCase,
     saveHistoryUseCase: SaveHistoryUseCase,
@@ -97,7 +97,7 @@ fun ControlBetweenScreens( //Звуки (какой звук играть при
     val context = LocalContext.current
     var selectedService by remember { mutableIntStateOf(0) }
     val showHistory = remember { mutableStateOf(false) }
-    val showAllServicesSummary = remember { mutableStateOf(false) }   // новый флаг
+    val showAllServicesSummary = remember { mutableStateOf(false) }
     var showServicesSelection by remember { mutableStateOf(false) }
 
     val services = getSelectedScreens(appContainer)
@@ -174,7 +174,7 @@ fun ControlBetweenScreens( //Звуки (какой звук играть при
         if (showAllServicesSummary.value) {
             AnalyticsScreen(
                 onBack = { onNavigateBack() },
-                getExpensesUseCase = getExpensesUseCase,  // используем существующую переменную
+                getExpensesUseCase = getExpensesUseCase,
                 defaultErrorMessage = defaultError,
                 incomeFactory = incomeViewModelFactory,
                 appContainer = appContainer
@@ -265,8 +265,6 @@ fun ControlBetweenScreens( //Звуки (какой звук играть при
                             }
                         )
                     }
-
-// Диалог резервного копирования
                     if (showBackupDialog) {
                         AlertDialog(
                             onDismissRequest = { showBackupDialog = false },
@@ -387,10 +385,10 @@ fun ControlBetweenScreens( //Звуки (какой звук играть при
                     Row(            //Определение звука для каждой услуги (when). Row с горизонтальным скроллом — чтобы все чипсы поместились.
                         modifier = Modifier.horizontalScroll(rememberScrollState())
                     ) {
-                        services.forEachIndexed { index, service ->   //services — список всех услуг (получен из getListInitialScreen()).forEachIndexed — для каждой услуги создаётся ServiceTab (кастомный компонент-чипс).
-                            val sound = when (service.fileKey) {  // sound — выбирается соответствующий звук для нажатия на чипс (чтобы при переключении играл специфичный звук, если задан).
+                        services.forEachIndexed { index, service ->
+                            val sound = when (service.fileKey) {
                                 ServiceKeys.ELECTRICITY -> light
-                                ServiceKeys.GAS -> gasSound               // 🔥 → звук газа
+                                ServiceKeys.GAS -> gasSound
                                 ServiceKeys.COLDWATER -> coldWaterSound
                                 ServiceKeys.HOTWATER -> hotWaterSound
                                 ServiceKeys.GARBAGE -> garbageSound
@@ -400,23 +398,23 @@ fun ControlBetweenScreens( //Звуки (какой звук играть при
                                 ServiceKeys.TINKOFF -> tinkoffSound
                                 ServiceKeys.TAXES -> taxesSound
                                 ServiceKeys.TROYKA -> carSound
-                                ServiceKeys.OSAGO -> osagoSound  // 🚗 → звук ОСАГО
+                                ServiceKeys.OSAGO -> osagoSound
                                 ServiceKeys.HOSTEL -> hostelSound
                                 else -> null  // Для остальных пока без звука
                             }
                             //Передача звука в кнопку
-                            ServiceTab(   // ServiceTab — отображает название услуги, эмодзи/иконку, дату следующего платежа (если есть). По клику меняет selectedService (индекс выбранной вкладки) и запускает звук.
+                            ServiceTab(
                                 service = service,
                                 isSelected = selectedService == index,
                                 dueDate = dueDates[service.fileKey],
                                 onClick = { selectedService = index },
-                                onSound = { sound?.start() })    // ← Передаём запуск звука
+                                onSound = { sound?.start() })
                         }
                     }
                     Spacer(modifier = Modifier.height(9.dp))
 
-                    Box(modifier = Modifier.weight(1f)) {   // Box — контейнер, в который помещается UI текущей услуги, weight(1f) — заставляет его растянуться на всю высоту внутри Column. Сейчас внутри Box ровно один элемент — результат вызова.
-                        services[selectedService].screen()   // — динамически подставляет экран выбранной услуги.
+                    Box(modifier = Modifier.weight(1f)) {
+                        services[selectedService].screen()
                     }
                     Image(
                         painter = painterResource(R.drawable.night),

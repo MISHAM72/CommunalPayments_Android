@@ -61,4 +61,9 @@ object DataConstants {
     const val LABEL_AMOUNT = "Сумма: "
     const val LABEL_SOURCE = "Источник: "
 
+    // Ключи для мусора
+    const val GARBAGE_MODE = "garbage_mode"
+    const val GARBAGE_VALUE = "garbage_value"
+    const val KEY_SELECTED_SERVICES = "selected_services"
+
 }

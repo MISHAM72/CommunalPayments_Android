@@ -5,11 +5,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.misham72.communalpayments.domain.model.ProviderDetails
 import com.github.misham72.communalpayments.domain.model.ValidationError
-import com.github.misham72.communalpayments.domain.model.periodic.PeriodicData
+import com.github.misham72.communalpayments.domain.model.periodic.GarbageData
+import com.github.misham72.communalpayments.domain.model.periodic.GarbageMode
 import com.github.misham72.communalpayments.domain.repository.IProviderRepository
 import com.github.misham72.communalpayments.domain.repository.UserSettingsRepository
+import com.github.misham72.communalpayments.domain.usecases.GarbageDataUseCase
 import com.github.misham72.communalpayments.domain.usecases.PdfHistoryUseCase
-import com.github.misham72.communalpayments.domain.usecases.PeriodicDataUseCase
 import com.github.misham72.communalpayments.domain.usecases.TextHistoryUseCase
 import com.github.misham72.communalpayments.domain.constants.ServiceKeys
 import com.github.misham72.communalpayments.presentation.common.UiMessages
@@ -25,45 +26,51 @@ import java.util.Date
 import java.util.Locale
 
 class GarbageViewModel(
-    private val periodicDataUseCase: PeriodicDataUseCase,
+    private val garbageDataUseCase: GarbageDataUseCase,
     private val settingsRepository: UserSettingsRepository,
     private val repository: IProviderRepository,
     private val textHistoryUseCase: TextHistoryUseCase,
     private val pdfHistoryUseCase: PdfHistoryUseCase,
     private val gson: Gson
-
 ) : ViewModel() {
 
     companion object {
         const val SERVICE_KEY = ServiceKeys.GARBAGE
     }
 
-    // 1️⃣ СОСТОЯНИЕ ЭКРАНА (что храним) - что отображать ?
     data class UiState(
         val paymentDay: String = "",
         val periodMonths: String = "",
+        val mode: GarbageMode = GarbageMode.AREA,
+        val value: String = "",
         val providerDetails: ProviderDetails = ProviderDetails(),
         val showAccountDialog: Boolean = false,
         val customDate: String = "",
-        val result: PeriodicData? = null,
-        val lastResult: PeriodicData? = null,
+        val result: GarbageData? = null,
+        val lastResult: GarbageData? = null,
         val error: ValidationError? = null,
     )
 
-    private val _uiState = MutableStateFlow(UiState())//когда отображать и как часто ?
+    private val _uiState = MutableStateFlow(UiState())
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
     init {
         viewModelScope.launch {
-            // Загружаем всё параллельно, если возможно
             val detailsDeferred = async { repository.loadProviderDetails(ServiceKeys.GARBAGE) }
             val saveDay = settingsRepository.getPaymentDay(SERVICE_KEY) ?: ""
             val savePeriod = settingsRepository.getPeriodMonths(SERVICE_KEY) ?: ""
             val savedTariff = settingsRepository.getTariff(SERVICE_KEY) ?: ""
             val savedDate = settingsRepository.getCustomDate(SERVICE_KEY)
-            val details = detailsDeferred.await() // ждём результат
+            val savedMode = try {
+                GarbageMode.valueOf(settingsRepository.getGarbageMode())
+            } catch (_: Exception) {
+                GarbageMode.AREA
+            }
+            val savedValue = settingsRepository.getGarbageValue()
+
+            val details = detailsDeferred.await()
             val savedJson = settingsRepository.getLastResult(SERVICE_KEY)
-            val lastResult = savedJson?.let { gson.fromJson(it, PeriodicData::class.java) }
+            val lastResult = savedJson?.let { gson.fromJson(it, GarbageData::class.java) }
             _uiState.update { it.copy(lastResult = lastResult) }
 
             _uiState.update { currentState ->
@@ -73,18 +80,18 @@ class GarbageViewModel(
                     ),
                     paymentDay = saveDay,
                     periodMonths = savePeriod,
+                    mode = savedMode,
+                    value = savedValue,
                     customDate = savedDate
                 )
             }
         }
     }
-    //Это функция для сохранения данных провайдера (реквизитов) в постоянное хранилище и обновления UI
 
     fun saveProviderDetails(details: ProviderDetails) {
         viewModelScope.launch {
-            repository.saveProviderDetails(ServiceKeys.GARBAGE, details)// 1) Сохраняем в SharedPreferences
-            _uiState.update { it.copy(providerDetails = details) }// 2) Обновляем состояние экрана
-            // Если нужно обновить другие поля (тариф и т.д.) – можно сделать здесь
+            repository.saveProviderDetails(ServiceKeys.GARBAGE, details)
+            _uiState.update { it.copy(providerDetails = details) }
         }
     }
 
@@ -115,13 +122,24 @@ class GarbageViewModel(
         _uiState.update { it.copy(showAccountDialog = false) }
     }
 
-    // 2️⃣ ПОЛУЧАЕМ ВВОД ОТ ПОЛЬЗОВАТЕЛЯ
     fun onPaymentDayChange(value: String) {
         _uiState.update { it.copy(paymentDay = value) }
     }
 
     fun onPeriodMonthsChange(value: String) {
         _uiState.update { it.copy(periodMonths = value) }
+    }
+
+    fun onModeChange(mode: GarbageMode) {
+        _uiState.update { it.copy(mode = mode, value = "") }
+        viewModelScope.launch {
+            settingsRepository.saveGarbageMode(mode.name)
+            settingsRepository.saveGarbageValue("")
+        }
+    }
+
+    fun onValueChange(value: String) {
+        _uiState.update { it.copy(value = value) }
     }
 
     fun onPriceTariffChange(value: String) {
@@ -132,12 +150,11 @@ class GarbageViewModel(
         }
     }
 
-    // 👇 НОВЫЙ МЕТОД
     private fun parseStartDate(dateString: String): Date {
         return try {
             SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).parse(dateString) ?: Date()
         } catch (_: Exception) {
-            Date() // при ошибке используем текущую дату
+            Date()
         }
     }
 
@@ -145,27 +162,33 @@ class GarbageViewModel(
         val paymentDay = _uiState.value.paymentDay.toIntOrNull()
         val periodMonths = _uiState.value.periodMonths.toIntOrNull()
         val priceTariff = _uiState.value.providerDetails.tariff.toDoubleOrNull()
+        val value = _uiState.value.value.toDoubleOrNull()
         val account = _uiState.value.providerDetails.accountNumber
-        if (paymentDay == null || periodMonths == null || priceTariff == null) {
+        val mode = _uiState.value.mode
+
+        if (paymentDay == null || periodMonths == null || priceTariff == null || value == null) {
             _uiState.update { it.copy(error = ValidationError.InvalidInput) }
             return
         }
+
         val startDate = parseStartDate(_uiState.value.customDate)
 
         viewModelScope.launch {
             try {
-                val data = periodicDataUseCase.collectPeriodicData(
-                    serviceKey = ServiceKeys.GARBAGE,
+                val data = garbageDataUseCase.collectGarbageData(
                     isHistory = true,
                     paymentDay = paymentDay,
                     periodMonths = periodMonths,
                     startDate = startDate,
+                    mode = mode,
+                    value = value,
                     priceTariff = priceTariff,
                     accountNumber = account
                 )
 
-                // Обновляем UI – UseCase уже сохранил данные
                 settingsRepository.saveLastResult(SERVICE_KEY, gson.toJson(data))
+                settingsRepository.saveGarbageValue(value.toString())
+
                 _uiState.update { state ->
                     state.copy(
                         result = data,

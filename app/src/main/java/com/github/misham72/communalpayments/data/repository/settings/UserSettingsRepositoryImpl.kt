@@ -68,4 +68,20 @@ class UserSettingsRepositoryImpl(
             accountPrefs.getString(DataConstants.LAST_RESULT_PREFIX + serviceKey)
         }
     }
+
+    override fun saveGarbageMode(mode: String) {
+        accountPrefs.saveGarbageMode(mode)
+    }
+
+    override fun getGarbageMode(): String {
+        return accountPrefs.getGarbageMode()
+    }
+
+    override fun saveGarbageValue(value: String) {
+        accountPrefs.saveGarbageValue(value)
+    }
+
+    override fun getGarbageValue(): String {
+        return accountPrefs.getGarbageValue()
+    }
 }

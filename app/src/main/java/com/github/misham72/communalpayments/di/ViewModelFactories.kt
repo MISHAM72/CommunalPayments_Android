@@ -147,7 +147,7 @@ class GarbageViewModelFactory(
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(GarbageViewModel::class.java)) {
             return GarbageViewModel(
-                periodicDataUseCase = container.periodicDataUseCase,
+                garbageDataUseCase = container.garbageDataUseCase,
                 settingsRepository = container.settingsRepository,
                 repository = container.providerRepository,
                 textHistoryUseCase = container.textHistoryUseCase,

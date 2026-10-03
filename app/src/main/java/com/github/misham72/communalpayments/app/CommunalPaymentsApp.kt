@@ -11,15 +11,15 @@ class CommunalPaymentsApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        appContainer = AppContainer(this)
+        appContainer = AppContainer(this)// — создаётся склад
 
         // Инициализация WorkManager с нашей фабрикой
-        val config = Configuration.Builder()
+        val config: Configuration = Configuration.Builder()
             .setWorkerFactory(appContainer.workerFactory)
             .build()
-        WorkManager.initialize(this, config)
+        WorkManager.initialize(this, config)//— настройка WorkManager
 
         // Периодическая проверка уведомлений (раз в час)
-        NotificationScheduler.schedulePeriodic(this)
+        NotificationScheduler.schedulePeriodic(this)// — постановка задачи
     }
 }

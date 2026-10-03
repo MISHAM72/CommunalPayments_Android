@@ -354,4 +354,11 @@
     <string name="payment_overdue_3">Вы должны были заплатить 3 дня назад по: %1$s</string>
     <string name="payment_overdue_many">Вы должны были заплатить %1$d дней назад по: %2$s</string>
 
+    <!-- МУСОР -->
+    <string name="garbage_mode_area">Тариф × Площадь</string>
+    <string name="garbage_mode_residents">Тариф × Кол-во проживающих</string>
+    <string name="garbage_residents_label">Проживающих, чел.</string>
+    <string name="garbage_tariff_per_person">Тариф: %.2f руб./чел</string>
+    <string name="garbage_residents_format">Проживающих: %1$d чел</string>
+
 </resources>

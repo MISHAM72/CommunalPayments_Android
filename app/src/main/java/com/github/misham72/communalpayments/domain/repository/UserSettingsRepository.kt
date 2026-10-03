@@ -18,4 +18,10 @@ interface UserSettingsRepository {
     suspend fun getCustomDate(serviceKey: String): String
     suspend fun getLastResult(serviceKey: String): String?
 
+    // Мусор
+    fun saveGarbageMode(mode: String)
+    fun getGarbageMode(): String
+    fun saveGarbageValue(value: String)
+    fun getGarbageValue(): String
+
 }

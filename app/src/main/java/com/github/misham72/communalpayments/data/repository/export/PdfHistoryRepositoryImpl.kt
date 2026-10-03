@@ -218,13 +218,13 @@ class PdfHistoryRepositoryImpl(
         }
         // Координаты колонок
         if (isMeter) {   // Отрисовка таблицы – ветвление по isMeter. Для счётчиковых услуг (электричество, вода и т.д.):
-            val xDate = 40f
-            val xPrev = 180f
-            val xCurr = 290f
-            val xCons = 400f
-            val xTariff = 500f
-            val xAmnt = 565f
-            val xStat = 650f
+            val xDate = 20f
+            val xPrev = 120f
+            val xCurr = 240f
+            val xCons = 360f
+            val xTariff = 480f
+            val xAmnt = 570f
+            val xStat = 670f
 
             // Заголовки для счётчиков
             canvas.drawText(pdfTableDate, xDate, y, headerFont)
@@ -246,11 +246,11 @@ class PdfHistoryRepositoryImpl(
                 y += 22
             }
         } else {  // Для периодических услуг (общежитие и пр.):
-            val xDate = 40f
-            val xPer = 150f
-            val xDay = 240f
-            val xTariff = 340f
-            val xAmount = 420f
+            val xDate = 20f
+            val xPer = 120f
+            val xDay = 190f
+            val xTariff = 290f
+            val xAmount = 410f
             val xStat = 520f
 
             // Заголовки для периодических

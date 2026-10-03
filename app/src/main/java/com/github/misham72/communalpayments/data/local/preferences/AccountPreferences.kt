@@ -113,4 +113,21 @@ class AccountPreferences(private val prefs: SharedPreferences) {
     fun getString(key: String, defaultValue: String? = null): String? {
         return prefs.getString(key, defaultValue)
     }
+
+    // Ключи для мусора (режим и значение)
+    fun saveGarbageMode(mode: String) {
+        prefs.edit { putString(DataConstants.GARBAGE_MODE, mode) }
+    }
+
+    fun getGarbageMode(): String {
+        return prefs.getString(DataConstants.GARBAGE_MODE, "AREA") ?: "AREA"
+    }
+
+    fun saveGarbageValue(value: String) {
+        prefs.edit { putString(DataConstants.GARBAGE_VALUE, value) }
+    }
+
+    fun getGarbageValue(): String {
+        return prefs.getString(DataConstants.GARBAGE_VALUE, "") ?: ""
+    }
 }

@@ -20,6 +20,7 @@ import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
@@ -48,6 +49,7 @@ import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.di.AppContainer
 import com.github.misham72.communalpayments.di.ReceiptsViewModelFactory
 import com.github.misham72.communalpayments.domain.model.ValidationError
+import com.github.misham72.communalpayments.domain.model.periodic.GarbageMode
 import com.github.misham72.communalpayments.domain.constants.ServiceKeys
 import com.github.misham72.communalpayments.presentation.screen.components.EditProviderDetailsDialog
 import com.github.misham72.communalpayments.presentation.screen.components.ProviderDetailsDialog
@@ -73,7 +75,6 @@ fun GarbageScreen(viewModel: GarbageViewModel, appContainer: AppContainer) {
     val bankSound = rememberBankButtonSoundPlayer()
     val uiState by viewModel.uiState.collectAsState()
 
-    // ----- Квитанции ----
     val receiptsViewModelFactory = ReceiptsViewModelFactory(appContainer.getReceiptsUseCase, appContainer.deleteReceiptUseCase, appContainer.saveReceiptUseCase)
     val receiptsViewModel: ReceiptsViewModel = viewModel(factory = receiptsViewModelFactory)
     var showReceipts by remember { mutableStateOf(false) }
@@ -98,7 +99,7 @@ fun GarbageScreen(viewModel: GarbageViewModel, appContainer: AppContainer) {
                 onTxtExport = { viewModel.onShareClick(context) },
                 modifier = Modifier.height(28.dp),
                 onPdfExport = { viewModel.onPdfExport(context) },
-                onReceiptsClick = { showReceipts = true },   // ← добавлен параметр
+                onReceiptsClick = { showReceipts = true },
             )
             if (uiState.customDate.isNotBlank()) {
                 Text(
@@ -116,6 +117,26 @@ fun GarbageScreen(viewModel: GarbageViewModel, appContainer: AppContainer) {
                     modifier = Modifier.padding(top = 1.dp)
                 )
             }
+
+            // Переключатель режима
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                FilterChip(
+                    selected = uiState.mode == GarbageMode.AREA,
+                    onClick = { viewModel.onModeChange(GarbageMode.AREA) },
+                    label = { Text(stringResource(R.string.garbage_mode_area)) },
+                    modifier = Modifier.weight(1f)
+                )
+                FilterChip(
+                    selected = uiState.mode == GarbageMode.RESIDENTS,
+                    onClick = { viewModel.onModeChange(GarbageMode.RESIDENTS) },
+                    label = { Text(stringResource(R.string.garbage_mode_residents)) },
+                    modifier = Modifier.weight(1f)
+                )
+            }
+
             OutlinedTextField(
                 value = uiState.paymentDay,
                 onValueChange = viewModel::onPaymentDayChange,
@@ -139,7 +160,31 @@ fun GarbageScreen(viewModel: GarbageViewModel, appContainer: AppContainer) {
             OutlinedTextField(
                 value = uiState.providerDetails.tariff,
                 onValueChange = viewModel::onPriceTariffChange,
-                label = { Text(stringResource(R.string.tariff_label)) },
+                label = {
+                    Text(
+                        if (uiState.mode == GarbageMode.AREA)
+                            stringResource(R.string.tariff_per_sqm)
+                        else
+                            stringResource(R.string.garbage_tariff_per_person)
+                    )
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 48.dp),
+                singleLine = true,
+                textStyle = LocalTextStyle.current.copy(fontSize = 20.sp, lineHeight = 20.sp)
+            )
+            OutlinedTextField(
+                value = uiState.value,
+                onValueChange = viewModel::onValueChange,
+                label = {
+                    Text(
+                        if (uiState.mode == GarbageMode.AREA)
+                            stringResource(R.string.area_label)
+                        else
+                            stringResource(R.string.garbage_residents_label)
+                    )
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = 48.dp),
@@ -206,14 +251,14 @@ fun GarbageScreen(viewModel: GarbageViewModel, appContainer: AppContainer) {
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             Text(
-                                text = stringResource(R.string.currency_rub, result.priceTariff),
+                                text = stringResource(R.string.currency_rub, result.totalAmount),
                                 style = MaterialTheme.typography.headlineSmall,
                                 color = Color.Red
                             )
                             IconButton(
                                 onClick = {
-                                    clipboardManager.setText(AnnotatedString(result.priceTariff.toString()))
-                                    Toast.makeText(context, context.getString(R.string.amount_copied, result.priceTariff), Toast.LENGTH_SHORT).show()
+                                    clipboardManager.setText(AnnotatedString(result.totalAmount.toString()))
+                                    Toast.makeText(context, context.getString(R.string.amount_copied, result.totalAmount), Toast.LENGTH_SHORT).show()
                                 },
                                 modifier = Modifier.size(24.dp)
                             ) {
@@ -295,4 +340,3 @@ fun GarbageScreen(viewModel: GarbageViewModel, appContainer: AppContainer) {
         }
     }
 }
-

@@ -17,6 +17,7 @@ import com.github.misham72.communalpayments.data.repository.drainagerepository.D
 import com.github.misham72.communalpayments.data.repository.expenses.ExpensesRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.export.PdfHistoryRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.export.TextHistoryRepositoryImpl
+import com.github.misham72.communalpayments.data.repository.garbagerepository.GarbageRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.history.HistoryRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.income.IncomeRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.meterrepository.ColdWaterRepositoryImpl
@@ -32,6 +33,7 @@ import com.github.misham72.communalpayments.domain.constants.ServiceKeys
 import com.github.misham72.communalpayments.domain.usecases.AttachHistoryAttachmentUseCase
 import com.github.misham72.communalpayments.domain.usecases.DeleteReceiptUseCase
 import com.github.misham72.communalpayments.domain.usecases.ExportBackupUseCase
+import com.github.misham72.communalpayments.domain.usecases.GarbageDataUseCase
 import com.github.misham72.communalpayments.domain.usecases.GetExpensesUseCase
 import com.github.misham72.communalpayments.domain.usecases.GetHistoryAttachmentUseCase
 import com.github.misham72.communalpayments.domain.usecases.GetHistoryUseCase
@@ -157,6 +159,25 @@ class AppContainer(context: Context) {
             ServiceKeys.INTERNET to context.getString(R.string.service_display_name_internet),
             ServiceKeys.ZONT to context.getString(R.string.service_display_name_zont)
         )  // ← теперь карта, а не строка
+    )
+    private val garbageRepository = GarbageRepositoryImpl(
+        fileManager = fileManager,
+        dateFormatPattern = DataConstants.DATE_TIME_FORMATE,
+        personalAccountTemplate = context.getString(R.string.personal_account_in_text_history),
+        nextPaymentTemplate = context.getString(R.string.next_payment),
+        periodMonthsTemplate = context.getString(R.string.period_months_format),
+        currencyTemplate = context.getString(R.string.currency_rub),
+        tariffPerSqmTemplate = context.getString(R.string.tariff_per_sqm),
+        tariffPerPersonTemplate = context.getString(R.string.garbage_tariff_per_person),
+        areaTemplate = context.getString(R.string.area_format),
+        residentsTemplate = context.getString(R.string.garbage_residents_format),
+        serviceDisplayName = context.getString(R.string.service_display_name_garbage)
+    )
+
+    val garbageDataUseCase = GarbageDataUseCase(
+        repository = garbageRepository,
+        settingsRepository = settingsRepository,
+        calculator = PeriodCalculatorImpl()
     )
 
     // UseCase

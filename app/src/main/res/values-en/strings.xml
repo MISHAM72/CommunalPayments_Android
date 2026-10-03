@@ -313,5 +313,12 @@
     <string name="payment_overdue_2">You should have paid 2 days ago for: %1$s</string>
     <string name="payment_overdue_3">You should have paid 3 days ago for: %1$s</string>
     <string name="payment_overdue_many">You should have paid %1$d days ago for: %2$s</string>
+
+    <!-- GARBAGE -->
+    <string name="garbage_mode_area">Tariff × Area</string>
+    <string name="garbage_mode_residents">Tariff × Residents</string>
+    <string name="garbage_residents_label">Residents, ppl.</string>
+    <string name="garbage_tariff_per_person">Tariff: %.2f rub/person</string>
+    <string name="garbage_residents_format">Residents: %1$d</string>
 </resources>
 
