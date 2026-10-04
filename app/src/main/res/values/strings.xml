@@ -69,20 +69,27 @@
     <string name="current_reading_pdf">Текущие показания: </string>
     <string name="previous_reading_pdf">Предыдущие показания: </string>
 
+    <string name="pdf_table_date">Дата</string>
     <string name="next_payment_pdf">"Дата оплаты: "</string>
     <string name="next_payment">Дата оплаты:  %1$s</string>
-    <!-- запись в PDF файл -->
-    <string name="status_calculated">  ПОДСЧИТАНО</string>
-
-    <string name="consumption_pdf">Расход:</string>
     <string name="to_be_paid">К оплате:</string>
     <string name="tariff">Тариф:</string>
+    <string name="tariff_details">Тариф: %s</string>
+    <string name="tariff_label">Тариф: руб.</string>
+    <string name="tariff_card">Тариф: %.2f руб.</string>
+    <string name="payment_date">Дата платежа: %s</string>
+
+
+    <!-- запись в PDF файл -->
+    <string name="status_calculated">  ПОДСЧИТАНО</string>
+    <string name="consumption_pdf">Расход:</string>
+
     <string name="period_pdf">Период:</string>
 
     <string name="pdf_title_history">История: %s</string>
     <string name="formed">Сформировано:</string>
     <string name="personal_account_label">Л/С:</string>
-    <string name="pdf_table_date">Дата</string>
+
 
     <string name="amount">Сумма</string>
     <string name="pdf_table_status">Статус</string>
@@ -253,12 +260,6 @@
 
     <string name="tariff_not_specified">Тариф не указан.</string>
 
-    <string name="tariff_details">Тариф: %s</string>
-    <string name="tariff_label">Тариф: руб.</string>
-    <string name="tariff_card">Тариф: %.2f руб.</string>
-
-    <!-- общая дата  -->
-    <string name="payment_date">Дата платежа: %s</string>
 
     <string name="unit_cubic_meter"> м./куб.</string>
     <string name="unit_kilowatt_hour"> кВт/ч</string>

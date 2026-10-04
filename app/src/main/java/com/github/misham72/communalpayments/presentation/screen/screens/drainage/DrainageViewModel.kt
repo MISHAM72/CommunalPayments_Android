@@ -28,7 +28,8 @@ class DrainageViewModel(
     private val fileManager: FileManager,
     private val textHistoryUseCase: TextHistoryUseCase,
     private val pdfHistoryUseCase: PdfHistoryUseCase,
-    private val gson: Gson
+    private val gson: Gson,
+    private val historyParser: HistoryParser
 ) : ViewModel() {
 
     companion object {
@@ -72,11 +73,11 @@ class DrainageViewModel(
             val savedHasHotWater = settingsRepository.getLastReading(KEY_HAS_HOT_WATER)
                 ?.toBooleanStrictOrNull() ?: true
             // Читаем последние расходы ХВС и ГВС (сохранены как простые числа)
-            val coldUsage = HistoryParser.extractLatestConsumption(
+            val coldUsage = historyParser.extractLatestConsumption(
                 fileManager.readHistory(ServiceKeys.COLDWATER)
             ) ?: 0.0
 
-            val hotUsage = HistoryParser.extractLatestConsumption(
+            val hotUsage = historyParser.extractLatestConsumption(
                 fileManager.readHistory(ServiceKeys.HOTWATER)
             ) ?: 0.0
 

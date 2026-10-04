@@ -9,7 +9,8 @@ import com.github.misham72.communalpayments.domain.model.Attachment
  * Остальные вложения сохраняются.
  */
 class RemoveHistoryAttachmentUseCase(
-    private val fileManager: FileManager
+    private val fileManager: FileManager,
+    private val historyParser: HistoryParser
 ) {
     suspend operator fun invoke(
         serviceKey: String,
@@ -26,7 +27,7 @@ class RemoveHistoryAttachmentUseCase(
         }
 
         // 3. Обновить блок в тексте истории
-        val newBlock = HistoryParser.updateBlockAttachments(
+        val newBlock = historyParser.updateBlockAttachments(
             block = rawBlock,
             attachments = updatedAttachments
         )

@@ -17,55 +17,123 @@ object HistoryFormat {
     const val MIME_TYPE_PREFIX = "MimeType"
 }
 
-object HistoryParser {
+class HistoryParser(
+    private val statusCalculated: String,
+    private val currentReadingPdf: String,
+    private val previousReadingPdf: String,
+    private val consumptionPdf: String,
+    private val toBePaid: String,
+    private val tariff: String,
+    private val periodPdf: String,
+    private val nextPaymentPdf: String,
+) {
 
-    private val SEPARATOR: String = DataConstants.HISTORY_SEPARATOR
+    private val separator: String = DataConstants.HISTORY_SEPARATOR
         .repeat(DataConstants.HISTORY_SEPARATOR_COUNT)
 
     private val dateTimeRegex = Regex(DataConstants.DATE_TIME_REGEX_PATTERN)
 
-    // Регулярка для строк вида "Вложение1: /path/to/file", "ИмяФайла2: ...", "MimeType3: ..."
     private val attachmentPathRegex = Regex("""^${HistoryFormat.ATTACHMENT_PREFIX}(\d+):\s*(.+)$""")
     private val attachmentNameRegex = Regex("""^${HistoryFormat.FILE_NAME_PREFIX}(\d+):\s*(.+)$""")
     private val attachmentMimeRegex = Regex("""^${HistoryFormat.MIME_TYPE_PREFIX}(\d+):\s*(.+)$""")
-    private val CONSUMPTION_REGEX = Regex("""Расход:?\s*-?\s*([\d.,]+)""")
+    private val consumptionRegex = Regex("""Расход:?\s*-?\s*[\d.,]+""")
 
     fun extractLatestConsumption(content: String): Double? {
         if (content.isBlank()) return null
-        val match = CONSUMPTION_REGEX.find(content) ?: return null
-        return match.groupValues[1].replace(',', '.').toDoubleOrNull()
+        val match = consumptionRegex.find(content) ?: return null
+        val number = match.value.replace(Regex("""[^\d.,]"""), "")
+        return number.replace(',', '.').toDoubleOrNull()
     }
 
     fun parse(content: String, serviceKey: String): List<HistoryRecord> {
         if (content.isBlank()) return emptyList()
 
-        val parts = content.split(SEPARATOR)
+        val parts = content.split(separator)
         val records = mutableListOf<HistoryRecord>()
 
         parts.forEachIndexed { index, part ->
             if (part.isBlank()) return@forEachIndexed
 
-            val block = if (index == 0) part else SEPARATOR + part
+            val block = if (index == 0) part else separator + part
             val dateMatch = dateTimeRegex.find(block) ?: return@forEachIndexed
 
             val attachments = extractAttachments(block)
+            val fields = parseFields(block)
 
             records.add(
                 HistoryRecord(
                     rawBlock = block.trimEnd(),
                     dateTime = dateMatch.value,
                     serviceKey = serviceKey,
-                    attachments = attachments
+                    attachments = attachments,
+                    status = fields.status,
+                    amount = fields.amount,
+                    tariff = fields.tariff,
+                    currentReading = fields.currentReading,
+                    previousReading = fields.previousReading,
+                    consumption = fields.consumption,
+                    nextPayment = fields.nextPayment,
+                    periodMonths = fields.periodMonths,
                 )
             )
         }
         return records
     }
 
-    /**
-     * Достаёт все вложения из блока.
-     * Поддерживает сколько угодно вложений: Вложение1, Вложение2, ...
-     */
+    // Внутренний контейнер для распарсенных полей
+    private data class ParsedFields(
+        val status: String = "",
+        val amount: String = "",
+        val tariff: String = "",
+        val currentReading: String = "",
+        val previousReading: String = "",
+        val consumption: String = "",
+        val nextPayment: String = "",
+        val periodMonths: String = "",
+    )
+
+    private fun parseFields(block: String): ParsedFields {
+        var status = statusCalculated
+        var amount = ""
+        var tariffValue = ""
+        var currentReading = ""
+        var previousReading = ""
+        var consumption = ""
+        var nextPayment = ""
+        var periodMonths = ""
+
+        block.lines().forEach { line ->
+            val trimmed = line.trim()
+            when {
+                trimmed.startsWith(currentReadingPdf) -> currentReading = trimmed.substringAfter(":").trim()
+                trimmed.startsWith(previousReadingPdf) -> previousReading = trimmed.substringAfter(":").trim()
+                trimmed.startsWith(consumptionPdf) -> consumption = trimmed.substringAfter(":").trim()
+                trimmed.startsWith(toBePaid) -> amount = trimmed.substringAfter(":").trim()
+                trimmed.startsWith(tariff) -> tariffValue = trimmed.substringAfter(":").trim()
+                trimmed.startsWith(periodPdf) -> periodMonths = trimmed.substringAfter(":").trim()
+                trimmed.startsWith(nextPaymentPdf) -> nextPayment = trimmed.substringAfter(":").trim()
+
+                trimmed.startsWith("\uD83D\uDD34") -> status = trimmed   // 🔴
+                trimmed.startsWith("\u23F3") -> status = trimmed          // ⏳
+                trimmed.startsWith("\u2705") -> status = trimmed          // ✅
+                trimmed.startsWith("\uD83D\uDD0D") -> status = trimmed    // 🔍
+                trimmed.startsWith("\uD83D\uDEAB") -> status = trimmed    // 🚫
+                trimmed.startsWith("\uD83E\uDD13") -> status = trimmed    // 🤓
+            }
+        }
+
+        return ParsedFields(
+            status = status,
+            amount = amount,
+            tariff = tariffValue,
+            currentReading = currentReading,
+            previousReading = previousReading,
+            consumption = consumption,
+            nextPayment = nextPayment,
+            periodMonths = periodMonths,
+        )
+    }
+
     private fun extractAttachments(block: String): List<Attachment> {
         val pathMap = mutableMapOf<Int, String>()
         val nameMap = mutableMapOf<Int, String>()
@@ -88,48 +156,27 @@ object HistoryParser {
             }
         }
 
-        // Собираем вложения, у которых есть все три поля
-        return pathMap.keys
-            .sorted()
-            .mapNotNull { idx ->
-                val path = pathMap[idx] ?: return@mapNotNull null
-                val name = nameMap[idx] ?: return@mapNotNull null
-                val mime = mimeMap[idx] ?: return@mapNotNull null
-                Attachment(path = path, name = name, mimeType = mime)
-            }
+        return pathMap.keys.sorted().mapNotNull { idx ->
+            val path = pathMap[idx] ?: return@mapNotNull null
+            val name = nameMap[idx] ?: return@mapNotNull null
+            val mime = mimeMap[idx] ?: return@mapNotNull null
+            Attachment(path = path, name = name, mimeType = mime)
+        }
     }
 
-    /**
-     * Обновляет строки вложений в блоке.
-     * Полностью заменяет все строки Вложение/ИмяФайла/MimeType на новые.
-     */
-
     fun updateBlockAttachments(
-        block: String,
-        attachments: List<Attachment>
+        block: String, attachments: List<Attachment>
     ): String {
 
-        // Убираем все старые строки вложений
-        val linesWithoutAttachments = block.lines()
-            .filterNot {
-                val t = it.trim()
-                t.startsWith(HistoryFormat.ATTACHMENT) ||         // старая версия (одно)
-                    t.startsWith(HistoryFormat.FILE_NAME) ||
-                    t.startsWith(HistoryFormat.MIME_TYPE) ||
-                    attachmentPathRegex.matches(t) ||
-                    attachmentNameRegex.matches(t) ||
-                    attachmentMimeRegex.matches(t)
-            }
-            .toMutableList()
+        val linesWithoutAttachments = block.lines().filterNot {
+            val t = it.trim()
+            t.startsWith(HistoryFormat.ATTACHMENT) || t.startsWith(HistoryFormat.FILE_NAME) || t.startsWith(HistoryFormat.MIME_TYPE) || attachmentPathRegex.matches(t) || attachmentNameRegex.matches(t) || attachmentMimeRegex.matches(t)
+        }.toMutableList()
 
-        // Удаляем пустые строки в конце
-        while (linesWithoutAttachments.isNotEmpty() &&
-            linesWithoutAttachments.last().isBlank()
-        ) {
+        while (linesWithoutAttachments.isNotEmpty() && linesWithoutAttachments.last().isBlank()) {
             linesWithoutAttachments.removeAt(linesWithoutAttachments.lastIndex)
         }
 
-        // Добавляем новые вложения с индексами 1, 2, 3...
         attachments.forEachIndexed { i, att ->
             val n = i + 1
             linesWithoutAttachments.add("Вложение$n: ${att.path}")

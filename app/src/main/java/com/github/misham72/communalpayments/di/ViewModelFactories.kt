@@ -135,6 +135,7 @@ class DrainageViewModelFactory(
                 textHistoryUseCase = container.textHistoryUseCase,
                 pdfHistoryUseCase = container.pdfHistoryUseCase,
                 gson = container.gson,
+                historyParser = container.historyParser
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")

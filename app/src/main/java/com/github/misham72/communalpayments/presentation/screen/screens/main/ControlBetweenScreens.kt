@@ -188,7 +188,8 @@ fun ControlBetweenScreens(
                 attachHistoryAttachmentUseCase = appContainer.attachHistoryAttachmentUseCase,
                 removeHistoryAttachmentUseCase = appContainer.removeHistoryAttachmentUseCase,
                 getHistoryAttachmentUseCase = appContainer.getHistoryAttachmentUseCase,
-                appContainer = appContainer
+                appContainer = appContainer,
+                historyParser = appContainer.historyParser
             )
         } else {
             Surface(

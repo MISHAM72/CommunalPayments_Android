@@ -10,12 +10,13 @@ import java.io.ByteArrayInputStream
  * Существующие вложения НЕ удаляются — новое добавляется в конец списка.
  */
 class AttachHistoryAttachmentUseCase(
-    private val fileManager: FileManager
+    private val fileManager: FileManager,
+    private val historyParser: HistoryParser
 ) {
     suspend operator fun invoke(
         serviceKey: String,
         rawBlock: String,
-        currentAttachments: List<Attachment>,   // ← существующие вложения
+        currentAttachments: List<Attachment>,
         bytes: ByteArray,
         fileName: String,
         mimeType: String
@@ -27,7 +28,7 @@ class AttachHistoryAttachmentUseCase(
             fileName = fileName
         )
 
-        // 2. Сформировать новый список: существующие + новое
+        // 2. Сформировать новый список
         val newAttachment = Attachment(
             path = savedPath,
             name = fileName,
@@ -35,13 +36,13 @@ class AttachHistoryAttachmentUseCase(
         )
         val updatedAttachments = currentAttachments + newAttachment
 
-        // 3. Обновить блок в тексте истории
-        val newBlock = HistoryParser.updateBlockAttachments(
+        // 3. Обновить блок
+        val newBlock = historyParser.updateBlockAttachments(
             block = rawBlock,
             attachments = updatedAttachments
         )
 
-        // 4. Заменить в файле истории
+        // 4. Заменить в файле
         val content = fileManager.readHistory(serviceKey)
         if (!content.contains(rawBlock)) {
             throw IllegalStateException(

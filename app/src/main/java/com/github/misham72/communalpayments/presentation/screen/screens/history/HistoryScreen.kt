@@ -92,8 +92,8 @@ fun HistoryScreen(
     removeHistoryAttachmentUseCase: RemoveHistoryAttachmentUseCase,
     getHistoryAttachmentUseCase: GetHistoryAttachmentUseCase,
     appContainer: AppContainer,
-
-    ) {
+    historyParser: HistoryParser,
+) {
     val loadingText = stringResource(R.string.loading)
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -344,10 +344,8 @@ fun HistoryScreen(
 
             }
         } else {
-
-            // === СПИСОК КАРТОЧЕК С ВЛОЖЕНИЯМИ ===
             val records = remember(fileContent, selectedService) {
-                HistoryParser.parse(fileContent, selectedService)
+                historyParser.parse(fileContent, selectedService)
             }
 
             // Имя услуги для форматирования (жирным)

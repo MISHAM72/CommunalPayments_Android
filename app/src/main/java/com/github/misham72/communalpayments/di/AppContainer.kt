@@ -28,6 +28,7 @@ import com.github.misham72.communalpayments.data.repository.periodrepository.Per
 import com.github.misham72.communalpayments.data.repository.provider.ProviderRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.receipt.ReceiptRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.settings.UserSettingsRepositoryImpl
+import com.github.misham72.communalpayments.data.parser.HistoryParser
 import com.github.misham72.communalpayments.data.worker.PaymentWorkerFactory
 import com.github.misham72.communalpayments.domain.constants.ServiceKeys
 import com.github.misham72.communalpayments.domain.usecases.AttachHistoryAttachmentUseCase
@@ -201,11 +202,7 @@ class AppContainer(context: Context) {
         ServiceKeys.OSAGO to context.getString(R.string.service_display_name_osago),
         ServiceKeys.HOSTEL to context.getString(R.string.service_display_name_hostel)
     )
-    private val pdfHistoryRepository = PdfHistoryRepositoryImpl(
-        fileManager = fileManager,
-        accountPrefs = accountPrefs,
-        cacheDir = context.cacheDir,
-        packageName = context.packageName,
+    val historyParser = HistoryParser(
         statusCalculated = context.getString(R.string.status_calculated),
         currentReadingPdf = context.getString(R.string.current_reading_pdf),
         previousReadingPdf = context.getString(R.string.previous_reading_pdf),
@@ -213,6 +210,16 @@ class AppContainer(context: Context) {
         toBePaid = context.getString(R.string.to_be_paid),
         tariff = context.getString(R.string.tariff),
         periodPdf = context.getString(R.string.period_pdf),
+        nextPaymentPdf = context.getString(R.string.next_payment_pdf),
+    )
+    private val pdfHistoryRepository = PdfHistoryRepositoryImpl(
+        fileManager = fileManager,
+        accountPrefs = accountPrefs,
+        cacheDir = context.cacheDir,
+        packageName = context.packageName,
+        historyParser = historyParser,
+        consumptionPdf = context.getString(R.string.consumption_pdf),
+        tariff = context.getString(R.string.tariff),
         nextPaymentPdf = context.getString(R.string.next_payment_pdf),
         pdfTitleHistory = context.getString(R.string.pdf_title_history),
         formed = context.getString(R.string.formed),
@@ -228,7 +235,6 @@ class AppContainer(context: Context) {
         sendPdf = context.getString(R.string.send_pdf),
         dateFormatPattern = DataConstants.DATE_TIME_FORMATE,
         serviceDisplayNames = serviceDisplayNames,
-        historyHeader = "🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩",
     )
 
     val pdfHistoryUseCase = PdfHistoryUseCase(pdfHistoryRepository)
@@ -246,8 +252,8 @@ class AppContainer(context: Context) {
     private val historyRepository = HistoryRepositoryImpl(fileManager)
     val getHistoryUseCase = GetHistoryUseCase(historyRepository)
     val saveHistoryUseCase = SaveHistoryUseCase(historyRepository)
-    val attachHistoryAttachmentUseCase = AttachHistoryAttachmentUseCase(fileManager)
-    val removeHistoryAttachmentUseCase = RemoveHistoryAttachmentUseCase(fileManager)
+    val attachHistoryAttachmentUseCase = AttachHistoryAttachmentUseCase(fileManager, historyParser)
+    val removeHistoryAttachmentUseCase = RemoveHistoryAttachmentUseCase(fileManager, historyParser)
     val getHistoryAttachmentUseCase = GetHistoryAttachmentUseCase(fileManager)
 
     // Доходы
