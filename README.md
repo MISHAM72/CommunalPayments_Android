@@ -163,8 +163,9 @@
 ---
 
 ## 🏗 Сборка и запуск
+
 1. Клонируйте репозиторий:
+   git clone https://github.com/MISHAM72/CommunalPayments_Android.git
 
-
-https://github.com/MISHAM72/CommunalPayments_Android/releases/download/v2.10.0/v2.10.0_code_25_app-release.apk
-https://console.rustore.ru/apps/2063707211
+📥 Скачать APK: https://github.com/MISHAM72/CommunalPayments_Android/releases/download/v2.10.0/v2.10.0_code_25_app-release.apk  
+🏪 RuStore: https://console.rustore.ru/apps/2063707211
