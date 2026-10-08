@@ -317,8 +317,17 @@
     <!-- GARBAGE -->
     <string name="garbage_mode_area">Tariff × Area</string>
     <string name="garbage_mode_residents">Tariff × Residents</string>
-    <string name="garbage_residents_label">Residents, ppl.</string>
     <string name="garbage_tariff_per_person">Tariff: %.2f rub/person</string>
     <string name="garbage_residents_format">Residents: %1$d</string>
+
+    <string name="gas_norm_format">Norm: %.2f m³</string>
+    <string name="gas_people_format">Residents: %d</string>
+    <!-- GAS: modes and fields -->
+    <string name="gas_mode_meter">Meter</string>
+    <string name="gas_mode_norm">Norm</string>
+    <string name="gas_norm_label">Norm, m³</string>
+    <string name="people_count_label">Residents, ppl.</string>
+    <string name="income_categories_title">Income categories</string>
+    <string name="configure_income_categories">⚙️ Income list</string>
 </resources>
 

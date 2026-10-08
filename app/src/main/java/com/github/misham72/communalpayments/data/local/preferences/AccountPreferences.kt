@@ -130,4 +130,29 @@ class AccountPreferences(private val prefs: SharedPreferences) {
     fun getGarbageValue(): String {
         return prefs.getString(DataConstants.GARBAGE_VALUE, "") ?: ""
     }
+
+    // Газ
+    fun saveGasMode(mode: String) {
+        prefs.edit { putString(DataConstants.GAS_MODE, mode) }
+    }
+
+    fun getGasMode(): String {
+        return prefs.getString(DataConstants.GAS_MODE, "METER") ?: "METER"
+    }
+
+    fun saveGasNorm(value: String) {
+        prefs.edit { putString(DataConstants.GAS_NORM, value) }
+    }
+
+    fun getGasNorm(): String {
+        return prefs.getString(DataConstants.GAS_NORM, "") ?: ""
+    }
+
+    fun saveGasPeople(value: String) {
+        prefs.edit { putString(DataConstants.GAS_PEOPLE, value) }
+    }
+
+    fun getGasPeople(): String {
+        return prefs.getString(DataConstants.GAS_PEOPLE, "") ?: ""
+    }
 }

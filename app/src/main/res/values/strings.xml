@@ -358,8 +358,19 @@
     <!-- МУСОР -->
     <string name="garbage_mode_area">Тариф × Площадь</string>
     <string name="garbage_mode_residents">Тариф × Кол-во проживающих</string>
-    <string name="garbage_residents_label">Проживающих, чел.</string>
+
     <string name="garbage_tariff_per_person">Тариф: %.2f руб./чел</string>
     <string name="garbage_residents_format">Проживающих: %1$d чел</string>
+
+    <string name="gas_norm_format">Норматив: %.2f м³</string>
+    <string name="gas_people_format">Проживающих: %d чел</string>
+    <!-- ГАЗ: режимы и поля -->
+    <string name="gas_mode_meter">Счётчик</string>
+    <string name="gas_mode_norm">Норматив</string>
+    <string name="gas_norm_label">Норматив, м³</string>
+    <string name="people_count_label">Проживающих, чел.</string>
+
+    <string name="income_categories_title">Категории доходов</string>
+    <string name="configure_income_categories">⚙️ Список доходов</string>
 
 </resources>

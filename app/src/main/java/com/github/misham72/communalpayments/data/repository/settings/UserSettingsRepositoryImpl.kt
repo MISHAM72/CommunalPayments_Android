@@ -84,4 +84,28 @@ class UserSettingsRepositoryImpl(
     override fun getGarbageValue(): String {
         return accountPrefs.getGarbageValue()
     }
+
+    override fun saveGasMode(mode: String) {
+        accountPrefs.saveGasMode(mode)
+    }
+
+    override fun getGasMode(): String {
+        return accountPrefs.getGasMode()
+    }
+
+    override fun saveGasNorm(value: String) {
+        accountPrefs.saveGasNorm(value)
+    }
+
+    override fun getGasNorm(): String {
+        return accountPrefs.getGasNorm()
+    }
+
+    override fun saveGasPeople(value: String) {
+        accountPrefs.saveGasPeople(value)
+    }
+
+    override fun getGasPeople(): String {
+        return accountPrefs.getGasPeople()
+    }
 }

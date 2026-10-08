@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.github.misham72.communalpayments.domain.model.Attachment
 import com.github.misham72.communalpayments.domain.model.incomes.IncomeRecord
 import com.github.misham72.communalpayments.domain.model.incomes.IncomeSummary
+import com.github.misham72.communalpayments.domain.repository.SelectedIncomeCategoriesRepository
 import com.github.misham72.communalpayments.domain.usecases.IncomeUseCase
 import com.github.misham72.communalpayments.presentation.common.UiMessages
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,7 +27,8 @@ data class IncomeUiState(
 )
 
 class IncomeViewModel(
-    private val incomeUseCase: IncomeUseCase
+    private val incomeUseCase: IncomeUseCase,
+    private val selectedIncomeCategoriesRepository: SelectedIncomeCategoriesRepository
 ) : ViewModel() {
 
     private val _recordsBySource = MutableStateFlow<Map<String, List<IncomeRecord>>>(emptyMap())
@@ -34,6 +36,21 @@ class IncomeViewModel(
 
     private val _uiState = MutableStateFlow(IncomeUiState())
     val uiState: StateFlow<IncomeUiState> = _uiState.asStateFlow()
+    private val _selectedKeys = MutableStateFlow<Set<String>>(emptySet())
+    val selectedKeys: StateFlow<Set<String>> = _selectedKeys.asStateFlow()
+
+    init {
+        refreshSelectedKeys()
+    }
+
+    private fun refreshSelectedKeys() {
+        _selectedKeys.value = selectedIncomeCategoriesRepository.getSelected().keys
+    }
+
+    fun toggleCategory(key: String) {
+        selectedIncomeCategoriesRepository.toggle(key)
+        refreshSelectedKeys()
+    }
 
     fun loadIncome(year: Int = Year.now().value) {
         _uiState.update { it.copy(selectedYear = year) }

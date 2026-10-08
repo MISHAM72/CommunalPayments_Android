@@ -19,6 +19,7 @@ import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
@@ -46,8 +47,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.di.AppContainer
 import com.github.misham72.communalpayments.di.ReceiptsViewModelFactory
-import com.github.misham72.communalpayments.domain.model.ValidationError
 import com.github.misham72.communalpayments.domain.constants.ServiceKeys
+import com.github.misham72.communalpayments.domain.model.ValidationError
+import com.github.misham72.communalpayments.domain.model.metric.GasMode
 import com.github.misham72.communalpayments.presentation.screen.components.EditProviderDetailsDialog
 import com.github.misham72.communalpayments.presentation.screen.components.ProviderDetailsDialog
 import com.github.misham72.communalpayments.presentation.screen.components.ServiceTopBar
@@ -115,31 +117,76 @@ fun GasScreen(viewModel: GasViewModel, appContainer: AppContainer) {
                     modifier = Modifier.padding(top = 1.dp)
                 )
             }
-            OutlinedTextField(
-                value = uiState.currentReading,
-                onValueChange = viewModel::onCurrentReadingChange,
-                label = { Text(stringResource(R.string.current_reading_txt_water_and_gas)) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = 48.dp), // сужаем
-                textStyle = LocalTextStyle.current.copy(
-                    fontSize = 20.sp,
-                    lineHeight = 20.sp
+            // Переключатель режима
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                FilterChip(
+                    selected = uiState.mode == GasMode.METER,
+                    onClick = { viewModel.onModeChange(GasMode.METER) },
+                    label = { Text(stringResource(R.string.gas_mode_meter)) },
+                    modifier = Modifier.weight(1f)
                 )
-            )
+                FilterChip(
+                    selected = uiState.mode == GasMode.NORM,
+                    onClick = { viewModel.onModeChange(GasMode.NORM) },
+                    label = { Text(stringResource(R.string.gas_mode_norm)) },
+                    modifier = Modifier.weight(1f)
+                )
+            }
+            when (uiState.mode) {
+                GasMode.METER -> {
+                    OutlinedTextField(
+                        value = uiState.currentReading,
+                        onValueChange = viewModel::onCurrentReadingChange,
+                        label = { Text(stringResource(R.string.current_reading_txt_water_and_gas)) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = 48.dp), // сужаем
+                        textStyle = LocalTextStyle.current.copy(
+                            fontSize = 20.sp,
+                            lineHeight = 20.sp
+                        )
+                    )
 
-            OutlinedTextField(
-                value = uiState.previousReading,
-                onValueChange = viewModel::onPreviousReadingChange,
-                label = { Text(stringResource(R.string.previous_reading_txt_water_and_gas)) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = 48.dp), // сужаем
-                textStyle = LocalTextStyle.current.copy(
-                    fontSize = 20.sp,
-                    lineHeight = 20.sp
-                )
-            )
+                    OutlinedTextField(
+                        value = uiState.previousReading,
+                        onValueChange = viewModel::onPreviousReadingChange,
+                        label = { Text(stringResource(R.string.previous_reading_txt_water_and_gas)) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = 48.dp), // сужаем
+                        textStyle = LocalTextStyle.current.copy(
+                            fontSize = 20.sp,
+                            lineHeight = 20.sp
+                        )
+                    )
+                }
+
+                GasMode.NORM -> {
+                    // Норматив
+                    OutlinedTextField(
+                        value = uiState.norm,
+                        onValueChange = viewModel::onNormChange,
+                        label = { Text(stringResource(R.string.gas_norm_label)) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = 48.dp),
+                        textStyle = LocalTextStyle.current.copy(fontSize = 20.sp, lineHeight = 20.sp)
+                    )
+                    // Кол-во проживающих
+                    OutlinedTextField(
+                        value = uiState.people,
+                        onValueChange = viewModel::onPeopleChange,
+                        label = { Text(stringResource(R.string.people_count_label)) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = 48.dp),
+                        textStyle = LocalTextStyle.current.copy(fontSize = 20.sp, lineHeight = 20.sp)
+                    )
+                }
+            }
 
             OutlinedTextField(
                 value = uiState.providerDetails.tariff,

@@ -66,4 +66,11 @@ object DataConstants {
     const val GARBAGE_VALUE = "garbage_value"
     const val KEY_SELECTED_SERVICES = "selected_services"
 
+    // Ключи для газа (режим + норматив)
+    const val GAS_MODE = "gas_mode"
+    const val GAS_NORM = "gas_norm"
+    const val GAS_PEOPLE = "gas_people"
+    const val KEY_SELECTED_INCOME_CATEGORIES = "selected_income_categories"
+    const val INCOME_FILE_PREFIX = "income_"
+
 }

@@ -182,7 +182,7 @@ fun GarbageScreen(viewModel: GarbageViewModel, appContainer: AppContainer) {
                         if (uiState.mode == GarbageMode.AREA)
                             stringResource(R.string.area_label)
                         else
-                            stringResource(R.string.garbage_residents_label)
+                            stringResource(R.string.people_count_label)
                     )
                 },
                 modifier = Modifier

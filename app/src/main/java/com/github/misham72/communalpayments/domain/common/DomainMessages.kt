@@ -14,4 +14,5 @@ object DomainMessages {
     const val PERIOD_MUST_BE_POSITIVE = "Период должен быть больше нуля"
     const val DAY_OF_PAYMENTS_MUST_BE_FROM_1_TO_31 = "День платежа должен быть от 1 до 31"
     const val VALUE_MUST_BE_POSITIVE = "Значение должно быть больше 0"
+    const val PEOPLE_MUST_BE_POSITIVE = "Кол-во проживающих должно быть больше 0"
 }

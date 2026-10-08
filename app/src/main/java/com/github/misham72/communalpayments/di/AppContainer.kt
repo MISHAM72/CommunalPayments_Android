@@ -9,7 +9,9 @@ import com.github.misham72.communalpayments.data.local.file.FileManager
 import com.github.misham72.communalpayments.data.local.income.filemanager.IncomeFileManager
 import com.github.misham72.communalpayments.data.local.preferences.AccountPreferences
 import com.github.misham72.communalpayments.data.migration.WaterToColdwaterMigration
+import com.github.misham72.communalpayments.data.parser.HistoryParser
 import com.github.misham72.communalpayments.data.repository.BankRepositoryImpl
+import com.github.misham72.communalpayments.data.repository.SelectedIncomeCategoriesRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.SelectedServicesRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.backup.BackupRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.capitalrepair.CapitalRepairRepositoryImpl
@@ -18,6 +20,7 @@ import com.github.misham72.communalpayments.data.repository.expenses.ExpensesRep
 import com.github.misham72.communalpayments.data.repository.export.PdfHistoryRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.export.TextHistoryRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.garbagerepository.GarbageRepositoryImpl
+import com.github.misham72.communalpayments.data.repository.gasnormrepository.GasNormRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.history.HistoryRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.income.IncomeRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.meterrepository.ColdWaterRepositoryImpl
@@ -28,13 +31,13 @@ import com.github.misham72.communalpayments.data.repository.periodrepository.Per
 import com.github.misham72.communalpayments.data.repository.provider.ProviderRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.receipt.ReceiptRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.settings.UserSettingsRepositoryImpl
-import com.github.misham72.communalpayments.data.parser.HistoryParser
 import com.github.misham72.communalpayments.data.worker.PaymentWorkerFactory
 import com.github.misham72.communalpayments.domain.constants.ServiceKeys
 import com.github.misham72.communalpayments.domain.usecases.AttachHistoryAttachmentUseCase
 import com.github.misham72.communalpayments.domain.usecases.DeleteReceiptUseCase
 import com.github.misham72.communalpayments.domain.usecases.ExportBackupUseCase
 import com.github.misham72.communalpayments.domain.usecases.GarbageDataUseCase
+import com.github.misham72.communalpayments.domain.usecases.GasNormUseCase
 import com.github.misham72.communalpayments.domain.usecases.GetExpensesUseCase
 import com.github.misham72.communalpayments.domain.usecases.GetHistoryAttachmentUseCase
 import com.github.misham72.communalpayments.domain.usecases.GetHistoryUseCase
@@ -66,6 +69,7 @@ class AppContainer(context: Context) {
         PaymentWorkerFactory(accountPrefs, selectedServicesRepository)
     }
     val selectedServicesRepository = SelectedServicesRepositoryImpl(sharedPrefs)
+    val selectedIncomeCategoriesRepository = SelectedIncomeCategoriesRepositoryImpl(sharedPrefs)
 
     // Репозитории
     val settingsRepository = UserSettingsRepositoryImpl(accountPrefs)
@@ -138,7 +142,18 @@ class AppContainer(context: Context) {
         serviceName = context.getString(R.string.service_display_name_gas),
         unit = context.getString(R.string.unit_cubic_meter)
     )
+    private val gasNormRepository = GasNormRepositoryImpl(
+        fileManager = fileManager,
+        dateFormatPattern = DataConstants.DATE_TIME_FORMATE,
+        personalAccountTemplate = context.getString(R.string.personal_account_in_text_history),
+        currencyTemplate = context.getString(R.string.currency_rub),
+        normTemplate = context.getString(R.string.gas_norm_format),
+        peopleTemplate = context.getString(R.string.gas_people_format),
+        tariffTemplate = context.getString(R.string.tariff_card),
+        serviceDisplayName = context.getString(R.string.service_display_name_gas)
+    )
 
+    val gasNormUseCase = GasNormUseCase(repository = gasNormRepository)
     // Репозиторий для периодических услуг
 
     private val periodicRepository = PeriodicRepositoryImpl(
@@ -263,7 +278,8 @@ class AppContainer(context: Context) {
     private val incomeRepository = IncomeRepositoryImpl(incomeFileManager)
     private val incomeUseCase = IncomeUseCase(incomeRepository)
 
-    val incomeViewModelFactory = IncomeViewModelFactory(incomeUseCase)
+    val incomeViewModelFactory = IncomeViewModelFactory(incomeUseCase, selectedIncomeCategoriesRepository)
+
 
     // Аналитика (расходы)
     private val expensesRepository = ExpensesRepositoryImpl(fileManager)
@@ -303,6 +319,22 @@ class AppContainer(context: Context) {
         } else emptySet()
 
         selectedServicesRepository.initializeFromExistingServices(existingServiceKeys)
+        // Миграция: собрать все ключи категорий из файлов доходов
+        val incomeDir = File(context.filesDir, DataConstants.INCOME_HISTORY_DIR)
+        val existingIncomeKeys: Set<String> = if (incomeDir.exists()) {
+            incomeDir.listFiles()
+                ?.filter { it.isFile && it.name.startsWith(DataConstants.INCOME_FILE_PREFIX) && it.extension == DataConstants.TXT_EXTENSION }
+                ?.flatMap { file ->
+                    file.readText()
+                        .lines()
+                        .filter { it.startsWith(DataConstants.LABEL_SOURCE) }
+                        .map { it.substringAfter(DataConstants.LABEL_SOURCE).trim() }
+                }
+                ?.toSet()
+                ?: emptySet()
+        } else emptySet()
+
+        selectedIncomeCategoriesRepository.initializeFromExisting(existingIncomeKeys)
     }
 }
 

@@ -24,4 +24,12 @@ interface UserSettingsRepository {
     fun saveGarbageValue(value: String)
     fun getGarbageValue(): String
 
+    // Газ
+    fun saveGasMode(mode: String)
+    fun getGasMode(): String
+    fun saveGasNorm(value: String)
+    fun getGasNorm(): String
+    fun saveGasPeople(value: String)
+    fun getGasPeople(): String
+
 }

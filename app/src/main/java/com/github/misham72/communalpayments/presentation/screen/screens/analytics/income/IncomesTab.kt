@@ -3,6 +3,7 @@ package com.github.misham72.communalpayments.presentation.screen.screens.analyti
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,6 +24,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -45,6 +47,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.di.IncomeViewModelFactory
+import com.github.misham72.communalpayments.domain.model.incomes.IncomeCategory
 import com.github.misham72.communalpayments.presentation.common.UiConstants
 import com.github.misham72.communalpayments.presentation.screen.screens.analytics.Period
 import com.github.misham72.communalpayments.presentation.screen.screens.analytics.IncomeViewModel
@@ -54,7 +57,6 @@ import com.github.misham72.communalpayments.presentation.screen.screens.analytic
 import com.github.misham72.communalpayments.presentation.screen.screens.analytics.components.monthName
 import com.github.misham72.communalpayments.presentation.utils.nameRes
 
-// ---------- Вкладка доходов ----------
 @Composable
 fun IncomesTab(factory: IncomeViewModelFactory) {
     val viewModel: IncomeViewModel = viewModel(factory = factory)
@@ -62,7 +64,8 @@ fun IncomesTab(factory: IncomeViewModelFactory) {
     var showAddDialog by remember { mutableStateOf(false) }
     var selectedSourceForEdit by remember { mutableStateOf<String?>(null) }
     var showDeleteSourceConfirm by remember { mutableStateOf<String?>(null) }
-
+    var showCategoryDialog by remember { mutableStateOf(false) }
+    val selectedKeys by viewModel.selectedKeys.collectAsStateWithLifecycle()
     LaunchedEffect(Unit) {
         viewModel.loadIncome()
     }
@@ -110,7 +113,6 @@ fun IncomesTab(factory: IncomeViewModelFactory) {
                         Spacer(modifier = Modifier.height(8.dp))
                     }
                 }
-
                 item {
                     Card(
                         modifier = Modifier.fillMaxWidth(),
@@ -144,7 +146,11 @@ fun IncomesTab(factory: IncomeViewModelFactory) {
                     IncomesChart(summary)
                 }
 
-                val sources = summary.bySource.toList().sortedBy { (category, _) -> category.order }
+                // ФИЛЬТРАЦИЯ по выбранным категориям
+                val sources = summary.bySource.toList()
+                    .filter { (category, _) -> selectedKeys.isEmpty() || category.name in selectedKeys }
+                    .sortedBy { (category, _) -> category.order }
+
                 if (sources.isNotEmpty()) {
                     items(sources.size) { index ->
                         val (category, total) = sources[index]
@@ -271,6 +277,14 @@ fun IncomesTab(factory: IncomeViewModelFactory) {
                     Button(onClick = { showAddDialog = true }) {
                         Text(stringResource(R.string.add_income))
                     }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Button(
+                        onClick = { showCategoryDialog = true },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(stringResource(R.string.configure_income_categories))
+                    }
+                    Spacer(modifier = Modifier.height(12.dp))
                 }
             }
         }
@@ -320,4 +334,57 @@ fun IncomesTab(factory: IncomeViewModelFactory) {
             }
         )
     }
+
+    // Диалог выбора категорий
+    if (showCategoryDialog) {
+        IncomeCategoriesDialog(
+            selectedKeys = selectedKeys,
+            onToggle = { key -> viewModel.toggleCategory(key) },
+            onDismiss = { showCategoryDialog = false }
+        )
+    }
+}
+
+@Composable
+private fun IncomeCategoriesDialog(
+    selectedKeys: Set<String>,
+    onToggle: (String) -> Unit,
+    onDismiss: () -> Unit
+) {
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.income_categories_title)) },
+        text = {
+            Column {
+                IncomeCategory.entries.forEach { category ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                onToggle(category.name)
+                            }
+                            .padding(vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = stringResource(category.nameRes()),
+                            modifier = Modifier.weight(1f)
+                        )
+                        Checkbox(
+                            checked = category.name in selectedKeys,
+                            onCheckedChange = {
+                                onToggle(category.name)
+                            }
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.close))
+            }
+        }
+    )
 }

@@ -16,6 +16,9 @@ import com.github.misham72.communalpayments.domain.usecases.PdfHistoryUseCase
 import com.github.misham72.communalpayments.domain.usecases.MeterDataUseCase
 import com.github.misham72.communalpayments.domain.usecases.TextHistoryUseCase
 import com.github.misham72.communalpayments.domain.constants.ServiceKeys
+import com.github.misham72.communalpayments.domain.model.metric.GasMode
+import com.github.misham72.communalpayments.domain.model.metric.GasNormData
+import com.github.misham72.communalpayments.domain.usecases.GasNormUseCase
 import com.google.gson.Gson
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,6 +29,7 @@ import kotlinx.coroutines.launch
 
 class GasViewModel(
     private val meterDataUseCase: MeterDataUseCase,
+    private val gasNormUseCase: GasNormUseCase,
     private val meterRepository: MeterRepository,
     private val settingsRepository: UserSettingsRepository,
     private val repository: IProviderRepository,
@@ -41,12 +45,17 @@ class GasViewModel(
     data class UiState(
         val currentReading: String = "",
         val previousReading: String = "",
+        val mode: GasMode = GasMode.METER,                 // ← НОВОЕ
+        val norm: String = "",                              // ← НОВОЕ
+        val people: String = "",
         val providerDetails: ProviderDetails = ProviderDetails(),
         val showAccountDialog: Boolean = false,   // флаг для диалога
         val customDate: String = "",
         val result: MeterData? = null,
         val error: ValidationError? = null,
         val lastResult: MeterData? = null,
+        val normResult: GasNormData? = null,                // ← НОВОЕ
+        val lastNormResult: GasNormData? = null,
         val showLastResult: Boolean = false
     )
 
@@ -64,13 +73,24 @@ class GasViewModel(
             val lastResult = savedJson?.let { gson.fromJson(it, GasData::class.java) }
             _uiState.update { it.copy(lastResult = lastResult) }
 
+            val savedMode = try {
+                GasMode.valueOf(settingsRepository.getGasMode())
+            } catch (_: Exception) {
+                GasMode.METER
+            }
+            val savedNorm = settingsRepository.getGasNorm()
+            val savedPeople = settingsRepository.getGasPeople()
+
             _uiState.update { currentState ->
                 currentState.copy(
                     providerDetails = details.copy(
                         tariff = savedTariff.ifBlank { details.tariff }
                     ),
                     previousReading = savedLastReading,
-                    customDate = savedDate
+                    customDate = savedDate,
+                    mode = savedMode,
+                    norm = savedNorm,
+                    people = savedPeople
                 )
             }
         }
@@ -127,12 +147,34 @@ class GasViewModel(
         }
     }
 
+    fun onModeChange(mode: GasMode) {
+        _uiState.update { it.copy(mode = mode, result = null, normResult = null, error = null) }
+        viewModelScope.launch {
+            settingsRepository.saveGasMode(mode.name)
+        }
+    }
+
+    fun onNormChange(value: String) {
+        _uiState.update { it.copy(norm = value) }
+    }
+
+    fun onPeopleChange(value: String) {
+        _uiState.update { it.copy(people = value) }
+    }
+
     fun onCalculateClick() {
-        val current = _uiState.value.currentReading.toDoubleOrNull() //Преобразует строки из полей ввода в числа (или null, если введена ерунда).
-        val previous = _uiState.value.previousReading.toDoubleOrNull() //Преобразует строки из полей ввода в числа (или null, если введена ерунда).
-        val tariff = _uiState.value.providerDetails.tariff.toDoubleOrNull() //Преобразует строки из полей ввода в числа (или null, если введена ерунда).
+        when (_uiState.value.mode) {
+            GasMode.METER -> calculateMeter()
+            GasMode.NORM -> calculateNorm()
+        }
+    }
+
+    private fun calculateMeter() {
+        val current = _uiState.value.currentReading.toDoubleOrNull()
+        val previous = _uiState.value.previousReading.toDoubleOrNull()
+        val tariff = _uiState.value.providerDetails.tariff.toDoubleOrNull()
         val account = _uiState.value.providerDetails.accountNumber
-        //Если хоть одно поле пустое или содержит не число — показывает ошибку и останавливается.
+
         if (current == null || previous == null || tariff == null) {
             _uiState.update { it.copy(error = ValidationError.InvalidInput) }
             return
@@ -152,22 +194,66 @@ class GasViewModel(
                 settingsRepository.saveLastResult(SERVICE_KEY, gson.toJson(data))
                 _uiState.update { state ->
                     state.copy(
-                        previousReading = state.currentReading, // перенос
-                        currentReading = "",                           // очистка для следующего ввода
+                        previousReading = state.currentReading,
+                        currentReading = "",
                         result = data,
                         error = null,
                         lastResult = data
                     )
                 }
             } catch (e: InvalidReadingException) {
-                // 🛑 Ловим доменное исключение и показываем пользователю
                 _uiState.update {
                     it.copy(
-                        error = ValidationError.DomainError(e.message ?: DomainMessages.DEFAULT_VALIDATION_ERROR),
+                        error = ValidationError.DomainError(
+                            e.message ?: DomainMessages.DEFAULT_VALIDATION_ERROR
+                        ),
                         result = null
                     )
                 }
             }
         }
     }
+
+    private fun calculateNorm() {
+        val norm = _uiState.value.norm.toDoubleOrNull()
+        val people = _uiState.value.people.toIntOrNull()
+        val tariff = _uiState.value.providerDetails.tariff.toDoubleOrNull()
+
+        if (norm == null || people == null || tariff == null) {
+            _uiState.update { it.copy(error = ValidationError.InvalidInput) }
+            return
+        }
+
+        viewModelScope.launch {
+            try {
+                val data = gasNormUseCase.collectGasNorm(
+                    serviceKey = SERVICE_KEY,
+                    isHistory = true,
+                    norm = norm,
+                    people = people,
+                    tariff = tariff
+                )
+                settingsRepository.saveGasNorm(norm.toString())
+                settingsRepository.saveGasPeople(people.toString())
+                settingsRepository.saveLastResult(SERVICE_KEY, gson.toJson(data))
+                _uiState.update { state ->
+                    state.copy(
+                        normResult = data,
+                        lastNormResult = data,
+                        error = null
+                    )
+                }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        error = ValidationError.DomainError(
+                            e.message ?: DomainMessages.DEFAULT_VALIDATION_ERROR
+                        ),
+                        normResult = null
+                    )
+                }
+            }
+        }
+    }
 }
+

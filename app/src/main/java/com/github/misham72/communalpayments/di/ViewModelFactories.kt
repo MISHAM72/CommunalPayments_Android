@@ -2,6 +2,7 @@ package com.github.misham72.communalpayments.di
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.github.misham72.communalpayments.domain.repository.SelectedIncomeCategoriesRepository
 import com.github.misham72.communalpayments.domain.usecases.DeleteReceiptUseCase
 import com.github.misham72.communalpayments.domain.usecases.GetExpensesUseCase
 import com.github.misham72.communalpayments.domain.usecases.GetReceiptsUseCase
@@ -54,6 +55,7 @@ class GasViewModelFactory(
         if (modelClass.isAssignableFrom(GasViewModel::class.java)) {
             return GasViewModel(
                 meterDataUseCase = container.meterDataUseCase,
+                gasNormUseCase = container.gasNormUseCase,
                 meterRepository = container.gasRepository,
                 settingsRepository = container.settingsRepository,
                 repository = container.providerRepository,
@@ -319,16 +321,16 @@ class ReceiptsViewModelFactory(
 }
 
 class IncomeViewModelFactory(
-    private val incomeUseCase: IncomeUseCase
+    private val incomeUseCase: IncomeUseCase,
+    private val selectedIncomeCategoriesRepository: SelectedIncomeCategoriesRepository
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(IncomeViewModel::class.java)) {
-            return IncomeViewModel(incomeUseCase) as T
+            return IncomeViewModel(incomeUseCase, selectedIncomeCategoriesRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
-
 
 class ExpensesViewModelFactory(
     private val useCase: GetExpensesUseCase,
