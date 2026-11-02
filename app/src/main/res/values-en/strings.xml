@@ -105,6 +105,7 @@
     <string name="tariff_card">Rate:  %.2f us$.</string>
 
 
+    <string name="phone_not_specified">Phone not specified</string>
     <string name="change_personal_account">Change your personal account</string>
 
     <string name="unknown_error">Unknown error</string>
@@ -233,6 +234,8 @@
     <string name="bank_account_label_not_specified">B/A not specified</string>
     <string name="tariff_details">Tariff: %s</string>
     <string name="enter_personal_account">Enter personal account</string>
+    <string name="email_address">e-mail address: %s</string>
+    <string name="email_not_specified">e-mail not specified</string>
 
     <string name="website_label">Service website</string>
     <string name="website_hint">https://example.com</string>
@@ -325,9 +328,26 @@
     <!-- GAS: modes and fields -->
     <string name="gas_mode_meter">Meter</string>
     <string name="gas_mode_norm">Norm</string>
+    <string name="gas_norm_value">Norm: %1$s m³/person</string>
+    <string name="gas_people_value">Residents: %1$d</string>
+    <string name="heating_mode_meter">Meter</string>
+    <string name="heating_mode_period">Period</string>
     <string name="gas_norm_label">Norm, m³</string>
     <string name="people_count_label">Residents, ppl.</string>
     <string name="income_categories_title">Income categories</string>
     <string name="configure_income_categories">⚙️ Income list</string>
+
+    <string name="current_reading_txt_heating">Current reading, Gcal</string>
+    <string name="previous_reading_txt_heating">Previous reading, Gcal</string>
+
+    <string name="unit_gcal">Gcal</string>
+
+    <string name="enter_name_company">Enter the name of the company</string>
+    <string name="enter_inn">Enter the INN</string>
+    <string name="enter_bank_account">Enter the bank account</string>
+    <string name="phone">Phone</string>
+    <string name="email">e-mail</string>
+    <string name="edit">Edit</string>
+
 </resources>
 

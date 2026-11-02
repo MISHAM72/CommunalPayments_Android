@@ -42,6 +42,12 @@ fun EditProviderDetailsDialog(
     var tempDetails by remember { mutableStateOf(details) }
     var tempDate by remember { mutableStateOf(customDate) }
 
+    val enterNameCompany = stringResource(R.string.enter_name_company)
+    val enterInn = stringResource(R.string.enter_inn)
+    val enterBankAccount = stringResource(R.string.enter_bank_account)
+    val enterPersonalAccount = stringResource(R.string.enter_personal_account)
+
+
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.edit_bank_details)) },
@@ -68,6 +74,12 @@ fun EditProviderDetailsDialog(
                     value = tempDetails.accountNumber,
                     onValueChange = { tempDetails = tempDetails.copy(accountNumber = it) },
                     label = { Text(stringResource(R.string.personal_account_label)) },
+                    isError = tempDetails.accountNumber.isBlank(),
+                    supportingText = {
+                        if (tempDetails.inn.isBlank()) {
+                            Text(stringResource(R.string.enter_personal_account))
+                        }
+                    },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -86,6 +98,12 @@ fun EditProviderDetailsDialog(
                     value = tempDetails.nameCompany,
                     onValueChange = { tempDetails = tempDetails.copy(nameCompany = it) },
                     label = { Text(stringResource(R.string.name_company)) },
+                    isError = tempDetails.nameCompany.isBlank(),
+                    supportingText = {
+                        if (tempDetails.inn.isBlank()) {
+                            Text(stringResource(R.string.enter_name_company))
+                        }
+                    },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -95,6 +113,12 @@ fun EditProviderDetailsDialog(
                     value = tempDetails.inn,
                     onValueChange = { tempDetails = tempDetails.copy(inn = it) },
                     label = { Text(stringResource(R.string.inn_label)) },
+                    isError = tempDetails.inn.isBlank(),
+                    supportingText = {
+                        if (tempDetails.inn.isBlank()) {
+                            Text(stringResource(R.string.enter_inn))
+                        }
+                    },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -104,11 +128,28 @@ fun EditProviderDetailsDialog(
                     value = tempDetails.bankAccount,
                     onValueChange = { tempDetails = tempDetails.copy(bankAccount = it) },
                     label = { Text(stringResource(R.string.bank_account)) },
+                    isError = tempDetails.bankAccount.isBlank(),
+                    supportingText = {
+                        if (tempDetails.inn.isBlank()) {
+                            Text(stringResource(R.string.enter_bank_account))
+                        }
+                    },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
-
-
+                OutlinedTextField(
+                    value = tempDetails.phone,
+                    onValueChange = { tempDetails = tempDetails.copy(phone = it) },
+                    label = { Text(stringResource(R.string.phone)) },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                OutlinedTextField(
+                    value = tempDetails.email,
+                    onValueChange = { tempDetails = tempDetails.copy(email = it) },
+                    label = { Text(stringResource(R.string.email)) },
+                    singleLine = true,
+                )
                 OutlinedTextField(
                     value = tempDetails.websiteUrl,  // ← берем из tempDetails
                     onValueChange = { tempDetails = tempDetails.copy(websiteUrl = it) }, // ← сохраняем в tempDetails
@@ -143,9 +184,14 @@ fun EditProviderDetailsDialog(
         confirmButton = {
             TextButton(
                 onClick = {
-                    // Проверка на пустые важные поля (опционально)
-                    if (tempDetails.accountNumber.isBlank()) {
-                        Toast.makeText(context, (R.string.enter_personal_account), Toast.LENGTH_SHORT).show()
+                    val missing = buildList {
+                        if (tempDetails.nameCompany.isBlank()) add(enterNameCompany)
+                        if (tempDetails.inn.isBlank()) add(enterInn)
+                        if (tempDetails.bankAccount.isBlank()) add(enterBankAccount)
+                        if (tempDetails.accountNumber.isBlank()) add(enterPersonalAccount)
+                    }
+                    if (missing.isNotEmpty()) {
+                        Toast.makeText(context, missing.joinToString("\n"), Toast.LENGTH_LONG).show()
                         return@TextButton
                     }
                     onSave(tempDetails, tempDate)

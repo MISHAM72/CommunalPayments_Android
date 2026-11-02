@@ -47,8 +47,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.di.AppContainer
 import com.github.misham72.communalpayments.di.ReceiptsViewModelFactory
-import com.github.misham72.communalpayments.domain.model.ValidationError
 import com.github.misham72.communalpayments.domain.constants.ServiceKeys
+import com.github.misham72.communalpayments.domain.model.ValidationError
 import com.github.misham72.communalpayments.presentation.screen.components.EditProviderDetailsDialog
 import com.github.misham72.communalpayments.presentation.screen.components.ProviderDetailsDialog
 import com.github.misham72.communalpayments.presentation.screen.components.ServiceTopBar
@@ -258,19 +258,23 @@ fun HotWaterScreen(viewModel: HotWaterViewModel, appContainer: AppContainer) {
         }
         // Диалог выбора: ИНН или Л/С
         if (showProviderDialog.value) {
-            ProviderDetailsDialog(providerDetails = uiState.providerDetails, onDismiss = { showProviderDialog.value = false }, onCopyText = { text ->
-                clipboardManager.setText(AnnotatedString(text))
-                Toast.makeText(context, R.string.copied, Toast.LENGTH_SHORT).show()
-            }, onOpenUrl = { url ->
-                val finalUrl = url.normalizeUrl()
-                val intent = Intent(Intent.ACTION_VIEW, finalUrl.toUri())
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                try {
-                    context.startActivity(intent)
-                } catch (_: Exception) {
-                    Toast.makeText(context, R.string.no_browser, Toast.LENGTH_SHORT).show()
-                }
-            })
+            ProviderDetailsDialog(
+                providerDetails = uiState.providerDetails,
+                onDismiss = { showProviderDialog.value = false },
+                onCopyText = { text ->
+                    clipboardManager.setText(AnnotatedString(text))
+                    Toast.makeText(context, R.string.copied, Toast.LENGTH_SHORT).show()
+                },
+                onOpenUrl = { url ->
+                    val finalUrl = url.normalizeUrl()
+                    val intent = Intent(Intent.ACTION_VIEW, finalUrl.toUri())
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    try {
+                        context.startActivity(intent)
+                    } catch (_: Exception) {
+                        Toast.makeText(context, R.string.no_browser, Toast.LENGTH_SHORT).show()
+                    }
+                })
         }
         if (uiState.showAccountDialog) {
             EditProviderDetailsDialog(

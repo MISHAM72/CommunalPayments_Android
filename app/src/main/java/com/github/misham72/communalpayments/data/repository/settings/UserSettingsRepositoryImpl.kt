@@ -69,6 +69,18 @@ class UserSettingsRepositoryImpl(
         }
     }
 
+    override suspend fun saveLastMeterResult(serviceKey: String, result: String) {
+        withContext(Dispatchers.IO) {
+            accountPrefs.saveString(DataConstants.LAST_METER_RESULT_PREFIX + serviceKey, result)
+        }
+    }
+
+    override suspend fun getLastMeterResult(serviceKey: String): String? {
+        return withContext(Dispatchers.IO) {
+            accountPrefs.getString(DataConstants.LAST_METER_RESULT_PREFIX + serviceKey)
+        }
+    }
+
     override fun saveGarbageMode(mode: String) {
         accountPrefs.saveGarbageMode(mode)
     }
@@ -107,5 +119,13 @@ class UserSettingsRepositoryImpl(
 
     override fun getGasPeople(): String {
         return accountPrefs.getGasPeople()
+    }
+
+    override fun saveHeatingMode(mode: String) {
+        accountPrefs.saveHeatingMode(mode)
+    }
+
+    override fun getHeatingMode(): String {
+        return accountPrefs.getHeatingMode()
     }
 }

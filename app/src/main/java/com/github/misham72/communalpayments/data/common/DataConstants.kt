@@ -35,6 +35,7 @@ object DataConstants {
     const val INCOME_RECORD_DATE_PATTERN = "yyyy-MM-dd"
     const val RECEIPTS_DIR = "receipts"
     const val LAST_RESULT_PREFIX = "last_result_"
+    const val LAST_METER_RESULT_PREFIX = "last_meter_result_"
     const val DATE_TIME_FORMATE = "yyyy-MM-dd HH:mm:ss"
     const val HISTORY_SEPARATOR = "🟩"
     const val HISTORY_SEPARATOR_COUNT = 12
@@ -63,6 +64,7 @@ object DataConstants {
 
     // Ключи для мусора
     const val GARBAGE_MODE = "garbage_mode"
+    const val HEATING_MODE = "heating_mode"
     const val GARBAGE_VALUE = "garbage_value"
     const val KEY_SELECTED_SERVICES = "selected_services"
 
@@ -72,5 +74,7 @@ object DataConstants {
     const val GAS_PEOPLE = "gas_people"
     const val KEY_SELECTED_INCOME_CATEGORIES = "selected_income_categories"
     const val INCOME_FILE_PREFIX = "income_"
+    const val TELEPHONE_NUMBER = "tel"
+    const val EMAIL = "email"
 
 }

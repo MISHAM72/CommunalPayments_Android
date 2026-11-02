@@ -4,21 +4,21 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.misham72.communalpayments.domain.common.DomainMessages
+import com.github.misham72.communalpayments.domain.constants.ServiceKeys
 import com.github.misham72.communalpayments.domain.exceptions.InvalidReadingException
 import com.github.misham72.communalpayments.domain.model.ProviderDetails
 import com.github.misham72.communalpayments.domain.model.ValidationError
 import com.github.misham72.communalpayments.domain.model.metric.GasData
+import com.github.misham72.communalpayments.domain.model.metric.GasMode
+import com.github.misham72.communalpayments.domain.model.metric.GasNormData
 import com.github.misham72.communalpayments.domain.model.metric.MeterData
 import com.github.misham72.communalpayments.domain.repository.IProviderRepository
 import com.github.misham72.communalpayments.domain.repository.MeterRepository
 import com.github.misham72.communalpayments.domain.repository.UserSettingsRepository
-import com.github.misham72.communalpayments.domain.usecases.PdfHistoryUseCase
-import com.github.misham72.communalpayments.domain.usecases.MeterDataUseCase
-import com.github.misham72.communalpayments.domain.usecases.TextHistoryUseCase
-import com.github.misham72.communalpayments.domain.constants.ServiceKeys
-import com.github.misham72.communalpayments.domain.model.metric.GasMode
-import com.github.misham72.communalpayments.domain.model.metric.GasNormData
 import com.github.misham72.communalpayments.domain.usecases.GasNormUseCase
+import com.github.misham72.communalpayments.domain.usecases.MeterDataUseCase
+import com.github.misham72.communalpayments.domain.usecases.PdfHistoryUseCase
+import com.github.misham72.communalpayments.domain.usecases.TextHistoryUseCase
 import com.google.gson.Gson
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -45,8 +45,8 @@ class GasViewModel(
     data class UiState(
         val currentReading: String = "",
         val previousReading: String = "",
-        val mode: GasMode = GasMode.METER,                 // ← НОВОЕ
-        val norm: String = "",                              // ← НОВОЕ
+        val mode: GasMode = GasMode.METER,
+        val norm: String = "",
         val people: String = "",
         val providerDetails: ProviderDetails = ProviderDetails(),
         val showAccountDialog: Boolean = false,   // флаг для диалога
@@ -54,9 +54,10 @@ class GasViewModel(
         val result: MeterData? = null,
         val error: ValidationError? = null,
         val lastResult: MeterData? = null,
-        val normResult: GasNormData? = null,                // ← НОВОЕ
+        val normResult: GasNormData? = null,
         val lastNormResult: GasNormData? = null,
-        val showLastResult: Boolean = false
+        val showLastResult: Boolean = false,
+        val displayResult: DisplayResult? = null
     )
 
     private val _uiState = MutableStateFlow(UiState())  //✅ MutableStateFlow для изменяемого состояния
@@ -93,6 +94,17 @@ class GasViewModel(
                     people = savedPeople
                 )
             }
+            updateDisplayResult()
+        }
+    }
+
+    private fun updateDisplayResult() {
+        _uiState.update { state ->
+            val display = when (state.mode) {
+                GasMode.METER -> state.lastResult?.let { DisplayResult.Meter(it) }
+                GasMode.NORM -> state.lastNormResult?.let { DisplayResult.Norm(it) }
+            }
+            state.copy(displayResult = display)
         }
     }
 
@@ -149,6 +161,7 @@ class GasViewModel(
 
     fun onModeChange(mode: GasMode) {
         _uiState.update { it.copy(mode = mode, result = null, normResult = null, error = null) }
+        updateDisplayResult()
         viewModelScope.launch {
             settingsRepository.saveGasMode(mode.name)
         }
@@ -201,6 +214,7 @@ class GasViewModel(
                         lastResult = data
                     )
                 }
+                updateDisplayResult()
             } catch (e: InvalidReadingException) {
                 _uiState.update {
                     it.copy(
@@ -243,6 +257,7 @@ class GasViewModel(
                         error = null
                     )
                 }
+                updateDisplayResult()
             } catch (e: Exception) {
                 _uiState.update {
                     it.copy(

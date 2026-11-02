@@ -11,6 +11,8 @@ interface UserSettingsRepository {
 
     // Чтение (добавить)
     suspend fun getLastReading(serviceKey: String): String?
+    suspend fun saveLastMeterResult(serviceKey: String, result: String)
+    suspend fun getLastMeterResult(serviceKey: String): String?
     suspend fun getTariff(serviceKey: String): String?
     suspend fun getPaymentDay(serviceKey: String): String?
     suspend fun getPeriodMonths(serviceKey: String): String?
@@ -32,4 +34,7 @@ interface UserSettingsRepository {
     fun saveGasPeople(value: String)
     fun getGasPeople(): String
 
+    //Отопление
+    fun saveHeatingMode(mode: String)
+    fun getHeatingMode(): String
 }

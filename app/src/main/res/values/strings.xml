@@ -240,6 +240,9 @@
     <string name="bank_account_not_specified">Расчётный счёт не указан.</string>
     <string name="bank_account_label">Р/С: %1$s</string>
     <string name="bank_account_label_not_specified">Р/С не указан</string>
+    <string name="phone_not_specified">Телефон не указан.</string>
+    <string name="email_address">e-mail адрес: %s</string>
+    <string name="email_not_specified">e-mail не указан.</string>
 
     <!-- ЛИЦЕВОЙ СЧЕТ  -->
     <string name="change_personal_account">Изменить лицевой счёт</string>
@@ -367,10 +370,28 @@
     <!-- ГАЗ: режимы и поля -->
     <string name="gas_mode_meter">Счётчик</string>
     <string name="gas_mode_norm">Норматив</string>
+    <string name="heating_mode_meter">Счётчик</string>
+    <string name="heating_mode_period">Период</string>
     <string name="gas_norm_label">Норматив, м³</string>
     <string name="people_count_label">Проживающих, чел.</string>
+    <string name="gas_norm_value">Норматив: %1$s м³/чел</string>
+    <string name="gas_people_value">Проживающих: %1$d</string>
 
     <string name="income_categories_title">Категории доходов</string>
     <string name="configure_income_categories">⚙️ Список доходов</string>
+
+    <string name="current_reading_txt_heating">Текущее показание, Гкал</string>
+    <string name="previous_reading_txt_heating">Предыдущее показание, Гкал</string>
+
+    <string name="unit_gcal">Гкал</string>
+
+    <string name="enter_name_company">Введите название компании</string>
+    <string name="enter_inn">Введите ИНН</string>
+    <string name="enter_bank_account">Введите расчётный счёт</string>
+    <string name="phone">Телефон</string>
+    <string name="email">e-mail</string>
+    <string name="edit">Редактировать</string>
+
+
 
 </resources>

@@ -3,7 +3,7 @@ package com.github.misham72.communalpayments.domain.model.periodic
 import java.util.Date
 
 data class PeriodicData(
-    val serviceKey: String,          // уникальный ключ услуги
+    val serviceKey: String,
     val isHistory: Boolean,
     val nextPayment: String,
     val priceTariff: Double,

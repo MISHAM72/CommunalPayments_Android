@@ -8,5 +8,7 @@ data class ProviderDetails(
     val nameCompany: String = "",
     val inn: String = "",
     val bankAccount: String = "",
+    val phone: String = "",
+    val email: String = "",
     val websiteUrl: String = ""
 )

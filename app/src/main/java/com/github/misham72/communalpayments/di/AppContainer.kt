@@ -26,6 +26,7 @@ import com.github.misham72.communalpayments.data.repository.income.IncomeReposit
 import com.github.misham72.communalpayments.data.repository.meterrepository.ColdWaterRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.meterrepository.ElectricityRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.meterrepository.GasRepositoryImpl
+import com.github.misham72.communalpayments.data.repository.meterrepository.HeatingRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.meterrepository.HotWaterRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.periodrepository.PeriodicRepositoryImpl
 import com.github.misham72.communalpayments.data.repository.provider.ProviderRepositoryImpl
@@ -152,7 +153,18 @@ class AppContainer(context: Context) {
         tariffTemplate = context.getString(R.string.tariff_card),
         serviceDisplayName = context.getString(R.string.service_display_name_gas)
     )
-
+    val heatingRepository = HeatingRepositoryImpl(
+        fileManager = fileManager,
+        dateFormatPattern = DataConstants.DATE_TIME_FORMATE,
+        personalAccountTemplate = context.getString(R.string.personal_account_in_text_history),
+        currentReadingTemplate = context.getString(R.string.current_reading),
+        previousReadingTemplate = context.getString(R.string.previous_reading),
+        tariffTemplate = context.getString(R.string.tariff_card),
+        consumptionTemplate = context.getString(R.string.consumption),
+        currencyTemplate = context.getString(R.string.currency_rub),
+        serviceName = context.getString(R.string.service_display_name_zont),
+        unit = context.getString(R.string.unit_gcal)
+    )
     val gasNormUseCase = GasNormUseCase(repository = gasNormRepository)
     // Репозиторий для периодических услуг
 

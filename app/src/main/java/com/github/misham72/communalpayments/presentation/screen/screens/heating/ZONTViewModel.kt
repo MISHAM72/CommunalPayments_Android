@@ -3,15 +3,21 @@ package com.github.misham72.communalpayments.presentation.screen.screens.heating
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.github.misham72.communalpayments.domain.common.DomainMessages
+import com.github.misham72.communalpayments.domain.constants.ServiceKeys
+import com.github.misham72.communalpayments.domain.exceptions.InvalidReadingException
 import com.github.misham72.communalpayments.domain.model.ProviderDetails
 import com.github.misham72.communalpayments.domain.model.ValidationError
+import com.github.misham72.communalpayments.domain.model.metric.HeatingMeterData
+import com.github.misham72.communalpayments.domain.model.metric.HeatingMode
 import com.github.misham72.communalpayments.domain.model.periodic.PeriodicData
 import com.github.misham72.communalpayments.domain.repository.IProviderRepository
+import com.github.misham72.communalpayments.domain.repository.MeterRepository
 import com.github.misham72.communalpayments.domain.repository.UserSettingsRepository
+import com.github.misham72.communalpayments.domain.usecases.MeterDataUseCase
 import com.github.misham72.communalpayments.domain.usecases.PdfHistoryUseCase
 import com.github.misham72.communalpayments.domain.usecases.PeriodicDataUseCase
 import com.github.misham72.communalpayments.domain.usecases.TextHistoryUseCase
-import com.github.misham72.communalpayments.domain.constants.ServiceKeys
 import com.github.misham72.communalpayments.presentation.common.UiMessages
 import com.google.gson.Gson
 import kotlinx.coroutines.async
@@ -27,6 +33,8 @@ import java.util.Locale
 
 class ZONTViewModel(
     private val periodicDataUseCase: PeriodicDataUseCase,
+    private val meterDataUseCase: MeterDataUseCase,
+    private val meterRepository: MeterRepository,
     private val settingsRepository: UserSettingsRepository,
     private val repository: IProviderRepository,
     private val textHistoryUseCase: TextHistoryUseCase,
@@ -42,12 +50,18 @@ class ZONTViewModel(
     data class UiState(
         val paymentDay: String = "",      // день платежа
         val periodMonths: String = "",
+        val currentReading: String = "",
+        val previousReading: String = "",
         val providerDetails: ProviderDetails = ProviderDetails(),
         val showAccountDialog: Boolean = false,
         val customDate: String = "",
-        val result: PeriodicData? = null,
+        val meterResult: HeatingMeterData? = null,
+        val periodResult: PeriodicData? = null,
         val lastResult: PeriodicData? = null,
-        val error: ValidationError? = null,   // вместо errorMessage: String?
+        val lastMeterResult: HeatingMeterData? = null,
+        val error: ValidationError? = null,
+        val mode: HeatingMode = HeatingMode.PERIOD,
+        val displayResult: HeatingDisplayResult? = null
     )
 
     private val _uiState = MutableStateFlow(UiState())
@@ -64,6 +78,10 @@ class ZONTViewModel(
             val details = detailsDeferred.await() // ждём результат
             val savedJson = settingsRepository.getLastResult(SERVICE_KEY)
             val lastResult = savedJson?.let { gson.fromJson(it, PeriodicData::class.java) }
+            // Загрузка последнего результата по счётчику
+            val savedMeterJson = settingsRepository.getLastMeterResult(SERVICE_KEY)   // ← новый метод
+            val lastMeterResult = savedMeterJson?.let { gson.fromJson(it, HeatingMeterData::class.java) }
+            _uiState.update { it.copy(lastMeterResult = lastMeterResult) }
             _uiState.update { it.copy(lastResult = lastResult) }
 
             _uiState.update { currentState ->
@@ -76,6 +94,17 @@ class ZONTViewModel(
                     customDate = savedDate
                 )
             }
+            updateDisplayResult()
+        }
+    }
+
+    private fun updateDisplayResult() {
+        _uiState.update { state ->
+            val display = when (state.mode) {
+                HeatingMode.METER -> state.lastMeterResult?.let { HeatingDisplayResult.Meter(it) }
+                HeatingMode.PERIOD -> state.lastResult?.let { HeatingDisplayResult.Period(it) }
+            }
+            state.copy(displayResult = display)
         }
     }
 
@@ -123,6 +152,14 @@ class ZONTViewModel(
         _uiState.update { it.copy(periodMonths = value) }
     }
 
+    fun onCurrentReadingChange(value: String) {
+        _uiState.update { it.copy(currentReading = value) }
+    }
+
+    fun onPreviousReadingChange(value: String) {
+        _uiState.update { it.copy(previousReading = value) }
+    }
+
     fun onPriceTariffChange(value: String) {
         _uiState.update { currentState ->
             currentState.copy(
@@ -130,6 +167,15 @@ class ZONTViewModel(
             )
         }
     }
+
+    fun onModeChange(mode: HeatingMode) {
+        _uiState.update { it.copy(mode = mode, periodResult = null, meterResult = null, error = null) }
+        updateDisplayResult()
+        viewModelScope.launch {
+            settingsRepository.saveHeatingMode(mode.name)
+        }
+    }
+
 
     private fun parseStartDate(dateString: String): Date {
         return try {
@@ -140,7 +186,13 @@ class ZONTViewModel(
     }
 
     fun onCalculateClick() {
-        // Валидация
+        when (_uiState.value.mode) {
+            HeatingMode.PERIOD -> calculatePeriod()
+            HeatingMode.METER -> calculateMeter()
+        }
+    }
+
+    private fun calculatePeriod() {
         val paymentDay = _uiState.value.paymentDay.toIntOrNull()
         val periodMonths = _uiState.value.periodMonths.toIntOrNull()
         val priceTariff = _uiState.value.providerDetails.tariff.toDoubleOrNull()
@@ -163,21 +215,65 @@ class ZONTViewModel(
                     priceTariff = priceTariff,
                     accountNumber = account
                 )
-
-                // Обновляем UI – UseCase уже сохранил данные
                 settingsRepository.saveLastResult(SERVICE_KEY, gson.toJson(data))
                 _uiState.update { state ->
                     state.copy(
-                        result = data,
+                        periodResult = data,
                         lastResult = data,
                         error = null,
                     )
                 }
+                updateDisplayResult()
             } catch (e: Exception) {
                 _uiState.update {
                     it.copy(
                         error = ValidationError.DomainError(e.message ?: UiMessages.ERROR_SAVING),
-                        result = null
+                        periodResult = null
+                    )
+                }
+            }
+        }
+    }
+
+    private fun calculateMeter() {
+        val current = _uiState.value.currentReading.toDoubleOrNull()
+        val previous = _uiState.value.previousReading.toDoubleOrNull()
+        val tariff = _uiState.value.providerDetails.tariff.toDoubleOrNull()
+        val account = _uiState.value.providerDetails.accountNumber
+
+        if (current == null || previous == null || tariff == null) {
+            _uiState.update { it.copy(error = ValidationError.InvalidInput) }
+            return
+        }
+
+        viewModelScope.launch {
+            try {
+                val data = meterDataUseCase.collectMeterData(
+                    repository = meterRepository,
+                    current = current,
+                    previous = previous,
+                    tariff = tariff,
+                    accountNumber = account,
+                    serviceKey = SERVICE_KEY,
+                    factory = ::HeatingMeterData
+                )
+                val heatingData = data as HeatingMeterData
+                settingsRepository.saveLastMeterResult(SERVICE_KEY, gson.toJson(heatingData))
+                _uiState.update { state ->
+                    state.copy(
+                        previousReading = state.currentReading,
+                        currentReading = "",
+                        meterResult = heatingData,
+                        lastMeterResult = heatingData,
+                        error = null
+                    )
+                }
+                updateDisplayResult()
+            } catch (e: InvalidReadingException) {
+                _uiState.update {
+                    it.copy(
+                        error = ValidationError.DomainError(e.message ?: DomainMessages.DEFAULT_VALIDATION_ERROR),
+                        meterResult = null
                     )
                 }
             }

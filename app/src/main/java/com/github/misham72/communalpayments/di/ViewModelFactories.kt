@@ -169,6 +169,8 @@ class ZONTViewModelFactory(
         if (modelClass.isAssignableFrom(ZONTViewModel::class.java)) {
             return ZONTViewModel(
                 periodicDataUseCase = container.periodicDataUseCase,
+                meterDataUseCase = container.meterDataUseCase,
+                meterRepository = container.heatingRepository,
                 settingsRepository = container.settingsRepository,
                 repository = container.providerRepository,
                 textHistoryUseCase = container.textHistoryUseCase,

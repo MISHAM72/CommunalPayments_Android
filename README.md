@@ -2,7 +2,7 @@
 
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.0-blue)](https://kotlinlang.org)
 [![Jetpack Compose](https://img.shields.io/badge/Jetpack%20Compose-2025.04-green)](https://developer.android.com/jetpack/compose)
-[![Version](https://img.shields.io/badge/version-2.11.0-brightgreen)](https://github.com/MISHAM72/CommunalPayments_Android/releases)
+[![Version](https://img.shields.io/badge/version-2.12.0-brightgreen)](https://github.com/MISHAM72/CommunalPayments_Android/releases)
 
 💸 Приложение полностью бесплатно, без рекламы и без встроенных покупок.  
 Все данные хранятся только на вашем устройстве.
@@ -138,11 +138,12 @@
 
 ## 📦 Релизы
 
-- **Последняя версия:** `v2.10.0`  
+- **Последняя версия:** `v2.12.0`  
   [Скачать APK](https://github.com/MISHAM72/CommunalPayments_Android/releases/latest)
 
 ### История версий
 
+- **v2.12.0** (Октябрь 2026) — Отопление: два режима расчёта (счётчик / период).
 - **v2.11.0** (Октябрь 2026) — Газ: два режима расчёта (счётчик / норматив). Доходы: выбор категорий галочками.
 - **v2.10.0** (Октябрь 2026) - Мусор: два режима расчёта (тариф × площадь, тариф × кол-во проживающих). Единый парсер истории.
 - **v2.9.0** (Сентябрь 2026) — Обновлена тема Material 3: новая цветовая палитра из Material Theme Builder, тёмная тема (`darkScheme`), кастомные шрифты **Pochaevsk** и **Ponomar** (применены к тексту, заголовкам и кнопкам).
@@ -168,5 +169,5 @@
 1. Клонируйте репозиторий:
    git clone https://github.com/MISHAM72/CommunalPayments_Android.git
 
-📥 Скачать APK: https://github.com/MISHAM72/CommunalPayments_Android/releases/download/v2.10.0/v2.11.0_code_26_app-release.apk  
+📥 Скачать: https://github.com/MISHAM72/CommunalPayments_Android/releases/download/v2.12.0/v2.12.0_code_27_app-release.apk 
 🏪 RuStore: https://console.rustore.ru/apps/2063707211

@@ -71,9 +71,6 @@ fun ElectricityScreen(viewModel: ElectricityViewModel, appContainer: AppContaine
     val copySound = rememberCopyButtonSoundPlayer()
     val bankSound = rememberBankButtonSoundPlayer()
     val uiState by viewModel.uiState.collectAsState()
-
-    // ----- Квитанции -----
-
     val receiptsViewModelFactory = ReceiptsViewModelFactory(appContainer.getReceiptsUseCase, appContainer.deleteReceiptUseCase, appContainer.saveReceiptUseCase)
     val receiptsViewModel: ReceiptsViewModel = viewModel(factory = receiptsViewModelFactory)
     var showReceipts by remember { mutableStateOf(false) }

@@ -16,6 +16,8 @@ class ProviderRepositoryImpl(
             nameCompany = prefs.getNameCompany(serviceKey),
             inn = prefs.getInn(serviceKey),
             bankAccount = prefs.getBankAccount(serviceKey),
+            phone = prefs.getPhone(serviceKey),
+            email = prefs.getEmail(serviceKey),
             websiteUrl = prefs.getWebsiteUrl(serviceKey)
         )
     }
@@ -28,6 +30,8 @@ class ProviderRepositoryImpl(
         prefs.saveNameCompany(serviceKey, details.nameCompany)
         prefs.saveInn(serviceKey, details.inn)
         prefs.saveBankAccount(serviceKey, details.bankAccount)
+        prefs.savePhone(serviceKey, details.phone)
+        prefs.saveEmail(serviceKey, details.email)
         prefs.saveWebsiteUrl(serviceKey, details.websiteUrl)
     }
 }

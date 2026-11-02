@@ -24,7 +24,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-
+//одна ответственность - состояние экрана электричества
 class ElectricityViewModel(
     private val meterDataUseCase: MeterDataUseCase,
     private val meterRepository: MeterRepository,
@@ -34,10 +34,10 @@ class ElectricityViewModel(
     private val pdfHistoryUseCase: PdfHistoryUseCase,
     private val gson: Gson
 
-) : ViewModel() {  //✅ Объявление класса ViewModel – чертёж будущих объектов.
+) : ViewModel() {
 
     companion object {
-        const val SERVICE_KEY = ServiceKeys.ELECTRICITY//– чертежи переменных.
+        const val SERVICE_KEY = ServiceKeys.ELECTRICITY
     }
 
     /**Принимает пользовательский ввод (текущие показания, прошлые показания, тариф) и временно хранит их в UiState.*/
@@ -45,7 +45,7 @@ class ElectricityViewModel(
         val currentReading: String = "",
         val previousReading: String = "",
         val providerDetails: ProviderDetails = ProviderDetails(),  //Все реквизиты (название, ЛС, тариф, компания, ИНН, р/с) хранятся внутри этого объекта.
-        val showAccountDialog: Boolean = false,   // флаг для диалога
+        val showAccountDialog: Boolean = false,
         val customDate: String = "",
         val result: MeterData? = null,
         val error: ValidationError? = null,
@@ -56,7 +56,7 @@ class ElectricityViewModel(
     private val _uiState = MutableStateFlow(UiState())  //✅ – чертежи переменных.
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()  //✅– чертежи переменных. Это StateFlow<UiState>, который хранит текущее состояние экрана.
 
-    init {//– чертежи действий (инструкции).
+    init {
         viewModelScope.launch {
             val detailsDeferred = async { repository.loadProviderDetails(ServiceKeys.ELECTRICITY) }
             val savedLastReading = settingsRepository.getLastReading(SERVICE_KEY) ?: ""

@@ -53,32 +53,25 @@ fun ServiceTopBar(
         horizontalArrangement = androidx.compose.foundation.layout.Arrangement.SpaceBetween
     ) {
         Text(
-            text = title,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold
+            text = title, fontSize = 20.sp, fontWeight = FontWeight.Bold
         )
         Row {
             IconButton(
                 onClick = {
                     changeListSound?.start()
                     onEditClick()
-                }
-            ) {
+                }) {
                 Icon(
-                    Icons.Default.Edit,
-                    contentDescription = stringResource(R.string.change_personal_account)
+                    Icons.Default.Edit, contentDescription = stringResource(R.string.change_personal_account)
                 )
             }
             // 🆕 Кнопка квитанций (папка)
             IconButton(
                 onClick = {
-                    // звук не обязателен, можно добавить позже
                     onReceiptsClick()
-                }
-            ) {
+                }) {
                 Icon(
-                    Icons.Outlined.Folder,
-                    contentDescription = DataConstants.RECEIPTS_DIR
+                    Icons.Outlined.Folder, contentDescription = DataConstants.RECEIPTS_DIR
                 )
             }
 
@@ -88,31 +81,27 @@ fun ServiceTopBar(
                     onClick = {
                         clockCuCuSound?.start()// звук
                         showMenu = true// открываем меню
-                    }
-                ) {
+                    }) {
                     Icon(// иконка шеринга
-                        Icons.Default.Share,
-                        contentDescription = stringResource(R.string.export_history)
+                        Icons.Default.Share, contentDescription = stringResource(R.string.export_history)
                     )
                 }
                 DropdownMenu(// 2. Выпадающее меню (показывается, если showMenu == true)
                     expanded = showMenu,
-                    onDismissRequest = { showMenu = false }
-                ) {
+                    onDismissRequest = { showMenu = false },
+                    modifier = Modifier.padding(horizontal = 30.dp)
+                )
+                {
                     DropdownMenuItem(// Пункт меню "Экспорт TXT"
-                        text = { Text(stringResource(R.string.export_txt)) },
-                        onClick = {
+                        text = { Text(stringResource(R.string.export_txt)) }, onClick = {
                             showMenu = false
                             onTxtExport()// ← вызывает переданный колбэк для TXT
-                        }
-                    )
+                        })
                     DropdownMenuItem(// Пункт меню "Экспорт PDF"
-                        text = { Text(stringResource(R.string.export_pdf)) },
-                        onClick = {
+                        text = { Text(stringResource(R.string.export_pdf)) }, onClick = {
                             showMenu = false
                             onPdfExport()// ← ВОТ ЗДЕСЬ ВЫЗЫВАЕТСЯ PDF-ЭКСПОРТ
-                        }
-                    )
+                        })
                 }
             }
         }

@@ -31,14 +31,14 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -50,6 +50,8 @@ import com.github.misham72.communalpayments.di.ReceiptsViewModelFactory
 import com.github.misham72.communalpayments.domain.constants.ServiceKeys
 import com.github.misham72.communalpayments.domain.model.ValidationError
 import com.github.misham72.communalpayments.domain.model.metric.GasMode
+import com.github.misham72.communalpayments.domain.model.metric.GasNormData
+import com.github.misham72.communalpayments.domain.model.metric.MeterData
 import com.github.misham72.communalpayments.presentation.screen.components.EditProviderDetailsDialog
 import com.github.misham72.communalpayments.presentation.screen.components.ProviderDetailsDialog
 import com.github.misham72.communalpayments.presentation.screen.components.ServiceTopBar
@@ -61,6 +63,7 @@ import com.github.misham72.communalpayments.presentation.utils.normalizeUrl
 import com.github.misham72.communalpayments.presentation.utils.rememberBankButtonSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberCoinSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberCopyButtonSoundPlayer
+import kotlinx.coroutines.launch
 
 @SuppressLint("LocalContextGetResourceValueCall")
 @Composable
@@ -68,7 +71,8 @@ fun GasScreen(viewModel: GasViewModel, appContainer: AppContainer) {
     val showBankDialog = remember { mutableStateOf(false) }
     val showProviderDialog = remember { mutableStateOf(false) }
     val context = LocalContext.current
-    val clipboardManager = LocalClipboardManager.current
+    val clipboard = LocalClipboard.current
+    val scope = rememberCoroutineScope()
     val coinSound = rememberCoinSoundPlayer()
     val copySound = rememberCopyButtonSoundPlayer()
     val bankSound = rememberBankButtonSoundPlayer()
@@ -80,86 +84,53 @@ fun GasScreen(viewModel: GasViewModel, appContainer: AppContainer) {
     var showReceipts by remember { mutableStateOf(false) }
     if (showReceipts) {
         ReceiptsScreen(
-            serviceKey = GasViewModel.SERVICE_KEY,
-            viewModel = receiptsViewModel,
-            onBack = { showReceipts = false }
-        )
+            serviceKey = GasViewModel.SERVICE_KEY, viewModel = receiptsViewModel, onBack = { showReceipts = false })
     } else {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(1.dp)
-                .verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(1.dp)
+                .verticalScroll(rememberScrollState()), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(1.dp)
         ) {
-            ServiceTopBar(
-                title = uiState.providerDetails.customServiceName.ifBlank { serviceName(ServiceKeys.GAS) },
-                onEditClick = { viewModel.openAccountDialog() },
-                onTxtExport = { viewModel.onShareClick(context) },
-                modifier = Modifier.height(28.dp),
-                onPdfExport = { viewModel.onPdfExport(context) },
-                onReceiptsClick = { showReceipts = true }
-            )
+            ServiceTopBar(title = uiState.providerDetails.customServiceName.ifBlank { serviceName(ServiceKeys.GAS) }, onEditClick = { viewModel.openAccountDialog() }, onTxtExport = { viewModel.onShareClick(context) }, modifier = Modifier.height(28.dp), onPdfExport = { viewModel.onPdfExport(context) }, onReceiptsClick = { showReceipts = true })
             if (uiState.customDate.isNotBlank()) {
                 Text(
-                    text = stringResource(R.string.payment_date, uiState.customDate),
-                    fontSize = 14.sp,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.padding(top = 1.dp)
+                    text = stringResource(R.string.payment_date, uiState.customDate), fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurface, modifier = Modifier.padding(top = 1.dp)
                 )
             }
             if (uiState.providerDetails.accountNumber.isNotBlank()) {
                 Text(
-                    text = stringResource(R.string.personal_account, uiState.providerDetails.accountNumber),
-                    fontSize = 14.sp,
-                    color = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.padding(top = 1.dp)
+                    text = stringResource(R.string.personal_account, uiState.providerDetails.accountNumber), fontSize = 14.sp, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(top = 1.dp)
                 )
             }
             // Переключатель режима
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 FilterChip(
-                    selected = uiState.mode == GasMode.METER,
-                    onClick = { viewModel.onModeChange(GasMode.METER) },
-                    label = { Text(stringResource(R.string.gas_mode_meter)) },
-                    modifier = Modifier.weight(1f)
+                    selected = uiState.mode == GasMode.METER, onClick = { viewModel.onModeChange(GasMode.METER) }, label = { Text(stringResource(R.string.gas_mode_meter)) }, modifier = Modifier.weight(1f)
                 )
                 FilterChip(
-                    selected = uiState.mode == GasMode.NORM,
-                    onClick = { viewModel.onModeChange(GasMode.NORM) },
-                    label = { Text(stringResource(R.string.gas_mode_norm)) },
-                    modifier = Modifier.weight(1f)
+                    selected = uiState.mode == GasMode.NORM, onClick = { viewModel.onModeChange(GasMode.NORM) }, label = { Text(stringResource(R.string.gas_mode_norm)) }, modifier = Modifier.weight(1f)
                 )
             }
             when (uiState.mode) {
                 GasMode.METER -> {
                     OutlinedTextField(
-                        value = uiState.currentReading,
-                        onValueChange = viewModel::onCurrentReadingChange,
-                        label = { Text(stringResource(R.string.current_reading_txt_water_and_gas)) },
-                        modifier = Modifier
+                        value = uiState.currentReading, onValueChange = viewModel::onCurrentReadingChange, label = { Text(stringResource(R.string.current_reading_txt_water_and_gas)) }, modifier = Modifier
                             .fillMaxWidth()
                             .heightIn(min = 48.dp), // сужаем
                         textStyle = LocalTextStyle.current.copy(
-                            fontSize = 20.sp,
-                            lineHeight = 20.sp
+                            fontSize = 20.sp, lineHeight = 20.sp
                         )
                     )
 
                     OutlinedTextField(
-                        value = uiState.previousReading,
-                        onValueChange = viewModel::onPreviousReadingChange,
-                        label = { Text(stringResource(R.string.previous_reading_txt_water_and_gas)) },
-                        modifier = Modifier
+                        value = uiState.previousReading, onValueChange = viewModel::onPreviousReadingChange, label = { Text(stringResource(R.string.previous_reading_txt_water_and_gas)) }, modifier = Modifier
                             .fillMaxWidth()
                             .heightIn(min = 48.dp), // сужаем
                         textStyle = LocalTextStyle.current.copy(
-                            fontSize = 20.sp,
-                            lineHeight = 20.sp
+                            fontSize = 20.sp, lineHeight = 20.sp
                         )
                     )
                 }
@@ -167,37 +138,25 @@ fun GasScreen(viewModel: GasViewModel, appContainer: AppContainer) {
                 GasMode.NORM -> {
                     // Норматив
                     OutlinedTextField(
-                        value = uiState.norm,
-                        onValueChange = viewModel::onNormChange,
-                        label = { Text(stringResource(R.string.gas_norm_label)) },
-                        modifier = Modifier
+                        value = uiState.norm, onValueChange = viewModel::onNormChange, label = { Text(stringResource(R.string.gas_norm_label)) }, modifier = Modifier
                             .fillMaxWidth()
-                            .heightIn(min = 48.dp),
-                        textStyle = LocalTextStyle.current.copy(fontSize = 20.sp, lineHeight = 20.sp)
+                            .heightIn(min = 48.dp), textStyle = LocalTextStyle.current.copy(fontSize = 20.sp, lineHeight = 20.sp)
                     )
                     // Кол-во проживающих
                     OutlinedTextField(
-                        value = uiState.people,
-                        onValueChange = viewModel::onPeopleChange,
-                        label = { Text(stringResource(R.string.people_count_label)) },
-                        modifier = Modifier
+                        value = uiState.people, onValueChange = viewModel::onPeopleChange, label = { Text(stringResource(R.string.people_count_label)) }, modifier = Modifier
                             .fillMaxWidth()
-                            .heightIn(min = 48.dp),
-                        textStyle = LocalTextStyle.current.copy(fontSize = 20.sp, lineHeight = 20.sp)
+                            .heightIn(min = 48.dp), textStyle = LocalTextStyle.current.copy(fontSize = 20.sp, lineHeight = 20.sp)
                     )
                 }
             }
 
             OutlinedTextField(
-                value = uiState.providerDetails.tariff,
-                onValueChange = viewModel::onTariffChange,
-                label = { Text(stringResource(R.string.tariff_label)) },
-                modifier = Modifier
+                value = uiState.providerDetails.tariff, onValueChange = viewModel::onTariffChange, label = { Text(stringResource(R.string.tariff_label)) }, modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = 48.dp), // сужаем
                 textStyle = LocalTextStyle.current.copy(
-                    fontSize = 20.sp,
-                    lineHeight = 20.sp
+                    fontSize = 20.sp, lineHeight = 20.sp
                 )
             )
             Spacer(modifier = Modifier.height(3.dp))
@@ -205,27 +164,22 @@ fun GasScreen(viewModel: GasViewModel, appContainer: AppContainer) {
                 onClick = {
                     coinSound?.start()
                     viewModel.onCalculateClick()
-                },
-                modifier = Modifier.fillMaxWidth()
+                }, modifier = Modifier.fillMaxWidth()
             ) {
                 Text(stringResource(R.string.calculate_and_save))
             }
             @Suppress("VariableDeclarationInWhen")
-            val error = uiState.error
-            when (error) {
+            when (val error = uiState.error) {
                 ValidationError.InvalidInput -> Text(
-                    stringResource(R.string.error_invalid_input),
-                    color = Color.Red
+                    stringResource(R.string.error_invalid_input), color = Color.Red
                 )
 
                 ValidationError.SavingError -> Text(
-                    stringResource(R.string.error_saving),
-                    color = Color.Red
+                    stringResource(R.string.error_saving), color = Color.Red
                 )
 
                 is ValidationError.DomainError -> Text(
-                    text = error.message,
-                    color = Color.Red
+                    text = error.message, color = Color.Red
                 )
 
                 null -> { /* ничего */
@@ -233,62 +187,32 @@ fun GasScreen(viewModel: GasViewModel, appContainer: AppContainer) {
             }
             // Карточка с результатом (всегда видна)
             Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
+                modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer
                 )
             ) {
-                val result = uiState.lastResult
-                if (result != null) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Text(
-                            text = stringResource(R.string.result_gas),
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Text(
-                            text = stringResource(
-                                R.string.consumption,
-                                result.consumption.value,
-                                stringResource(R.string.unit_cubic_meter)
-                            )
-                        )
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Text(
-                                text = stringResource(R.string.currency_rub, result.payment.amount),
-                                style = MaterialTheme.typography.headlineSmall,
-                                color = Color.Red
-                            )
-                            IconButton(
-                                onClick = {
-                                    clipboardManager.setText(AnnotatedString(result.payment.amount.toString()))
-                                    Toast.makeText(
-                                        context, context.getString(R.string.amount_copied, result.payment.amount),
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                },
-                                modifier = Modifier.size(24.dp)
-                            ) {
-                                Icon(
-                                    Icons.Outlined.ContentCopy,
-                                    contentDescription = stringResource(R.string.copy_amount)
+                when (val display = uiState.displayResult) {
+                    is DisplayResult.Meter -> MeterResultCard(
+                        data = display.data,
+                        onCopy = { text ->
+                            scope.launch {
+                                clipboard.setClipEntry(
+                                    androidx.compose.ui.platform.ClipEntry(
+                                        android.content.ClipData.newPlainText("", text)
+                                    )
                                 )
                             }
+                            Toast.makeText(
+                                context,
+                                context.getString(R.string.amount_copied, display.data.payment.amount),
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
-                    }
-                } else {
-                    Text(
-                        text = stringResource(R.string.no_saved_result), // нужно добавить в strings.xml
-                        modifier = Modifier.padding(16.dp),
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                    )
+
+                    is DisplayResult.Norm -> NormResultCard(display.data)
+                    null -> Text(
+                        text = stringResource(R.string.no_saved_result), modifier = Modifier.padding(16.dp), color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                     )
                 }
             }
@@ -298,8 +222,7 @@ fun GasScreen(viewModel: GasViewModel, appContainer: AppContainer) {
                 onClick = {
                     bankSound?.start()
                     showBankDialog.value = true
-                },
-                modifier = Modifier.fillMaxWidth()
+                }, modifier = Modifier.fillMaxWidth()
             ) {
                 Text(stringResource(R.string.select_bank_to_pay))
             }
@@ -307,8 +230,7 @@ fun GasScreen(viewModel: GasViewModel, appContainer: AppContainer) {
                 onClick = {
                     copySound?.start()
                     showProviderDialog.value = true
-                },
-                modifier = Modifier.fillMaxWidth()
+                }, modifier = Modifier.fillMaxWidth()
             ) {
                 Text(stringResource(R.string.payment_details))
             }
@@ -316,8 +238,7 @@ fun GasScreen(viewModel: GasViewModel, appContainer: AppContainer) {
         }
         if (showBankDialog.value) {
             BankSelectionDialog(
-                onDismiss = { showBankDialog.value = false },
-                appContainer = appContainer
+                onDismiss = { showBankDialog.value = false }, appContainer = appContainer
             )
         }
         // Диалог выбора: ИНН или Л/С
@@ -326,9 +247,16 @@ fun GasScreen(viewModel: GasViewModel, appContainer: AppContainer) {
                 providerDetails = uiState.providerDetails,
                 onDismiss = { showProviderDialog.value = false },
                 onCopyText = { text ->
-                    clipboardManager.setText(AnnotatedString(text))
+                    scope.launch {
+                        clipboard.setClipEntry(
+                            androidx.compose.ui.platform.ClipEntry(
+                                android.content.ClipData.newPlainText("", text)
+                            )
+                        )
+                    }
                     Toast.makeText(context, R.string.copied, Toast.LENGTH_SHORT).show()
-                }, onOpenUrl = { url ->
+                },
+                onOpenUrl = { url ->
                     val finalUrl = url.normalizeUrl()
                     val intent = Intent(Intent.ACTION_VIEW, finalUrl.toUri())
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -340,17 +268,64 @@ fun GasScreen(viewModel: GasViewModel, appContainer: AppContainer) {
                 })
         }
         if (uiState.showAccountDialog) {
-            EditProviderDetailsDialog(
-                details = uiState.providerDetails,
-                customDate = uiState.customDate,
-                onSave = { updatedDetails, updatedDate ->
-                    viewModel.saveProviderDetails(updatedDetails)
-                    viewModel.updateCustomDate(updatedDate)
-                    viewModel.closeAccountDialog()
-                },
-                onDismiss = { viewModel.closeAccountDialog() }
-            )
+            EditProviderDetailsDialog(details = uiState.providerDetails, customDate = uiState.customDate, onSave = { updatedDetails, updatedDate ->
+                viewModel.saveProviderDetails(updatedDetails)
+                viewModel.updateCustomDate(updatedDate)
+                viewModel.closeAccountDialog()
+            }, onDismiss = { viewModel.closeAccountDialog() })
         }
     }
 }
 
+@Composable
+fun MeterResultCard(
+    data: MeterData, onCopy: (String) -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Text(
+            text = stringResource(R.string.result_gas), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold
+        )
+        Text(
+            text = stringResource(
+                R.string.consumption, data.consumption.value, stringResource(R.string.unit_cubic_meter)
+            )
+        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text(
+                text = stringResource(R.string.currency_rub, data.payment.amount), style = MaterialTheme.typography.headlineSmall, color = Color.Red
+            )
+            IconButton(
+                onClick = { onCopy(data.payment.amount.toString()) },
+                modifier = Modifier.size(24.dp)
+            ) {
+                Icon(
+                    Icons.Outlined.ContentCopy, contentDescription = stringResource(R.string.copy_amount)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun NormResultCard(data: GasNormData) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Text(
+            text = stringResource(R.string.result_gas), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold
+        )
+        Text(stringResource(R.string.gas_norm_value, data.norm.toString()))
+        Text(stringResource(R.string.gas_people_value, data.people))
+        Text(
+            text = stringResource(R.string.currency_rub, data.payment), style = MaterialTheme.typography.headlineSmall, color = Color.Red
+        )
+    }
+}

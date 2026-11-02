@@ -131,7 +131,40 @@ fun ProviderDetailsDialog(
                         else stringResource(R.string.bank_account_label_not_specified)
                     )
                 }
-
+                //Телефон
+                TextButton(
+                    onClick = {
+                        if (providerDetails.phone.isNotBlank()) {
+                            onCopyText(providerDetails.phone)
+                        } else {
+                            Toast.makeText(context, R.string.phone_not_specified, Toast.LENGTH_LONG).show()
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = if (providerDetails.phone.isNotBlank())
+                            stringResource(R.string.number_phone, providerDetails.phone)
+                        else stringResource(R.string.phone_not_specified)
+                    )
+                }
+                //e-mail
+                TextButton(
+                    onClick = {
+                        if (providerDetails.email.isNotBlank()) {
+                            onCopyText(providerDetails.email)
+                        } else {
+                            Toast.makeText(context, R.string.email_not_specified, Toast.LENGTH_LONG).show()
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = if (providerDetails.email.isNotBlank())
+                            stringResource(R.string.email_address, providerDetails.email)
+                        else stringResource(R.string.email_not_specified)
+                    )
+                }
                 // Сайт услуги (кликабельная ссылка)
                 TextButton(
                     onClick = {
@@ -158,7 +191,7 @@ fun ProviderDetailsDialog(
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.cancel))
+                Text(stringResource(R.string.close))
             }
         }
     )

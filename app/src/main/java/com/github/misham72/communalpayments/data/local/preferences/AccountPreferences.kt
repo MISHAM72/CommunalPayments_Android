@@ -155,4 +155,29 @@ class AccountPreferences(private val prefs: SharedPreferences) {
     fun getGasPeople(): String {
         return prefs.getString(DataConstants.GAS_PEOPLE, "") ?: ""
     }
+
+    fun saveHeatingMode(value: String) {
+        prefs.edit { putString(DataConstants.GARBAGE_VALUE, value) }
+    }
+
+    fun getHeatingMode(): String {
+        return prefs.getString(DataConstants.HEATING_MODE, "PERIOD") ?: "PERIOD"
+    }
+
+    fun savePhone(serviceKey: String, value: String) {
+        prefs.edit { putString(serviceKey + DataConstants.TELEPHONE_NUMBER, value) }
+    }
+
+    fun getPhone(serviceKey: String): String {
+        return prefs.getString(serviceKey + DataConstants.TELEPHONE_NUMBER, "") ?: ""
+    }
+
+    fun saveEmail(serviceKey: String, value: String) {
+        prefs.edit {putString(serviceKey + DataConstants.EMAIL, value) }
+    }
+
+    fun getEmail(serviceKey: String): String {
+        return prefs.getString(serviceKey + DataConstants.EMAIL, "") ?: ""
+    }
 }
+

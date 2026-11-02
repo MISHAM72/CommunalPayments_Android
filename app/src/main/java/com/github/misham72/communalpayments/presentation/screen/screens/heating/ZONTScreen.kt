@@ -20,6 +20,7 @@ import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
@@ -47,8 +48,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.di.AppContainer
 import com.github.misham72.communalpayments.di.ReceiptsViewModelFactory
-import com.github.misham72.communalpayments.domain.model.ValidationError
 import com.github.misham72.communalpayments.domain.constants.ServiceKeys
+import com.github.misham72.communalpayments.domain.model.ValidationError
+import com.github.misham72.communalpayments.domain.model.metric.HeatingMeterData
+import com.github.misham72.communalpayments.domain.model.metric.HeatingMode
 import com.github.misham72.communalpayments.presentation.screen.components.EditProviderDetailsDialog
 import com.github.misham72.communalpayments.presentation.screen.components.ProviderDetailsDialog
 import com.github.misham72.communalpayments.presentation.screen.components.ServiceTopBar
@@ -60,6 +63,7 @@ import com.github.misham72.communalpayments.presentation.utils.normalizeUrl
 import com.github.misham72.communalpayments.presentation.utils.rememberBankButtonSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberCoinSoundPlayer
 import com.github.misham72.communalpayments.presentation.utils.rememberCopyButtonSoundPlayer
+import com.github.misham72.communalpayments.domain.model.periodic.PeriodicData
 
 @SuppressLint("LocalContextGetResourceValueCall")
 @Composable
@@ -113,49 +117,82 @@ fun ZONTScreen(viewModel: ZONTViewModel, appContainer: AppContainer) {
                     text = stringResource(R.string.number_phone, uiState.providerDetails.accountNumber), fontSize = 14.sp, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(top = 1.dp)
                 )
             }
-            // Поле ввода - день платежа
-            OutlinedTextField(
-                value = uiState.paymentDay,
-                onValueChange = viewModel::onPaymentDayChange,
-                label = { Text(stringResource(R.string.next_payment_pdf)) },  // явный текст
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = 48.dp),
-                singleLine = true,
-                textStyle = LocalTextStyle.current.copy(
-                    fontSize = 20.sp,
-                    lineHeight = 20.sp
+            // Переключатель режима
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                FilterChip(
+                    selected = uiState.mode == HeatingMode.METER,
+                    onClick = { viewModel.onModeChange(HeatingMode.METER) },
+                    label = { Text(stringResource(R.string.heating_mode_meter)) },
+                    modifier = Modifier.weight(1f)
                 )
-            )
-
-            // Поле ввода - период в месяцах
-            OutlinedTextField(
-                value = uiState.periodMonths,
-                onValueChange = viewModel::onPeriodMonthsChange,
-                label = { Text(stringResource(R.string.period_months_label)) },  // явный текст
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = 48.dp),
-                singleLine = true,
-                textStyle = LocalTextStyle.current.copy(
-                    fontSize = 20.sp,
-                    lineHeight = 20.sp
+                FilterChip(
+                    selected = uiState.mode == HeatingMode.PERIOD,
+                    onClick = { viewModel.onModeChange(HeatingMode.PERIOD) },
+                    label = { Text(stringResource(R.string.heating_mode_period)) },
+                    modifier = Modifier.weight(1f)
                 )
-            )
+            }
+            when (uiState.mode) {
+                HeatingMode.PERIOD -> {
+                    OutlinedTextField(
+                        value = uiState.paymentDay,
+                        onValueChange = viewModel::onPaymentDayChange,
+                        label = { Text(stringResource(R.string.next_payment_pdf)) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = 48.dp),
+                        singleLine = true,
+                        textStyle = LocalTextStyle.current.copy(fontSize = 20.sp, lineHeight = 20.sp)
+                    )
+                    OutlinedTextField(
+                        value = uiState.periodMonths,
+                        onValueChange = viewModel::onPeriodMonthsChange,
+                        label = { Text(stringResource(R.string.period_months_label)) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = 48.dp),
+                        singleLine = true,
+                        textStyle = LocalTextStyle.current.copy(fontSize = 20.sp, lineHeight = 20.sp)
+                    )
+                }
 
-            // Поле ввода - тариф
+                HeatingMode.METER -> {
+                    OutlinedTextField(
+                        value = uiState.currentReading,
+                        onValueChange = viewModel::onCurrentReadingChange,
+                        label = { Text(stringResource(R.string.current_reading_txt_heating)) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = 48.dp),
+                        singleLine = true,
+                        textStyle = LocalTextStyle.current.copy(fontSize = 20.sp, lineHeight = 20.sp)
+                    )
+                    OutlinedTextField(
+                        value = uiState.previousReading,
+                        onValueChange = viewModel::onPreviousReadingChange,
+                        label = { Text(stringResource(R.string.previous_reading_txt_heating)) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = 48.dp),
+                        singleLine = true,
+                        textStyle = LocalTextStyle.current.copy(fontSize = 20.sp, lineHeight = 20.sp)
+                    )
+                }
+            }
+
+// Тариф — для обоих режимов
             OutlinedTextField(
                 value = uiState.providerDetails.tariff,
                 onValueChange = viewModel::onPriceTariffChange,
-                label = { Text(stringResource(R.string.tariff_label)) },  // явный текст
+                label = { Text(stringResource(R.string.tariff_label)) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = 48.dp),
                 singleLine = true,
-                textStyle = LocalTextStyle.current.copy(
-                    fontSize = 20.sp,
-                    lineHeight = 20.sp
-                )
+                textStyle = LocalTextStyle.current.copy(fontSize = 20.sp, lineHeight = 20.sp)
             )
             Spacer(modifier = Modifier.height(3.dp))
             Button(
@@ -186,50 +223,38 @@ fun ZONTScreen(viewModel: ZONTViewModel, appContainer: AppContainer) {
                 }
             }
             // Результат с ТВОИМИ ресурсами
-            val result = uiState.result ?: uiState.lastResult
             Card(
-                modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer
                 )
             ) {
-                if (result != null) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Text(
-                            text = stringResource(R.string.result_zont), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold
-                        )
-
-                        Text(
-                            text = stringResource(R.string.next_payment, result.nextPayment), fontWeight = FontWeight.Bold, color = Color.Red
-                        )
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Text(
-                                text = stringResource(R.string.currency_rub, result.priceTariff),
-                                style = MaterialTheme.typography.headlineSmall,
-                                color = Color.Red
-                            )
-                            IconButton(
-                                onClick = {
-                                    clipboardManager.setText(AnnotatedString(result.priceTariff.toString()))
-                                    Toast.makeText(context, context.getString(R.string.amount_copied, result.priceTariff), Toast.LENGTH_SHORT).show()
-                                },
-                                modifier = Modifier.size(24.dp)
-                            ) {
-                                Icon(
-                                    Icons.Outlined.ContentCopy,
-                                    contentDescription = stringResource(R.string.copy_amount)
-                                )
-                            }
+                when (val display = uiState.displayResult) {
+                    is HeatingDisplayResult.Meter -> HeatingMeterResultCard(
+                        data = display.data,
+                        onCopy = { text ->
+                            clipboardManager.setText(AnnotatedString(text))
+                            Toast.makeText(
+                                context,
+                                context.getString(R.string.amount_copied, display.data.payment.amount),
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
-                    }
-                } else {
-                    Text(
+                    )
+
+                    is HeatingDisplayResult.Period -> PeriodResultCard(
+                        data = display.data,
+                        onCopy = { text ->
+                            clipboardManager.setText(AnnotatedString(text))
+                            Toast.makeText(
+                                context,
+                                context.getString(R.string.amount_copied, display.data.priceTariff),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    )
+
+                    null -> Text(
                         text = stringResource(R.string.no_saved_result),
                         modifier = Modifier.padding(16.dp),
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
@@ -293,4 +318,93 @@ fun ZONTScreen(viewModel: ZONTViewModel, appContainer: AppContainer) {
         }
     }
 }
+
+@Composable
+fun HeatingMeterResultCard(
+    data: HeatingMeterData,
+    onCopy: (String) -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Text(
+            text = stringResource(R.string.result_zont),
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold
+        )
+        Text(
+            text = stringResource(
+                R.string.consumption,
+                data.consumption.value,
+                stringResource(R.string.unit_gcal)
+            )
+        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text(
+                text = stringResource(R.string.currency_rub, data.payment.amount),
+                style = MaterialTheme.typography.headlineSmall,
+                color = Color.Red
+            )
+            IconButton(
+                onClick = { onCopy(data.payment.amount.toString()) },
+                modifier = Modifier.size(24.dp)
+            ) {
+                Icon(
+                    Icons.Outlined.ContentCopy,
+                    contentDescription = stringResource(R.string.copy_amount)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun PeriodResultCard(
+    data: PeriodicData,
+    onCopy: (String) -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Text(
+            text = stringResource(R.string.result_zont),
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold
+        )
+        Text(
+            text = stringResource(R.string.next_payment, data.nextPayment),
+            fontWeight = FontWeight.Bold,
+            color = Color.Red
+        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text(
+                text = stringResource(R.string.currency_rub, data.priceTariff),
+                style = MaterialTheme.typography.headlineSmall,
+                color = Color.Red
+            )
+            IconButton(
+                onClick = { onCopy(data.priceTariff.toString()) },
+                modifier = Modifier.size(24.dp)
+            ) {
+                Icon(
+                    Icons.Outlined.ContentCopy,
+                    contentDescription = stringResource(R.string.copy_amount)
+                )
+            }
+        }
+    }
+}
+
 
