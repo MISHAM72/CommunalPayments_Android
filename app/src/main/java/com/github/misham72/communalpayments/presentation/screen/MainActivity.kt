@@ -1,7 +1,6 @@
 package com.github.misham72.communalpayments.presentation.screen
 
 import android.Manifest
-import android.app.AlertDialog
 import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
@@ -19,6 +18,8 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.ActivityCompat
@@ -29,6 +30,7 @@ import androidx.lifecycle.lifecycleScope
 import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.app.CommunalPaymentsApp
 import com.github.misham72.communalpayments.presentation.common.UiConstants
+import com.github.misham72.communalpayments.presentation.screen.components.ServicePickerDialog
 import com.github.misham72.communalpayments.presentation.screen.screens.main.ControlBetweenScreens
 import com.github.misham72.communalpayments.presentation.screen.screens.services.ServiceRegistry
 import com.github.misham72.communalpayments.presentation.theme.AppTheme
@@ -75,8 +77,9 @@ class MainActivity : AppCompatActivity() {
             "${def.emoji} ${getString(def.nameRes)}" to def.key
         }
     }
-    private var pendingFileUri: Uri? = null
-    private var pendingFileName: String? = null
+    private var showServicePicker by mutableStateOf(false)
+    private var pendingFileUri by mutableStateOf<Uri?>(null)
+    private var pendingFileName by mutableStateOf<String?>(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -144,6 +147,26 @@ class MainActivity : AppCompatActivity() {
                         appContainer = container
                     )
                 }
+                if (showServicePicker) {
+                    ServicePickerDialog(
+                        serviceItems = serviceItems,
+                        onSelect = { key ->
+                            pendingFileUri?.let { uri ->
+                                pendingFileName?.let { name ->
+                                    saveReceiptWithService(uri, name, key)
+                                }
+                            }
+                            showServicePicker = false
+                            pendingFileUri = null
+                            pendingFileName = null
+                        },
+                        onDismiss = {
+                            showServicePicker = false
+                            pendingFileUri = null
+                            pendingFileName = null
+                        }
+                    )
+                }
             }
         }
 
@@ -187,42 +210,14 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-
         if (uri != null) {
             pendingFileUri = uri
             pendingFileName = getFileNameFromUri(uri) ?: UiConstants.DEFAULT_RECEIPT_FILENAME_TEMPLATE.format(System.currentTimeMillis())
-            showServicePickerDialog()
+            showServicePicker = true           // ← показать Compose-диалог
         } else {
             Toast.makeText(this, getString(R.string.error_intent_no_file), Toast.LENGTH_SHORT).show()
         }
-    }
 
-    // Диалог выбора услуги
-    private fun showServicePickerDialog() {
-        if (serviceItems.isEmpty()) {
-            Toast.makeText(this, getString(R.string.list_services_empty), Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        val serviceNames = serviceItems.map { it.first }.toTypedArray()
-
-        AlertDialog.Builder(this)
-            .setTitle(getString(R.string.select_service_receipt))
-            .setItems(serviceNames) { _, which ->
-                val serviceKey = serviceItems[which].second
-                pendingFileUri?.let { uri ->
-                    pendingFileName?.let { fileName ->
-                        saveReceiptWithService(uri, fileName, serviceKey)
-                    }
-                }
-                pendingFileUri = null
-                pendingFileName = null
-            }
-            .setNegativeButton(getString(R.string.cancel)) { _, _ ->
-                pendingFileUri = null
-                pendingFileName = null
-            }
-            .show()
     }
 
     // Сохранение с выбранной услугой

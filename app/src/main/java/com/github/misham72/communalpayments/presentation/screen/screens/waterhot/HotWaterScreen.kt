@@ -180,7 +180,8 @@ fun HotWaterScreen(viewModel: HotWaterViewModel, appContainer: AppContainer) {
             }
             // Результат (как у тебя - с датой)
             Card(
-                modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer
                 )
             ) {
