@@ -57,6 +57,7 @@ import com.github.misham72.communalpayments.domain.usecases.GetExpensesUseCase
 import com.github.misham72.communalpayments.domain.usecases.GetHistoryUseCase
 import com.github.misham72.communalpayments.domain.usecases.PdfHistoryUseCase
 import com.github.misham72.communalpayments.domain.usecases.SaveHistoryUseCase
+import com.github.misham72.communalpayments.presentation.screen.components.AskAiButton
 import com.github.misham72.communalpayments.presentation.screen.components.ServiceTab
 import com.github.misham72.communalpayments.presentation.screen.screens.analytics.AnalyticsScreen
 import com.github.misham72.communalpayments.presentation.screen.screens.history.HistoryScreen
@@ -266,6 +267,11 @@ fun ControlBetweenScreens(
                             }
                         )
                     }
+                    AskAiButton(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(3.dp)
+                    )
                     if (showBackupDialog) {
                         AlertDialog(
                             onDismissRequest = { showBackupDialog = false },

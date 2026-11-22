@@ -46,8 +46,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.di.AppContainer
 import com.github.misham72.communalpayments.di.ReceiptsViewModelFactory
-import com.github.misham72.communalpayments.domain.model.ValidationError
 import com.github.misham72.communalpayments.domain.constants.ServiceKeys
+import com.github.misham72.communalpayments.domain.model.ValidationError
 import com.github.misham72.communalpayments.presentation.screen.components.EditProviderDetailsDialog
 import com.github.misham72.communalpayments.presentation.screen.components.ProviderDetailsDialog
 import com.github.misham72.communalpayments.presentation.screen.components.ServiceTopBar
@@ -95,7 +95,7 @@ fun ElectricityScreen(viewModel: ElectricityViewModel, appContainer: AppContaine
                 onTxtExport = { viewModel.onShareClick(context) },
                 modifier = Modifier.height(28.dp),
                 onPdfExport = { viewModel.onPdfExport(context) },
-                onReceiptsClick = { showReceipts = true }
+                onReceiptsClick = { showReceipts = true },
             )
             if (uiState.customDate.isNotBlank()) {
                 Text(
@@ -306,4 +306,5 @@ fun ElectricityScreen(viewModel: ElectricityViewModel, appContainer: AppContaine
         }
     }
 }
+
 

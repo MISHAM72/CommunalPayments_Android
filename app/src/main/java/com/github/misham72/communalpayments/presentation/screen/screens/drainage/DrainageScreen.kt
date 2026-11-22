@@ -48,6 +48,7 @@ import com.github.misham72.communalpayments.R
 import com.github.misham72.communalpayments.di.AppContainer
 import com.github.misham72.communalpayments.di.ReceiptsViewModelFactory
 import com.github.misham72.communalpayments.domain.constants.ServiceKeys
+import com.github.misham72.communalpayments.presentation.screen.components.AskAiButton
 import com.github.misham72.communalpayments.presentation.screen.components.EditProviderDetailsDialog
 import com.github.misham72.communalpayments.presentation.screen.components.ProviderDetailsDialog
 import com.github.misham72.communalpayments.presentation.screen.components.ServiceTopBar
@@ -303,7 +304,6 @@ fun DrainageScreen(viewModel: DrainageViewModel, appContainer: AppContainer) {
             ) {
                 Text(stringResource(R.string.payment_details))
             }
-
             Spacer(modifier = Modifier.height(10.dp))
         }
 

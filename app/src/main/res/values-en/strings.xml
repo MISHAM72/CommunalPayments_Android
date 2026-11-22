@@ -348,6 +348,7 @@
     <string name="phone">Phone</string>
     <string name="email">e-mail</string>
     <string name="edit">Edit</string>
+    <string name="ask_ai">AI Assistant</string>
 
 </resources>
 

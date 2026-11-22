@@ -52,6 +52,7 @@ import com.github.misham72.communalpayments.domain.model.ValidationError
 import com.github.misham72.communalpayments.domain.model.metric.GasMode
 import com.github.misham72.communalpayments.domain.model.metric.GasNormData
 import com.github.misham72.communalpayments.domain.model.metric.MeterData
+import com.github.misham72.communalpayments.presentation.screen.components.AskAiButton
 import com.github.misham72.communalpayments.presentation.screen.components.EditProviderDetailsDialog
 import com.github.misham72.communalpayments.presentation.screen.components.ProviderDetailsDialog
 import com.github.misham72.communalpayments.presentation.screen.components.ServiceTopBar

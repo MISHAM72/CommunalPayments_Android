@@ -392,6 +392,8 @@
     <string name="email">e-mail</string>
     <string name="edit">Редактировать</string>
 
+    <string name="ask_ai">"🐬 Спросить DeepSeek</string>
+
 
 
 </resources>

@@ -37,13 +37,11 @@ fun ServiceTopBar(
     onTxtExport: () -> Unit,
     onReceiptsClick: () -> Unit,
     modifier: Modifier = Modifier,
-    onPdfExport: () -> Unit = {}
-
+    onPdfExport: () -> Unit,
 ) {
     val clockCuCuSound = rememberClockCuCuSoundPlayer()
     val changeListSound = rememberChangeListSoundPlayer()
     var showMenu by remember { mutableStateOf(false) }
-
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -53,7 +51,9 @@ fun ServiceTopBar(
         horizontalArrangement = androidx.compose.foundation.layout.Arrangement.SpaceBetween
     ) {
         Text(
-            text = title, fontSize = 20.sp, fontWeight = FontWeight.Bold
+            text = title,
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold
         )
         Row {
             IconButton(
@@ -79,7 +79,7 @@ fun ServiceTopBar(
             Box {
                 IconButton(// 1. Кнопка с иконкой "Поделиться"
                     onClick = {
-                        clockCuCuSound?.start()// звук
+                        clockCuCuSound?.start()
                         showMenu = true// открываем меню
                     }) {
                     Icon(// иконка шеринга
@@ -90,10 +90,10 @@ fun ServiceTopBar(
                     expanded = showMenu,
                     onDismissRequest = { showMenu = false },
                     modifier = Modifier.padding(horizontal = 30.dp)
-                )
-                {
+                ) {
                     DropdownMenuItem(// Пункт меню "Экспорт TXT"
-                        text = { Text(stringResource(R.string.export_txt)) }, onClick = {
+                        text = { Text(stringResource(R.string.export_txt)) },
+                        onClick = {
                             showMenu = false
                             onTxtExport()// ← вызывает переданный колбэк для TXT
                         })
